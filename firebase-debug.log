@@ -1,183 +1,20 @@
-[debug] [2025-01-07T00:53:56.371Z] ----------------------------------------------------------------------
-[debug] [2025-01-07T00:53:56.373Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dtran\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only auth
-[debug] [2025-01-07T00:53:56.374Z] CLI Version:   13.29.1
-[debug] [2025-01-07T00:53:56.374Z] Platform:      win32
-[debug] [2025-01-07T00:53:56.374Z] Node Version:  v22.11.0
-[debug] [2025-01-07T00:53:56.374Z] Time:          Mon Jan 06 2025 16:53:56 GMT-0800 (Pacific Standard Time)
-[debug] [2025-01-07T00:53:56.374Z] ----------------------------------------------------------------------
+[debug] [2025-01-07T02:03:33.269Z] ----------------------------------------------------------------------
+[debug] [2025-01-07T02:03:33.272Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dtran\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-01-07T02:03:33.272Z] CLI Version:   13.29.1
+[debug] [2025-01-07T02:03:33.272Z] Platform:      win32
+[debug] [2025-01-07T02:03:33.272Z] Node Version:  v22.11.0
+[debug] [2025-01-07T02:03:33.272Z] Time:          Mon Jan 06 2025 18:03:33 GMT-0800 (Pacific Standard Time)
+[debug] [2025-01-07T02:03:33.272Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2025-01-07T00:53:56.467Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-01-07T00:53:56.468Z] > authorizing via signed-in user (Stephen@StephenJLu.com)
+[debug] [2025-01-07T02:03:33.364Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-01-07T02:03:33.364Z] > authorizing via signed-in user (Stephen@StephenJLu.com)
 [info] i  emulators: Starting emulators: auth {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth"}}
-[debug] [2025-01-07T00:53:56.477Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T00:53:56.477Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T00:53:56.477Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}]},"metadata":{"message":"assigned listening specs for emulators"}}
-[debug] [2025-01-07T00:53:56.481Z] [hub] writing locator at C:\Users\dtran\AppData\Local\Temp\hub-striae-e9493.json
-[info] i  ui: downloading ui-v1.14.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.14.0.zip..."}}
-[debug] [2025-01-07T00:54:01.017Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip 
-[debug] [2025-01-07T00:54:01.266Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip 200
-[debug] [2025-01-07T00:54:01.266Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.14.0.zip [stream]
-[debug] [2025-01-07T00:54:01.761Z] Data is 3615311
-[debug] [2025-01-07T00:54:01.761Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.761Z] [unzip] Processing entry: client\
-[debug] [2025-01-07T00:54:01.761Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\
-[debug] [2025-01-07T00:54:01.761Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
-[debug] [2025-01-07T00:54:01.761Z] [unzip] Processing entry: client\favicon-16x16.png
-[debug] [2025-01-07T00:54:01.761Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.762Z] [unzip] Writing file: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\favicon-16x16.png
-[debug] [2025-01-07T00:54:01.762Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
-[debug] [2025-01-07T00:54:01.762Z] [unzip] Processing entry: client\safari-pinned-tab.svg
-[debug] [2025-01-07T00:54:01.762Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.762Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\safari-pinned-tab.svg
-[debug] [2025-01-07T00:54:01.765Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
-[debug] [2025-01-07T00:54:01.765Z] [unzip] Processing entry: client\favicon.ico
-[debug] [2025-01-07T00:54:01.765Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.765Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\favicon.ico
-[debug] [2025-01-07T00:54:01.766Z] [unzip] Entry: client/index.html (compressed_size=1363 bytes, uncompressed_size=3071 bytes)
-[debug] [2025-01-07T00:54:01.766Z] [unzip] Processing entry: client\index.html
-[debug] [2025-01-07T00:54:01.766Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.767Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\index.html
-[debug] [2025-01-07T00:54:01.767Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
-[debug] [2025-01-07T00:54:01.767Z] [unzip] Processing entry: client\android-chrome-192x192.png
-[debug] [2025-01-07T00:54:01.767Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.768Z] [unzip] Writing file: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\android-chrome-192x192.png
-[debug] [2025-01-07T00:54:01.768Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
-[debug] [2025-01-07T00:54:01.768Z] [unzip] Processing entry: client\apple-touch-icon.png
-[debug] [2025-01-07T00:54:01.768Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.768Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\apple-touch-icon.png
-[debug] [2025-01-07T00:54:01.770Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
-[debug] [2025-01-07T00:54:01.770Z] [unzip] Processing entry: client\android-chrome-512x512.png
-[debug] [2025-01-07T00:54:01.770Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.770Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\android-chrome-512x512.png
-[debug] [2025-01-07T00:54:01.771Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
-[debug] [2025-01-07T00:54:01.771Z] [unzip] Processing entry: client\manifest.json
-[debug] [2025-01-07T00:54:01.771Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.771Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\manifest.json
-[debug] [2025-01-07T00:54:01.772Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
-[debug] [2025-01-07T00:54:01.772Z] [unzip] Processing entry: client\robots.txt
-[debug] [2025-01-07T00:54:01.772Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.772Z] [unzip] Writing file: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\robots.txt
-[debug] [2025-01-07T00:54:01.773Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
-[debug] [2025-01-07T00:54:01.773Z] [unzip] Processing entry: client\mstile-150x150.png
-[debug] [2025-01-07T00:54:01.773Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.773Z] [unzip] Writing file: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\mstile-150x150.png
-[debug] [2025-01-07T00:54:01.773Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.773Z] [unzip] Processing entry: client\assets\
-[debug] [2025-01-07T00:54:01.773Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\
-[debug] [2025-01-07T00:54:01.774Z] [unzip] Entry: client/assets/index-ClZTY_JS.js.map (compressed_size=2328270 bytes, uncompressed_size=9947004 bytes)
-[debug] [2025-01-07T00:54:01.774Z] [unzip] Processing entry: client\assets\index-ClZTY_JS.js.map
-[debug] [2025-01-07T00:54:01.774Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets
-[debug] [2025-01-07T00:54:01.774Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-ClZTY_JS.js.map
-[debug] [2025-01-07T00:54:01.809Z] [unzip] Entry: client/assets/index-ClZTY_JS.js (compressed_size=567195 bytes, uncompressed_size=2035940 bytes)
-[debug] [2025-01-07T00:54:01.809Z] [unzip] Processing entry: client\assets\index-ClZTY_JS.js
-[debug] [2025-01-07T00:54:01.809Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets
-[debug] [2025-01-07T00:54:01.810Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-ClZTY_JS.js
-[debug] [2025-01-07T00:54:01.817Z] [unzip] Entry: client/assets/index-BdgySamB.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
-[debug] [2025-01-07T00:54:01.817Z] [unzip] Processing entry: client\assets\index-BdgySamB.css
-[debug] [2025-01-07T00:54:01.817Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets
-[debug] [2025-01-07T00:54:01.818Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\index-BdgySamB.css
-[debug] [2025-01-07T00:54:01.820Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.820Z] [unzip] Processing entry: client\assets\extensions\
-[debug] [2025-01-07T00:54:01.820Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions\
-[debug] [2025-01-07T00:54:01.821Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
-[debug] [2025-01-07T00:54:01.821Z] [unzip] Processing entry: client\assets\extensions\default-extension.png
-[debug] [2025-01-07T00:54:01.821Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions
-[debug] [2025-01-07T00:54:01.821Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\extensions\default-extension.png
-[debug] [2025-01-07T00:54:01.821Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.821Z] [unzip] Processing entry: client\assets\img\
-[debug] [2025-01-07T00:54:01.822Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\img\
-[debug] [2025-01-07T00:54:01.822Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
-[debug] [2025-01-07T00:54:01.822Z] [unzip] Processing entry: client\assets\img\database.png
-[debug] [2025-01-07T00:54:01.822Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\img
-[debug] [2025-01-07T00:54:01.822Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\img\database.png
-[debug] [2025-01-07T00:54:01.823Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.823Z] [unzip] Processing entry: client\assets\provider-icons\
-[debug] [2025-01-07T00:54:01.823Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\
-[debug] [2025-01-07T00:54:01.823Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
-[debug] [2025-01-07T00:54:01.823Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_saml.svg
-[debug] [2025-01-07T00:54:01.823Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.823Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_saml.svg
-[debug] [2025-01-07T00:54:01.824Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
-[debug] [2025-01-07T00:54:01.824Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_phone.svg
-[debug] [2025-01-07T00:54:01.824Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.824Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_phone.svg
-[debug] [2025-01-07T00:54:01.824Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
-[debug] [2025-01-07T00:54:01.824Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_facebook.svg
-[debug] [2025-01-07T00:54:01.824Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.824Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_facebook.svg
-[debug] [2025-01-07T00:54:01.825Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
-[debug] [2025-01-07T00:54:01.825Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_game_center.svg
-[debug] [2025-01-07T00:54:01.825Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.825Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_game_center.svg
-[debug] [2025-01-07T00:54:01.826Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
-[debug] [2025-01-07T00:54:01.826Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_apple.svg
-[debug] [2025-01-07T00:54:01.826Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.826Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_apple.svg
-[debug] [2025-01-07T00:54:01.826Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
-[debug] [2025-01-07T00:54:01.826Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_github.svg
-[debug] [2025-01-07T00:54:01.826Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.827Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_github.svg
-[debug] [2025-01-07T00:54:01.827Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
-[debug] [2025-01-07T00:54:01.827Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_mslive.svg
-[debug] [2025-01-07T00:54:01.827Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.827Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_mslive.svg
-[debug] [2025-01-07T00:54:01.828Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
-[debug] [2025-01-07T00:54:01.828Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_yahoo.svg
-[debug] [2025-01-07T00:54:01.828Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.828Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_yahoo.svg
-[debug] [2025-01-07T00:54:01.828Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
-[debug] [2025-01-07T00:54:01.828Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_twitter.svg
-[debug] [2025-01-07T00:54:01.828Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.829Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_twitter.svg
-[debug] [2025-01-07T00:54:01.829Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
-[debug] [2025-01-07T00:54:01.829Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_play_games.svg
-[debug] [2025-01-07T00:54:01.829Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.829Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_play_games.svg
-[debug] [2025-01-07T00:54:01.830Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
-[debug] [2025-01-07T00:54:01.830Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_email.svg
-[debug] [2025-01-07T00:54:01.830Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.830Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_email.svg
-[debug] [2025-01-07T00:54:01.830Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
-[debug] [2025-01-07T00:54:01.830Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_google.svg
-[debug] [2025-01-07T00:54:01.830Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.831Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_google.svg
-[debug] [2025-01-07T00:54:01.831Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
-[debug] [2025-01-07T00:54:01.831Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_oidc.svg
-[debug] [2025-01-07T00:54:01.831Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons
-[debug] [2025-01-07T00:54:01.831Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\assets\provider-icons\auth_service_oidc.svg
-[debug] [2025-01-07T00:54:01.832Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
-[debug] [2025-01-07T00:54:01.832Z] [unzip] Processing entry: client\browserconfig.xml
-[debug] [2025-01-07T00:54:01.832Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.832Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\browserconfig.xml
-[debug] [2025-01-07T00:54:01.832Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Processing entry: client\favicon-32x32.png
-[debug] [2025-01-07T00:54:01.833Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Writing file: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\client\favicon-32x32.png
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Processing entry: server\
-[debug] [2025-01-07T00:54:01.833Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Entry: server/server.mjs.map (compressed_size=296496 bytes, uncompressed_size=1355667 bytes)
-[debug] [2025-01-07T00:54:01.833Z] [unzip] Processing entry: server\server.mjs.map
-[debug] [2025-01-07T00:54:01.833Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server
-[debug] [2025-01-07T00:54:01.833Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\server.mjs.map
-[debug] [2025-01-07T00:54:01.838Z] [unzip] Entry: server/server.mjs (compressed_size=315701 bytes, uncompressed_size=1172682 bytes)
-[debug] [2025-01-07T00:54:01.838Z] [unzip] Processing entry: server\server.mjs
-[debug] [2025-01-07T00:54:01.838Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server
-[debug] [2025-01-07T00:54:01.839Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\server.mjs
-[debug] [2025-01-07T00:54:01.843Z] [unzip] Entry: server/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
-[debug] [2025-01-07T00:54:01.843Z] [unzip] Processing entry: server\assets\
-[debug] [2025-01-07T00:54:01.843Z] [unzip] mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\assets\
-[debug] [2025-01-07T00:54:01.843Z] [unzip] Entry: server/assets/multipart-parser-DGCUZdXu.mjs.map (compressed_size=4791 bytes, uncompressed_size=17918 bytes)
-[debug] [2025-01-07T00:54:01.843Z] [unzip] Processing entry: server\assets\multipart-parser-DGCUZdXu.mjs.map
-[debug] [2025-01-07T00:54:01.843Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\assets
-[debug] [2025-01-07T00:54:01.844Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\assets\multipart-parser-DGCUZdXu.mjs.map
-[debug] [2025-01-07T00:54:01.844Z] [unzip] Entry: server/assets/multipart-parser-DGCUZdXu.mjs (compressed_size=2621 bytes, uncompressed_size=10390 bytes)
-[debug] [2025-01-07T00:54:01.844Z] [unzip] Processing entry: server\assets\multipart-parser-DGCUZdXu.mjs
-[debug] [2025-01-07T00:54:01.844Z] [unzip] else mkdir: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\assets
-[debug] [2025-01-07T00:54:01.844Z] [unzip] deflating: C:\Users\dtran\.cache\firebase\emulators\ui-v1.14.0\server\assets\multipart-parser-DGCUZdXu.mjs
-[info] i  ui: Removing outdated emulator files: ui-v1.11.1 {"metadata":{"emulator":{"name":"ui"},"message":"Removing outdated emulator files: ui-v1.11.1"}}
-[info] i  ui: Removing outdated emulator files: ui-v1.11.1.zip {"metadata":{"emulator":{"name":"ui"},"message":"Removing outdated emulator files: ui-v1.11.1.zip"}}
-[debug] [2025-01-07T00:54:01.861Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[debug] [2025-01-07T02:03:33.373Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-01-07T02:03:33.374Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-01-07T02:03:33.374Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project striae-e9493. This may result in unexpected behavior. 
+[debug] [2025-01-07T02:03:33.378Z] [hub] writing locator at C:\Users\dtran\AppData\Local\Temp\hub-striae-e9493.json
+[debug] [2025-01-07T02:03:37.910Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
 [info] 
 ┌─────────────────────────────────────────────────────────────┐
 │ ✔  All emulators ready! It is now safe to connect your app. │

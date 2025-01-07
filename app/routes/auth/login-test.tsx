@@ -1,12 +1,11 @@
-import { useState } from 'react';
-
+import { useState, useRef } from 'react';
 import { 
     getAuth, 
     connectAuthEmulator, 
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword 
 } from 'firebase/auth';
-import { initializeApp, FirebaseError } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import styles from './login.module.css';
 
 const firebaseConfig = {
@@ -20,48 +19,39 @@ const firebaseConfig = {
 };
 
 const appAuth = initializeApp(firebaseConfig);
+const auth = getAuth(appAuth);
+
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  
-  const auth = getAuth(appAuth);
-
-  connectAuthEmulator(auth, 'http://localhost:9099');
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
+    const formData = new FormData(formRef.current!);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
     try {
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log(userCredential.user);
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log(userCredential.user);
+        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log(createCredential.user);
       }
       console.log('Success');
       
-    } catch (err: unknown) {
-      let errorMessage = 'An error occurred. Please try again.';
-      if (err instanceof FirebaseError) {
-        if (err.code === 'auth/wrong-password') {
-          errorMessage = 'Invalid password.';
-        } else if (err.code === 'auth/user-not-found') {
-          errorMessage = 'No account found with this email.';
-        } else if (err.code === 'auth/email-already-in-use') {
-          errorMessage = 'An account with this email already exists.';
-        }
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError('An error occurred. Please try again.');
     }
   };
 
@@ -70,21 +60,19 @@ export default function Login() {
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>{isLogin ? 'Login' : 'Register'}</h1>
         
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             className={styles.input}
             required
             disabled={isLoading}
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             className={styles.input}
             required
             minLength={6}
