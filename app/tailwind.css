@@ -4,11 +4,22 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-black;
+  @apply text-gray-900;
   @apply bg-[url('/images/striae.jpg')] bg-cover bg-center bg-no-repeat bg-fixed;
   @apply min-h-screen;
-  @apply bg-opacity-50 bg-blend-multiply;
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;    
+  @apply bg-opacity-5 bg-blend-overlay;
+  color-scheme: light;
+}
+
+/* Force light mode */
+:root {
+  color-scheme: light;
+}
+
+/* Override dark mode */
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: light;
   }
 }
