@@ -1,9 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
     getAuth, 
     connectAuthEmulator, 
     signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword 
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    User
 } from 'firebase/auth';
 import { initializeApp } from "firebase/app";
 import styles from './login.module.css';
@@ -27,8 +29,26 @@ connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 export default function Login() {
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);  
+  const [user, setUser] = useState<User | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+   useEffect(() => {
+    const monitorAuthState = async () => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("Logged in user:", user.email);
+          setUser(user);
+          // navigate('/dashboard');
+        } else {
+          console.log("No user logged in");
+          setUser(null);
+        }
+      });
+    };
+
+    monitorAuthState();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +74,23 @@ export default function Login() {
       setError('An error occurred. Please try again.');
     }
   };
+
+  // If user is already logged in, show a message or redirect
+  if (user) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.formWrapper}>
+          <h1 className={styles.title}>Welcome {user.email}</h1>
+          <button 
+            onClick={() => auth.signOut()} 
+            className={styles.button}
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
