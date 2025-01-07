@@ -1,67 +1,16 @@
-[debug] [2025-01-07T02:03:33.269Z] ----------------------------------------------------------------------
-[debug] [2025-01-07T02:03:33.272Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dtran\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
-[debug] [2025-01-07T02:03:33.272Z] CLI Version:   13.29.1
-[debug] [2025-01-07T02:03:33.272Z] Platform:      win32
-[debug] [2025-01-07T02:03:33.272Z] Node Version:  v22.11.0
-[debug] [2025-01-07T02:03:33.272Z] Time:          Mon Jan 06 2025 18:03:33 GMT-0800 (Pacific Standard Time)
-[debug] [2025-01-07T02:03:33.272Z] ----------------------------------------------------------------------
+[debug] [2025-01-07T18:27:03.272Z] ----------------------------------------------------------------------
+[debug] [2025-01-07T18:27:03.274Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dtran\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only auth
+[debug] [2025-01-07T18:27:03.274Z] CLI Version:   13.29.1
+[debug] [2025-01-07T18:27:03.274Z] Platform:      win32
+[debug] [2025-01-07T18:27:03.274Z] Node Version:  v22.11.0
+[debug] [2025-01-07T18:27:03.275Z] Time:          Tue Jan 07 2025 10:27:03 GMT-0800 (Pacific Standard Time)
+[debug] [2025-01-07T18:27:03.275Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2025-01-07T02:03:33.364Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-01-07T02:03:33.364Z] > authorizing via signed-in user (Stephen@StephenJLu.com)
+[debug] [2025-01-07T18:27:03.367Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-01-07T18:27:03.367Z] > authorizing via signed-in user (Stephen@StephenJLu.com)
 [info] i  emulators: Starting emulators: auth {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth"}}
-[debug] [2025-01-07T02:03:33.373Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T02:03:33.374Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T02:03:33.374Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-01-07T18:27:03.376Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-01-07T18:27:03.376Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-01-07T18:27:03.376Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}]},"metadata":{"message":"assigned listening specs for emulators"}}
 [warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project striae-e9493. This may result in unexpected behavior. 
-[debug] [2025-01-07T02:03:33.378Z] [hub] writing locator at C:\Users\dtran\AppData\Local\Temp\hub-striae-e9493.json
-[debug] [2025-01-07T02:03:37.910Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
-[info] 
-┌─────────────────────────────────────────────────────────────┐
-│ ✔  All emulators ready! It is now safe to connect your app. │
-│ i  View Emulator UI at http://127.0.0.1:4000/               │
-└─────────────────────────────────────────────────────────────┘
-
-┌────────────────┬────────────────┬────────────────────────────┐
-│ Emulator       │ Host:Port      │ View in Emulator UI        │
-├────────────────┼────────────────┼────────────────────────────┤
-│ Authentication │ 127.0.0.1:9099 │ http://127.0.0.1:4000/auth │
-└────────────────┴────────────────┴────────────────────────────┘
-  Emulator Hub running at 127.0.0.1:4400
-  Other reserved ports: 4500
-
-Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
- 
-[debug] [2025-01-07T03:04:06.397Z] Received signal SIGHUP 1
-[debug] [2025-01-07T05:05:53.686Z] ----------------------------------------------------------------------
-[debug] [2025-01-07T05:05:53.689Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\dtran\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
-[debug] [2025-01-07T05:05:53.689Z] CLI Version:   13.29.1
-[debug] [2025-01-07T05:05:53.689Z] Platform:      win32
-[debug] [2025-01-07T05:05:53.689Z] Node Version:  v22.11.0
-[debug] [2025-01-07T05:05:53.690Z] Time:          Mon Jan 06 2025 21:05:53 GMT-0800 (Pacific Standard Time)
-[debug] [2025-01-07T05:05:53.690Z] ----------------------------------------------------------------------
-[debug] 
-[debug] [2025-01-07T05:05:53.815Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-01-07T05:05:53.815Z] > authorizing via signed-in user (Stephen@StephenJLu.com)
-[info] i  emulators: Starting emulators: auth {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth"}}
-[debug] [2025-01-07T05:05:53.824Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T05:05:53.824Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
-[debug] [2025-01-07T05:05:53.825Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}]},"metadata":{"message":"assigned listening specs for emulators"}}
-[warn] !  emulators: It seems that you are running multiple instances of the emulator suite for project striae-e9493. This may result in unexpected behavior. 
-[debug] [2025-01-07T05:05:53.829Z] [hub] writing locator at C:\Users\dtran\AppData\Local\Temp\hub-striae-e9493.json
-[debug] [2025-01-07T05:05:58.430Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
-[info] 
-┌─────────────────────────────────────────────────────────────┐
-│ ✔  All emulators ready! It is now safe to connect your app. │
-│ i  View Emulator UI at http://127.0.0.1:4000/               │
-└─────────────────────────────────────────────────────────────┘
-
-┌────────────────┬────────────────┬────────────────────────────┐
-│ Emulator       │ Host:Port      │ View in Emulator UI        │
-├────────────────┼────────────────┼────────────────────────────┤
-│ Authentication │ 127.0.0.1:9099 │ http://127.0.0.1:4000/auth │
-└────────────────┴────────────────┴────────────────────────────┘
-  Emulator Hub running at 127.0.0.1:4400
-  Other reserved ports: 4500
-
-Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
- 
+[debug] [2025-01-07T18:27:03.381Z] [hub] writing locator at C:\Users\dtran\AppData\Local\Temp\hub-striae-e9493.json
