@@ -5,8 +5,10 @@
 html,
 body {
   @apply bg-white dark:bg-gray-950;
-
+  @apply bg-[url('/images/striae.jpg')] bg-cover bg-center bg-no-repeat bg-fixed;
+  @apply min-h-screen;
+  @apply bg-opacity-50 bg-blend-multiply;
   @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+    color-scheme: dark;    
   }
 }
