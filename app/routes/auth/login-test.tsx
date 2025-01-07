@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from '@remix-run/react';
 import { 
     getAuth, 
     connectAuthEmulator, 
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
-    User
+    User    
 } from 'firebase/auth';
-import { initializeApp } from "firebase/app";
+import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
 const firebaseConfig = {
@@ -27,6 +28,7 @@ connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 
 export default function Login() {
+  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);  
@@ -39,7 +41,7 @@ export default function Login() {
         if (user) {
           console.log("Logged in user:", user.email);
           setUser(user);
-          // navigate('/dashboard');
+          navigate('/'); // Redirect after successful auth
         } else {
           console.log("No user logged in");
           setUser(null);
@@ -48,7 +50,7 @@ export default function Login() {
     };
 
     monitorAuthState();
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,9 +71,31 @@ export default function Login() {
       }
       console.log('Success');
       
-    } catch (error) {
-      console.error(error);
-      setError('An error occurred. Please try again.');
+    } catch (err: unknown) {
+      let errorMessage = 'An error occurred. Please try again.';
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/wrong-password') {
+          errorMessage = 'Invalid password.';
+        } else if (err.code === 'auth/user-not-found') {
+          errorMessage = 'No account found with this email.';
+        } else if (err.code === 'auth/email-already-in-use') {
+          errorMessage = 'An account with this email already exists.';
+        }
+      }
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add proper sign out handling
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      setUser(null);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Sign out error:', err);
     }
   };
 
@@ -82,7 +106,7 @@ export default function Login() {
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Welcome {user.email}</h1>
           <button 
-            onClick={() => auth.signOut()} 
+            onClick={handleSignOut} 
             className={styles.button}
           >
             Sign Out
@@ -142,6 +166,5 @@ export default function Login() {
   );
 }
 
-//navigate('/dashboard'); // Redirect after successful auth
-//import { useNavigate } from '@remix-run/react';
-//const navigate = useNavigate();
+
+
