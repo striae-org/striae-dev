@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from '@remix-run/react';
-import { 
-    getAuth, 
-    connectAuthEmulator, 
+import {
+    //connectAuthEmulator, 
+    getAuth,      
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
@@ -25,7 +25,7 @@ const appAuth = initializeApp(firebaseConfig);
 const auth = getAuth(appAuth);
 
 // Connect to the Firebase Auth emulator if running locally
-connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 
 export default function Login() {
