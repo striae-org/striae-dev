@@ -111,3 +111,36 @@
   margin: 0;
   font-family: inherit;
 }
+
+.authToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+.authToggleButton, .emailLinkButton {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.authToggleButton:hover, .emailLinkButton:hover {
+  background: #f8fafc;
+}
+
+.active {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.divider {
+  color: #64748b;
+  font-size: 0.875rem;
+}

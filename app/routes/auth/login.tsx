@@ -6,6 +6,9 @@ import {
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
+    sendSignInLinkToEmail,
+    signInWithEmailLink,
+    isSignInWithEmailLink,
     User    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
@@ -21,6 +24,11 @@ const firebaseConfig = {
   measurementId: "G-PE7BBQK1W2"
 };
 
+const actionCodeSettings = {
+  url: 'https://www.allyforensics.com', // Update with your domain in production
+  handleCodeInApp: true,
+};
+
 const appAuth = initializeApp(firebaseConfig);
 const auth = getAuth(appAuth);
 
@@ -34,7 +42,8 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);  
   const [user, setUser] = useState<User | null>(null);
-  const [passwordStrength, setPasswordStrength] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState('');  
+  const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
   const formRef = useRef<HTMLFormElement>(null);
 
   const checkPasswordStrength = (password: string): boolean => {
@@ -68,9 +77,41 @@ export default function Login() {
         }
       });
     };
+    
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      let email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+        email = window.prompt('Please provide your email for confirmation');
+      }
+      if (email) {
+        setIsLoading(true);
+        signInWithEmailLink(auth, email, window.location.href)
+          .then(() => {
+            window.localStorage.removeItem('emailForSignIn');
+            navigate('/');
+          })
+          .catch((error) => setError(error.message))
+          .finally(() => setIsLoading(false));
+      }
+    }
 
     monitorAuthState();
   }, [navigate]);
+  
+  const handleEmailLink = async (email: string) => {
+    try {
+      setIsLoading(true);
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+      setError('Check your email for the login link!');
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        setError(err.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,17 +140,17 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);        
         console.log(userCredential.user);
       } else {
-        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const createCredential = await createUserWithEmailAndPassword(auth, email, password);       
         console.log(createCredential.user);
       }
       console.log('Success');
       
     } catch (err: unknown) {
       let errorMessage = 'An error occurred. Please try again.';
-      if (err instanceof FirebaseError) {
+      if (err instanceof FirebaseError) {        
         if (err.code === 'auth/wrong-password') {
           errorMessage = 'Invalid password.';
         } else if (err.code === 'auth/user-not-found') {
@@ -124,10 +165,38 @@ export default function Login() {
     }
   };
 
+  const EmailLinkForm = () => {
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get('email') as string;
+      handleEmailLink(email);
+    }} className={styles.form}>
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        className={styles.input}
+        required
+        disabled={isLoading}
+      />
+      {error && <p className={styles.error}>{error}</p>}
+      <button 
+        type="submit" 
+        className={styles.button}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Sending...' : 'Send Login Link'}
+      </button>
+    </form>
+  );
+};
+
   // Add proper sign out handling
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
+      await auth.signOut();      
       setUser(null);
       setIsLoading(false);
     } catch (err) {
@@ -156,9 +225,27 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
+
+        <div className={styles.authToggle}>
+  <button 
+    onClick={() => setAuthMethod('password')}
+    className={`${styles.authToggleButton} ${authMethod === 'password' ? styles.active : ''}`}
+  >
+    Sign in with Password
+  </button>
+  <span className={styles.divider}>or</span>
+  <button 
+    onClick={() => setAuthMethod('emailLink')}
+    className={`${styles.emailLinkButton} ${authMethod === 'emailLink' ? styles.active : ''}`}
+  >
+    Get a Code Instead
+  </button>
+</div>
         
-        <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
-          <input
+        {authMethod === 'password' ? (
+          <>
+            <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
+              <input
             type="email"
             name="email"
             placeholder="Email"
@@ -204,9 +291,8 @@ export default function Login() {
             {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
-
-        <p className={styles.toggle}>
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <p className={styles.toggle}>
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button 
             onClick={() => setIsLogin(!isLogin)}
             className={styles.toggleButton}
@@ -215,7 +301,11 @@ export default function Login() {
             {isLogin ? 'Register' : 'Login'}
           </button>
         </p>
+          </>
+        ) : (
+          <EmailLinkForm />
+        )}
       </div>
     </div>
-  );
+);
 }
