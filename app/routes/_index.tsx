@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/cloudflare";
-import Login from "./login-test";
+import Login from "./auth/login-test";
 
 export const meta: MetaFunction = () => {
   return [

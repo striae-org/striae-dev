@@ -43,7 +43,8 @@ export default function Login() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log(userCredential.user);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log(userCredential.user);
       }
       console.log('Success');
       
