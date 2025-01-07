@@ -32,7 +32,7 @@ export async function verifyTurnstileToken(token: string): Promise<TurnstileResp
       throw new Error(`Expected JSON response but received: ${contentType}`);
     }
 
-    const verificationResult = await verificationResponse.json();
+    const verificationResult = await verificationResponse.json() as TurnstileResponse;
     return verificationResult;
   } catch (error) {
     console.error('Error verifying Turnstile token:', error);

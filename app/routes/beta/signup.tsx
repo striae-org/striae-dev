@@ -73,22 +73,36 @@ export async function action({ request, context }: { request: Request; context: 
       body: JSON.stringify({
         "from": {
           "name": "Striae Beta Signup",
-          "email": "no-reply@allyforensics.com"
+          "email": "no-reply@stephenjlu.com"
         },
         "to": [
           {
-            "name": "Striae Admin",
+            "name": "Striae Beta Signup",
             "email": "beta@allyforensics.com"
           }
         ],
         "subject": "New Beta Signup Request",
-        "HTMLContent": `
+        "ContentType": "HTML",
+        "HTMLContent": `<html><body>
           <h2>New Beta Signup Request</h2>
           <p><strong>Name:</strong> ${firstName}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
           <p><strong>Beta Feedback Agreement:</strong> ${betaFeedback}</p>
-        `,
+        </body></html>`,
+        "PlainContent": `New Beta Signup Request:
+
+Name: ${firstName}
+Email: ${email}
+Email Consent: ${emailConsent}
+Beta Feedback Agreement: ${betaFeedback}`,
+        "Tags": [
+          "beta-signup"          
+        ],
+        "Headers": {
+          "X-Mailer": "StephenJLu.com",
+          "X-Test": "test header"
+        }
       }),
     });
 
@@ -146,7 +160,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>I agree to receive emails from allyforensics.com</span>
+            <span>  I agree to receive emails from allyforensics.com</span>
           </label>
 
           <label className={styles.toggle}>
@@ -156,7 +170,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>I agree to provide feedback during beta testing in exchange for free access upon release</span>
+            <span>  I agree to provide feedback during beta testing in exchange for free access upon release</span>
           </label>
 
           <Turnstile
@@ -169,14 +183,14 @@ export const BetaSignup = () => {
             className={styles.button}
             disabled={sending}
           >
-            {sending ? 'Submitting...' : 'Join Beta'}
+            {sending ? 'Submitting...' : 'Request Beta Access'}
           </button>
         </Form>
         
         {actionData?.success && (
           <div className={styles.success}>
             <h2>Thank you for signing up!</h2>
-            <p>We&apos;ll be in touch soon with next steps.</p>
+            <p>We&apos;ll be in touch 2Q 2025.</p>
           </div>
         )}
       </div>
