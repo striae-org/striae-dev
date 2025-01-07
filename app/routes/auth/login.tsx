@@ -25,7 +25,7 @@ const firebaseConfig = {
 };
 
 const actionCodeSettings = {
-  url: 'https://www.allyforensics.com', // Update with your domain in production
+  url: 'https://allyforensics.com', // Update with your domain in production
   handleCodeInApp: true,
 };
 
