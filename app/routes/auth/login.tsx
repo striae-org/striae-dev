@@ -201,14 +201,14 @@ export default function Login() {
     } catch (err: unknown) {
       let errorMessage = 'An error occurred. Please try again.';
       if (err instanceof FirebaseError) {        
-        if (err.code === 'auth/wrong-password') {
+        if (err.code === 'auth/invalid-password') {
           errorMessage = 'Invalid password.';
         } else if (err.code === 'auth/user-not-found') {
           errorMessage = 'No account found with this email.';
-        } else if (err.code === 'auth/email-already-in-use') {
+        } else if (err.code === 'auth/email-already-exists') {
           errorMessage = 'An account with this email already exists.';
-        } else if (err.code === 'auth/admin-restricted-operation') {
-      errorMessage = 'New registrations are currently disabled';
+        } else if (err.code === 'auth/operation-not-allowed') {
+          errorMessage = 'New registrations are currently disabled';
         }        
       }
       setError(errorMessage);
