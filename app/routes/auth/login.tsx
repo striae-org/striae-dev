@@ -9,13 +9,13 @@ import {
     sendSignInLinkToEmail,
     signInWithEmailLink,
     isSignInWithEmailLink,
-    User    
+    sendPasswordResetEmail,
+    User,    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
-const firebaseConfig = {
-  name: "Striae",
+const firebaseConfig = {  
   apiKey: "AIzaSyCY6nHqxZ4OrB6coHxE12MSkYERQSVXU0E",
   authDomain: "striae.allyforensics.com",
   projectId: "striae-e9493",
@@ -26,7 +26,7 @@ const firebaseConfig = {
 };
 
 const actionCodeSettings = {
-  url: 'https://allyforensics.com', // Update with your domain in production
+  url: 'https://striae.allyforensics.com', // Update with your domain in production
   handleCodeInApp: true,
 };
 
@@ -45,7 +45,56 @@ export default function Login() {
   const [user, setUser] = useState<User | null>(null);
   const [passwordStrength, setPasswordStrength] = useState('');  
   const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
+  const [isResetting, setIsResetting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const ResetPasswordForm = () => {
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = formRef.current?.email.value;
+    if (email) {
+      setIsLoading(true);
+      try {
+        await sendPasswordResetEmail(auth, email);
+        setError('Password reset email sent!');
+        // Allow user to see success message before returning to login
+        setTimeout(() => setIsResetting(false), 2000);
+      } catch (err) {
+        if (err instanceof FirebaseError) {
+          setError(err.message);
+        } else {
+          setError('Failed to send reset email');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  return (
+    <form ref={formRef} onSubmit={handleReset} className={styles.form}>
+      <h2>Reset Password</h2>
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        className={styles.input}
+        required
+      />
+      {error && <p className={styles.error}>{error}</p>}
+      <button type="submit" className={styles.button} disabled={isLoading}>
+        {isLoading ? 'Sending...' : 'Send Reset Link'}
+      </button>
+      <button 
+        type="button" 
+        onClick={() => setIsResetting(false)}
+        className={styles.secondaryButton}
+      >
+        Back to Login
+      </button>
+    </form>
+  );
+};
 
   const checkPasswordStrength = (password: string): boolean => {
     const hasMinLength = password.length >= 10;
@@ -225,88 +274,104 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
-
-        <div className={styles.authToggle}>
-  <button 
-    onClick={() => setAuthMethod('password')}
-    className={`${styles.authToggleButton} ${authMethod === 'password' ? styles.active : ''}`}
-  >
-    Sign in with Password
-  </button>
-  <span className={styles.divider}>or</span>
-  <button 
-    onClick={() => setAuthMethod('emailLink')}
-    className={`${styles.emailLinkButton} ${authMethod === 'emailLink' ? styles.active : ''}`}
-  >
-    Get a Code Instead
-  </button>
-</div>
-        
-        {authMethod === 'password' ? (
-          <>
-            <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
-              <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className={styles.input}
-            required
-            disabled={isLoading}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className={styles.input}
-            required
-            disabled={isLoading}
-            onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
-          />
-          
-          {!isLogin && (
-            <>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                className={styles.input}
-                required
-                disabled={isLoading}
-              />
-              {passwordStrength && (
-                <div className={styles.passwordStrength}>
-                  <pre>{passwordStrength}</pre>
-                </div>
-              )}
-            </>
-          )}
-          
-          {error && <p className={styles.error}>{error}</p>}
-          
-          <button 
-            type="submit" 
-            className={styles.button}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
-          </button>
-        </form>
-            <p className={styles.toggle}>
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button 
-            onClick={() => setIsLogin(!isLogin)}
-            className={styles.toggleButton}
-            disabled={isLoading}
-          >
-            {isLogin ? 'Register' : 'Login'}
-          </button>
-        </p>
-          </>
+        {isResetting ? (
+          <ResetPasswordForm />
         ) : (
-          <EmailLinkForm />
+          <>
+            <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
+
+            <div className={styles.authToggle}>
+              <button 
+                onClick={() => setAuthMethod('password')}
+                className={`${styles.authToggleButton} ${authMethod === 'password' ? styles.active : ''}`}
+              >
+                Sign in with Password
+              </button>
+              <span className={styles.divider}>or</span>
+              <button 
+                onClick={() => setAuthMethod('emailLink')}
+                className={`${styles.emailLinkButton} ${authMethod === 'emailLink' ? styles.active : ''}`}
+              >
+                Get a Code Instead
+              </button>
+            </div>
+            
+            {authMethod === 'password' ? (
+              <>
+                <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    className={styles.input}
+                    required
+                    disabled={isLoading}
+                  />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    className={styles.input}
+                    required
+                    disabled={isLoading}
+                    onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
+                  />
+                  
+                  {!isLogin && (
+                    <>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        className={styles.input}
+                        required
+                        disabled={isLoading}
+                      />
+                      {passwordStrength && (
+                        <div className={styles.passwordStrength}>
+                          <pre>{passwordStrength}</pre>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {isLogin && (
+                    <button 
+                      type="button"
+                      onClick={() => setIsResetting(true)}
+                      className={styles.resetLink}
+                    >
+                    Forgot Password?
+                    </button>
+                  )}
+                  
+                  {error && <p className={styles.error}>{error}</p>}
+                  
+                  <button 
+                    type="submit" 
+                    className={styles.button}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
+                  </button>
+                </form>
+                <p className={styles.toggle}>
+                  {isLogin ? "Don't have an account? " : "Already have an account? "}
+                  <button 
+                    onClick={() => setIsLogin(!isLogin)}
+                    className={styles.toggleButton}
+                    disabled={isLoading}
+                  >
+                    {isLogin ? 'Register' : 'Login'}
+                  </button>
+                </p>
+              </>
+            ) : (
+              <EmailLinkForm />
+            )}
+          </>
         )}
       </div>
     </div>
-);
+  );
 }
