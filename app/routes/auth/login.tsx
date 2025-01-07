@@ -36,6 +36,20 @@ const auth = getAuth(appAuth);
 //Connect to the Firebase Auth emulator if running locally
 //connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
+const ERROR_MESSAGES = {
+  INVALID_PASSWORD: 'Invalid password',
+  USER_NOT_FOUND: 'No account found with this email',
+  EMAIL_IN_USE: 'An account with this email already exists',
+  REGISTRATION_DISABLED: 'New registrations are currently disabled',
+  PASSWORDS_MISMATCH: 'Passwords do not match',
+  WEAK_PASSWORD: 'Password does not meet strength requirements',
+  RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
+  RESET_EMAIL_FAILED: 'Failed to send reset email',
+  LOGIN_LINK_SENT: 'Check your email for the login link!',
+  GENERAL_ERROR: 'New registrations are currently disabled',
+  EMAIL_REQUIRED: 'Please provide your email for confirmation'
+};
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -55,17 +69,22 @@ export default function Login() {
     if (email) {
       setIsLoading(true);
       try {
-        await sendPasswordResetEmail(auth, email);
-        setError('Password reset email sent!');
-        // Allow user to see success message before returning to login
-        setTimeout(() => setIsResetting(false), 2000);
-      } catch (err) {
-        if (err instanceof FirebaseError) {
-          setError(err.message);
-        } else {
-          setError('Failed to send reset email');
-        }
-      } finally {
+  await sendPasswordResetEmail(auth, email);
+  setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
+  setTimeout(() => setIsResetting(false), 2000);
+} catch (err) {
+  if (err instanceof FirebaseError) {
+    switch (err.code) {
+      case 'auth/user-not-found':
+        setError(ERROR_MESSAGES.USER_NOT_FOUND);
+        break;
+      default:
+        setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
+    }
+  } else {
+    setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
+  }
+} finally {
         setIsLoading(false);
       }
     }
@@ -131,8 +150,8 @@ export default function Login() {
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
-        email = window.prompt('Please provide your email for confirmation');
-      }
+  email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+}
       if (email) {
         setIsLoading(true);
         signInWithEmailLink(auth, email, window.location.href)
@@ -150,15 +169,22 @@ export default function Login() {
   
   const handleEmailLink = async (email: string) => {
     try {
-      setIsLoading(true);
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', email);
-      setError('Check your email for the login link!');
-    } catch (err) {
-      if (err instanceof FirebaseError) {
-        setError(err.message);
-      }
-    } finally {
+  await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+  window.localStorage.setItem('emailForSignIn', email);
+  setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
+} catch (err) {
+  if (err instanceof FirebaseError) {
+    switch (err.code) {
+      case 'auth/invalid-email':
+        setError(ERROR_MESSAGES.USER_NOT_FOUND);
+        break;
+      default:
+        setError(ERROR_MESSAGES.GENERAL_ERROR);
+    }
+  } else {
+    setError(ERROR_MESSAGES.GENERAL_ERROR);
+  }
+} finally {
       setIsLoading(false);
     }
   };
@@ -199,28 +225,28 @@ export default function Login() {
       console.log('Success');
       
     } catch (err: unknown) {
-  let errorMessage = 'An error occurred. Please try again.';
   if (err instanceof FirebaseError) {        
     switch (err.code) {
       case 'auth/wrong-password':
-        errorMessage = 'Invalid password.';
+        setError(ERROR_MESSAGES.INVALID_PASSWORD);
         break;
       case 'auth/user-not-found':
-        errorMessage = 'No account found with this email.';
+        setError(ERROR_MESSAGES.USER_NOT_FOUND);
         break;
-      case 'auth/email-already-in-use':  
-        errorMessage = 'An account with this email already exists.';
+      case 'auth/email-already-in-use':
+        setError(ERROR_MESSAGES.EMAIL_IN_USE);
         break;
-      case 'auth/operation-not-allowed':  
-        errorMessage = 'New registrations are currently disabled';
+      case 'auth/operation-not-allowed':
+      case 'auth/admin-restricted-operation':
+        setError(ERROR_MESSAGES.REGISTRATION_DISABLED);
         break;
-      case 'auth/admin-restricted-operation': 
-        errorMessage = 'New registrations are currently disabled';
-        break;
+      default:
+        setError(ERROR_MESSAGES.GENERAL_ERROR);
     }
+  } else {
+    setError(ERROR_MESSAGES.GENERAL_ERROR);
   }
-  setError(errorMessage);
-    } finally {
+} finally {
       setIsLoading(false);
     }
   };
