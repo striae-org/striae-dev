@@ -1,0 +1,121 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 2rem 0 1.5rem;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section a {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.section a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.section ol {
+  counter-reset: item;
+  padding-left: 0;
+}
+
+.section ol > li {
+  display: block;
+  margin: 2rem 0;
+  padding-left: 2.5rem;
+  position: relative;
+}
+
+.section ol > li:before {
+  content: counter(item) ".";
+  counter-increment: item;
+  position: absolute;
+  left: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.section ol > li p {
+  margin: 1rem 0;
+}
+
+.section ol > li strong {
+  font-weight: 600;
+  color: #333;
+}
+
+.section ol > li > ol {
+  counter-reset: none;
+  list-style-type: lower-alpha;
+  padding-left: 2rem;
+  margin: 1rem 0;
+}
+
+.section ol > li > ol > li {
+  display: list-item;
+  counter-increment: none;
+  padding-left: 0;
+  margin: 0.75rem 0;
+}
+
+.section ol > li > ol > li::before {
+  display: none;
+}
+
+.section ol > li > ol > li p {
+  margin: 0.5rem 0;
+}
+
+.copyright {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.copyright p {
+  margin: 0.5rem 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.lastUpdated {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 1rem 0 2rem;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+  
+  .section ol > li {
+    padding-left: 2rem;
+  }
+}
