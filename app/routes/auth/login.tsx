@@ -69,26 +69,26 @@ export default function Login() {
     if (email) {
       setIsLoading(true);
       try {
-  await sendPasswordResetEmail(auth, email);
-  setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
-  setTimeout(() => setIsResetting(false), 2000);
-} catch (err) {
-  if (err instanceof FirebaseError) {
-    switch (err.code) {
-      case 'auth/user-not-found':
-        setError(ERROR_MESSAGES.USER_NOT_FOUND);
-        break;
-      default:
+      await sendPasswordResetEmail(auth, email);
+      setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
+      setTimeout(() => setIsResetting(false), 2000);
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case 'auth/user-not-found':
+            setError(ERROR_MESSAGES.USER_NOT_FOUND);
+            break;
+          default:
+            setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
+        }
+      } else {
         setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
-    }
-  } else {
-    setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
-  }
-} finally {
-        setIsLoading(false);
       }
-    }
-  };
+    } finally {
+            setIsLoading(false);
+          }
+        }
+      };
 
   return (
     <form ref={formRef} onSubmit={handleReset} className={styles.form}>
@@ -115,7 +115,7 @@ export default function Login() {
   );
 };
 
-  const checkPasswordStrength = (password: string): boolean => {
+    const checkPasswordStrength = (password: string): boolean => {
     const hasMinLength = password.length >= 10;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
@@ -150,8 +150,8 @@ export default function Login() {
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
-  email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
-}
+      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+      }
       if (email) {
         setIsLoading(true);
         signInWithEmailLink(auth, email, window.location.href)
@@ -172,19 +172,19 @@ export default function Login() {
   await sendSignInLinkToEmail(auth, email, actionCodeSettings);
   window.localStorage.setItem('emailForSignIn', email);
   setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
-} catch (err) {
-  if (err instanceof FirebaseError) {
-    switch (err.code) {
-      case 'auth/invalid-email':
-        setError(ERROR_MESSAGES.USER_NOT_FOUND);
-        break;
-      default:
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case 'auth/invalid-email':
+            setError(ERROR_MESSAGES.USER_NOT_FOUND);
+            break;
+          default:
+            setError(ERROR_MESSAGES.GENERAL_ERROR);
+        }
+      } else {
         setError(ERROR_MESSAGES.GENERAL_ERROR);
-    }
-  } else {
-    setError(ERROR_MESSAGES.GENERAL_ERROR);
-  }
-} finally {
+      }
+    } finally {
       setIsLoading(false);
     }
   };
