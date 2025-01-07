@@ -99,3 +99,15 @@
   color: #999;
   cursor: not-allowed;
 }
+
+.passwordStrength {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.5rem;
+  white-space: pre-line;
+}
+
+.passwordStrength pre {
+  margin: 0;
+  font-family: inherit;
+}

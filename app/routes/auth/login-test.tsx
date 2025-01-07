@@ -24,6 +24,7 @@ const firebaseConfig = {
 const appAuth = initializeApp(firebaseConfig);
 const auth = getAuth(appAuth);
 
+// Connect to the Firebase Auth emulator if running locally
 connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 
@@ -33,7 +34,26 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);  
   const [user, setUser] = useState<User | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+
+  const checkPasswordStrength = (password: string): boolean => {
+    const hasMinLength = password.length >= 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    setPasswordStrength(
+      `Password must contain:
+      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
+      ${!hasUpperCase ? '❌' : '✅'} Capital letters
+      ${!hasNumber ? '❌' : '✅'} Numbers
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+    );
+    
+    return isStrong;
+  };
 
    useEffect(() => {
     const monitorAuthState = async () => {
@@ -60,6 +80,22 @@ export default function Login() {
     const formData = new FormData(formRef.current!);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!isLogin) {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!checkPasswordStrength(password)) {
+        setError('Password does not meet strength requirements');
+        setIsLoading(false);
+        return;
+      }
+    }
+
 
     try {
       if (isLogin) {
@@ -119,7 +155,7 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>{isLogin ? 'Login' : 'Register'}</h1>
+        <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
         
         <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
           <input
@@ -136,9 +172,27 @@ export default function Login() {
             placeholder="Password"
             className={styles.input}
             required
-            minLength={6}
             disabled={isLoading}
+            onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
           />
+          
+          {!isLogin && (
+            <>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                className={styles.input}
+                required
+                disabled={isLoading}
+              />
+              {passwordStrength && (
+                <div className={styles.passwordStrength}>
+                  <pre>{passwordStrength}</pre>
+                </div>
+              )}
+            </>
+          )}
           
           {error && <p className={styles.error}>{error}</p>}
           
