@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from '@remix-run/react';
+
 import { 
     getAuth, 
     connectAuthEmulator, 
@@ -28,7 +28,7 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  
   const auth = getAuth(appAuth);
 
   connectAuthEmulator(auth, 'http://localhost:9099');
@@ -45,7 +45,8 @@ export default function Login() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-      navigate('.'); // Redirect after successful auth
+      console.log('Success');
+      
     } catch (err: unknown) {
       let errorMessage = 'An error occurred. Please try again.';
       if (err instanceof FirebaseError) {
@@ -114,3 +115,7 @@ export default function Login() {
     </div>
   );
 }
+
+//navigate('/dashboard'); // Redirect after successful auth
+//import { useNavigate } from '@remix-run/react';
+//const navigate = useNavigate();
