@@ -31,3 +31,4 @@
 
 Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
  
+[debug] [2025-01-07T03:04:06.397Z] Received signal SIGHUP 1
