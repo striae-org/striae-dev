@@ -225,29 +225,29 @@ export default function Login() {
       console.log('Success');
       
     } catch (err: unknown) {
-  if (err instanceof FirebaseError) {        
-    switch (err.code) {
-      case 'auth/wrong-password':
-        setError(ERROR_MESSAGES.INVALID_PASSWORD);
-        break;
-      case 'auth/user-not-found':
-        setError(ERROR_MESSAGES.USER_NOT_FOUND);
-        break;
-      case 'auth/email-already-in-use':
-        setError(ERROR_MESSAGES.EMAIL_IN_USE);
-        break;
-      case 'auth/operation-not-allowed':
-      case 'auth/admin-restricted-operation':
-        setError(ERROR_MESSAGES.REGISTRATION_DISABLED);
-        break;
-      default:
+      if (err instanceof FirebaseError) {        
+        switch (err.code) {
+          case 'auth/wrong-password':
+            setError(ERROR_MESSAGES.INVALID_PASSWORD);
+            break;
+          case 'auth/user-not-found':
+            setError(ERROR_MESSAGES.USER_NOT_FOUND);
+            break;
+          case 'auth/email-already-in-use':
+            setError(ERROR_MESSAGES.EMAIL_IN_USE);
+            break;
+          case 'auth/operation-not-allowed':
+          case 'auth/admin-restricted-operation':
+            setError(ERROR_MESSAGES.REGISTRATION_DISABLED);
+            break;
+          default:
+            setError(ERROR_MESSAGES.GENERAL_ERROR);
+        }
+      } else {
         setError(ERROR_MESSAGES.GENERAL_ERROR);
-    }
-  } else {
-    setError(ERROR_MESSAGES.GENERAL_ERROR);
-  }
-} finally {
-      setIsLoading(false);
+      }
+    } finally {
+          setIsLoading(false);
     }
   };
 
