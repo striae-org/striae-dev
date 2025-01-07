@@ -120,14 +120,18 @@ export default function Login() {
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const confirmPasswordValue = formRef.current?.confirmPassword?.value;
+    const passwordsMatch = isLogin || !confirmPasswordValue || password === confirmPasswordValue;
+        
     
-    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar && passwordsMatch;
     setPasswordStrength(
       `Password must contain:
       ${!hasMinLength ? '❌' : '✅'} At least 10 characters
       ${!hasUpperCase ? '❌' : '✅'} Capital letters
       ${!hasNumber ? '❌' : '✅'} Numbers
-      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters
+      ${!passwordsMatch ? '❌' : '✅'} Passwords must match`
     );
     
     return isStrong;
