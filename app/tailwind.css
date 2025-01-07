@@ -6,10 +6,11 @@ html,
 body {
   @apply bg-black;
   @apply text-gray-900;
-  @apply bg-[url('/images/striae.jpg')] bg-cover bg-center bg-no-repeat bg-fixed;
+  @apply bg-[url('/assets/striae.jpg')] bg-cover bg-center bg-no-repeat bg-fixed;
   @apply min-h-screen;
   @apply bg-opacity-5 bg-blend-overlay;
   color-scheme: light;
+  z-index: -999;
 }
 
 /* Force light mode */

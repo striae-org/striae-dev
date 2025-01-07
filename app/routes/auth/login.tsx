@@ -309,6 +309,7 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.logo} />
       <div className={styles.formWrapper}>
         {isResetting ? (
           <ResetPasswordForm />
