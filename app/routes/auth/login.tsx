@@ -316,6 +316,7 @@ export default function Login() {
         ) : (
           <>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
+            <a href="/beta"><h5 className={styles.subtitle}>Sign up for Beta Access</h5></a>
 
             <div className={styles.authToggle}>
               <button 

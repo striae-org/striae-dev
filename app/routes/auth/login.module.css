@@ -46,6 +46,13 @@
   font-size: 1.75rem;
 }
 
+.subtitle {
+  text-align: center;
+  color: #7688ff;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
 .form {
   display: flex;
   flex-direction: column;
