@@ -207,7 +207,9 @@ export default function Login() {
           errorMessage = 'No account found with this email.';
         } else if (err.code === 'auth/email-already-in-use') {
           errorMessage = 'An account with this email already exists.';
-        }
+        } else if (err.code === 'auth/admin-restricted-operation') {
+      errorMessage = 'New registrations are currently disabled';
+        }        
       }
       setError(errorMessage);
     } finally {
