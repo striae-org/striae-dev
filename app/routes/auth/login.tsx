@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from '@remix-run/react';
 import { 
     getAuth, 
     connectAuthEmulator, 
     signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword 
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    User    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
@@ -20,28 +22,91 @@ const firebaseConfig = {
 };
 
 const appAuth = initializeApp(firebaseConfig);
+const auth = getAuth(appAuth);
+
+// Connect to the Firebase Auth emulator if running locally
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const auth = getAuth(appAuth);
+  const [error, setError] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);  
+  const [user, setUser] = useState<User | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const checkPasswordStrength = (password: string): boolean => {
+    const hasMinLength = password.length >= 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    setPasswordStrength(
+      `Password must contain:
+      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
+      ${!hasUpperCase ? '❌' : '✅'} Capital letters
+      ${!hasNumber ? '❌' : '✅'} Numbers
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+    );
+    
+    return isStrong;
+  };
+
+   useEffect(() => {
+    const monitorAuthState = async () => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("Logged in user:", user.email);
+          setUser(user);
+          navigate('/'); // Redirect after successful auth
+        } else {
+          console.log("No user logged in");
+          setUser(null);
+        }
+      });
+    };
+
+    monitorAuthState();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
+    const formData = new FormData(formRef.current!);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!isLogin) {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!checkPasswordStrength(password)) {
+        setError('Password does not meet strength requirements');
+        setIsLoading(false);
+        return;
+      }
+    }
+
+
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log(userCredential.user);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log(createCredential.user);
       }
-      navigate('/dashboard'); // Redirect after successful auth
+      console.log('Success');
+      
     } catch (err: unknown) {
       let errorMessage = 'An error occurred. Please try again.';
       if (err instanceof FirebaseError) {
@@ -59,31 +124,75 @@ export default function Login() {
     }
   };
 
+  // Add proper sign out handling
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      setUser(null);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
+  };
+
+  // If user is already logged in, show a message or redirect
+  if (user) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.formWrapper}>
+          <h1 className={styles.title}>Welcome {user.email}</h1>
+          <button 
+            onClick={handleSignOut} 
+            className={styles.button}
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>{isLogin ? 'Login' : 'Register'}</h1>
+        <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
         
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             className={styles.input}
             required
             disabled={isLoading}
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             className={styles.input}
             required
-            minLength={6}
             disabled={isLoading}
+            onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
           />
+          
+          {!isLogin && (
+            <>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                className={styles.input}
+                required
+                disabled={isLoading}
+              />
+              {passwordStrength && (
+                <div className={styles.passwordStrength}>
+                  <pre>{passwordStrength}</pre>
+                </div>
+              )}
+            </>
+          )}
           
           {error && <p className={styles.error}>{error}</p>}
           
