@@ -9,15 +9,13 @@ import {
     sendSignInLinkToEmail,
     signInWithEmailLink,
     isSignInWithEmailLink,
-    linkWithCredential, 
-    EmailAuthProvider,
-    fetchSignInMethodsForEmail,
     User    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
-const firebaseConfig = {  
+const firebaseConfig = {
+  name: "Striae",
   apiKey: "AIzaSyCY6nHqxZ4OrB6coHxE12MSkYERQSVXU0E",
   authDomain: "striae.allyforensics.com",
   projectId: "striae-e9493",
@@ -28,33 +26,16 @@ const firebaseConfig = {
 };
 
 const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com', // Update with your domain in production
-  handleCodeInApp: true,  
+  url: 'https://allyforensics.com', // Update with your domain in production
+  handleCodeInApp: true,
 };
 
-const appAuth = initializeApp(firebaseConfig, "Striae");
+const appAuth = initializeApp(firebaseConfig);
 const auth = getAuth(appAuth);
 
 // Connect to the Firebase Auth emulator if running locally
 //connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
-const linkAuthMethods = async (email: string, url: string) => {
-  try {
-    const credential = EmailAuthProvider.credentialWithLink(email, url);
-    if (auth.currentUser) {
-      await linkWithCredential(auth.currentUser, credential);
-      return true;
-    }
-  } catch (error) {
-    if (error instanceof FirebaseError) {
-      if (error.code === 'auth/provider-already-linked') {
-        return true; // Already linked, not an error
-      }
-      throw error;
-    }
-  }
-  return false;
-};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -96,7 +77,7 @@ export default function Login() {
           setUser(null);
         }
       });
-    }; monitorAuthState();
+    };
     
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let email = window.localStorage.getItem('emailForSignIn');
@@ -104,19 +85,19 @@ export default function Login() {
         email = window.prompt('Please provide your email for confirmation');
       }
       if (email) {
-      setIsLoading(true);
-      signInWithEmailLink(auth, email, window.location.href)
-        .then(async () => {
-          window.localStorage.removeItem('emailForSignIn');
-          // Try to link methods if user exists
-          await linkAuthMethods(email, window.location.href);
-          navigate('/');
-        })
-        .catch((error) => setError(error.message))
-        .finally(() => setIsLoading(false));
+        setIsLoading(true);
+        signInWithEmailLink(auth, email, window.location.href)
+          .then(() => {
+            window.localStorage.removeItem('emailForSignIn');
+            navigate('/');
+          })
+          .catch((error) => setError(error.message))
+          .finally(() => setIsLoading(false));
+      }
     }
-  }
-}, [navigate]);
+
+    monitorAuthState();
+  }, [navigate]);
   
   const handleEmailLink = async (email: string) => {
     try {
