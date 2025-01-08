@@ -1,0 +1,1 @@
+export { Policy as default, meta } from './policy'
