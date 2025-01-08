@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
+import { Notice } from '~/components/notice/notice';
+import NoticeText from './NoticeText';
 import { verifyTurnstileToken } from '~/utils/turnstile';
 import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
@@ -119,9 +122,16 @@ Beta Feedback Agreement: ${betaFeedback}`,
 
 
 export const BetaSignup = () => {
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const actionData = useActionData<ActionData>();
   const { state } = useNavigation();
   const sending = state === 'submitting';
+
+  const signupNotice = {
+    title: 'Before You Request Access',
+    content: <NoticeText />,
+    buttonText: 'I Understand'
+  };
 
   return (
     <div className={styles.container}>
@@ -130,6 +140,18 @@ export const BetaSignup = () => {
 </Link>
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Join Striae Beta</h1>
+         <button 
+          type="button"
+          onClick={() => setIsNoticeOpen(true)}
+          className={styles.noticeButton}
+        >
+          Read before requesting an invite
+        </button>
+        <Notice 
+          isOpen={isNoticeOpen} 
+          onClose={() => setIsNoticeOpen(false)}
+          notice={signupNotice}
+        />
         <Form method="post" className={styles.form}>
           <input
             type="text"
