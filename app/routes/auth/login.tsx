@@ -22,7 +22,7 @@ import styles from './login.module.css';
 
 const firebaseConfig = {    
   apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
-  authDomain: "striae.allyforensics.com",
+  authDomain: "login.allyforensics.com",
   projectId: "striae-6e5ef",
   storageBucket: "striae-6e5ef.firebasestorage.app",
   messagingSenderId: "981912078156",
@@ -31,7 +31,7 @@ const firebaseConfig = {
 };
 
 const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com', // Update with your domain in production
+  url: 'https://login.allyforensics.com', // Update with your domain in production
   handleCodeInApp: true,
 };
 
