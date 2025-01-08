@@ -40,7 +40,7 @@ export const Policy = () => {
           <ul>
             <li>https://striae.allyforensics.com</li>
             <li>All Striae subdomains</li>
-            <li>Striae desktop application</li>
+            <li>Striae web application</li>
           </ul>
         </section>
 
