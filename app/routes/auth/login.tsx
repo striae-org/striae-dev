@@ -24,7 +24,8 @@ export const meta = () => {
   });
 };
 
-const firebaseConfig = {  
+const firebaseConfig = {
+  name: "Striae",  
   apiKey: "AIzaSyCY6nHqxZ4OrB6coHxE12MSkYERQSVXU0E",
   authDomain: "striae.allyforensics.com",
   projectId: "striae-e9493",
@@ -39,7 +40,7 @@ const actionCodeSettings = {
   handleCodeInApp: true,
 };
 
-const appAuth = initializeApp(firebaseConfig);
+const appAuth = initializeApp(firebaseConfig, "Striae");
 const auth = getAuth(appAuth);
 
 //Connect to the Firebase Auth emulator if running locally
