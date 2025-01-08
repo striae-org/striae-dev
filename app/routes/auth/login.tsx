@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { baseMeta } from '~/utils/meta';
 import { useNavigate, Link } from '@remix-run/react';
 import {
     //connectAuthEmulator, 
@@ -15,14 +14,6 @@ import {
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
-
-export const meta = () => {
-  return baseMeta({
-    title: 'Login to Striae',
-    description:
-      'Login to your Striae account to access your projects and data.',
-  });
-};
 
 const firebaseConfig = {
   name: "Striae",  
