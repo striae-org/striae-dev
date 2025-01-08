@@ -339,6 +339,9 @@ export default function Login() {
   if (user) {
     return (
       <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Welcome {user.email}</h1>
           <button 
