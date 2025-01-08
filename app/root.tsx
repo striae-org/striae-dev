@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import Footer from "~/components/footer/footer";
+import MobileWarning from "~/components/mobile/mobile-warning";
 import "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -32,6 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="flex flex-col min-h-screen">
+        <MobileWarning />
         <main className="flex-grow">
           {children}
         </main>
