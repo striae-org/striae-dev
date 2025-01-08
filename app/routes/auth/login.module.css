@@ -21,6 +21,16 @@
   z-index: 2;
 }
 
+.logoLink {
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
 .formWrapper {
   background-color: rgba(255, 255, 255, 0.95);
   padding: 2rem;

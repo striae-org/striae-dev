@@ -1,7 +1,7 @@
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
 import { verifyTurnstileToken } from '~/utils/turnstile';
-import { Form, useActionData, useNavigation } from '@remix-run/react';
+import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import styles from './signup.module.css';
 
@@ -125,7 +125,9 @@ export const BetaSignup = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.logo} />
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Join Striae Beta</h1>
         <Form method="post" className={styles.form}>

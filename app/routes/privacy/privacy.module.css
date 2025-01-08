@@ -4,6 +4,29 @@
   padding: 2rem;
 }
 
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: 150px;
+  background-image: url('/logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 2;
+}
+
+.logoLink {
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
 .content {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;

@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { baseMeta } from '~/utils/meta';
+import { Link } from '@remix-run/react';
 import styles from './privacy.module.css';
 
 export const meta = () => {
@@ -12,6 +13,9 @@ export const meta = () => {
 export const Privacy = () => {
   return (
     <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
       <div className={styles.content}>
         <h1>Privacy Policy</h1>
         <p className={styles.lastUpdated}>Last updated: January 07, 2025</p>

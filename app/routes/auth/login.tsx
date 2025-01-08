@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { baseMeta } from '~/utils/meta';
-import { useNavigate } from '@remix-run/react';
+import { useNavigate, Link } from '@remix-run/react';
 import {
     //connectAuthEmulator, 
     getAuth,      
@@ -318,7 +318,9 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.logo} />
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
       <div className={styles.formWrapper}>
         {isResetting ? (
           <ResetPasswordForm />
