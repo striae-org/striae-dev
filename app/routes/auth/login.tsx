@@ -18,13 +18,13 @@ import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
 const firebaseConfig = {    
-  apiKey: "AIzaSyCY6nHqxZ4OrB6coHxE12MSkYERQSVXU0E",
+  apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
   authDomain: "striae.allyforensics.com",
-  projectId: "striae-e9493",
-  storageBucket: "striae-e9493.firebasestorage.app",
-  messagingSenderId: "452634981308",
-  appId: "1:452634981308:web:4c83bd86cad3b3fa6cf1b9",
-  measurementId: "G-PE7BBQK1W2"
+  projectId: "striae-6e5ef",
+  storageBucket: "striae-6e5ef.firebasestorage.app",
+  messagingSenderId: "981912078156",
+  appId: "1:981912078156:web:75e4590085492b750471e9",
+  measurementId: "G-FFXGKSFXXN"
 };
 
 const actionCodeSettings = {
