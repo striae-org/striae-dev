@@ -194,7 +194,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>  I agree to provide feedback during beta testing in exchange for free access upon release</span>
+            <span>  I have read the notice and agree to provide feedback during beta testing in exchange for free access upon release</span>
           </label>
 
           <Turnstile
