@@ -15,8 +15,7 @@ import {
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
-const firebaseConfig = {
-  name: "Striae",  
+const firebaseConfig = {    
   apiKey: "AIzaSyCY6nHqxZ4OrB6coHxE12MSkYERQSVXU0E",
   authDomain: "striae.allyforensics.com",
   projectId: "striae-e9493",
