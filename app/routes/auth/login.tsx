@@ -103,7 +103,7 @@ export default function Login() {
           setError('Pop-up blocked by browser');
           break;
         default:
-          setError(`Sign-in failed: ${err.message}`);
+          setError(ERROR_MESSAGES.GENERAL_ERROR);
       }
       console.error('Google sign-in error:', { err, email, credential });
     }
