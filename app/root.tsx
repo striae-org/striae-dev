@@ -20,7 +20,7 @@ export const headers: HeadersFunction = () => ({
     "frame-src 'self' https://challenges.cloudflare.com",
     "frame-ancestors 'none'",
   ].join("; "),
-  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
   "X-Frame-Options": "DENY",
   "X-Content-Type-Options": "nosniff",
   "X-XSS-Protection": "1; mode=block",
