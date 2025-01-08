@@ -10,11 +10,14 @@ import {
     signInWithEmailLink,
     isSignInWithEmailLink,
     sendPasswordResetEmail,
+    verifyPasswordResetCode,
+    confirmPasswordReset,
     sendEmailVerification,
     applyActionCode,
     User,    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
+import { ResetPasswordConfirm } from './ResetPasswordConfirm';
 import styles from './login.module.css';
 
 const firebaseConfig = {    
@@ -62,9 +65,57 @@ export default function Login() {
   const [user, setUser] = useState<User | null>(null);
   const [passwordStrength, setPasswordStrength] = useState('');  
   const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
-  const [isResetting, setIsResetting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);  
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Add reset password handler
+const handleResetPassword = async (actionCode: string) => {
+  try {
+    const email = await verifyPasswordResetCode(auth, actionCode);
+    setResetEmail(email);
+    setIsResettingPassword(true);
+  } catch (err) {
+    if (err instanceof FirebaseError) {
+      switch (err.code) {
+        case 'auth/expired-action-code':
+          setError('Reset link has expired');
+          break;
+        case 'auth/invalid-action-code':
+          setError('Invalid reset link');
+          break;
+        default:
+          setError('Failed to verify reset code');
+      }
+    }
+  }
+};
+
+// Add reset confirmation handler
+const handleResetConfirm = async (newPassword: string) => {
+  try {
+    const actionCode = new URLSearchParams(window.location.search).get('oobCode');
+    if (!actionCode) throw new Error('No reset code found');
+
+    await confirmPasswordReset(auth, actionCode, newPassword);
+    setError('Password reset successful! You can now login.');
+    setIsResettingPassword(false);
+    setIsLogin(true);
+  } catch (err) {
+    if (err instanceof FirebaseError) {
+      switch (err.code) {
+        case 'auth/weak-password':
+          setError(ERROR_MESSAGES.WEAK_PASSWORD);
+          break;
+        default:
+          setError('Failed to reset password');
+      }
+    }
+  }
+};
+  
+  
   const ResetPasswordForm = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,10 +250,13 @@ export default function Login() {
   const actionCode = urlParams.get('oobCode');
   const continueUrl = urlParams.get('continueUrl');
 
-  if (mode === 'verifyEmail' && actionCode) {
+  if (mode === 'resetPassword' && actionCode) {
+    handleResetPassword(actionCode);
+  } else if (mode === 'verifyEmail' && actionCode) {
     handleVerifyEmail(actionCode, continueUrl || undefined);
   }
-   return () => unsubscribe();
+
+  return () => unsubscribe();
 }, [navigate]);
   
   const handleEmailLink = async (email: string) => {
@@ -353,14 +407,23 @@ export default function Login() {
   }
 
   return (
-    <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-      <div className={styles.formWrapper}>
-        {isResetting ? (
-          <ResetPasswordForm />
-        ) : (
+  <div className={styles.container}>
+    <Link to="/" className={styles.logoLink}>
+      <div className={styles.logo} />
+    </Link>
+    <div className={styles.formWrapper}>
+      {isResettingPassword ? (
+        <ResetPasswordConfirm
+          email={resetEmail}
+          isLoading={isLoading}
+          error={error}
+          passwordStrength={passwordStrength}
+          onPasswordChange={checkPasswordStrength}
+          onSubmit={handleResetConfirm}
+        />
+      ) : isResetting ? (
+        <ResetPasswordForm />
+      ) : (
           <>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
             <a href="/beta"><h5 className={styles.subtitle}>Sign up for Beta Access</h5></a>
