@@ -1,4 +1,4 @@
-import type { LinksFunction, HeadersFunction } from "@remix-run/cloudflare";
+import type { LinksFunction } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -14,6 +14,7 @@ import MobileWarning from "~/components/mobile/mobile-warning";
 import "./tailwind.css";
 import styles from '~/styles/error.module.css';
 
+/*
 export const headers: HeadersFunction = () => ({
   "Content-Security-Policy": [
     "default-src 'self'",
@@ -31,6 +32,7 @@ export const headers: HeadersFunction = () => ({
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
 });
+*/
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
