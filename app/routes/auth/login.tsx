@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import {
-    connectAuthEmulator, 
+    //connectAuthEmulator, 
     getAuth,      
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
@@ -37,7 +37,7 @@ const auth = getAuth(appAuth);
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
-connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 const ERROR_MESSAGES = {
   INVALID_PASSWORD: 'Invalid password',
