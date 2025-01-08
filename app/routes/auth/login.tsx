@@ -12,9 +12,6 @@ import {
     sendPasswordResetEmail,
     sendEmailVerification,
     applyActionCode,
-    GoogleAuthProvider,
-    signInWithRedirect,
-    getRedirectResult,
     User,    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
@@ -37,8 +34,6 @@ const actionCodeSettings = {
 
 const appAuth = initializeApp(firebaseConfig, "Striae");
 const auth = getAuth(appAuth);
-const provider = new GoogleAuthProvider();
-
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
@@ -67,15 +62,9 @@ export default function Login() {
   const [user, setUser] = useState<User | null>(null);
   const [passwordStrength, setPasswordStrength] = useState('');  
   const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
-  const [isResetting, setIsResetting] = useState(false);  
+  const [isResetting, setIsResetting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleGoogleSignIn = () => {
-  setIsLoading(true);
-  setError('');
-  signInWithRedirect(auth, provider);
-};
-  
   const ResetPasswordForm = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,33 +137,6 @@ export default function Login() {
   };  
 
    useEffect(() => {
-  const handleRedirectResult = async () => {
-  try {
-    const result = await getRedirectResult(auth);
-    if (result) {
-      const user = result.user;
-      if (!user.emailVerified) {
-        await handleSignOut();
-        setError('Please verify your email before logging in');
-        return;
-      }
-      setUser(user);
-      navigate('/');
-    }
-  } catch (error) {
-      if (error instanceof FirebaseError) {
-        const email = error.customData?.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        setError(`Sign-in failed: ${error.message}`);
-        console.error('Google sign-in error:', { error, email, credential });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  handleRedirectResult();
-
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (user) {
       if (!user.emailVerified) {
@@ -421,14 +383,6 @@ export default function Login() {
                 Get a Code Instead
               </button>
             </div>
-            <button 
-            type="button"
-            onClick={handleGoogleSignIn}
-            className={styles.googleButton}
-            disabled={isLoading}
-          >
-            Sign in with Google
-            </button>
             
             {authMethod === 'password' ? (
               <>
