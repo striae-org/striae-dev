@@ -192,7 +192,7 @@ export const BetaSignup = () => {
         {actionData?.success && (
           <div className={styles.success}>
             <p><h2>Thank you for signing up!</h2></p>
-            <p>We&apos;ll be in touch 2Q 2025.</p>
+            <p>We&apos;ll be in touch Q2 2025</p>
           </div>
         )}
       </div>
