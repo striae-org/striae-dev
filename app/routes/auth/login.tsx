@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import {
-    //connectAuthEmulator, 
+    connectAuthEmulator, 
     getAuth,      
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
@@ -10,6 +10,8 @@ import {
     signInWithEmailLink,
     isSignInWithEmailLink,
     sendPasswordResetEmail,
+    sendEmailVerification,
+    applyActionCode,
     User,    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
@@ -35,7 +37,7 @@ const auth = getAuth(appAuth);
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 const ERROR_MESSAGES = {
   INVALID_PASSWORD: 'Invalid password',
@@ -132,21 +134,48 @@ export default function Login() {
     );
     
     return isStrong;
-  };
+  };  
 
    useEffect(() => {
-    const monitorAuthState = async () => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          console.log("Logged in user:", user.email);
-          setUser(user);
-          navigate('/'); // Redirect after successful auth
-        } else {
-          console.log("No user logged in");
-          setUser(null);
-        }
-      });
-    };
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      if (!user.emailVerified) {
+        handleSignOut();
+        setError('Please verify your email before logging in');
+        return;
+      }
+      console.log("Logged in user:", user.email);
+      setUser(user);
+      navigate('/');
+    } else {
+      console.log("No user logged in");
+      setUser(null);
+    }
+  });
+  
+
+    const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
+  try {
+    await applyActionCode(auth, actionCode);
+    setError('Email verified successfully!');
+    if (continueUrl) {
+      navigate(continueUrl);
+    }
+  } catch (err) {
+    if (err instanceof FirebaseError) {
+      switch (err.code) {
+        case 'auth/expired-action-code':
+          setError('Verification link has expired');
+          break;
+        case 'auth/invalid-action-code':
+          setError('Invalid verification link');
+          break;
+        default:
+          setError('Failed to verify email');
+      }
+    }
+  }
+};
     
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let email = window.localStorage.getItem('emailForSignIn');
@@ -165,8 +194,16 @@ export default function Login() {
       }
     }
 
-    monitorAuthState();
-  }, [navigate]);
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const actionCode = urlParams.get('oobCode');
+  const continueUrl = urlParams.get('continueUrl');
+
+  if (mode === 'verifyEmail' && actionCode) {
+    handleVerifyEmail(actionCode, continueUrl || undefined);
+  }
+   return () => unsubscribe();
+}, [navigate]);
   
   const handleEmailLink = async (email: string) => {
     try {
@@ -216,16 +253,23 @@ export default function Login() {
 
 
     try {
-      if (isLogin) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);        
-        console.log(userCredential.user);
-      } else {
-        const createCredential = await createUserWithEmailAndPassword(auth, email, password);       
-        console.log(createCredential.user);
+    if (isLogin) {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        await handleSignOut();
+        setError('Please verify your email before logging in');
+        return;
       }
-      console.log('Success');
-      
-    } catch (err: unknown) {
+      console.log(userCredential.user);
+    } else {
+      const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(createCredential.user);
+      await handleSignOut(); // Sign out immediately after registration
+      setError('Registration successful! Please check your email to verify your account before logging in.');
+      setIsLogin(true); // Switch to login view
+      console.log('Verification email sent');
+    }
+  } catch (err: unknown) {
       if (err instanceof FirebaseError) {        
         switch (err.code) {
           case 'auth/wrong-password':
