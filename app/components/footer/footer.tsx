@@ -14,6 +14,9 @@ export default function Footer() {
           <Link to="/license" className={styles.link}>
             License & Terms
           </Link>
+          <Link to="/security-policy" className={styles.link}>
+            Security Policy
+          </Link>
         </nav>
         <p className={styles.copyright}>
           © {year} AllyForensics. All rights reserved.
