@@ -22,7 +22,7 @@ import styles from './login.module.css';
 
 const firebaseConfig = {    
   apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
-  authDomain: "striae.allyforensics.com",
+  authDomain: "striae-6e5ef.firebaseapp.com",
   projectId: "striae-6e5ef",
   storageBucket: "striae-6e5ef.firebasestorage.app",
   messagingSenderId: "981912078156",
