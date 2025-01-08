@@ -29,10 +29,7 @@ export const Terms = () => {
 <p>For the purposes of these Terms and Conditions:</p>
 <ul>
 <li>
-<p><strong>Application</strong> means the software program provided by the Company downloaded by You on any electronic device, named Striae</p>
-</li>
-<li>
-<p><strong>Application Store</strong> means the digital distribution service operated and developed by Apple Inc. (Apple App Store) or Google Inc. (Google Play Store) in which the Application has been downloaded.</p>
+<p><strong>Application</strong> means the software program provided by the Company downloaded or accessed by You on any electronic device, named Striae</p>
 </li>
 <li>
 <p><strong>Affiliate</strong> means an entity that controls, is controlled by or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</p>
@@ -41,7 +38,7 @@ export const Terms = () => {
 <p><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</p>
 </li>
 <li>
-<p><strong>Country</strong> refers to: California,  United States</p>
+<p><strong>Country</strong> refers to: California, United States</p>
 </li>
 <li>
 <p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AllyForensics, 2031 Crenshaw St, San Diego, CA 92105.</p>
@@ -214,6 +211,33 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. If a revision is material We will make reasonable efforts to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at Our sole discretion.</p>
 <p>By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms. If You do not agree to the new terms, in whole or in part, please stop using the website and the Service.</p>
         </section>
+        <section id="storage" className={styles.section}>
+          <h2>Data Storage Addendum</h2>
+<p>At AllyForensics, we take your privacy and data security seriously. We understand the sensitive nature of the data that you may store with us. This Data Storage Addendum outlines how we handle and store your data within the app.</p>
+<ul>
+<li>
+<p><strong>Data Storage: Secure and Private</strong></p>
+<p>Your data is securely stored on our systems, using industry-standard security protocols to ensure it is protected from unauthorized access. We prioritize your privacy and make sure your information is kept private and confidential.</p>
+</li>
+<li>
+<p><strong>Access to Data</strong></p>
+<p>Your data is strictly accessible only by you, the user, and by AllyForensics as necessary. AllyForensics may access your data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to your data.</p>
+</li>
+<li>
+<p><strong>No Sharing of Sensitive Information</strong></p>
+<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, your data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of your data are paramount to us.</p>
+</li>
+<li>
+<p><strong>User Data Sharing</strong></p>
+<p>You have the option to share data with other Striae users at your discretion. This may include sharing specific case information or data relevant to your use of the app. However, you retain full control over what data is shared and with whom.</p>
+</li>
+<li>
+<p><strong>Account Deletion</strong></p>
+<p>If you choose to delete your account, all associated data and information will be permanently and completely removed from Striae. This means that no data will remain stored on our systems once your account is deleted, and you will no longer have access to any of your previous data.</p>
+</li>
+</ul>
+<p>At Striae, we are committed to ensuring that your data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
+</section>
         <section className={styles.section}>
           <h2>Contact Us</h2>
 <p>If you have any questions about these Terms and Conditions, You can contact us:</p>

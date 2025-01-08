@@ -4,7 +4,7 @@ export default function NoticeText() {
       <h1>Striae Beta Program Notice</h1>
       <p>We&apos;re excited to invite you to participate in the Striae Beta Program! As part of this exclusive program, you&apos;ll get early access to new features and updates, and help us ensure the best possible experience for all users.</p>
       <p>Please understand that Striae is still in early development. After requesting an invite, you&apos;ll receive a Beta Tester Interest Form to complete by Q2 2025. If selected, you&apos;ll then receive an email with instructions on how to access the beta version of the app.</p>
-      <p>Due to the sensitive nature of the data you may use with Striae, please refer to our <a href="/privacy#storage">Data Storage Addendum</a> in the Privacy Policy to understand how we handle and store your data within Striae.</p>
+      <p>Due to the sensitive nature of the data you may use with Striae, please refer to our <a href="/terms#storage">Data Storage Addendum</a> in the Terms & Conditions to understand how we handle and store your data within Striae.</p>
       <h2>Important Details</h2>
       <ul>
         <li><p><strong>Beta Spot Not Guaranteed:</strong> Due to limited availability, participation in the beta program is not guaranteed. We&apos;ll do our best to accommodate as many participants as possible.</p></li>

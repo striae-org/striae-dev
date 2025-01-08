@@ -455,33 +455,6 @@ export const Privacy = () => {
 <p>We will let You know via email and/or a prominent notice on Our Service, prior to the change becoming effective and update the &quot;Last updated&quot; date at the top of this Privacy Policy.</p>
 <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>            
         </section>
-<section id="storage" className={styles.section}>
-          <h2>Data Storage Addendum</h2>
-<p>At AllyForensics, we take your privacy and data security seriously. We understand the sensitive nature of the data that you may store with us. This Data Storage Addendum outlines how we handle and store your data within the app.</p>
-<ul>
-<li>
-<p><strong>Data Storage: Secure and Private</strong></p>
-<p>Your data is securely stored on our systems, using industry-standard security protocols to ensure it is protected from unauthorized access. We prioritize your privacy and make sure your information is kept private and confidential.</p>
-</li>
-<li>
-<p><strong>Access to Data</strong></p>
-<p>Your data is strictly accessible only by you, the user, and by AllyForensics as necessary. AllyForensics may access your data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to your data.</p>
-</li>
-<li>
-<p><strong>No Sharing of Sensitive Information</strong></p>
-<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, your data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of your data are paramount to us.</p>
-</li>
-<li>
-<p><strong>User Data Sharing</strong></p>
-<p>You have the option to share data with other Striae users at your discretion. This may include sharing specific case information or data relevant to your use of the app. However, you retain full control over what data is shared and with whom.</p>
-</li>
-<li>
-<p><strong>Account Deletion</strong></p>
-<p>If you choose to delete your account, all associated data and information will be permanently and completely removed from Striae. This means that no data will remain stored on our systems once your account is deleted, and you will no longer have access to any of your previous data.</p>
-</li>
-</ul>
-<p>At Striae, we are committed to ensuring that your data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
-</section>
         <section className={styles.section}>
           <h2>Contact Us</h2>
 <p>If you have any questions about this Privacy Policy, You can contact us:</p>
