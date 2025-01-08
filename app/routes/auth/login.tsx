@@ -12,7 +12,10 @@ import {
     sendPasswordResetEmail,
     sendEmailVerification,
     applyActionCode,
-    User,    
+    User,
+    GoogleAuthProvider,
+    signInWithPopup,
+    getAdditionalUserInfo    
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
@@ -34,6 +37,7 @@ const actionCodeSettings = {
 
 const appAuth = initializeApp(firebaseConfig, "Striae");
 const auth = getAuth(appAuth);
+const provider = new GoogleAuthProvider();
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
@@ -65,6 +69,49 @@ export default function Login() {
   const [isResetting, setIsResetting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const handleGoogleSignIn = async () => {
+  setIsLoading(true);
+  setError('');
+  
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential?.accessToken;
+    const user = result.user;
+    
+    if (!user.emailVerified) {
+      await handleSignOut();
+      setError('Please verify your email before logging in');
+      return;
+    }
+    
+    const additionalInfo = getAdditionalUserInfo(result);
+    console.log('Google sign-in successful:', { user, token, additionalInfo });
+    
+    setUser(user);
+    navigate('/');
+  } catch (err) {
+    if (err instanceof FirebaseError) {
+      const email = err.customData?.email;
+      const credential = GoogleAuthProvider.credentialFromError(err);
+      
+      switch (err.code) {
+        case 'auth/popup-closed-by-user':
+          setError('Sign-in cancelled');
+          break;
+        case 'auth/popup-blocked':
+          setError('Pop-up blocked by browser');
+          break;
+        default:
+          setError(`Sign-in failed: ${err.message}`);
+      }
+      console.error('Google sign-in error:', { err, email, credential });
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+  
   const ResetPasswordForm = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -383,6 +430,14 @@ export default function Login() {
                 Get a Code Instead
               </button>
             </div>
+            <button 
+              type="button"
+              onClick={handleGoogleSignIn}
+              className={styles.googleButton}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing in...' : 'Sign in with Google'}
+            </button>
             
             {authMethod === 'password' ? (
               <>
