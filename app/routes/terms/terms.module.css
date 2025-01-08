@@ -1,0 +1,109 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: 150px;
+  background-image: url('/logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 2;
+}
+
+.logoLink {
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
+.content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+}
+
+.content h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.content p {
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h2, 
+.section h3,
+.section h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+}
+
+.section h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.section h4 {
+  font-size: 1.2rem;
+}
+
+.section p, 
+.section ul {
+  margin-bottom: 1rem;
+}
+
+.section ul {
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.section li {
+  margin-bottom: 0.5rem;
+}
+
+.section a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.section a:hover {
+  text-decoration: underline;
+}
+
+.lastUpdated {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+}

@@ -11,8 +11,11 @@ export default function Footer() {
           <Link to="/privacy" className={styles.link}>
             Privacy Policy
           </Link>
+          <Link to="/terms" className={styles.link}>
+            Terms & Conditions
+          </Link>
           <Link to="/license" className={styles.link}>
-            License & Terms
+            License
           </Link>
           <Link to="/security-policy" className={styles.link}>
             Security Policy
