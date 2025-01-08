@@ -19,7 +19,7 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          © {year} AllyForensics. All rights reserved.
+          Striae © {year} AllyForensics. All rights reserved.
         </p>
       </div>
     </footer>
