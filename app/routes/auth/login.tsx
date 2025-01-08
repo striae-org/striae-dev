@@ -32,6 +32,7 @@ const actionCodeSettings = {
 
 const appAuth = initializeApp(firebaseConfig, "Striae");
 const auth = getAuth(appAuth);
+console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
 //connectAuthEmulator(auth, 'http://127.0.0.1:9099');
