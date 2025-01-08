@@ -67,7 +67,6 @@
 }
 
 .section ol > li > ol {
-  counter-reset: none;
   list-style-type: lower-alpha;
   padding-left: 2rem;
   margin: 1rem 0;
@@ -75,17 +74,12 @@
 
 .section ol > li > ol > li {
   display: list-item;
-  counter-increment: none;
   padding-left: 0;
   margin: 0.75rem 0;
 }
 
 .section ol > li > ol > li::before {
   display: none;
-}
-
-.section ol > li > ol > li p {
-  margin: 0.5rem 0;
 }
 
 .copyright {
