@@ -1,4 +1,4 @@
-import type { LinksFunction } from "@remix-run/cloudflare";
+import type { LinksFunction, HeadersFunction } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -9,6 +9,24 @@ import {
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
 import "./tailwind.css";
+
+export const headers: HeadersFunction = () => ({
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: https:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "frame-src 'self' https://challenges.cloudflare.com",
+    "frame-ancestors 'none'",
+  ].join("; "),
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+});
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
