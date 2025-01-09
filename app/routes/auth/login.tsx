@@ -577,7 +577,7 @@ export const Login = () => {
                         type="password"
                         name="confirmPassword"
                         placeholder="Confirm Password"
-                        autoComplete={isLogin ? "current-password" : "new-password"}
+                        autoComplete="new-password"
                         className={styles.input}
                         required
                         disabled={isLoading}
