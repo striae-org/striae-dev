@@ -163,7 +163,6 @@ export const BetaSignup = () => {
             type="text"
             name="firstName"
             placeholder="First Name"
-            autoComplete="given-name"
             className={styles.input}
             required
             disabled={sending}
@@ -176,7 +175,6 @@ export const BetaSignup = () => {
             type="email"
             name="email"
             placeholder="Email Address"
-            autoComplete="email"
             className={styles.input}
             required
             disabled={sending}
