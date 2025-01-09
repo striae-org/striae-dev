@@ -212,7 +212,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 <ul>
 <li>
 <p><strong>Data Storage: Secure and Private</strong></p>
-<p>Your Data is securely stored on our systems, using industry-standard security protocols to ensure it is protected from unauthorized access. We prioritize your privacy and make sure your information is kept private and confidential.</p>
+<p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize your privacy and make sure your information is kept private and confidential.</p>
 </li>
 <li>
 <p><strong>Access to Data</strong></p>
@@ -228,7 +228,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>
-<p>If you choose to delete your account, all associated Data and information will be permanently and completely removed from Striae. This means that no Data will remain stored on our systems once your account is deleted, and you will no longer have access to any of your previous Data.</p>
+<p>If you choose to delete your account, all associated Data and information will be permanently and completely removed from Striae. This means that no Data will remain stored in the system once your account is deleted, and you will no longer have access to any of your previous Data.</p>
 </li>
 </ul>
 <p>At Striae, we are committed to ensuring that your Data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
