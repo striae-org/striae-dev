@@ -1,3 +1,3 @@
-import { Login, loader } from './auth/login'
+import { Login, loader, meta } from './auth/login'
 
-export { Login as default, loader }
+export { Login as default, loader, meta }
