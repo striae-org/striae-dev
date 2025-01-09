@@ -7,8 +7,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
-  Link,
-  LiveReload,
+  Link
 } from "@remix-run/react";
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
@@ -35,35 +34,38 @@ export const links: LinksFunction = () => [
 
 interface DocumentProps {
   children: React.ReactNode;
+  title?: string;
 }
 
-function Document({ children }: DocumentProps) {
+function Document({ children, title }: DocumentProps) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {title && <title>{title}</title>}
         <Meta />
         <Links />
       </head>
       <body className="flex flex-col min-h-screen">
         <MobileWarning />
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow">
+          {children}
+        </main>
         <Footer />
         <ScrollRestoration />
         <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
       </body>
     </html>
   );
 }
 
+export function Layout({ children }: { children: React.ReactNode }) {
+  return <Document>{children}</Document>;
+}
+
 export default function App() {
-  return (
-    <Document>
-      <Outlet />
-    </Document>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary() {
@@ -71,12 +73,7 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <Document>
-        <head>
-          <title>{`${error.status} ${error.statusText} | Striae`}</title>
-          <Meta />
-          <Links />
-        </head>
+      <Document title={`${error.status} ${error.statusText}`}>
         <div className={styles.errorContainer}>
           <h1 className={styles.errorTitle}>{error.status}</h1>
           <p className={styles.errorMessage}>{error.statusText}</p>
@@ -87,12 +84,7 @@ export function ErrorBoundary() {
   }
 
   return (
-    <Document>
-      <head>
-        <title>500 Internal Server Error | Striae</title>
-        <Meta />
-        <Links />
-      </head>
+    <Document title="Oops! Something went wrong">
       <div className={styles.errorContainer}>
         <h1 className={styles.errorTitle}>500</h1>
         <p className={styles.errorMessage}>Something went wrong. Please try again later.</p>
