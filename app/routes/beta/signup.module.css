@@ -8,6 +8,35 @@
   z-index: 0;
 }
 
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: 150px;
+  background-image: url('/logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    display: none;
+  }
+}
+
+.logoLink {
+  display: block;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
 .formWrapper {
   background-color: rgba(255, 255, 255, 0.95);
   padding: 2rem;
