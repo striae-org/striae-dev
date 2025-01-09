@@ -13,10 +13,7 @@ export default function Footer() {
           </Link>
           <Link to="/terms" className={styles.link}>
             Terms & Conditions
-          </Link>
-          <Link to="/license" className={styles.link}>
-            License
-          </Link>
+          </Link>          
           <Link to="/security-policy" className={styles.link}>
             Security Policy
           </Link>
