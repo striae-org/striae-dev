@@ -32,7 +32,7 @@ export const links: LinksFunction = () => [
   { rel: 'apple-touch-icon', href: '/icon-256.png', sizes: '256x256' },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function App() {
   return (
     <html lang="en">
       <head>
@@ -44,7 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className="flex flex-col min-h-screen">
         <MobileWarning />
         <main className="flex-grow">
-          {children}
+          <Outlet />
         </main>
         <Footer />
         <ScrollRestoration />
@@ -52,10 +52,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
 
 export function ErrorBoundary() {
