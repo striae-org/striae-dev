@@ -44,7 +44,7 @@ export const Terms = () => {
 <p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AllyForensics, 2031 Crenshaw St, San Diego, CA 92105.</p>
 </li>
 <li>
-<p><strong>Content</strong> refers to content such as text, images, or other information that can be posted, uploaded, linked to or otherwise made available by You, regardless of the form of that content.</p>
+<p><strong>Data</strong> refers to content such as text, images, or other information that can be posted, uploaded, linked to or otherwise made available by You, regardless of the form of that content.</p>
 </li>
 <li>
 <p><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</p>
@@ -102,14 +102,10 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <p>You may not use as a username the name of another person or entity or that is not lawfully available for use, a name or trademark that is subject to any rights of another person or entity other than You without appropriate authorization, or a name that is otherwise offensive, vulgar or obscene.</p>
         </section>
         <section className={styles.section}>
-          <h2>Content</h2>
-<h3>Your Right to Post Content</h3>
-<p>Our Service allows You to post Content. You are responsible for the Content that You post to the Service, including its legality, reliability, and appropriateness.</p>
-<p>By posting Content to the Service, You grant Us the right and license to use, modify, publicly perform, publicly display, reproduce, and distribute such Content on and through the Service. You retain any and all of Your rights to any Content You submit, post or display on or through the Service and You are responsible for protecting those rights. You agree that this license includes the right for Us to make Your Content available to other users of the Service, who may also use Your Content subject to these Terms.</p>
-<p>You represent and warrant that: (i) the Content is Yours (You own it) or You have the right to use it and grant Us the rights and license as provided in these Terms, and (ii) the posting of Your Content on or through the Service does not violate the privacy rights, publicity rights, copyrights, contract rights or any other rights of any person.</p>
-<h3>Content Restrictions</h3>
-<p>The Company is not responsible for the content of the Service's users. You expressly understand and agree that You are solely responsible for the Content and for all activity that occurs under Your account, whether done so by You or any third person using Your account.</p>
-<p>You may not transmit any Content that is unlawful, offensive, upsetting, intended to disgust, threatening, libelous, defamatory, obscene or otherwise objectionable. Examples of such objectionable Content include, but are not limited to, the following:</p>
+          <h2>Data</h2>
+<h3>Data Restrictions</h3>
+<p>The Company is not responsible for the content of the Service's users. You expressly understand and agree that You are solely responsible for the Data and for all activity that occurs under Your account, whether done so by You or any third person using Your account.</p>
+<p>You may not transmit any Data that is unlawful, offensive, upsetting, intended to disgust, threatening, libelous, defamatory, obscene or otherwise objectionable. Examples of such objectionable Data include, but are not limited to, the following:</p>
 <ul>
 <li>Unlawful or promoting unlawful activity.</li>
 <li>Defamatory, discriminatory, or mean-spirited content, including references or commentary about religion, race, sexual orientation, gender, national/ethnic origin, or other targeted groups.</li>
@@ -120,20 +116,19 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <li>Violating the privacy of any third person.</li>
 <li>False information and features.</li>
 </ul>
-<p>The Company reserves the right, but not the obligation, to, in its sole discretion, determine whether or not any Content is appropriate and complies with these Terms, refuse or remove this Content. The Company further reserves the right to make formatting and edits and change the manner of any Content. The Company can also limit or revoke the use of the Service if You post such objectionable Content.
-As the Company cannot control all content posted by users and/or third parties on the Service, you agree to use the Service at your own risk. You understand that by using the Service You may be exposed to content that You may find offensive, indecent, incorrect or objectionable, and You agree that under no circumstances will the Company be liable in any way for any content, including any errors or omissions in any content, or any loss or damage of any kind incurred as a result of your use of any content.</p>
-<h3>Content Backups</h3>
-<p>Although regular backups of Content are performed, the Company does not guarantee there will be no loss or corruption of data.</p>
-<p>Corrupt or invalid backup points may be caused by, without limitation, Content that is corrupted prior to being backed up or that changes during the time a backup is performed.</p>
-<p>The Company will provide support and attempt to troubleshoot any known or discovered issues that may affect the backups of Content. But You acknowledge that the Company has no liability related to the integrity of Content or the failure to successfully restore Content to a usable state.</p>
-<p>You agree to maintain a complete and accurate copy of any Content in a location independent of the Service.</p>
+<p>The Company reserves the right, but not the obligation, to, in its sole discretion, determine whether or not any Data is appropriate and complies with these Terms, refuse or remove this Data. The Company further reserves the right to make formatting and edits and change the manner of any Data. The Company can also limit or revoke the use of the Service if You post such objectionable Data.</p>
+<h3>Data Backups</h3>
+<p>Although regular backups of Data are performed, the Company does not guarantee there will be no loss or corruption of Data.</p>
+<p>Corrupt or invalid backup points may be caused by, without limitation, Data that is corrupted prior to being backed up or that changes during the time a backup is performed.</p>
+<p>The Company will provide support and attempt to troubleshoot any known or discovered issues that may affect the backups of Data. But You acknowledge that the Company has no liability related to the integrity of Data or the failure to successfully restore Data to a usable state.</p>
+<p>You agree to maintain a complete and accurate copy of any Data in a location independent of the Service.</p>
         </section>
         <section className={styles.section}>
 <h2>Copyright Policy</h2>
 <h3>Intellectual Property Infringement</h3>
-<p>We respect the intellectual property rights of others. It is Our policy to respond to any claim that Content posted on the Service infringes a copyright or other intellectual property infringement of any person.</p>
+<p>We respect the intellectual property rights of others. It is Our policy to respond to any claim that Data posted on the Service infringes a copyright or other intellectual property infringement of any person.</p>
 <p>If You are a copyright owner, or authorized on behalf of one, and You believe that the copyrighted work has been copied in a way that constitutes copyright infringement that is taking place through the Service, You must submit Your notice in writing to the attention of our copyright agent via email at info@allyforensics.com and include in Your notice a detailed description of the alleged infringement.</p>
-<p>You may be held accountable for damages (including costs and attorneys' fees) for misrepresenting that any Content is infringing Your copyright.</p>
+<p>You may be held accountable for damages (including costs and attorneys' fees) for misrepresenting that any Data is infringing Your copyright.</p>
 <h3>DMCA Notice and DMCA Procedure for Copyright Infringement Claims</h3>
 <p>You may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by providing our Copyright Agent with the following information in writing (see 17 U.S.C 512(c)(3) for further detail):</p>
 <ul>
@@ -149,7 +144,7 @@ Upon receipt of a notification, the Company will take whatever action, in its so
         </section>
 <section className={styles.section}>
           <h2>Intellectual Property</h2>
-<p>The Service and its original content (excluding Content provided by You or other users), features and functionality are and will remain the exclusive property of the Company and its licensors.</p>
+<p>The Service and its original content (excluding Data provided by You or other users), features and functionality are and will remain the exclusive property of the Company and its licensors.</p>
 <p>The Service is protected by copyright, trademark, and other laws of both the Country and foreign countries.</p>
 <p>Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of the Company.</p>
 <h2>Your Feedback to Us</h2>
