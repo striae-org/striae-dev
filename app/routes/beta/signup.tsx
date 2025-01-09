@@ -123,14 +123,20 @@ Beta Feedback Agreement: ${betaFeedback}`,
 
 export const BetaSignup = () => {
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+  const [hasReadNotice, setHasReadNotice] = useState(false);
   const actionData = useActionData<ActionData>();
   const { state } = useNavigation();
   const sending = state === 'submitting';
 
+  const handleNoticeClose = () => {
+    setHasReadNotice(true);
+    setIsNoticeOpen(false);
+  };
+
   const signupNotice = {
     title: 'Before You Request Access',
     content: <NoticeText />,
-    buttonText: 'I Understand'
+    buttonText: 'I Have Read and Understand'
   };
 
   return (
@@ -148,11 +154,11 @@ export const BetaSignup = () => {
           Read before requesting an invite
         </button>
         <Notice 
-          isOpen={isNoticeOpen} 
-          onClose={() => setIsNoticeOpen(false)}
-          notice={signupNotice}
-        />
-        <Form method="post" className={styles.form}>
+        isOpen={isNoticeOpen} 
+        onClose={handleNoticeClose}
+        notice={signupNotice}
+      />
+      <Form method="post" className={styles.form}>
           <input
             type="text"
             name="firstName"
@@ -201,16 +207,19 @@ export const BetaSignup = () => {
             className={styles.turnstile}
             theme="light"
           />
-
           <button 
-            type="submit" 
-            className={styles.button}
-            disabled={sending}
+          type="submit" 
+          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
+          disabled={sending || !hasReadNotice}
+          title={!hasReadNotice ? 'Please read the notice first' : undefined}
           >
-            {sending ? 'Submitting...' : 'Request Beta Access'}
-          </button>
-        </Form>
-        
+          {!hasReadNotice 
+            ? 'Please read the notice first'
+            : sending 
+              ? 'Submitting...' 
+              : 'Request Beta Access'}
+        </button>
+      </Form>
         {actionData?.success && (
           <div className={styles.success}>
             <p><h2>Thank you for signing up!</h2></p>

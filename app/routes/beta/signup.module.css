@@ -82,6 +82,16 @@
   border: none;
 }
 
+.buttonDisabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.button[title] {
+  cursor: help;
+}
+
 .button:hover {
   background-color: #357abd;
 }
