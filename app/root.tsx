@@ -37,12 +37,13 @@ interface DocumentProps {
   title?: string;
 }
 
-function Document({ children }: DocumentProps) {
+function Document({ children, title }: DocumentProps) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />        
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {title && <title>{title}</title>}
         <Meta />
         <Links />
       </head>
