@@ -57,6 +57,36 @@ const ERROR_MESSAGES = {
   EMAIL_REQUIRED: 'Please provide your email for confirmation'
 };
 
+const addUserToData = async (user: User) => {
+  const userData = {
+    uid: user.uid,
+    email: user.email,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (process.env.R2_KEY_SECRET) {
+      headers['X-Custom-Auth-Key'] = process.env.R2_KEY_SECRET;
+    }
+
+    const response = await fetch('https://data.striae.allyforensics.com', {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(userData)
+    });
+
+    const result = await response.json() as { success: boolean };
+    if (!result.success) {
+      throw new Error('Failed to add user to data store');
+    }
+  } catch (error) {
+    console.error('Error adding user to data:', error);
+    throw error;
+  }
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -311,6 +341,7 @@ export default function Login() {
     } else {
       const createCredential = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(createCredential.user);
+      await addUserToData(createCredential.user);
       await handleSignOut(); // Sign out immediately after registration
       setError('Registration successful! Please check your email to verify your account before logging in.');
       setIsLogin(true); // Switch to login view
