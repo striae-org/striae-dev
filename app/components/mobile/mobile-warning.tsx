@@ -19,7 +19,9 @@ export default function MobileWarning() {
   // Exclude paths containing 'popup' or specific auth routes
   const isExcludedPath = location.pathname.includes('popup') || 
     location.pathname.includes('oauth') || 
-    location.pathname.includes('auth');
+    location.pathname.includes('auth')  ||
+    location.pathname.includes('beta');
+
 
   if (!isMobile || isExcludedPath) return null;
 
