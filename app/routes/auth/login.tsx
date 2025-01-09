@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import {
-    //connectAuthEmulator, 
+    connectAuthEmulator, 
     getAuth,      
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
@@ -41,7 +41,7 @@ const provider = new GoogleAuthProvider();
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 const ERROR_MESSAGES = {
   INVALID_PASSWORD: 'Invalid password',
@@ -57,6 +57,42 @@ const ERROR_MESSAGES = {
   EMAIL_REQUIRED: 'Please provide your email for confirmation'
 };
 
+interface CloudflareContext {
+  cloudflare: {
+    env: {
+      R2_KEY_SECRET: string;
+    };
+  };
+}
+
+const addUserToData = async (user: User, context: CloudflareContext) => {
+  const userData = {
+    uid: user.uid,
+    email: user.email,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET || ''
+    };
+
+    const response = await fetch('https://data.striae.allyforensics.com', {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(userData)
+    });
+
+    const result = await response.json() as { success: boolean };
+    if (!result.success) {
+      throw new Error('Failed to add user to data store');
+    }
+  } catch (error) {
+    console.error('Error adding user to data:', error);
+    throw error;
+  }
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -274,8 +310,8 @@ export default function Login() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent, context: CloudflareContext) => {
+  e.preventDefault();
     setError('');
     setIsLoading(true);
 
@@ -311,6 +347,7 @@ export default function Login() {
     } else {
       const createCredential = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(createCredential.user);
+      await addUserToData(createCredential.user, context);
       await handleSignOut(); // Sign out immediately after registration
       setError('Registration successful! Please check your email to verify your account before logging in.');
       setIsLogin(true); // Switch to login view
@@ -441,7 +478,7 @@ export default function Login() {
             
             {authMethod === 'password' ? (
               <>
-                <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
+                <form ref={formRef} onSubmit={(e) => handleSubmit(e, { cloudflare: { env: { R2_KEY_SECRET: '' } } })} className={styles.form}>
                   <input
                     type="email"
                     name="email"
