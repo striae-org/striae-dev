@@ -208,30 +208,30 @@ You agree that the original English text shall prevail in the case of a dispute.
         </section>
         <section id="storage" className={styles.section}>
           <h2>Data Storage Addendum</h2>
-<p>At AllyForensics, we take your privacy and data security seriously. We understand the sensitive nature of the data that you may store with us. This Data Storage Addendum outlines how we handle and store your data within the app.</p>
+<p>At AllyForensics, we take your privacy and Data security seriously. We understand the sensitive nature of the Data that you may store with us. This Data Storage Addendum outlines how we handle and store your Data within the app.</p>
 <ul>
 <li>
 <p><strong>Data Storage: Secure and Private</strong></p>
-<p>Your data is securely stored on our systems, using industry-standard security protocols to ensure it is protected from unauthorized access. We prioritize your privacy and make sure your information is kept private and confidential.</p>
+<p>Your Data is securely stored on our systems, using industry-standard security protocols to ensure it is protected from unauthorized access. We prioritize your privacy and make sure your information is kept private and confidential.</p>
 </li>
 <li>
 <p><strong>Access to Data</strong></p>
-<p>Your data is strictly accessible only by you, the user, and by AllyForensics as necessary. AllyForensics may access your data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to your data.</p>
+<p>Your Data is strictly accessible only by you, the user, and by AllyForensics as necessary. AllyForensics may access your Data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to your Data.</p>
 </li>
 <li>
 <p><strong>No Sharing of Sensitive Information</strong></p>
-<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, your data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of your data are paramount to us.</p>
+<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, your Data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of your Data are paramount to us.</p>
 </li>
 <li>
 <p><strong>User Data Sharing</strong></p>
-<p>You have the option to share data with other Striae users at your discretion. This may include sharing specific case information or data relevant to your use of the app. However, you retain full control over what data is shared and with whom.</p>
+<p>You have the option to share Data with other Striae users at your discretion. This may include sharing images, specific case information, or other Data relevant to your use of the app. However, you retain full control over what Data is shared and with whom.</p>
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>
-<p>If you choose to delete your account, all associated data and information will be permanently and completely removed from Striae. This means that no data will remain stored on our systems once your account is deleted, and you will no longer have access to any of your previous data.</p>
+<p>If you choose to delete your account, all associated Data and information will be permanently and completely removed from Striae. This means that no Data will remain stored on our systems once your account is deleted, and you will no longer have access to any of your previous Data.</p>
 </li>
 </ul>
-<p>At Striae, we are committed to ensuring that your data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
+<p>At Striae, we are committed to ensuring that your Data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
 </section>
         <section className={styles.section}>
           <h2>Contact Us</h2>
