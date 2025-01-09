@@ -81,7 +81,7 @@ export async function action({ request, context }: { request: Request; context: 
         "to": [
           {
             "name": "Striae Beta Signup",
-            "email": "beta@allyforensics.com"
+            "email": "info@allyforensics.com"
           }
         ],
         "subject": "New Beta Signup Request",
