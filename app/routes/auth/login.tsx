@@ -20,6 +20,21 @@ import {
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 
+interface CloudflareContext {
+  cloudflare: {
+    env: {
+      R2_KEY_SECRET: string;
+    }
+  }
+}
+
+interface AddUserParams {
+  user: User;
+  firstName?: string;
+  lastName?: string;
+  context: CloudflareContext;
+}
+
 const firebaseConfig = {    
   apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
   authDomain: "striae-6e5ef.firebaseapp.com",
@@ -28,6 +43,33 @@ const firebaseConfig = {
   messagingSenderId: "981912078156",
   appId: "1:981912078156:web:75e4590085492b750471e9",
   measurementId: "G-FFXGKSFXXN"
+};
+
+const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
+  const userData = {
+    email: user.email,
+    firstName: firstName || '',
+    lastName: lastName || '',
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch(`https://data.striae.allyforensics.com/${user.uid}/data.json`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create user data');
+    }
+  } catch (error) {
+    console.error('Error creating user data:', error);
+    throw error;
+  }
 };
 
 const actionCodeSettings = {
@@ -58,7 +100,7 @@ const ERROR_MESSAGES = {
 };
 
 
-export default function Login() {
+export default function Login({ context }: { context: CloudflareContext }) {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -311,6 +353,17 @@ export default function Login() {
     } else {
       const createCredential = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(createCredential.user);
+
+      // Add user data to R2
+      const firstName = formData.get('firstName') as string;
+      const lastName = formData.get('lastName') as string;
+      await addUserToData({
+        user: createCredential.user,
+        firstName: firstName,
+        lastName: lastName,
+        context: context
+      });
+
       await handleSignOut(); // Sign out immediately after registration
       setError('Registration successful! Please check your email to verify your account before logging in.');
       setIsLogin(true); // Switch to login view
@@ -462,6 +515,20 @@ export default function Login() {
                   
                   {!isLogin && (
                     <>
+                    <input
+                      type="text"
+                      name="firstName"
+                      placeholder="First Name"
+                      className={styles.input}
+                      disabled={isLoading}
+                    />
+                    <input
+                      type="text"
+                      name="lastName"
+                      placeholder="Last Name"
+                      className={styles.input}
+                      disabled={isLoading}
+                    />
                       <input
                         type="password"
                         name="confirmPassword"

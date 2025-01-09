@@ -24,29 +24,36 @@ export default {
     }
 
     try {
+      const url = new URL(request.url);
+      const filename = url.pathname.slice(1) || 'data.json'; // Remove leading slash, default to data.json
+      
+      if (!filename.endsWith('.json')) {
+        return createResponse({ error: 'Invalid file type. Only JSON files are allowed.' }, 400);
+      }
+
       const bucket = env.STRIAE_DATA;
       
       switch (request.method) {
         case "GET": {
-          const file = await bucket.get('data.json');
+          const file = await bucket.get(filename);
           const data = file ? JSON.parse(await file.text()) : [];
           return createResponse(data);
         }
 
         case "PUT": {
-          const file = await bucket.get('data.json');
+          const file = await bucket.get(filename);
           const data = file ? JSON.parse(await file.text()) : [];
           const newData = await request.json();
           
           data.push(newData);
-          await bucket.put('data.json', JSON.stringify(data));
+          await bucket.put(filename, JSON.stringify(data));
           
           return createResponse({ success: true });
         }
 
         case "DELETE": {
           const { filterKey, filterValue } = await request.json();
-          const file = await bucket.get('data.json');
+          const file = await bucket.get(filename);
           const data = file ? JSON.parse(await file.text()) : [];
           
           if (!filterKey || filterValue === undefined) {
@@ -54,13 +61,11 @@ export default {
           }
           
           const updatedData = data.filter(item => item[filterKey] !== filterValue);
-          await bucket.put('data.json', JSON.stringify(updatedData));
+          await bucket.put(filename, JSON.stringify(updatedData));
           
           return createResponse({ success: true });
         }
-
-        default:
-          return createResponse({ error: 'Method not allowed' }, 405);
+        // ...existing code...
       }
     } catch (error) {
       console.error('Worker error:', error);
