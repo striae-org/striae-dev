@@ -1,13 +1,3 @@
-import Login from './auth/login';
-import { baseMeta } from '~/utils/meta';
+import { Login, loader } from './auth/login'
 
-export const meta = () => {
-  return baseMeta({
-    title: 'Login to Striae',
-    description: 'Login to your Striae account to access your projects and data',
-  });
-};
-
-export default function Index() {
-  return <Login />;
-}
+export { Login as default, loader }

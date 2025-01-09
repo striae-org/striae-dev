@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@remix-run/react';
+import { useNavigate, Link, useLoaderData } from '@remix-run/react';
+import { json } from '@remix-run/cloudflare';
 import {
     connectAuthEmulator, 
     getAuth,      
@@ -19,14 +20,35 @@ import {
 } from 'firebase/auth';
 import { initializeApp, FirebaseError } from "firebase/app";
 import styles from './login.module.css';
+import paths from '~/config.json';
+import { baseMeta } from '~/utils/meta';
 
-interface CloudflareContext {
-  cloudflare: {
-    env: {
-      R2_KEY_SECRET: string;
-    }
+export const meta = () => {
+  return baseMeta({
+    title: 'Login to Striae',
+    description: 'Login to your Striae account to access your projects and data',
+  });
+};
+
+interface CloudflareContext {  
+    cloudflare: {
+      env: {
+        R2_KEY_SECRET: string;
+      };
+    };
   }
-}
+
+  interface Data {
+    email: string;
+    firstName: string;
+    lastName: string;
+    createdAt: string;
+  }
+
+  interface LoaderData {
+    data: Data[];
+    context: CloudflareContext;
+  }
 
 interface AddUserParams {
   user: User;
@@ -34,6 +56,35 @@ interface AddUserParams {
   lastName?: string;
   context: CloudflareContext;
 }
+
+const WORKER_URL = paths.data_worker_url;
+
+export const loader = async ({ context }: { context: CloudflareContext }) => {
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch:', response.status);
+      return json<LoaderData>({ data: [], context });
+    }
+
+    const data = await response.json();
+    return json<LoaderData>({ 
+    data: Array.isArray(data) ? data.filter(Boolean) : [],
+    context 
+  });
+    
+  } catch (error) {
+    console.error('Loader error:', error);
+    return json<LoaderData>({ data: [], context });
+  }
+};
 
 const firebaseConfig = {    
   apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
@@ -46,22 +97,15 @@ const firebaseConfig = {
 };
 
 const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
-  
-  console.log('Full context:', context);
-  console.log('Cloudflare env:', context?.cloudflare?.env);
-  console.log('R2 Secret:', context?.cloudflare?.env?.R2_KEY_SECRET);
-
-  const userData = {
+  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
+    throw new Error('Missing Cloudflare context');
+  }  
+    const userData = {
     email: user.email,
     firstName: firstName || '',
     lastName: lastName || '',
     createdAt: new Date().toISOString()
-  };
-
-  // Add null check
-  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
-    throw new Error('Missing required Cloudflare context');
-  }
+  };  
 
   try {    
     const response = await fetch(`https://data.striae.allyforensics.com/${user.uid}/data.json`, {
@@ -109,8 +153,8 @@ const ERROR_MESSAGES = {
   EMAIL_REQUIRED: 'Please provide your email for confirmation'
 };
 
-
-export default function Login({ context }: { context: CloudflareContext }) {
+export const Login = () => {
+  const { context } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -369,9 +413,9 @@ export default function Login({ context }: { context: CloudflareContext }) {
       const lastName = formData.get('lastName') as string;
       await addUserToData({
         user: createCredential.user,
-        firstName: firstName,
-        lastName: lastName,
-        context: context
+        firstName,
+        lastName,
+        context
       });
 
       await handleSignOut(); // Sign out immediately after registration
@@ -595,3 +639,5 @@ export default function Login({ context }: { context: CloudflareContext }) {
     </div>
   );
 }
+
+export default Login;
