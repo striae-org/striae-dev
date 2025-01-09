@@ -4,6 +4,7 @@ node_modules
 /build
 .env
 .dev.vars
+.dns
 
 .wrangler
 .firebase
