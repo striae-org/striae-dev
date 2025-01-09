@@ -70,6 +70,7 @@ export const Turnstile = ({ className, onWidgetId, success, theme, ...rest }: Tu
   return (
     <div
     id="cf-turnstile"
+    data-size="flexible"
      className={className}     
       {...rest}      
     />
