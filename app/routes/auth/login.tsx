@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import {
-    //connectAuthEmulator, 
+    connectAuthEmulator, 
     getAuth,      
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
@@ -46,6 +46,11 @@ const firebaseConfig = {
 };
 
 const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
+  
+  console.log('Full context:', context);
+  console.log('Cloudflare env:', context?.cloudflare?.env);
+  console.log('R2 Secret:', context?.cloudflare?.env?.R2_KEY_SECRET);
+
   const userData = {
     email: user.email,
     firstName: firstName || '',
@@ -53,7 +58,12 @@ const addUserToData = async ({ user, firstName, lastName, context }: AddUserPara
     createdAt: new Date().toISOString()
   };
 
-  try {
+  // Add null check
+  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
+    throw new Error('Missing required Cloudflare context');
+  }
+
+  try {    
     const response = await fetch(`https://data.striae.allyforensics.com/${user.uid}/data.json`, {
       method: 'PUT',
       headers: {
@@ -62,9 +72,9 @@ const addUserToData = async ({ user, firstName, lastName, context }: AddUserPara
       },
       body: JSON.stringify(userData)
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to create user data');
+    
+    if (!response.ok) {      
+      throw new Error('Failed to create user data');      
     }
   } catch (error) {
     console.error('Error creating user data:', error);
@@ -83,7 +93,7 @@ const provider = new GoogleAuthProvider();
 console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 
 const ERROR_MESSAGES = {
   INVALID_PASSWORD: 'Invalid password',
@@ -516,6 +526,14 @@ export default function Login({ context }: { context: CloudflareContext }) {
                   {!isLogin && (
                     <>
                     <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        className={styles.input}
+                        required
+                        disabled={isLoading}
+                      />
+                    <input
                       type="text"
                       name="firstName"
                       placeholder="First Name"
@@ -528,15 +546,7 @@ export default function Login({ context }: { context: CloudflareContext }) {
                       placeholder="Last Name"
                       className={styles.input}
                       disabled={isLoading}
-                    />
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Confirm Password"
-                        className={styles.input}
-                        required
-                        disabled={isLoading}
-                      />
+                    />                      
                       {passwordStrength && (
                         <div className={styles.passwordStrength}>
                           <pre>{passwordStrength}</pre>
