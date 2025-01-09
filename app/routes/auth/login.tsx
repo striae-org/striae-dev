@@ -243,7 +243,6 @@ export const Login = () => {
         type="email"
         name="email"
         placeholder="Email"
-        autoComplete="email"
         className={styles.input}
         required
       />
@@ -463,7 +462,6 @@ export const Login = () => {
         type="email"
         name="email"
         placeholder="Email"
-        autoComplete="email"
         className={styles.input}
         required
         disabled={isLoading}
@@ -555,7 +553,6 @@ export const Login = () => {
                     type="email"
                     name="email"
                     placeholder="Email"
-                    autoComplete="email"
                     className={styles.input}
                     required
                     disabled={isLoading}
@@ -564,7 +561,6 @@ export const Login = () => {
                     type="password"
                     name="password"
                     placeholder="Password"
-                    autoComplete={isLogin ? "current-password" : "new-password"}
                     className={styles.input}
                     required
                     disabled={isLoading}
@@ -577,7 +573,6 @@ export const Login = () => {
                         type="password"
                         name="confirmPassword"
                         placeholder="Confirm Password"
-                        autoComplete={isLogin ? "current-password" : "new-password"}
                         className={styles.input}
                         required
                         disabled={isLoading}
@@ -586,7 +581,6 @@ export const Login = () => {
                       type="text"
                       name="firstName"
                       placeholder="First Name"
-                      autoComplete="given-name"
                       className={styles.input}
                       disabled={isLoading}
                     />
@@ -594,7 +588,6 @@ export const Login = () => {
                       type="text"
                       name="lastName"
                       placeholder="Last Name"
-                      autoComplete="family-name"
                       className={styles.input}
                       disabled={isLoading}
                     />                      
