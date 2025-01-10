@@ -4,6 +4,9 @@ import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import paths from '~/config.json';
 import { SignOut } from '~/components/actions/signout';
+import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import firebaseConfig from '~/config/firebase';
 
 export const meta = () => {
   return baseMeta({
@@ -36,13 +39,23 @@ interface CloudflareContext {
 
   const WORKER_URL = paths.data_worker_url;
 
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
 
 export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
   const url = new URL(request.url);
   const uid = url.searchParams.get('uid');
 
-  if (!uid) {
-    return redirect('/');
+  // Check if user is authenticated
+  const currentUser = auth.currentUser;
+  if (!currentUser || !currentUser.emailVerified) {
+    return redirect('/auth/login');
+  }
+
+  // Verify UID matches current user
+  if (!uid || uid !== currentUser.uid) {
+    return redirect('/auth/login');
   }
 
   try {
