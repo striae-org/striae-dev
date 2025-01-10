@@ -44,7 +44,7 @@ export const loader = async ({ request, context }: { request: Request; context: 
   const uid = url.searchParams.get('uid');  
   
   if (!uid) {
-    return redirect('/auth/login');
+    return redirect('/');
   }
 
   try {
@@ -70,13 +70,14 @@ export const loader = async ({ request, context }: { request: Request; context: 
     }
 
     return json<LoaderData>({
-      uid,
-      permitted: false,
+      uid: data.uid,
+      permitted: data.permitted,
       email: data.email,
       firstName: data.firstName
     });
 
   } catch (error) {
+    console.error(error);
     throw new Error('Failed to load user data');
   }
 };
