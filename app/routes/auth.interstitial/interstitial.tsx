@@ -48,7 +48,9 @@ export const loader = async ({ request, context }: { request: Request; context: 
   }
 
   try {
+    // Get user data from data.json using worker's GET method
     const response = await fetch(`https://data.striae.allyforensics.com/${uid}/data.json`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
@@ -59,22 +61,27 @@ export const loader = async ({ request, context }: { request: Request; context: 
       throw new Error('Failed to fetch user data');
     }
 
-    const data = await response.json();
+    const users = await response.json();
+    const userData = Array.isArray(users) ? users.find(user => user.uid === uid) : null;
     
-    if (!isUserData(data)) {
-      throw new Error('Invalid user data format');
+    if (!userData || !isUserData(userData)) {
+      throw new Error('User not found');
     }
     
-    if (data.permitted) {
-      return redirect(`/app?uid=${uid}`); //TODO Replace with Canvas when completed
+    if (userData.permitted === true) {
+      return redirect(`/app?uid=${uid}`);
     }
 
-    return json<LoaderData>({
-      uid: data.uid,
-      permitted: data.permitted,
-      email: data.email,
-      firstName: data.firstName
-    });
+    if (userData.permitted === false) {
+      return json<LoaderData>({
+        uid: userData.uid,
+        permitted: false,
+        email: userData.email,
+        firstName: userData.firstName
+      });
+    }
+
+    throw new Error('Invalid permission state');
 
   } catch (error) {
     console.error(error);
