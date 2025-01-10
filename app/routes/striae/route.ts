@@ -1,1 +1,0 @@
-export { Striae as default, meta, loader } from './striae'

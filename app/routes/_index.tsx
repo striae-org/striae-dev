@@ -1,1 +1,1 @@
-export { Login as default, action, loader, meta } from './auth/login'
+export { Login as default, loader, meta } from './auth/login'
