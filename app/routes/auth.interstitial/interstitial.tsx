@@ -4,11 +4,12 @@ import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import paths from '~/config.json';
 import { SignOut } from '~/components/actions/signout';
+import { auth } from '~/services/firebase';
 
 export const meta = () => {
   return baseMeta({
     title: 'Beta Gatekeeper',
-    description: 'Sorry, the beta is closed',
+    description: 'Sorry, the beta is currently closed. Check back later.',
   });
 };
 
@@ -36,14 +37,16 @@ interface CloudflareContext {
 
   const WORKER_URL = paths.data_worker_url;
 
-
 export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
   const url = new URL(request.url);
   const uid = url.searchParams.get('uid');
 
-  if (!uid) {
+  // Check if user is authenticated
+  const currentUser = auth.currentUser;
+  
+  if (!currentUser || !currentUser.emailVerified || !uid || currentUser.uid !== uid) {
     return redirect('/');
-  }
+  }  
 
   try {
     const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
@@ -66,9 +69,9 @@ export const loader = async ({ request, context }: { request: Request; context: 
       context 
     });
      
-  } catch (error) {
+ } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    return redirect('/');
   }
 };
 

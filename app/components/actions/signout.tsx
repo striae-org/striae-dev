@@ -1,15 +1,11 @@
-import { getAuth } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import firebaseConfig from '~/config/firebase';
+import { auth } from '~/services/firebase';
 import styles from './signout.module.css';
 
 interface SignOutProps {
   redirectTo?: string;
 }
 
-  export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {  
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {    
 
   const handleSignOut = async () => {
     try {

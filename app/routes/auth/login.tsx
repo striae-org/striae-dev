@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
+import { auth } from '~/services/firebase';
 import {
-    //connectAuthEmulator, 
-    getAuth,      
+    //connectAuthEmulator,           
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
@@ -18,8 +18,7 @@ import {
     signInWithPopup,
     getAdditionalUserInfo    
 } from 'firebase/auth';
-import { initializeApp, FirebaseError } from "firebase/app";
-import firebaseConfig from '~/config/firebase';
+import { FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 import paths from '~/config.json';
 import { baseMeta } from '~/utils/meta';
@@ -90,17 +89,6 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     return json<LoaderData>({ data: [], context });
   }
 };
-/*
-const firebaseConfig = {    
-  apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
-  authDomain: "striae-6e5ef.firebaseapp.com",
-  projectId: "striae-6e5ef",
-  storageBucket: "striae-6e5ef.firebasestorage.app",
-  messagingSenderId: "981912078156",
-  appId: "1:981912078156:web:75e4590085492b750471e9",
-  measurementId: "G-FFXGKSFXXN"
-};
-*/
 
 const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
   if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
@@ -139,10 +127,7 @@ const actionCodeSettings = {
   handleCodeInApp: true,
 };
 
-const appAuth = initializeApp(firebaseConfig, "Striae");
-const auth = getAuth(appAuth);
 const provider = new GoogleAuthProvider();
-console.log(`Welcome to ${appAuth.name}`); // "Welcome to Striae"
 
 //Connect to the Firebase Auth emulator if running locally
 //connectAuthEmulator(auth, 'http://127.0.0.1:9099');
