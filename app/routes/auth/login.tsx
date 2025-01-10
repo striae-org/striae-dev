@@ -290,10 +290,14 @@ export const Login = () => {
 
    useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-   if (user && !window.location.href.includes('signout=true')) {
+   if (user) {
       if (!user.emailVerified) {
         handleSignOut();
         setError('Please verify your email before logging in');
+        return;
+      }
+      if (window.location.href.includes('signout=true')) {
+        handleSignOut();
         return;
       }
       console.log("Logged in user:", user.email);
