@@ -228,11 +228,7 @@ export const Login = () => {
         handleSignOut();
         setError('Please verify your email before logging in');
         return;
-      }
-      if (window.location.href.includes('signout=true')) {
-        handleSignOut();
-        return;
-      }
+      }      
       console.log("Logged in user:", user.email);
       setUser(user);
       navigate(`/auth/interstitial?uid=${user.uid}`);
@@ -437,8 +433,12 @@ export const Login = () => {
   };
 
   // If user is already logged in, show a message or redirect
-  if (user) {          
-    return (
+  if (user) {
+    setUser(user);
+      navigate(`/auth/interstitial?uid=${user.uid}`);          
+    return null;
+    /*
+      return (
       <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>
   <div className={styles.logo} />
@@ -448,7 +448,8 @@ export const Login = () => {
           <h2>Please wait, you are being redirected</h2>          
         </div>
       </div>
-    );
+    ); 
+    */
   }
 
   return (

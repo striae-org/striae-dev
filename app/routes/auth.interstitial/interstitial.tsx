@@ -5,6 +5,7 @@ import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import { SignOut } from '~/components/actions/signout';
 import paths from '~/config.json';
+import { auth } from '~/services/firebase';
 
 export const meta = () => {
   return baseMeta({
@@ -21,7 +22,7 @@ interface CloudflareContext {
     };
   }
 
-  interface Data {
+  interface UserData {
     email: string;
     firstName: string;
     lastName: string;
@@ -30,10 +31,7 @@ interface CloudflareContext {
     uid: string;
   }
 
-  interface LoaderData {
-    data: Data[];
-    context: CloudflareContext;
-  }
+  type LoaderData = UserData;
 
   const WORKER_URL = paths.data_worker_url;
 
@@ -46,12 +44,10 @@ export const loader = async ({ request, context }: { request: Request; context: 
     return redirect('/');
   }
 
-  // Clean URL after getting uid
-  if (typeof window !== 'undefined') {
-    const cleanUrl = new URL(window.location.href);
-    cleanUrl.searchParams.delete('uid');
-    window.history.replaceState({}, '', cleanUrl.toString());
-  }
+  const currentUser = auth.currentUser;
+  if (!currentUser || !currentUser.emailVerified || currentUser.uid !== uid) {
+    return redirect('/');
+  } 
 
   try {
     const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
@@ -63,58 +59,53 @@ export const loader = async ({ request, context }: { request: Request; context: 
     });
     
     if (!response.ok) {
-      console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [], context });
+      throw new Error('Failed to fetch user data');
     }
 
-    const data = await response.json();
-    console.log('Loader data:', data); // Debug log
-    return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : [],
-      context 
-    });
+    const userData = await response.json() as UserData;
+    
+    if (userData.permitted === true) {
+      return redirect(`/app?uid=${uid}`);
+    }
+
+    return json<LoaderData>(userData);
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    throw error;
   }
 };
 
 export const Interstitial = () => {
-  const { data } = useLoaderData<typeof loader>();
+  const userData = useLoaderData<typeof loader>();
   const { user } = useAuth();
   
-  if (!user) return redirect('/');
-  
-  console.log('Component data:', data); // Debug log
-
-  if (data[0]?.permitted === true) {
-    return redirect(`/app?uid=${data[0].uid}`);
-  } 
+  if (!user) {
+    return redirect('/');
+  }
 
   return (
     <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-        <div className={styles.formWrapper}>
-          <div className={styles.form}>
-            <div className={styles.title}>
-      <h1>Welcome to Striae</h1>
+        <div className={styles.logo} />
+      </Link>
+      <div className={styles.formWrapper}>
+        <div className={styles.form}>
+          <div className={styles.title}>
+            <h1>Welcome to Striae</h1>
+          </div>
+          <div className={styles.subtitle}>
+            <h2>{userData.firstName || userData.email || 'User'}</h2>
+          </div>
+          <p>Your account is pending activation.</p>
+          <div className={styles.options}>
+            <Link to="/pricing" className={styles.button}>
+              View Plans
+            </Link>
+            <SignOut />
+          </div>
+        </div>
       </div>
-      <div className={styles.subtitle}>
-      <h2>{data?.[0]?.firstName || data?.[0]?.email || 'User'}</h2>
-      </div>
-      <p>Your account is pending activation.</p>
-      <div className={styles.options}>
-        {/* TODO Replace with Pricing when Completed */}
-        <Link to="/pricing" className={styles.button}>
-          View Plans
-        </Link>
-        <SignOut />
-      </div>
-      </div>
-    </div>
     </div>
   );
 }
