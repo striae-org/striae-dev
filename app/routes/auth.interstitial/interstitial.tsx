@@ -1,6 +1,14 @@
 import { json, redirect } from '@remix-run/cloudflare';
 import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
+import { baseMeta } from '~/utils/meta';
+
+export const meta = () => {
+  return baseMeta({
+    title: 'Beta Gatekeeper',
+    description: 'Sorry, the beta is closed',
+  });
+};
 
 interface LoaderData {
   uid: string;
@@ -73,7 +81,7 @@ export const loader = async ({ request, context }: { request: Request; context: 
   }
 };
 
-export default function Interstitial() {
+export const Interstitial = () => {
   const data = useLoaderData<typeof loader>();
 
   return (
@@ -93,3 +101,5 @@ export default function Interstitial() {
     </div>
   );
 }
+
+export default Interstitial;
