@@ -42,6 +42,7 @@ interface CloudflareContext {
     email: string;
     firstName: string;
     lastName: string;
+    permitted: boolean;
     createdAt: string;
   }
 
@@ -54,6 +55,7 @@ interface AddUserParams {
   user: User;
   firstName?: string;
   lastName?: string;
+  permitted?: boolean;
   context: CloudflareContext;
 }
 
@@ -416,6 +418,7 @@ export const Login = () => {
         user: createCredential.user,
         firstName,
         lastName,
+        permitted: false,
         context
       });
 
