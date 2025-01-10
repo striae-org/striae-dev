@@ -3,7 +3,7 @@ import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { auth } from '~/services/firebase';
 import {
-    //connectAuthEmulator,           
+    applyActionCode,           
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
@@ -12,12 +12,12 @@ import {
     isSignInWithEmailLink,
     sendPasswordResetEmail,
     sendEmailVerification,
-    applyActionCode,
     User,
     GoogleAuthProvider,
     signInWithPopup,
     getAdditionalUserInfo    
 } from 'firebase/auth';
+import { ERROR_MESSAGES } from '~/services/firebase-errors';
 import { FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 import paths from '~/config.json';
@@ -60,6 +60,11 @@ interface AddUserParams {
   uid: string;
   context: CloudflareContext;
 }
+
+const actionCodeSettings = {
+  url: 'https://striae.allyforensics.com', // Update with your domain in production
+  handleCodeInApp: true,
+};
 
 const WORKER_URL = paths.data_worker_url;
 
@@ -122,29 +127,7 @@ const addUserToData = async ({ user, firstName, lastName, context }: AddUserPara
   }
 };
 
-const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com', // Update with your domain in production
-  handleCodeInApp: true,
-};
-
 const provider = new GoogleAuthProvider();
-
-//Connect to the Firebase Auth emulator if running locally
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-
-const ERROR_MESSAGES = {
-  INVALID_PASSWORD: 'Invalid password',
-  USER_NOT_FOUND: 'No account found with this email',
-  EMAIL_IN_USE: 'An account with this email already exists',
-  REGISTRATION_DISABLED: 'New registrations are currently disabled',
-  PASSWORDS_MISMATCH: 'Passwords do not match',
-  WEAK_PASSWORD: 'Password does not meet strength requirements',
-  RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
-  RESET_EMAIL_FAILED: 'Failed to send reset email',
-  LOGIN_LINK_SENT: 'Check your email for the login link!',
-  GENERAL_ERROR: 'New registrations are currently disabled',
-  EMAIL_REQUIRED: 'Please provide your email for confirmation'
-};
 
 export const Login = () => {
   const { context } = useLoaderData<LoaderData>();

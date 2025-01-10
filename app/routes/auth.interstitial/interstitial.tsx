@@ -1,3 +1,4 @@
+import { useAuth } from '~/hooks/useAuth';
 import { json, redirect } from '@remix-run/cloudflare';
 import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
@@ -81,11 +82,15 @@ export const loader = async ({ request, context }: { request: Request; context: 
 
 export const Interstitial = () => {
   const { data } = useLoaderData<typeof loader>();
+  const { user } = useAuth();
+  
+  if (!user) return redirect('/');
+  
   console.log('Component data:', data); // Debug log
 
   if (data[0]?.permitted === true) {
     return redirect(`/app?uid=${data[0].uid}`);
-  }
+  } 
 
   return (
     <div className={styles.container}>
