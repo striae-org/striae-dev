@@ -11,7 +11,7 @@ import firebaseConfig from '~/config/firebase';
 export const meta = () => {
   return baseMeta({
     title: 'Beta Gatekeeper',
-    description: 'Sorry, the beta is currently closed. Check back later.',
+    description: 'Sorry, the beta is closed',
   });
 };
 
@@ -50,12 +50,12 @@ export const loader = async ({ request, context }: { request: Request; context: 
   // Check if user is authenticated
   const currentUser = auth.currentUser;
   if (!currentUser || !currentUser.emailVerified) {
-    return redirect('/');
+    return redirect('/auth/login');
   }
 
   // Verify UID matches current user
   if (!uid || uid !== currentUser.uid) {
-    return redirect('/');
+    return redirect('/auth/login');
   }
 
   try {
