@@ -39,16 +39,9 @@ function isUserData(data: unknown): data is UserData {
   );
 }
 
-export const loader = async ({ request, context }: { request: Request; context: { cloudflare: { env: { R2_KEY_SECRET: string } } } }) => {
-  const url = new URL(request.url);
-  const uid = url.searchParams.get('uid');  
-  
-  if (!uid) {
-    return redirect('/auth/login');
-  }
-
+export const loader = async ({ context }: { context: { cloudflare: { env: { R2_KEY_SECRET: string } } } }) => {
   try {
-    const response = await fetch(`https://data.striae.allyforensics.com/${uid}/data.json`, {
+    const response = await fetch('https://data.striae.allyforensics.com/data.json', {
       headers: {
         'Content-Type': 'application/json',
         'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
@@ -60,20 +53,21 @@ export const loader = async ({ request, context }: { request: Request; context: 
     }
 
     const data = await response.json();
+    const userData = Array.isArray(data) ? data.find(isUserData) : null;
     
-    if (!isUserData(data)) {
-      throw new Error('Invalid user data format');
+    if (!userData) {
+      return redirect('/auth/login');
     }
     
-    if (data.permitted) {
-      return redirect(`/app?uid=${uid}`); //TODO Replace with Canvas when completed
+    if (userData.permitted) {
+      return redirect('/app'); // TODO: Replace with Canvas when completed
     }
 
     return json<LoaderData>({
-      uid,
+      uid: userData.uid,
       permitted: false,
-      email: data.email,
-      firstName: data.firstName
+      email: userData.email,
+      firstName: userData.firstName
     });
 
   } catch (error) {
