@@ -44,6 +44,7 @@ interface CloudflareContext {
     lastName: string;
     permitted: boolean;
     createdAt: string;
+    uid: string;
   }
 
   interface LoaderData {
@@ -56,6 +57,7 @@ interface AddUserParams {
   firstName?: string;
   lastName?: string;
   permitted?: boolean;
+  uid: string;
   context: CloudflareContext;
 }
 
@@ -103,9 +105,11 @@ const addUserToData = async ({ user, firstName, lastName, context }: AddUserPara
     throw new Error('Missing Cloudflare context');
   }  
     const userData = {
+    uid: user.uid,
     email: user.email,
     firstName: firstName || '',
     lastName: lastName || '',
+    permitted: false,
     createdAt: new Date().toISOString()
   };  
 
@@ -419,6 +423,7 @@ export const Login = () => {
         firstName,
         lastName,
         permitted: false,
+        uid: createCredential.user.uid,
         context
       });
 
