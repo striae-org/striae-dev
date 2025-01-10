@@ -1,13 +1,21 @@
 import { json, redirect } from '@remix-run/cloudflare';
 import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
-import type { CloudflareContext, UserData } from '~/types/auth';
 
 interface LoaderData {
   uid: string;
   permitted: boolean;
   email: string;
   firstName: string;
+}
+
+interface UserData {
+    email: string;
+    firstName: string;
+    lastName: string;
+    permitted: boolean;
+    createdAt: string;
+    uid: string;
 }
 
 function isUserData(data: unknown): data is UserData {
@@ -23,7 +31,7 @@ function isUserData(data: unknown): data is UserData {
   );
 }
 
-export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
+export const loader = async ({ request, context }: { request: Request; context: { cloudflare: { env: { R2_KEY_SECRET: string } } } }) => {
   const url = new URL(request.url);
   const uid = url.searchParams.get('uid');  
   
@@ -64,17 +72,6 @@ export const loader = async ({ request, context }: { request: Request; context: 
     throw new Error('Failed to load user data');
   }
 };
-
-export function ErrorBoundary() {
-  return (
-    <div className={styles.container}>
-      <h1>Error Loading User Data</h1>
-      <Link to="/auth/login" className={styles.secondaryButton}>
-        Return to Login
-      </Link>
-    </div>
-  );
-}
 
 export default function Interstitial() {
   const data = useLoaderData<typeof loader>();

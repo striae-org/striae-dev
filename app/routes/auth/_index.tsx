@@ -1,1 +1,0 @@
-export { Login as default, loader, meta } from './login';
