@@ -1,0 +1,1 @@
+export { Interstitial as default, meta, loader } from './interstitial'
