@@ -258,72 +258,72 @@ export const Login = () => {
 };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+  e.preventDefault();
+  setError('');
+  setIsLoading(true);
 
-    const formData = new FormData(formRef.current!);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
+  const formData = new FormData(formRef.current!);
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
 
-    if (!isLogin) {
-  const createCredential = await createUserWithEmailAndPassword(auth, email, password);
-  const firstName = formData.get('firstName') as string;
-  const lastName = formData.get('lastName') as string;
-  
-  // Update Firebase profile
-  await updateProfile(createCredential.user, {
-    displayName: `${firstName} ${lastName}`
-  });
-  
-  await sendEmailVerification(createCredential.user);
-  await handleSignOut();
-  setError('Registration successful! Please check your email to verify your account before logging in.');
-  setIsLogin(true);
-}
+  try {
+    if (isLogin) {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (!userCredential.user.emailVerified) {
+          await handleSignOut();
+          setError('Please verify your email before logging in');
+          return;
+        }
+        setUser(userCredential.user);
+      } catch (err) {
+        const { message } = handleAuthError(err);
+        setError(message);
+        return;
+      }
+    } else {
+      // Registration validation
+      if (password !== confirmPassword) {
+        setError(ERROR_MESSAGES.PASSWORDS_MISMATCH);
+        return;
+      }
+      
+      if (!checkPasswordStrength(password)) {
+        setError(ERROR_MESSAGES.WEAK_PASSWORD);
+        return;
+      }
 
- try {
-  if (isLogin) {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    if (!userCredential.user.emailVerified) {
-      await handleSignOut();
-      setError('Please verify your email before logging in');
-      return;
+      const firstName = formData.get('firstName') as string;
+      const lastName = formData.get('lastName') as string;
+
+      if (!firstName || !lastName) {
+        setError('First and last name are required');
+        return;
+      }
+
+      try {
+        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(createCredential.user, {
+          displayName: `${firstName} ${lastName}`
+        });
+
+        await sendEmailVerification(createCredential.user);
+        await handleSignOut();
+        setError('Registration successful! Please verify your email before logging in.');
+        setIsLogin(true);
+      } catch (err) {
+        const { message } = handleAuthError(err);
+        setError(message);
+        return;
+      }
     }
-  } else {
-    // Validation checks remain unchanged
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-    
-    if (!checkPasswordStrength(password)) {
-      setError('Password does not meet strength requirements');
-      setIsLoading(false);
-      return;
-    }
-
-    // New user creation with profile update
-    const createCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
-
-    await updateProfile(createCredential.user, {
-      displayName: `${firstName} ${lastName}`
-    });
-
-    await sendEmailVerification(createCredential.user);
-    await handleSignOut();
-    setError('Registration successful! Please verify your email before logging in.');
-    setIsLogin(true);
+  } catch (err) {
+    const { message } = handleAuthError(err);
+    setError(message);
+  } finally {
+    setIsLoading(false);
   }
-} catch (err: unknown) {
-  handleAuthError(err);
-} finally {
-  setIsLoading(false);
-}
 };
 
   const EmailLinkForm = () => {
