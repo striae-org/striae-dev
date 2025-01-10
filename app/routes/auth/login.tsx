@@ -491,9 +491,7 @@ export const Login = () => {
   };
 
   // If user is already logged in, show a message or redirect
-  if (user) {
-    setUser(user);
-      navigate(`/auth/interstitial?uid=${user.uid}`);
+  if (user) {          
     return (
       <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>

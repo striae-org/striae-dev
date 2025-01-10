@@ -2,6 +2,7 @@ import { json, redirect } from '@remix-run/cloudflare';
 import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
+import { SignOut } from '~/components/actions/signout';
 import paths from '~/config.json';
 
 export const meta = () => {
@@ -98,9 +99,7 @@ export const Interstitial = () => {
         <Link to="/pricing" className={styles.button}>
           View Plans
         </Link>
-        <Link to="/" className={styles.secondaryButton}>
-          Sign Out
-        </Link>
+        <SignOut />
       </div>
       </div>
     </div>
