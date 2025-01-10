@@ -52,10 +52,11 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     }
 
     const data = await response.json();
+    console.log('Loader data:', data); // Debug log
     return json<LoaderData>({ 
-    data: Array.isArray(data) ? data.filter(Boolean) : [],
-    context 
-  });
+      data: Array.isArray(data) ? data.filter(Boolean) : [],
+      context 
+    });
      
   } catch (error) {
     console.error('Loader error:', error);
@@ -65,6 +66,7 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
 
 export const Interstitial = () => {
   const { data } = useLoaderData<typeof loader>();
+  console.log('Component data:', data); // Debug log
 
   if (data[0]?.permitted === true) {
     return redirect(`/app?uid=${data[0].uid}`);
@@ -81,7 +83,7 @@ export const Interstitial = () => {
       <h1>Welcome to Striae</h1>
       </div>
       <div className={styles.subtitle}>
-      <h2>{data[0]?.firstName || data[0]?.email}</h2>
+      <h2>{data?.[0]?.firstName || data?.[0]?.email || 'User'}</h2>
       </div>
       <p>Your account is pending activation.</p>
       <div className={styles.options}>
