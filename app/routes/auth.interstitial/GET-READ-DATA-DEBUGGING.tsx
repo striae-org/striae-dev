@@ -98,7 +98,7 @@ export const Interstitial = () => {
         <Link to="/pricing" className={styles.button}>
           View Plans
         </Link>
-        <Link to="/auth/login" className={styles.secondaryButton}>
+        <Link to="/" className={styles.secondaryButton}>
           Sign Out
         </Link>
       </div>

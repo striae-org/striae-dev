@@ -3,13 +3,11 @@ import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import paths from '~/config.json';
-import { SignOut } from '~/components/actions/signout';
-import { auth } from '~/services/firebase';
 
 export const meta = () => {
   return baseMeta({
     title: 'Beta Gatekeeper',
-    description: 'Sorry, the beta is currently closed. Check back later.',
+    description: 'Sorry, the beta is closed',
   });
 };
 
@@ -37,16 +35,14 @@ interface CloudflareContext {
 
   const WORKER_URL = paths.data_worker_url;
 
+
 export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
   const url = new URL(request.url);
   const uid = url.searchParams.get('uid');
 
-  // Check if user is authenticated
-  const currentUser = auth.currentUser;
-  
-  if (!currentUser || !currentUser.emailVerified || !uid || currentUser.uid !== uid) {
+  if (!uid) {
     return redirect('/');
-  }  
+  }
 
   try {
     const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
@@ -69,9 +65,9 @@ export const loader = async ({ request, context }: { request: Request; context: 
       context 
     });
      
- } catch (error) {
+  } catch (error) {
     console.error('Loader error:', error);
-    return redirect('/');
+    return json<LoaderData>({ data: [], context });
   }
 };
 
@@ -102,7 +98,9 @@ export const Interstitial = () => {
         <Link to="/pricing" className={styles.button}>
           View Plans
         </Link>
-        <SignOut />
+        <Link to="/" className={styles.secondaryButton}>
+          Sign Out
+        </Link>
       </div>
       </div>
     </div>
