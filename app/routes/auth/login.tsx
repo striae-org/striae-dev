@@ -19,7 +19,6 @@ import {
     getAdditionalUserInfo    
 } from 'firebase/auth';
 import { FirebaseError } from "firebase/app";
-import { SignOut } from '~/components/actions/signout';
 import styles from './login.module.css';
 import paths from '~/config.json';
 import { baseMeta } from '~/utils/meta';
@@ -500,7 +499,7 @@ export const Login = () => {
 </Link>
         <div className={styles.formWrapper}>
           <h1 className={styles.title}>Welcome {user.email}</h1>
-          <SignOut />
+          <h2>Please wait, you are being redirected</h2>          
         </div>
       </div>
     );
