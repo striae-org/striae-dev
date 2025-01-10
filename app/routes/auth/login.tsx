@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
+import { addUserData } from '~/components/actions/addUserData';
 import { auth } from '~/services/firebase';
+import { json } from '@remix-run/cloudflare';
 import {
     applyActionCode,           
     signInWithEmailAndPassword, 
@@ -21,6 +22,7 @@ import { ERROR_MESSAGES } from '~/services/firebase-errors';
 import { FirebaseError } from "firebase/app";
 import styles from './login.module.css';
 import paths from '~/config.json';
+
 import { baseMeta } from '~/utils/meta';
 
 export const meta = () => {
@@ -30,15 +32,7 @@ export const meta = () => {
   });
 };
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        R2_KEY_SECRET: string;
-      };
-    };
-  }
-
-  interface Data {
+interface Data {
     email: string;
     firstName: string;
     lastName: string;
@@ -47,18 +41,17 @@ interface CloudflareContext {
     uid: string;
   }
 
-  interface LoaderData {
+interface LoaderData {
     data: Data[];
     context: CloudflareContext;
   }
 
-interface AddUserParams {
-  user: User;
-  firstName?: string;
-  lastName?: string;
-  permitted?: boolean;
-  uid: string;
-  context: CloudflareContext;
+interface CloudflareContext {
+  cloudflare: {
+    env: {
+      R2_KEY_SECRET: string;
+    };
+  };
 }
 
 const actionCodeSettings = {
@@ -66,6 +59,7 @@ const actionCodeSettings = {
   handleCodeInApp: true,
 };
 
+const provider = new GoogleAuthProvider();
 const WORKER_URL = paths.data_worker_url;
 
 export const loader = async ({ context }: { context: CloudflareContext }) => {
@@ -94,40 +88,6 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     return json<LoaderData>({ data: [], context });
   }
 };
-
-const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
-  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
-    throw new Error('Missing Cloudflare context');
-  }  
-    const userData = {
-    uid: user.uid,
-    email: user.email,
-    firstName: firstName || '',
-    lastName: lastName || '',
-    permitted: false,
-    createdAt: new Date().toISOString()
-  };  
-
-  try {    
-    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
-      },
-      body: JSON.stringify(userData)
-    });
-    
-    if (!response.ok) {      
-      throw new Error('Failed to create user data');      
-    }
-  } catch (error) {
-    console.error('Error creating user data:', error);
-    throw error;
-  }
-};
-
-const provider = new GoogleAuthProvider();
 
 export const Login = () => {
   const { context } = useLoaderData<LoaderData>();
@@ -158,8 +118,13 @@ export const Login = () => {
     }
     
     const additionalInfo = getAdditionalUserInfo(result);
-    console.log('Google sign-in successful:', { user, token, additionalInfo });
-    
+    if (additionalInfo?.isNewUser) {
+      await addUserData({
+        user: result.user,
+        context
+      });
+}
+    console.log('Google sign-in successful:', { user, token, additionalInfo });    
     setUser(user);
     navigate('/');
   } catch (err) {
@@ -392,12 +357,10 @@ export const Login = () => {
       // Add user data to R2
       const firstName = formData.get('firstName') as string;
       const lastName = formData.get('lastName') as string;
-      await addUserToData({
+      await addUserData({
         user: createCredential.user,
         firstName,
         lastName,
-        permitted: false,
-        uid: createCredential.user.uid,
         context
       });
 
