@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
+import { addUserData } from '~/components/actions/addUserData';
 import { auth } from '~/services/firebase';
+import { json } from '@remix-run/cloudflare';
 import {
-    //connectAuthEmulator,           
+    applyActionCode,           
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
@@ -12,15 +13,17 @@ import {
     isSignInWithEmailLink,
     sendPasswordResetEmail,
     sendEmailVerification,
-    applyActionCode,
     User,
     GoogleAuthProvider,
     signInWithPopup,
     getAdditionalUserInfo    
 } from 'firebase/auth';
-import { FirebaseError } from "firebase/app";
+import { ERROR_MESSAGES } from '~/services/firebase-errors';
+import { FirebaseError } from 'firebase/app';
+import { Interstitial } from './interstitial';
 import styles from './login.module.css';
 import paths from '~/config.json';
+
 import { baseMeta } from '~/utils/meta';
 
 export const meta = () => {
@@ -30,15 +33,7 @@ export const meta = () => {
   });
 };
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        R2_KEY_SECRET: string;
-      };
-    };
-  }
-
-  interface Data {
+interface Data {
     email: string;
     firstName: string;
     lastName: string;
@@ -47,20 +42,25 @@ interface CloudflareContext {
     uid: string;
   }
 
-  interface LoaderData {
+interface LoaderData {
     data: Data[];
     context: CloudflareContext;
   }
 
-interface AddUserParams {
-  user: User;
-  firstName?: string;
-  lastName?: string;
-  permitted?: boolean;
-  uid: string;
-  context: CloudflareContext;
+interface CloudflareContext {
+  cloudflare: {
+    env: {
+      R2_KEY_SECRET: string;
+    };
+  };
 }
 
+const actionCodeSettings = {
+  url: 'https://striae.allyforensics.com', // Update with your domain in production
+  handleCodeInApp: true,
+};
+
+const provider = new GoogleAuthProvider();
 const WORKER_URL = paths.data_worker_url;
 
 export const loader = async ({ context }: { context: CloudflareContext }) => {
@@ -88,62 +88,6 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     console.error('Loader error:', error);
     return json<LoaderData>({ data: [], context });
   }
-};
-
-const addUserToData = async ({ user, firstName, lastName, context }: AddUserParams) => {
-  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
-    throw new Error('Missing Cloudflare context');
-  }  
-    const userData = {
-    uid: user.uid,
-    email: user.email,
-    firstName: firstName || '',
-    lastName: lastName || '',
-    permitted: false,
-    createdAt: new Date().toISOString()
-  };  
-
-  try {    
-    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
-      },
-      body: JSON.stringify(userData)
-    });
-    
-    if (!response.ok) {      
-      throw new Error('Failed to create user data');      
-    }
-  } catch (error) {
-    console.error('Error creating user data:', error);
-    throw error;
-  }
-};
-
-const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com', // Update with your domain in production
-  handleCodeInApp: true,
-};
-
-const provider = new GoogleAuthProvider();
-
-//Connect to the Firebase Auth emulator if running locally
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-
-const ERROR_MESSAGES = {
-  INVALID_PASSWORD: 'Invalid password',
-  USER_NOT_FOUND: 'No account found with this email',
-  EMAIL_IN_USE: 'An account with this email already exists',
-  REGISTRATION_DISABLED: 'New registrations are currently disabled',
-  PASSWORDS_MISMATCH: 'Passwords do not match',
-  WEAK_PASSWORD: 'Password does not meet strength requirements',
-  RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
-  RESET_EMAIL_FAILED: 'Failed to send reset email',
-  LOGIN_LINK_SENT: 'Check your email for the login link!',
-  GENERAL_ERROR: 'New registrations are currently disabled',
-  EMAIL_REQUIRED: 'Please provide your email for confirmation'
 };
 
 export const Login = () => {
@@ -175,8 +119,13 @@ export const Login = () => {
     }
     
     const additionalInfo = getAdditionalUserInfo(result);
-    console.log('Google sign-in successful:', { user, token, additionalInfo });
-    
+    if (additionalInfo?.isNewUser) {
+      await addUserData({
+        user: result.user,
+        context
+      });
+}
+    console.log('Google sign-in successful:', { user, token, additionalInfo });    
     setUser(user);
     navigate('/');
   } catch (err) {
@@ -280,14 +229,9 @@ export const Login = () => {
         handleSignOut();
         setError('Please verify your email before logging in');
         return;
-      }
-      if (window.location.href.includes('signout=true')) {
-        handleSignOut();
-        return;
-      }
+      }      
       console.log("Logged in user:", user.email);
-      setUser(user);
-      navigate(`/auth/interstitial?uid=${user.uid}`);
+      setUser(user);      
     } else {
       console.log("No user logged in");
       setUser(null);
@@ -409,12 +353,10 @@ export const Login = () => {
       // Add user data to R2
       const firstName = formData.get('firstName') as string;
       const lastName = formData.get('lastName') as string;
-      await addUserToData({
+      await addUserData({
         user: createCredential.user,
         firstName,
         lastName,
-        permitted: false,
-        uid: createCredential.user.uid,
         context
       });
 
@@ -488,29 +430,18 @@ export const Login = () => {
     } catch (err) {
       console.error('Sign out error:', err);
     }
-  };
-
-  // If user is already logged in, show a message or redirect
-  if (user) {          
-    return (
-      <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-        <div className={styles.formWrapper}>
-          <h1 className={styles.title}>Welcome {user.email}</h1>
-          <h2>Please wait, you are being redirected</h2>          
-        </div>
-      </div>
-    );
-  }
+  };  
 
   return (
-    <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-      <div className={styles.formWrapper}>
+    <>
+      {user ? (
+        <Interstitial user={user} />
+      ) : (
+        <div className={styles.container}>
+          <Link to="/" className={styles.logoLink}>
+            <div className={styles.logo} />
+          </Link>
+          <div className={styles.formWrapper}>
         {isResetting ? (
           <ResetPasswordForm />
         ) : (
@@ -636,9 +567,11 @@ export const Login = () => {
             )}
           </>
         )}
-      </div>
-    </div>
+     </div>
+        </div>
+      )}
+    </>
   );
-}
+};
 
 export default Login;

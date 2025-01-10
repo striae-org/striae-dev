@@ -13,6 +13,10 @@ import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
 import "./tailwind.css";
 import styles from '~/styles/error.module.css';
+import { auth } from "./services/firebase";
+import { AuthContext } from "./contexts/auth.context";
+import { User } from 'firebase/auth';
+import { useEffect, useState } from 'react';
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -53,9 +57,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    return auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
 }
 
 export function ErrorBoundary() {

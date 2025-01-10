@@ -5,17 +5,12 @@ interface SignOutProps {
   redirectTo?: string;
 }
 
-  export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {    
-
+export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {    
   const handleSignOut = async () => {
     try {
       await auth.signOut();
       localStorage.clear();
-      
-      // Add signout param to URL
-      const url = new URL(redirectTo, window.location.origin);
-      url.searchParams.set('signout', 'true');
-      window.location.href = url.toString();
+      window.location.href = redirectTo;
     } catch (error) {
       console.error('Sign out error:', error);
     }
