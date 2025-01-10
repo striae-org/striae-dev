@@ -61,28 +61,22 @@ export const loader = async ({ request, context }: { request: Request; context: 
       throw new Error('Failed to fetch user data');
     }
 
-    const users = await response.json();
-    const userData = Array.isArray(users) ? users.find(user => user.uid === uid) : null;
-    
-    if (!userData || !isUserData(userData)) {
-      throw new Error('User not found');
-    }
-    
-    if (userData.permitted === true) {
-      return redirect(`/app?uid=${uid}`);
-    }
+    const data = await response.json();
 
-    if (userData.permitted === false) {
-      return json<LoaderData>({
-        uid: userData.uid,
-        permitted: false,
-        email: userData.email,
-        firstName: userData.firstName
-      });
-    }
+if (!isUserData(data)) {
+  throw new Error('Invalid user data format');
+}
 
-    throw new Error('Invalid permission state');
+if (data.permitted === true) {
+  return redirect(`/app?uid=${uid}`);
+}
 
+return json<LoaderData>({
+  uid: data.uid,
+  permitted: data.permitted,
+  email: data.email,
+  firstName: data.firstName
+});
   } catch (error) {
     console.error(error);
     throw new Error('Failed to load user data');
