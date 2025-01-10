@@ -1,5 +1,5 @@
-//import { json, redirect } from '@remix-run/cloudflare'; useLoaderData,
-import { Link } from '@remix-run/react';
+import { json, redirect } from '@remix-run/cloudflare';
+import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 
@@ -10,7 +10,6 @@ export const meta = () => {
   });
 };
 
-/*
 interface LoaderData {
   uid: string;
   permitted: boolean;
@@ -75,29 +74,24 @@ export const loader = async ({ context }: { context: { cloudflare: { env: { R2_K
     throw new Error('Failed to load user data');
   }
 };
-*/
+
 export const Interstitial = () => {
-  //const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
 
   return (
     <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-        <div className={styles.formWrapper}>
       <h1>Welcome to Striae</h1>
-      {/*<h2>{data.firstName || data.email}</h2>*/}
+      <h2>{data.firstName || data.email}</h2>
       <p>Your account is pending activation.</p>
       <div className={styles.options}>
         {/* TODO Replace with Pricing when Completed */}
         <Link to="/pricing" className={styles.button}>
           View Plans
         </Link>
-        <Link to="/" className={styles.secondaryButton}>
+        <Link to="/auth/login" className={styles.secondaryButton}>
           Sign Out
         </Link>
       </div>
-    </div>
     </div>
   );
 }
