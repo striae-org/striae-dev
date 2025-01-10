@@ -19,7 +19,8 @@ import {
     getAdditionalUserInfo    
 } from 'firebase/auth';
 import { ERROR_MESSAGES } from '~/services/firebase-errors';
-import { FirebaseError } from "firebase/app";
+import { FirebaseError } from 'firebase/app';
+import { Interstitial } from './interstitial';
 import styles from './login.module.css';
 import paths from '~/config.json';
 
@@ -230,8 +231,7 @@ export const Login = () => {
         return;
       }      
       console.log("Logged in user:", user.email);
-      setUser(user);
-      navigate(`/auth/interstitial?uid=${user.uid}`);
+      setUser(user);      
     } else {
       console.log("No user logged in");
       setUser(null);
@@ -430,34 +430,18 @@ export const Login = () => {
     } catch (err) {
       console.error('Sign out error:', err);
     }
-  };
-
-  // If user is already logged in, show a message or redirect
-  if (user) {
-    setUser(user);
-      navigate(`/auth/interstitial?uid=${user.uid}`);          
-    return null;
-    /*
-      return (
-      <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-        <div className={styles.formWrapper}>
-          <h1 className={styles.title}>Welcome {user.email}</h1>
-          <h2>Please wait, you are being redirected</h2>          
-        </div>
-      </div>
-    ); 
-    */
-  }
+  };  
 
   return (
-    <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-      <div className={styles.formWrapper}>
+    <>
+      {user ? (
+        <Interstitial user={user} />
+      ) : (
+        <div className={styles.container}>
+          <Link to="/" className={styles.logoLink}>
+            <div className={styles.logo} />
+          </Link>
+          <div className={styles.formWrapper}>
         {isResetting ? (
           <ResetPasswordForm />
         ) : (
@@ -583,9 +567,11 @@ export const Login = () => {
             )}
           </>
         )}
-      </div>
-    </div>
+     </div>
+        </div>
+      )}
+    </>
   );
-}
+};
 
 export default Login;
