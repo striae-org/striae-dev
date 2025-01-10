@@ -1,1 +1,0 @@
-export { Interstitial as default, loader } from './interstitial';

@@ -296,7 +296,7 @@ export const Login = () => {
       }
       console.log("Logged in user:", user.email);
       setUser(user);
-      navigate('/auth/interstitial');
+      navigate('/interstitial');
     } else {
       console.log("No user logged in");
       setUser(null);
