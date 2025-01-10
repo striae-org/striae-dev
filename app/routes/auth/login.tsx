@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link, useLoaderData } from '@remix-run/react';
-import { addUserData } from '~/components/actions/addUserData';
+import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import { json } from '@remix-run/cloudflare';
 import {
@@ -14,12 +13,11 @@ import {
     sendPasswordResetEmail,
     sendEmailVerification,
     User,
+    updateProfile,
     GoogleAuthProvider,
-    signInWithPopup,
-    getAdditionalUserInfo    
+    signInWithPopup,        
 } from 'firebase/auth';
-import { ERROR_MESSAGES } from '~/services/firebase-errors';
-import { FirebaseError } from 'firebase/app';
+import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import { Interstitial } from './interstitial';
 import styles from './login.module.css';
 import paths from '~/config.json';
@@ -90,8 +88,7 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
   }
 };
 
-export const Login = () => {
-  const { context } = useLoaderData<LoaderData>();
+export const Login = () => {  
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -108,43 +105,17 @@ export const Login = () => {
   
   try {
     const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
     const user = result.user;
     
     if (!user.emailVerified) {
       await handleSignOut();
       setError('Please verify your email before logging in');
       return;
-    }
-    
-    const additionalInfo = getAdditionalUserInfo(result);
-    if (additionalInfo?.isNewUser) {
-      await addUserData({
-        user: result.user,
-        context
-      });
-}
-    console.log('Google sign-in successful:', { user, token, additionalInfo });    
+    }    
     setUser(user);
-    navigate('/');
   } catch (err) {
-    if (err instanceof FirebaseError) {
-      const email = err.customData?.email;
-      const credential = GoogleAuthProvider.credentialFromError(err);
-      
-      switch (err.code) {
-        case 'auth/popup-closed-by-user':
-          setError('Sign-in cancelled');
-          break;
-        case 'auth/popup-blocked':
-          setError('Pop-up blocked by browser');
-          break;
-        default:
-          setError(ERROR_MESSAGES.GENERAL_ERROR);
-      }
-      console.error('Google sign-in error:', { err, email, credential });
-    }
+    const { message } = handleAuthError(err);
+    setError(message);
   } finally {
     setIsLoading(false);
   }
@@ -161,22 +132,13 @@ export const Login = () => {
       setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
       setTimeout(() => setIsResetting(false), 2000);
     } catch (err) {
-      if (err instanceof FirebaseError) {
-        switch (err.code) {
-          case 'auth/user-not-found':
-            setError(ERROR_MESSAGES.USER_NOT_FOUND);
-            break;
-          default:
-            setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
-        }
-      } else {
-        setError(ERROR_MESSAGES.RESET_EMAIL_FAILED);
-      }
+      const { message } = handleAuthError(err);
+      setError(message);
     } finally {
-            setIsLoading(false);
-          }
-        }
-      };
+      setIsLoading(false);
+    }
+  }
+};
 
   return (
     <form ref={formRef} onSubmit={handleReset} className={styles.form}>
@@ -247,18 +209,10 @@ export const Login = () => {
       navigate(continueUrl);
     }
   } catch (err) {
-    if (err instanceof FirebaseError) {
-      switch (err.code) {
-        case 'auth/expired-action-code':
-          setError('Verification link has expired');
-          break;
-        case 'auth/invalid-action-code':
-          setError('Invalid verification link');
-          break;
-        default:
-          setError('Failed to verify email');
-      }
-    }
+    const { message } = handleAuthError(err);
+    setError(message);
+  } finally {
+    setIsLoading(false);
   }
 };
     
@@ -291,26 +245,17 @@ export const Login = () => {
 }, [navigate]);
   
   const handleEmailLink = async (email: string) => {
-    try {
-  await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-  window.localStorage.setItem('emailForSignIn', email);
-  setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
-    } catch (err) {
-      if (err instanceof FirebaseError) {
-        switch (err.code) {
-          case 'auth/invalid-email':
-            setError(ERROR_MESSAGES.USER_NOT_FOUND);
-            break;
-          default:
-            setError(ERROR_MESSAGES.GENERAL_ERROR);
-        }
-      } else {
-        setError(ERROR_MESSAGES.GENERAL_ERROR);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+    window.localStorage.setItem('emailForSignIn', email);
+    setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
+  } catch (err) {
+    const { message } = handleAuthError(err);
+    setError(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,74 +268,63 @@ export const Login = () => {
     const confirmPassword = formData.get('confirmPassword') as string;
 
     if (!isLogin) {
-      if (password !== confirmPassword) {
-        setError('Passwords do not match');
-        setIsLoading(false);
-        return;
-      }
-      
-      if (!checkPasswordStrength(password)) {
-        setError('Password does not meet strength requirements');
-        setIsLoading(false);
-        return;
-      }
+  const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
+  
+  // Update Firebase profile
+  await updateProfile(createCredential.user, {
+    displayName: `${firstName} ${lastName}`
+  });
+  
+  await sendEmailVerification(createCredential.user);
+  await handleSignOut();
+  setError('Registration successful! Please check your email to verify your account before logging in.');
+  setIsLogin(true);
+}
+
+ try {
+  if (isLogin) {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    if (!userCredential.user.emailVerified) {
+      await handleSignOut();
+      setError('Please verify your email before logging in');
+      return;
+    }
+  } else {
+    // Validation checks remain unchanged
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!checkPasswordStrength(password)) {
+      setError('Password does not meet strength requirements');
+      setIsLoading(false);
+      return;
     }
 
+    // New user creation with profile update
+    const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
 
-    try {
-    if (isLogin) {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (!userCredential.user.emailVerified) {
-        await handleSignOut();
-        setError('Please verify your email before logging in');
-        return;
-      }
-      console.log(userCredential.user);
-    } else {
-      const createCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await sendEmailVerification(createCredential.user);
+    await updateProfile(createCredential.user, {
+      displayName: `${firstName} ${lastName}`
+    });
 
-      // Add user data to R2
-      const firstName = formData.get('firstName') as string;
-      const lastName = formData.get('lastName') as string;
-      await addUserData({
-        user: createCredential.user,
-        firstName,
-        lastName,
-        context
-      });
-
-      await handleSignOut(); // Sign out immediately after registration
-      setError('Registration successful! Please check your email to verify your account before logging in.');
-      setIsLogin(true); // Switch to login view
-      console.log('Verification email sent');
-    }
-  } catch (err: unknown) {
-      if (err instanceof FirebaseError) {        
-        switch (err.code) {
-          case 'auth/wrong-password':
-            setError(ERROR_MESSAGES.INVALID_PASSWORD);
-            break;
-          case 'auth/user-not-found':
-            setError(ERROR_MESSAGES.USER_NOT_FOUND);
-            break;
-          case 'auth/email-already-in-use':
-            setError(ERROR_MESSAGES.EMAIL_IN_USE);
-            break;
-          case 'auth/operation-not-allowed':
-          case 'auth/admin-restricted-operation':
-            setError(ERROR_MESSAGES.REGISTRATION_DISABLED);
-            break;
-          default:
-            setError(ERROR_MESSAGES.GENERAL_ERROR);
-        }
-      } else {
-        setError(ERROR_MESSAGES.GENERAL_ERROR);
-      }
-    } finally {
-          setIsLoading(false);
-    }
-  };
+    await sendEmailVerification(createCredential.user);
+    await handleSignOut();
+    setError('Registration successful! Please verify your email before logging in.');
+    setIsLogin(true);
+  }
+} catch (err: unknown) {
+  handleAuthError(err);
+} finally {
+  setIsLoading(false);
+}
+};
 
   const EmailLinkForm = () => {
   return (
