@@ -36,9 +36,16 @@ interface CloudflareContext {
   const WORKER_URL = paths.data_worker_url;
 
 
-export const loader = async ({ context }: { context: CloudflareContext }) => {
+export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
+  const url = new URL(request.url);
+  const uid = url.searchParams.get('uid');
+
+  if (!uid) {
+    return redirect('/');
+  }
+
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
