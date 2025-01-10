@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
+//import { json } from '@remix-run/cloudflare';
 import {
     //connectAuthEmulator, 
     getAuth,      
@@ -63,6 +63,7 @@ interface AddUserParams {
 
 const WORKER_URL = paths.data_worker_url;
 
+/*
 export const loader = async ({ context }: { context: CloudflareContext }) => {
   try {
     const response = await fetch(WORKER_URL, {
@@ -89,6 +90,7 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     return json<LoaderData>({ data: [], context });
   }
 };
+*/
 
 const firebaseConfig = {    
   apiKey: "AIzaSyA683U5AyDPNEWJaSvjXuzMp1czKlzm8pM",
@@ -114,7 +116,7 @@ const addUserToData = async ({ user, firstName, lastName, context }: AddUserPara
   };  
 
   try {    
-    const response = await fetch(`https://data.striae.allyforensics.com/${user.uid}/data.json`, {
+    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

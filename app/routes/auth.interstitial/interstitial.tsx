@@ -19,7 +19,7 @@ interface CloudflareContext {
     };
   }
 
-  interface UserData {
+  interface Data {
     email: string;
     firstName: string;
     lastName: string;
@@ -28,22 +28,12 @@ interface CloudflareContext {
     uid: string;
   }
 
-  type LoaderData = UserData;
+  interface LoaderData {
+    data: Data[];
+    context: CloudflareContext;
+  }
 
   const WORKER_URL = paths.data_worker_url;
-
-  function isUserData(data: unknown): data is UserData {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'email' in data &&
-    'firstName' in data &&
-    'lastName' in data &&
-    'permitted' in data &&
-    'createdAt' in data &&
-    'uid' in data
-  );
-}
 
 
 export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
@@ -64,49 +54,56 @@ export const loader = async ({ request, context }: { request: Request; context: 
     });
     
     if (!response.ok) {
-      throw new Error('Failed to fetch user data');
+      console.error('Failed to fetch:', response.status);
+      return json<LoaderData>({ data: [], context });
     }
 
-    const userData = await response.json();
-    if (!isUserData(userData)) {
-      throw new Error('Invalid user data format');
-    }
-
-    return json<LoaderData>(userData);
+    const data = await response.json();
+    console.log('Loader data:', data); // Debug log
+    return json<LoaderData>({ 
+      data: Array.isArray(data) ? data.filter(Boolean) : [],
+      context 
+    });
      
   } catch (error) {
     console.error('Loader error:', error);
-    throw error;
+    return json<LoaderData>({ data: [], context });
   }
 };
 
 export const Interstitial = () => {
-  const data = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
+  console.log('Component data:', data); // Debug log
+
+  if (data[0]?.permitted === true) {
+    return redirect(`/app?uid=${data[0].uid}`);
+  }
 
   return (
     <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>
-        <div className={styles.logo} />
-      </Link>
-      <div className={styles.formWrapper}>
-        <div className={styles.form}>
-          <div className={styles.title}>
-            <h1>Welcome to Striae</h1>
-          </div>
-          <div className={styles.subtitle}>
-            <h2>{data.firstName || data.email || 'User'}</h2>
-          </div>
-          <p>Your account is pending activation.</p>
-          <div className={styles.options}>
-            <Link to="/pricing" className={styles.button}>
-              View Plans
-            </Link>
-            <Link to="/auth/login" className={styles.secondaryButton}>
-              Sign Out
-            </Link>
-          </div>
-        </div>
+  <div className={styles.logo} />
+</Link>
+        <div className={styles.formWrapper}>
+          <div className={styles.form}>
+            <div className={styles.title}>
+      <h1>Welcome to Striae</h1>
       </div>
+      <div className={styles.subtitle}>
+      <h2>{data?.[0]?.firstName || data?.[0]?.email || 'User'}</h2>
+      </div>
+      <p>Your account is pending activation.</p>
+      <div className={styles.options}>
+        {/* TODO Replace with Pricing when Completed */}
+        <Link to="/pricing" className={styles.button}>
+          View Plans
+        </Link>
+        <Link to="/auth/login" className={styles.secondaryButton}>
+          Sign Out
+        </Link>
+      </div>
+      </div>
+    </div>
     </div>
   );
 }
