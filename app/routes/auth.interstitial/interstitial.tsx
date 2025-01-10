@@ -45,6 +45,13 @@ export const loader = async ({ request, context }: { request: Request; context: 
     return redirect('/');
   }
 
+  // Clean URL after getting uid
+  if (typeof window !== 'undefined') {
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete('uid');
+    window.history.replaceState({}, '', cleanUrl.toString());
+  }
+
   try {
     const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
       method: 'GET',
