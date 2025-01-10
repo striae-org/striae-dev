@@ -72,8 +72,17 @@ export const Interstitial = () => {
 
   return (
     <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
+        <div className={styles.formWrapper}>
+          <div className={styles.form}>
+            <div className={styles.title}>
       <h1>Welcome to Striae</h1>
+      </div>
+      <div className={styles.subtitle}>
       <h2>{data[0]?.firstName || data[0]?.email}</h2>
+      </div>
       <p>Your account is pending activation.</p>
       <div className={styles.options}>
         {/* TODO Replace with Pricing when Completed */}
@@ -84,6 +93,8 @@ export const Interstitial = () => {
           Sign Out
         </Link>
       </div>
+      </div>
+    </div>
     </div>
   );
 }
