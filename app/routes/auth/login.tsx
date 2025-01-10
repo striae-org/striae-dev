@@ -275,14 +275,19 @@ export const Login = () => {
 
    useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
-   if (user && window.location.href.includes('signout=true')) {
+   if (user) {
       if (!user.emailVerified) {
         handleSignOut();
         setError('Please verify your email before logging in');
         return;
-      }      
+      }
+      if (window.location.href.includes('signout=true')) {
+        handleSignOut();
+        return;
+      }
       console.log("Logged in user:", user.email);
-      setUser(user);      
+      setUser(user);
+      navigate(`/auth/interstitial?uid=${user.uid}`);
     } else {
       console.log("No user logged in");
       setUser(null);
@@ -487,8 +492,22 @@ export const Login = () => {
 
   // If user is already logged in, show a message or redirect
   if (user) {
-    navigate(`/auth/interstitial?uid=${user.uid}`);
-    return null;
+    return (
+      <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+  <div className={styles.logo} />
+</Link>
+        <div className={styles.formWrapper}>
+          <h1 className={styles.title}>Welcome {user.email}</h1>
+          <button 
+            onClick={handleSignOut} 
+            className={styles.button}
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
