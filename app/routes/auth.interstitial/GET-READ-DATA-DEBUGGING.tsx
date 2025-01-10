@@ -19,7 +19,7 @@ interface CloudflareContext {
     };
   }
 
-  interface Data {
+  interface UserData {
     email: string;
     firstName: string;
     lastName: string;
@@ -28,17 +28,34 @@ interface CloudflareContext {
     uid: string;
   }
 
-  interface LoaderData {
-    data: Data[];
-    context: CloudflareContext;
-  }
+  type LoaderData = UserData;
 
   const WORKER_URL = paths.data_worker_url;
 
+  function isUserData(data: unknown): data is UserData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'email' in data &&
+    'firstName' in data &&
+    'lastName' in data &&
+    'permitted' in data &&
+    'createdAt' in data &&
+    'uid' in data
+  );
+}
 
-export const loader = async ({ context }: { context: CloudflareContext }) => {
+
+export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
+  const url = new URL(request.url);
+  const uid = url.searchParams.get('uid');
+
+  if (!uid) {
+    return redirect('/');
+  }
+
   try {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -47,56 +64,49 @@ export const loader = async ({ context }: { context: CloudflareContext }) => {
     });
     
     if (!response.ok) {
-      console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [], context });
+      throw new Error('Failed to fetch user data');
     }
 
-    const data = await response.json();
-    console.log('Loader data:', data); // Debug log
-    return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : [],
-      context 
-    });
+    const userData = await response.json();
+    if (!isUserData(userData)) {
+      throw new Error('Invalid user data format');
+    }
+
+    return json<LoaderData>(userData);
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    throw error;
   }
 };
 
 export const Interstitial = () => {
-  const { data } = useLoaderData<typeof loader>();
-  console.log('Component data:', data); // Debug log
-
-  if (data[0]?.permitted === true) {
-    return redirect(`/app?uid=${data[0].uid}`);
-  }
+  const data = useLoaderData<typeof loader>();
 
   return (
     <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>
-  <div className={styles.logo} />
-</Link>
-        <div className={styles.formWrapper}>
-          <div className={styles.form}>
-            <div className={styles.title}>
-      <h1>Welcome to Striae</h1>
+        <div className={styles.logo} />
+      </Link>
+      <div className={styles.formWrapper}>
+        <div className={styles.form}>
+          <div className={styles.title}>
+            <h1>Welcome to Striae</h1>
+          </div>
+          <div className={styles.subtitle}>
+            <h2>{data.firstName || data.email || 'User'}</h2>
+          </div>
+          <p>Your account is pending activation.</p>
+          <div className={styles.options}>
+            <Link to="/pricing" className={styles.button}>
+              View Plans
+            </Link>
+            <Link to="/auth/login" className={styles.secondaryButton}>
+              Sign Out
+            </Link>
+          </div>
+        </div>
       </div>
-      <div className={styles.subtitle}>
-      <h2>{data?.[0]?.firstName || data?.[0]?.email || 'User'}</h2>
-      </div>
-      <p>Your account is pending activation.</p>
-      <div className={styles.options}>
-        {/* TODO Replace with Pricing when Completed */}
-        <Link to="/pricing" className={styles.button}>
-          View Plans
-        </Link>
-        <Link to="/auth/login" className={styles.secondaryButton}>
-          Sign Out
-        </Link>
-      </div>
-      </div>
-    </div>
     </div>
   );
 }
