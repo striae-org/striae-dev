@@ -3,6 +3,7 @@ import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import paths from '~/config.json';
+import { SignOut } from '~/components/actions/signout';
 
 export const meta = () => {
   return baseMeta({
@@ -98,9 +99,7 @@ export const Interstitial = () => {
         <Link to="/pricing" className={styles.button}>
           View Plans
         </Link>
-        <Link to="/auth/login" className={styles.secondaryButton}>
-          Sign Out
-        </Link>
+        <SignOut />
       </div>
       </div>
     </div>
