@@ -487,7 +487,8 @@ export const Login = () => {
                     <input
                       type="text"
                       name="lastName"
-                      placeholder="Last Name"
+                      required
+                      placeholder="Last Name (required)"
                       autoComplete="family-name"
                       className={styles.input}
                       disabled={isLoading}
