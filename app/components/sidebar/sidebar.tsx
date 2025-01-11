@@ -5,15 +5,9 @@ import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
+import type { CloudflareContext } from '~/types/actions';
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        R2_KEY_SECRET: string;
-      };
-    };
-  }
-  
+ 
   interface CaseData {
   uid: string;
   caseNumber: string;
