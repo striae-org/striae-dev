@@ -27,7 +27,7 @@ import { json } from '@remix-run/cloudflare';
 
 export const meta = () => {
   return baseMeta({
-    title: 'Login to Striae',
+    title: 'Welcome to Striae',
     description: 'Login to your Striae account to access your projects and data',
   });
 };
