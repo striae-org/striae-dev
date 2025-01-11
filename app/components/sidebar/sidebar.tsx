@@ -109,7 +109,9 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
   return (
     <div className={styles.sidebar}>
       <div className={styles.userInfo}>
-        <h3>{user.displayName?.split(' ')[0] || 'User'}</h3>
+        <h3 className={styles.userTitle}>
+          {`${user.displayName?.split(' ')[0] || 'User'}'s Striae`}
+        </h3>
       </div>
       
       <div className={styles.caseSection}>
