@@ -1,4 +1,5 @@
 import { User } from 'firebase/auth';
+import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { useState } from 'react';
 import { json } from '@remix-run/cloudflare';
@@ -112,6 +113,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         <h3 className={styles.userTitle}>
           {`${user.displayName?.split(' ')[0] || 'User'}'s Striae`}
         </h3>
+        <SignOut />
       </div>
       
       <div className={styles.caseSection}>
