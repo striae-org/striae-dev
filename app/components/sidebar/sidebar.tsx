@@ -5,15 +5,9 @@ import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
+import type { CloudflareContext } from '~/types/actions';
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        R2_KEY_SECRET: string;
-      };
-    };
-  }
-  
+ 
   interface CaseData {
   uid: string;
   caseNumber: string;
@@ -133,10 +127,11 @@ export const Sidebar = ({ user }: SidebarProps) => {
       </div>
 
       <Form 
-        method="post" 
+        method="put" 
         className={styles.caseForm}
         onSubmit={() => setIsCreating(true)}
       >
+        <input type="hidden" name="actionType" value="sidebar" />
         <input type="hidden" name="uid" value={user.uid} />
         <input
           required
@@ -163,10 +158,11 @@ export const Sidebar = ({ user }: SidebarProps) => {
             <div key={caseItem.caseNumber} className={styles.caseItem}>
               <span>{caseItem.caseNumber}</span>
               <Form 
-                method="post" 
+                method="put" 
                 style={{ display: 'inline' }}
                 onSubmit={() => setIsDeleting(true)}
               >
+                <input type="hidden" name="actionType" value="sidebar" />
                 <input type="hidden" name="intent" value="delete" />
                 <input type="hidden" name="uid" value={user.uid} />
                 <input type="hidden" name="caseNumber" value={caseItem.caseNumber} />
