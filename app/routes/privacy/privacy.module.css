@@ -21,6 +21,14 @@
   .logo {
     display: none;
   }
+
+  .container {
+    padding: 1rem;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
 }
 
 .logoLink {
@@ -102,14 +110,4 @@
   color: #666;
   font-size: 0.875rem;
   margin-bottom: 2rem;
-}
-
-@media (max-width: 640px) {
-  .container {
-    padding: 1rem;
-  }
-  
-  .content {
-    padding: 1.5rem;
-  }
 }

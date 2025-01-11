@@ -188,15 +188,6 @@
   color: #2563eb;
 }
 
-@media (max-width: 640px) {
-  .logo {
-    width: 100px;
-    height: 100px;
-    top: 10px;
-    left: 10px;
-  }
-}
-
 .googleButton {
   width: 100%;
   padding: 0.75rem 1rem;

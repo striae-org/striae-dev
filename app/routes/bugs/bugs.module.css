@@ -26,8 +26,14 @@
     display: none;
   }
 
-  .turnstile {
-    justify-self: center;
+  .formWrapper {
+    max-width: 100%;
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .textarea {
+    min-height: 80px;
   }
 }
 
@@ -47,7 +53,8 @@
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
+  margin: 2rem auto;
 }
 
 .title {
@@ -55,6 +62,14 @@
   color: #333;
   margin-bottom: 1.5rem;
   font-size: 1.75rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .form {
@@ -77,6 +92,27 @@
 }
 
 .input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.textarea:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
@@ -112,9 +148,9 @@
 
 .error {
   color: #dc3545;
-  text-align: center;
-  margin: 0.5rem 0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  text-align: left;
 }
 
 .toggle {

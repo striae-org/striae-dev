@@ -1,0 +1,1 @@
+export { Bugs as default, meta, action } from './bugs'

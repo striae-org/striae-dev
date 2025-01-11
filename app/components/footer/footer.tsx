@@ -17,6 +17,9 @@ export default function Footer() {
           <Link to="/security-policy" className={styles.link}>
             Security Policy
           </Link>
+          <Link to="/bugs" className={styles.link}>
+            Submit a Bug Report
+          </Link>
         </nav>
         <p className={styles.copyright}>
           Striae © {year} AllyForensics. All rights reserved.

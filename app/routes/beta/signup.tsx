@@ -103,8 +103,7 @@ Beta Feedback Agreement: ${betaFeedback}`,
           "beta-signup"          
         ],
         "Headers": {
-          "X-Mailer": "StephenJLu.com",
-          "X-Test": "test header"
+          "X-Mailer": "allyforensics.com"          
         }
       }),
     });
