@@ -127,10 +127,11 @@ export const Sidebar = ({ user }: SidebarProps) => {
       </div>
 
       <Form 
-        method="post" 
+        method="put" 
         className={styles.caseForm}
         onSubmit={() => setIsCreating(true)}
       >
+        <input type="hidden" name="actionType" value="sidebar" />
         <input type="hidden" name="uid" value={user.uid} />
         <input
           required
@@ -157,10 +158,11 @@ export const Sidebar = ({ user }: SidebarProps) => {
             <div key={caseItem.caseNumber} className={styles.caseItem}>
               <span>{caseItem.caseNumber}</span>
               <Form 
-                method="post" 
+                method="put" 
                 style={{ display: 'inline' }}
                 onSubmit={() => setIsDeleting(true)}
               >
+                <input type="hidden" name="actionType" value="sidebar" />
                 <input type="hidden" name="intent" value="delete" />
                 <input type="hidden" name="uid" value={user.uid} />
                 <input type="hidden" name="caseNumber" value={caseItem.caseNumber} />
