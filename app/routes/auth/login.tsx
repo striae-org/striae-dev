@@ -478,7 +478,8 @@ export const Login = () => {
                     <input
                       type="text"
                       name="firstName"
-                      placeholder="First Name"
+                      required
+                      placeholder="First Name (required)"
                       autoComplete="given-name"
                       className={styles.input}
                       disabled={isLoading}
