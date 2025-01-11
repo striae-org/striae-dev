@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { auth } from '~/services/firebase';
+import { addUserData } from '~/components/actions/addUserData';
 import {
     applyActionCode,           
     signInWithEmailAndPassword, 
@@ -119,7 +120,16 @@ export const Login = () => {
       await handleSignOut();
       setError('Please verify your email before logging in');
       return;
-    }    
+    }
+    
+    // Add user data to R2
+    await addUserData({
+      user,
+      firstName: user.displayName?.split(' ')[0] || '',
+      lastName: user.displayName?.split(' ')[1] || '',
+      context
+    });
+
     setUser(user);
   } catch (err) {
     const { message } = handleAuthError(err);
@@ -232,9 +242,13 @@ export const Login = () => {
       if (email) {
         setIsLoading(true);
         signInWithEmailLink(auth, email, window.location.href)
-          .then(() => {
-            window.localStorage.removeItem('emailForSignIn');
-            navigate('/');
+          .then(async (result) => {
+            // Add user data to R2
+            await addUserData({
+              user: result.user,
+              context
+            });
+            window.localStorage.removeItem('emailForSignIn');            
           })
           .catch((error) => setError(error.message))
           .finally(() => setIsLoading(false));
@@ -250,7 +264,7 @@ export const Login = () => {
     handleVerifyEmail(actionCode, continueUrl || undefined);
   }
    return () => unsubscribe();
-}, [navigate]);
+}, [navigate, context]);
   
   const handleEmailLink = async (email: string) => {
   try {
@@ -315,6 +329,14 @@ export const Login = () => {
         await updateProfile(createCredential.user, {
           displayName: `${firstName} ${lastName}`
         });
+
+        // Add user data to R2
+      await addUserData({
+        user: createCredential.user,
+        firstName,
+        lastName,
+        context
+      });
 
         await sendEmailVerification(createCredential.user);
         await handleSignOut();
