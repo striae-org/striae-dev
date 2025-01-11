@@ -76,11 +76,11 @@ export async function action({ request, context }: { request: Request; context: 
       body: JSON.stringify({
         "from": {
           "name": "Striae Beta Signup",
-          "email": "no-reply@stephenjlu.com"
+          "email": "no-reply@allyforensics.com"
         },
         "to": [
           {
-            "name": "Striae Beta Signup",
+            "name": "AllyForensics",
             "email": "info@allyforensics.com"
           }
         ],
@@ -211,15 +211,18 @@ export const BetaSignup = () => {
           />
           <button 
           type="submit" 
-          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
-          disabled={sending || !hasReadNotice}
+          className={`${styles.button} ${styles.buttonDisabled}`}
+          disabled
+          //className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
+          //disabled={sending || !hasReadNotice}
           title={!hasReadNotice ? 'Please read the notice first' : undefined}
-          >
-          {!hasReadNotice 
+          >Beta Signups Closed
+          {/* {!hasReadNotice 
             ? 'Please read the notice first'
             : sending 
               ? 'Submitting...' 
               : 'Request Beta Access'}
+              */}
         </button>
       </Form>
         {actionData?.success && (
