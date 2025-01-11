@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@remix-run/react';
+import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import {
     applyActionCode,           
@@ -20,6 +20,9 @@ import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import { Interstitial } from './interstitial';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
+import { Striae } from '~/routes/striae/striae';
+import paths from '~/config.json';
+import { json } from '@remix-run/cloudflare';
 
 export const meta = () => {
   return baseMeta({
@@ -28,6 +31,30 @@ export const meta = () => {
   });
 };
 
+interface CloudflareContext {  
+    cloudflare: {
+      env: {
+        R2_KEY_SECRET: string;
+      };
+    };
+  }
+
+  interface Data {
+    email: string;
+    firstName: string;
+    lastName: string;
+    permitted: boolean;
+    createdAt: string;
+    uid: string;
+  }
+
+  interface LoaderData {
+    data: Data[];
+    context: CloudflareContext;
+  }
+
+  const WORKER_URL = paths.data_worker_url;
+
 const actionCodeSettings = {
   url: 'https://striae.allyforensics.com', // Update with your domain in production
   handleCodeInApp: true,
@@ -35,7 +62,41 @@ const actionCodeSettings = {
 
 const provider = new GoogleAuthProvider();
 
+export const loader = async ({ context }: { request: Request; context: CloudflareContext }) => {  
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    return json<LoaderData>({ data: [], context });
+  }
+
+  try {
+    const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch:', response.status);
+      return json<LoaderData>({ data: [], context });
+    }
+
+    const data = await response.json();
+    console.log('Loader data:', data); // Debug log
+    return json<LoaderData>({ 
+      data: Array.isArray(data) ? data.filter(Boolean) : [],
+      context 
+    });
+     
+  } catch (error) {
+    console.error('Loader error:', error);
+    return json<LoaderData>({ data: [], context });
+  }
+};
+
 export const Login = () => {  
+  const { context } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -316,7 +377,11 @@ export const Login = () => {
   return (
     <>
       {user ? (
-        <Interstitial user={user} />
+        user.emailVerified ? (
+          <Striae user={user} context={context} />
+        ) : (
+          <Interstitial user={user} />
+        )
       ) : (
         <div className={styles.container}>
           <Link to="/" className={styles.logoLink}>
