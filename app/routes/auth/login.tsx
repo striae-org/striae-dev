@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link, useLoaderData } from '@remix-run/react';
+import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import { addUserData } from '~/components/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
@@ -97,8 +97,7 @@ export const loader = async ({ context }: { request: Request; context: Cloudflar
   }
 };
 
-export const Login = () => {  
-  const { context } = useLoaderData<LoaderData>();
+export const Login = () => {    
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState('');
@@ -132,8 +131,7 @@ export const Login = () => {
       await addUserData({
         user: result.user,
         firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || '',
-        context
+        lastName: additionalInfo.profile?.family_name || ''        
       });
     }
 
@@ -165,8 +163,7 @@ export const Login = () => {
           await addUserData({
             user: emailLinkUser,
             firstName,
-            lastName,
-            context
+            lastName            
           });
 
           setUser(emailLinkUser);
@@ -320,8 +317,7 @@ export const Login = () => {
             } else {
             // Add user data to R2
             await addUserData({
-              user: result.user,
-              context
+              user: result.user              
             });
             setUser(result.user);
           }
@@ -341,7 +337,7 @@ export const Login = () => {
     handleVerifyEmail(actionCode, continueUrl || undefined);
   }
    return () => unsubscribe();
-}, [navigate, context]);
+}, [navigate]);
   
   const handleEmailLink = async (email: string) => {
   try {
@@ -411,8 +407,7 @@ export const Login = () => {
       await addUserData({
         user: createCredential.user,
         firstName,
-        lastName,
-        context
+        lastName        
       });
 
         await sendEmailVerification(createCredential.user);
@@ -477,7 +472,7 @@ export const Login = () => {
     <>
       {user ? (
         user.emailVerified ? (
-          <Striae user={user} context={context} />
+          <Striae user={user} />
         ) : (
           <Interstitial user={user} />
         )
