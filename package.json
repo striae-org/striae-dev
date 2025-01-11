@@ -13,9 +13,10 @@
     "typecheck": "tsc",
     "typegen": "wrangler types",
     "preview": "npm run build && wrangler pages dev",
-    "cf-typegen": "wrangler types"    
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "@remix-run/cloudflare": "^2.15.1",
     "@remix-run/cloudflare-pages": "^2.15.1",
     "@remix-run/react": "^2.15.1",
