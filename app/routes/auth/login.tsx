@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import { addUserData } from '~/components/actions/addUserData';
+import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
     signInWithEmailAndPassword, 
@@ -14,7 +15,7 @@ import {
     sendEmailVerification,
     User,
     updateProfile,
-    GoogleAuthProvider,
+    GoogleAuthProvider,    
     signInWithPopup,        
 } from 'firebase/auth';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
@@ -99,6 +100,7 @@ export const loader = async ({ context }: { request: Request; context: Cloudflar
 export const Login = () => {  
   const { context } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
+  const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);  
@@ -106,37 +108,104 @@ export const Login = () => {
   const [passwordStrength, setPasswordStrength] = useState('');  
   const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
   const [isResetting, setIsResetting] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [needsProfile, setNeedsProfile] = useState(false);
+  const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
+
+  
 
   const handleGoogleSignIn = async () => {
   setIsLoading(true);
   setError('');
   
+  
   try {
     const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    const additionalInfo = getAdditionalUserInfo(result);
     
-    if (!user.emailVerified) {
+    if (!result.user.emailVerified) {
       await handleSignOut();
       setError('Please verify your email before logging in');
       return;
     }
     
-    // Add user data to R2
-    await addUserData({
-      user,
-      firstName: user.displayName?.split(' ')[0] || '',
-      lastName: user.displayName?.split(' ')[1] || '',
-      context
-    });
+    if (additionalInfo.isNewUser) {
+      await addUserData({
+        user: result.user,
+        firstName: additionalInfo.profile?.given_name || '',
+        lastName: additionalInfo.profile?.family_name || '',
+        context
+      });
+    }
 
-    setUser(user);
+    setUser(result.user);
   } catch (err) {
     const { message } = handleAuthError(err);
     setError(message);
   } finally {
     setIsLoading(false);
   }
+};
+
+  const NameCollectionForm = () => {
+  return (
+    <form onSubmit={async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      
+      const formData = new FormData(e.currentTarget);
+      const firstName = formData.get('firstName') as string;
+      const lastName = formData.get('lastName') as string;
+
+      try {
+        if (emailLinkUser) {
+          await updateProfile(emailLinkUser, {
+            displayName: `${firstName} ${lastName}`
+          });
+
+          await addUserData({
+            user: emailLinkUser,
+            firstName,
+            lastName,
+            context
+          });
+
+          setUser(emailLinkUser);
+          setNeedsProfile(false);
+        }
+      } catch (err) {
+        const { message } = handleAuthError(err);
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    }} className={styles.form}>
+      <h2>Complete Your Profile</h2>
+      <input
+        type="text"
+        name="firstName"
+        required
+        placeholder="First Name (required)"
+        className={styles.input}
+        disabled={isLoading}
+      />
+      <input
+        type="text"
+        name="lastName"
+        required
+        placeholder="Last Name (required)"
+        className={styles.input}
+        disabled={isLoading}
+      />
+      {error && <p className={styles.error}>{error}</p>}
+      <button
+        type="submit"
+        className={styles.button}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Saving...' : 'Continue'}
+      </button>
+    </form>
+  );
 };
   
   const ResetPasswordForm = () => {
@@ -243,11 +312,19 @@ export const Login = () => {
         setIsLoading(true);
         signInWithEmailLink(auth, email, window.location.href)
           .then(async (result) => {
+             const additionalInfo = getAdditionalUserInfo(result);
+        
+            if (additionalInfo?.isNewUser) {
+              setEmailLinkUser(result.user);
+              setNeedsProfile(true);
+            } else {
             // Add user data to R2
             await addUserData({
               user: result.user,
               context
             });
+            setUser(result.user);
+          }
             window.localStorage.removeItem('emailForSignIn');            
           })
           .catch((error) => setError(error.message))
@@ -404,6 +481,15 @@ export const Login = () => {
         ) : (
           <Interstitial user={user} />
         )
+        ) : needsProfile ? (
+      <div className={styles.container}>
+        <Link to="/" className={styles.logoLink}>
+          <div className={styles.logo} />
+        </Link>
+        <div className={styles.formWrapper}>
+          <NameCollectionForm />
+        </div>
+      </div>
       ) : (
         <div className={styles.container}>
           <Link to="/" className={styles.logoLink}>
