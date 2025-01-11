@@ -17,7 +17,7 @@ export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {
   };
 
   return (
-    <button onClick={handleSignOut} className={styles.secondaryButton}>
+    <button onClick={handleSignOut} className={styles.signOutButton}>
       Sign Out
     </button>
   );

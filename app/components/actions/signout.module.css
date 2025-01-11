@@ -1,7 +1,15 @@
-.secondaryButton {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #0070f3;
-  color: #0070f3;
-  border-radius: 0.5rem;
-  text-decoration: none;
+.signOutButton {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signOutButton:hover {
+  background: #dc3545;
+  color: white;
 }
