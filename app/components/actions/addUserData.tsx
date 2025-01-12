@@ -3,9 +3,7 @@ import paths from '~/config.json';
 
 interface CloudflareContext {
   cloudflare: {
-    env: {
-      FWJIO_WFOLIWLF_WFOUIH: string;
-    };
+    env: Env;
   };
 }
 
@@ -40,7 +38,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
       }
     });
 
@@ -75,7 +73,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
       },
       body: JSON.stringify(userData)
     });

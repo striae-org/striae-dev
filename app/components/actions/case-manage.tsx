@@ -39,7 +39,7 @@ export const checkExistingCase = async (
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
+      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
     }
   });
 
@@ -60,7 +60,7 @@ export const createNewCase = async (
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
+      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
     },
     body: JSON.stringify({
       createdAt: new Date().toISOString(),

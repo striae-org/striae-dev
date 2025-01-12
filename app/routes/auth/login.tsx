@@ -32,13 +32,11 @@ export const meta = () => {
   });
 };
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        FWJIO_WFOLIWLF_WFOUIH: string;
-      };
-    };
-  }
+interface CloudflareContext {
+  cloudflare: {
+    env: Env;
+  };
+}
 
   interface Data {
     email: string;
@@ -74,7 +72,7 @@ export const loader = async ({ context }: { request: Request; context: Cloudflar
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH,
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
       }
     });
     

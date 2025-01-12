@@ -20,11 +20,9 @@ interface ActionData {
     };
 }
 
-interface Env {
+interface CloudflareContext {
   cloudflare: {
-    env: {
-      WDEFOIJ_EFOIJ: string;
-    };
+    env: Env;
   };
 }
 
@@ -36,7 +34,7 @@ export const meta = () => {
   });
 };
 
-export async function action({ request, context }: { request: Request; context: Env }) {
+export async function action({ request, context }: { request: Request; context: CloudflareContext }) {
   const formData = await request.formData();
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;

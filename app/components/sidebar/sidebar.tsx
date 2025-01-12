@@ -10,13 +10,11 @@ import { useState } from 'react';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        FWJIO_WFOLIWLF_WFOUIH: string;
-      };
-    };
-  }  
+interface CloudflareContext {
+  cloudflare: {
+    env: Env;
+  };
+}  
   interface FileData {
   name: string;
   size: number;
@@ -48,7 +46,7 @@ export const loader = async ({ user, context, caseNumber }: {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH,
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
       }
     });
 

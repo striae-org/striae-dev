@@ -28,15 +28,13 @@ export const meta = () => {
   });
 };
 
-interface Env {
+interface CloudflareContext {
   cloudflare: {
-    env: {
-      WDEFOIJ_EFOIJ: string;
-    };
+    env: Env;
   };
 }
 
-export async function action({ request, context }: { request: Request; context: Env }) {
+export async function action({ request, context }: { request: Request; context: CloudflareContext }) {
   const formData = await request.formData();
   const firstName = formData.get('firstName') as string;
   const email = formData.get('email') as string;

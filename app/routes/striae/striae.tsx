@@ -9,13 +9,11 @@ interface StriaePage {
   context: CloudflareContext;  
 }
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        FWJIO_WFOLIWLF_WFOUIH: string;
-      };
-    };
-  }
+interface CloudflareContext {
+  cloudflare: {
+    env: Env;
+  };
+}
 
 export const Striae = ({ user, context }: StriaePage) => {
   return (
