@@ -13,6 +13,13 @@ interface CloudflareContext {
     };
   }
 
+  interface CaseData {
+  createdAt: string;
+  caseNumber: string;
+  userId: string;
+  files: FileData[];
+}
+
   interface FileData {
   name: string;
   size: number;
@@ -75,13 +82,51 @@ export const loader = async ({ user, context, caseNumber }: {
 
 export const Sidebar = ({ user, context }: SidebarProps) => {
   const [caseNumber, setCaseNumber] = useState<string>('');
+  const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
 
-  const createCase = async () => {
+   const createCase = async () => {
     setIsLoading(true);
+    setError('');
+    
+    // Validate case number
+    if (!caseNumber.match(/^[A-Za-z0-9-]+$/)) {
+      setError('Invalid case number format');
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      // Check if case exists
+      const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+        }
+      });
+
+      if (checkResponse.ok) {
+        const data = await checkResponse.json();
+        const isCaseData = (data: unknown): data is CaseData => {
+          return (
+            typeof data === 'object' &&
+            data !== null &&
+            'caseNumber' in data &&
+            typeof (data as CaseData).caseNumber === 'string'
+          );
+        };
+        
+        if (isCaseData(data) && data.caseNumber === caseNumber) {
+          setError('Case already exists');
+          setIsLoading(false);
+          return;
+        }
+      }
+
       const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
         method: 'PUT',
         headers: {
@@ -90,17 +135,20 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         },
         body: JSON.stringify({
           createdAt: new Date().toISOString(),
-          caseNumber
+          caseNumber,
+          userId: user.uid,
+          files: []
         })
       });
 
-      if (!response.ok) throw new Error('Failed to create case');
-      // Refresh file list after creating case
-      const filesResponse = await loader({ user, context, caseNumber });
-      const data = await filesResponse.json();
-      setFiles(data.files);
+      if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);      
+      setCurrentCase(caseNumber);
+      setFiles([]);
+      setCaseNumber('');
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError('Failed to create case');
+      setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -116,7 +164,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         <SignOut />
       </div>
       
-      <div className={styles.caseSection}>
+     <div className={styles.caseSection}>
         <h4>Case Management</h4>
         <div className={styles.caseInput}>
           <input
@@ -133,15 +181,14 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
           </button>
         </div>
         {error && <p className={styles.error}>{error}</p>}
+        {success && <p className={styles.success}>Case created successfully!</p>}
         
         <div className={styles.filesSection}>
-          <h4>Files</h4>
-          {!caseNumber ? (
-            <p className={styles.emptyState}>Enter a case number to view files</p>
-          ) : isLoading ? (
-            <p className={styles.loading}>Loading files...</p>
+          <h4>{currentCase || 'No Case Selected'}</h4>
+          {!currentCase ? (
+            <p className={styles.emptyState}>Create or select a case to view files</p>
           ) : files.length === 0 ? (
-            <p className={styles.emptyState}>No files found for this case</p>
+            <p className={styles.emptyState}>No files found for {currentCase}</p>
           ) : (
             <ul className={styles.fileList}>
               {files.map((file) => (

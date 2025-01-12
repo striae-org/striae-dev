@@ -1,83 +1,152 @@
 .sidebar {
   width: 15%;
-  min-width: 200px;
+  min-width: 250px;
+  max-width: 300px;
   height: 100vh;
-  background-color: #f5f5f5;
-  border-right: 1px solid #e0e0e0;
-  padding: 1rem;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding: 1.5rem;
+  overflow-x: hidden;
 }
 
 .userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 2rem;
 }
 
 .userTitle {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 1rem;
+  color: #212529;
+  margin: 0;
 }
 
 .caseSection {
+  margin-bottom: 2rem;
+}
+
+.caseSection h4 {
+  color: #495057;
   margin-bottom: 1rem;
+  font-size: 1rem;
 }
 
 .caseInput {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .caseInput input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.caseInput input:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,.25);
 }
 
 .caseInput button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.caseInput button:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  transform: translateY(-1px);
+}
+
+.caseInput button:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.signOutButton {
   padding: 0.5rem 1rem;
-  background-color: #007bff;
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 4px;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.signOutButton:hover {
+  background-color: #bb2d3b;
 }
 
 .error {
-  color: red;
-  font-size: 0.8rem;
+  color: #dc3545;
+  font-size: 0.875rem;
   margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(220,53,69,0.1);
+  border-radius: 4px;
+}
+
+.success {
+  color: #198754;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(25,135,84,0.1);
+  border-radius: 4px;
 }
 
 .emptyState {
-  color: #666;
+  color: #6c757d;
   font-size: 0.9rem;
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
   background: #f8f9fa;
-  border-radius: 4px;
+  border: 1px dashed #dee2e6;
+  border-radius: 6px;
   margin: 1rem 0;
 }
 
-.loading {
-  color: #007bff;
-  text-align: center;
-  padding: 1rem;
+.filesSection {
+  margin-top: 2rem;
 }
 
 .fileList {
   list-style: none;
   padding: 0;
   margin: 1rem 0;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .fileItem {
-  padding: 0.5rem;
-  border-bottom: 1px solid #eee;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
   font-size: 0.9rem;
+  background: white;
+  transition: background-color 0.2s;
+}
+
+.fileItem:hover {
+  background-color: #f8f9fa;
 }
 
 .fileItem:last-child {
