@@ -24,7 +24,7 @@ export const ERROR_MESSAGES = {
   GOOGLE_ERROR: 'Error signing in with Google',
   
   // General
-  GENERAL_ERROR: 'An error occurred. Please try again'
+  GENERAL_ERROR: 'New registrations are currently disabled',
 };
 
 interface AuthErrorData {
