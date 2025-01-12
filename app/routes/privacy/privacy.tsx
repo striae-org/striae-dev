@@ -386,10 +386,7 @@ export const Privacy = () => {
 <p>By email: info@allyforensics.com</p>
 </li>
 <li>
-<p>By phone number: (520) 403-1908</p>
-</li>
-<li>
-<p>By mail: 2031 Crenshaw St, San Diego, CA 92105</p>
+<p>By phone number: (619) 798-6062</p>
 </li>
 </ul>
 <p>Only You, or a person registered with the California Secretary of State that You authorize to act on Your behalf, may make a verifiable request related to Your personal information.</p>
@@ -463,10 +460,7 @@ export const Privacy = () => {
 <p>By email: info@allyforensics.com</p>
 </li>
 <li>
-<p>By phone number: (520) 403-1908</p>
-</li>
-<li>
-<p>By mail: 2031 Crenshaw St, San Diego, CA 92105</p>
+<p>By phone number: (619) 798-6062</p>
 </li>
 </ul>
         </section>
