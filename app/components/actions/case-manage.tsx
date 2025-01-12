@@ -15,6 +15,10 @@ interface FileData {
   type: string;
 }
 
+interface userData {
+  cases: CaseData[];
+}
+
 const WORKER_URL = paths.data_worker_url;
 const KEYS_URL = paths.keys_url;
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
@@ -60,22 +64,51 @@ export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseD
 
 export const createNewCase = (user: User, caseNumber: string): Promise<CaseData> =>
   getApiKey()
-    .then(apiKey =>
-      fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    .then(apiKey =>{
+      const newCase: CaseData = {
+        createdAt: new Date().toISOString(),
+        caseNumber,
+        userId: user.uid,
+        files: []
+      };
+
+      // First create individual case file
+      const createCaseFile = fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Custom-Auth-Key': apiKey
         },
-        body: JSON.stringify({
-          createdAt: new Date().toISOString(),
-          caseNumber,
-          userId: user.uid,
-          files: []
-        })
+        body: JSON.stringify(newCase)
+      });
+
+      // Then update user's data.json with cases array
+      const updateUserData = fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        }
       })
-    )
-    .then(response => {
-      if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);
-      return response.json();
+      .then(response => response.ok ? response.json() : {})
+      .then((existingData: Partial<userData>) => {
+        // Keep existing data and ensure cases array exists
+        const updatedData = {
+          ...existingData,           // preserve all existing user data
+          cases: [...(existingData.cases || []), newCase]  // append to cases array
+        };
+        
+        return fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Custom-Auth-Key': apiKey
+          },
+          body: JSON.stringify(updatedData)
+        });
+      });
+
+      // Wait for both operations
+      return Promise.all([createCaseFile, updateUserData])
+        .then(() => newCase);
     });
