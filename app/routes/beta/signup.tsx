@@ -215,7 +215,7 @@ export const BetaSignup = () => {
           //className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
           //disabled={sending || !hasReadNotice}
           title={!hasReadNotice ? 'Please read the notice first' : undefined}
-          >Beta Signups Closed
+          >Beta Signups Closed. Please check back later.
           {/* {!hasReadNotice 
             ? 'Please read the notice first'
             : sending 
