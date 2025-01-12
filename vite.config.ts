@@ -12,9 +12,17 @@ declare module "@remix-run/cloudflare" {
 }
 
 export default defineConfig({
+  server: {
+    port: 7777,
+  },
   plugins: [
     remixCloudflareDevProxy(),
     remix({
+      routes(defineRoutes) {
+        return defineRoutes(route => {
+          route('/', 'routes/auth/route.ts', { index: true });
+        });
+      },
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
