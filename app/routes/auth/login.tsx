@@ -19,7 +19,6 @@ import {
     signInWithPopup,        
 } from 'firebase/auth';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
-import { Interstitial } from './interstitial';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
@@ -479,17 +478,21 @@ export const Login = () => {
         user.emailVerified ? (
           <Striae user={user} context={context} />
         ) : (
-          <Interstitial user={user} />
+          <div className={styles.verificationPrompt}>
+            <h2>Email Verification Required</h2>
+            <p>Please check your email and verify your account before continuing.</p>
+            <button 
+              onClick={handleSignOut}
+              className={styles.button}
+            >
+              Sign Out
+            </button>
+          </div>
         )
-        ) : needsProfile ? (
-      <div className={styles.container}>
-        <Link to="/" className={styles.logoLink}>
-          <div className={styles.logo} />
-        </Link>
-        <div className={styles.formWrapper}>
-          <NameCollectionForm />
-        </div>
-      </div>
+      ) : needsProfile ? (
+        <NameCollectionForm />
+      ) : isResetting ? (
+        <ResetPasswordForm />
       ) : (
         <div className={styles.container}>
           <Link to="/" className={styles.logoLink}>
