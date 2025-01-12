@@ -10,13 +10,6 @@ import { useState } from 'react';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        FWJIO_WFOLIWLF_WFOUIH: string;
-      };
-    };
-  }  
   interface FileData {
   name: string;
   size: number;
@@ -25,36 +18,42 @@ interface CloudflareContext {
 }
 
 interface LoaderData {
-  files: FileData[];
-  context: CloudflareContext;
+  files: FileData[];  
 }
 
 interface SidebarProps {
-  user: User;
-  context: CloudflareContext;
+  user: User;  
 }
 
 const WORKER_URL = paths.data_worker_url;
+const KEYS_URL = paths.keys_url;
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
-export const loader = async ({ user, context, caseNumber }: { 
-  user: User; 
-  context: CloudflareContext;
+export const loader = async ({ user, caseNumber }: { 
+  user: User;   
   caseNumber: string;
 }) => {
     try {
+
+      // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+    
     // First fetch case directory listing
     const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH,
+        'X-Custom-Auth-Key': apiKey
       }
     });
 
     if (!response.ok) {
       console.error('Failed to fetch files:', response.status);
-      return json<LoaderData>({ files: [], context });
+      return json<LoaderData>({ files: [] });
     }
 
     const fileList: { name: string; size: number; lastModified: string; type: string; }[] = await response.json();
@@ -68,17 +67,16 @@ export const loader = async ({ user, context, caseNumber }: {
     }));
 
     return json<LoaderData>({ 
-      files: files.filter(Boolean),
-      context 
+      files: files.filter(Boolean)       
     });
 
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ files: [], context });
+    return json<LoaderData>({ files: [] });
   }
 };
 
-export const Sidebar = ({ user, context }: SidebarProps) => {
+export const Sidebar = ({ user }: SidebarProps) => {
   const [caseNumber, setCaseNumber] = useState<string>('');
   const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
@@ -98,7 +96,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
     }
 
     try {
-      const existingCase = await checkExistingCase(user, caseNumber, context);
+      const existingCase = await checkExistingCase(user, caseNumber);
       
       if (existingCase) {
         setCurrentCase(caseNumber);
@@ -109,7 +107,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         return;
       }
 
-      const newCase = await createNewCase(user, caseNumber, context);
+      const newCase = await createNewCase(user, caseNumber);
       setCurrentCase(caseNumber);
       setFiles(newCase.files || []);
       setCaseNumber('');

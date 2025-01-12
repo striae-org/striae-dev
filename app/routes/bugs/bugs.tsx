@@ -4,9 +4,11 @@ import { verifyTurnstileToken } from '~/utils/turnstile';
 import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import styles from './bugs.module.css';
+import paths from '~/config.json';
 
 const MAX_NAME_LENGTH = 128;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const KEYS_URL = paths.keys_url;
 
 interface ActionData {
     success?: boolean;
@@ -20,14 +22,6 @@ interface ActionData {
     };
 }
 
-interface Env {
-  cloudflare: {
-    env: {
-      WDEFOIJ_EFOIJ: string;
-    };
-  };
-}
-
 export const meta = () => {
   return baseMeta({
     title: 'Submit a Bug Report - Striae',
@@ -36,7 +30,7 @@ export const meta = () => {
   });
 };
 
-export async function action({ request, context }: { request: Request; context: Env }) {
+export async function action({ request }: { request: Request }) {
   const formData = await request.formData();
   const name = formData.get('name') as string;
   const email = formData.get('email') as string;
@@ -59,6 +53,14 @@ export async function action({ request, context }: { request: Request; context: 
   }
 
   try {
+
+    // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+
     const token = formData.get('cf-turnstile-response') as string;
     const verificationResult = await verifyTurnstileToken(token);
     
@@ -73,7 +75,7 @@ export async function action({ request, context }: { request: Request; context: 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${context.cloudflare.env.WDEFOIJ_EFOIJ}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         "from": {

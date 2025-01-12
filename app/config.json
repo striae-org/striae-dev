@@ -2,5 +2,6 @@
   "name": "Striae",
   "title": "AllyForensics",  
   "url": "https://striae.allyforensics.com",    
-  "data_worker_url": "https://data.striae.allyforensics.com"
+  "data_worker_url": "https://data.striae.allyforensics.com",
+  "keys_url": "https://keys.striae.allyforensics.com"
 }
