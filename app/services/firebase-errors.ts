@@ -48,7 +48,9 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
     switch (err.code) {
       // Standard Auth Errors
       case 'auth/invalid-credential':
-        return { message: ERROR_MESSAGES.INVALID_PASSWORD, data: errorData };
+        return { message: ERROR_MESSAGES.USER_NOT_FOUND, data: errorData };
+      case 'auth/wrong-password':
+        return { message: ERROR_MESSAGES.INVALID_PASSWORD, data: errorData };  
       case 'auth/user-not-found':
         return { message: ERROR_MESSAGES.USER_NOT_FOUND, data: errorData };
       case 'auth/email-already-in-use':
