@@ -173,40 +173,46 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
           );
         };
         
-        if (isCaseData(data) && data.caseNumber === caseNumber) {
-          setError('Case already exists');
-          setIsLoadingCase(false);
-          return;
-        }
+        if (isCaseData(data)) {
+        // Case already exists, load it instead
+        setCurrentCase(caseNumber);
+        setFiles(data.files || []);
+        setCaseNumber('');
+        setSuccessAction('loaded');
+        setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+        setIsLoadingCase(false);
+        return;
       }
-
-      const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
-        },
-        body: JSON.stringify({
-          createdAt: new Date().toISOString(),
-          caseNumber,
-          userId: user.uid,
-          files: []
-        })
-      });
-
-      if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);      
-      setCurrentCase(caseNumber);
-      setFiles([]);
-      setCaseNumber('');
-      setSuccessAction('created');
-      setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create case');
-      console.error(err);
-    } finally {
-      setIsLoadingCase(false);
     }
-  };
+
+      // If we get here, case doesn't exist - create it
+    const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
+      },
+      body: JSON.stringify({
+        createdAt: new Date().toISOString(),
+        caseNumber,
+        userId: user.uid,
+        files: []
+      })
+    });
+
+    if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);      
+    setCurrentCase(caseNumber);
+    setFiles([]);
+    setCaseNumber('');
+    setSuccessAction('created');
+    setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to create case');
+    console.error(err);
+  } finally {
+    setIsLoadingCase(false);
+  }
+};
 
   return (
     <div className={styles.sidebar}>
