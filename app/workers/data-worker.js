@@ -25,7 +25,7 @@ export default {
 
     try {
       const url = new URL(request.url);
-      const filename = url.pathname.slice(1) || 'data.json'; // Remove leading slash, default to data.json
+      const filename = url.pathname.slice(1) || 'data.json';
       
       if (!filename.endsWith('.json')) {
         return createResponse({ error: 'Invalid file type. Only JSON files are allowed.' }, 400);
@@ -36,36 +36,30 @@ export default {
       switch (request.method) {
         case "GET": {
           const file = await bucket.get(filename);
-          const data = file ? JSON.parse(await file.text()) : [];
+          if (!file) {
+            return createResponse([], 200);
+          }
+          const data = JSON.parse(await file.text());
           return createResponse(data);
         }
 
         case "PUT": {
-          const file = await bucket.get(filename);
-          const data = file ? JSON.parse(await file.text()) : [];
           const newData = await request.json();
-          
-          data.push(newData);
-          await bucket.put(filename, JSON.stringify(data));
-          
+          await bucket.put(filename, JSON.stringify(newData)); // Replace instead of push
           return createResponse({ success: true });
         }
 
         case "DELETE": {
-          const { filterKey, filterValue } = await request.json();
           const file = await bucket.get(filename);
-          const data = file ? JSON.parse(await file.text()) : [];
-          
-          if (!filterKey || filterValue === undefined) {
-            return createResponse({ error: 'Missing filter parameters' }, 400);
+          if (!file) {
+            return createResponse({ error: 'File not found' }, 404);
           }
-          
-          const updatedData = data.filter(item => item[filterKey] !== filterValue);
-          await bucket.put(filename, JSON.stringify(updatedData));
-          
+          await bucket.delete(filename);
           return createResponse({ success: true });
         }
-        // ...existing code...
+
+        default:
+          return createResponse({ error: 'Method not allowed' }, 405);
       }
     } catch (error) {
       console.error('Worker error:', error);

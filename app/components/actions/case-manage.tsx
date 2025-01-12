@@ -3,8 +3,7 @@ import paths from '~/config.json';
 
 interface CaseData {
   createdAt: string;
-  caseNumber: string;
-  userId: string;
+  caseNumber: string;  
   files: FileData[];
 }
 
@@ -13,10 +12,6 @@ interface FileData {
   size: number;
   lastModified: string;
   type: string;
-}
-
-interface userData {
-  cases: CaseData[];
 }
 
 const WORKER_URL = paths.data_worker_url;
@@ -67,8 +62,7 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
     .then(apiKey =>{
       const newCase: CaseData = {
         createdAt: new Date().toISOString(),
-        caseNumber,
-        userId: user.uid,
+        caseNumber,        
         files: []
       };
 
@@ -90,24 +84,33 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
           'X-Custom-Auth-Key': apiKey
         }
       })
-      .then(response => response.ok ? response.json() : {})
-      .then((existingData: Partial<userData>) => {
-        // Keep existing data and ensure cases array exists
-        const updatedData = {
-          ...existingData,           // preserve all existing user data
-          cases: [...(existingData.cases || []), newCase]  // append to cases array
+      .then(response => response.ok ? response.json() : { cases: [] })
+      .then((existingData) => {
+        // Always work with first user object only
+        const baseUserData = Array.isArray(existingData) ? existingData[0] : existingData;
+        
+
+        // Store all existing user properties
+        const newData = {
+          ...baseUserData,                    // Keep all existing properties
+          cases: baseUserData.cases || [],    // Initialize or keep existing cases array               
         };
         
+        // Add new case if not already present
+        if (!newData.cases.some((c: CaseData) => c.caseNumber === newCase.caseNumber)) {
+          newData.cases.push(newCase);
+        }
+        
+        // Always replace with single user object
         return fetch(`${WORKER_URL}/${user.uid}/data.json`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'X-Custom-Auth-Key': apiKey
           },
-          body: JSON.stringify(updatedData)
+          body: JSON.stringify(newData)  // Single object with consolidated cases
         });
       });
-
       // Wait for both operations
       return Promise.all([createCaseFile, updateUserData])
         .then(() => newCase);

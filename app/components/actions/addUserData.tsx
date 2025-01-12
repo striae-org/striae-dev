@@ -15,7 +15,7 @@ interface AddUserParams {
   user: User;
   firstName?: string;
   lastName?: string;
-  permitted?: boolean;
+  permitted?: boolean;  
   createdAt?: string;  
 }
 
