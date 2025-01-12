@@ -1,51 +1,49 @@
-import { User } from 'firebase/auth';
+import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
-
-interface AddUserDataParams {
-  user: User;  
-  firstName?: string;
-  lastName?: string;
-  permitted?: boolean;
-}
-
-interface UserData {
-  uid: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  permitted: boolean;
-  createdAt: string;
-}
+import type { CloudflareContext, UserActionData, UserData } from '~/types/actions';
 
 const WORKER_URL = paths.data_worker_url;
 
-export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false }: AddUserDataParams) => {
+export const action = async ({ request, context }: { request: Request; context: CloudflareContext}) => {
+  const formData = await request.formData();
+  const intent = formData.get('intent');
+
+  if (intent !== 'addUser') {
+    return json<UserActionData>({ 
+      success: false, 
+      error: 'Invalid intent' 
+    }, { status: 400 });
+  }
+
   const userData: UserData = {
-    uid: user.uid,
-    email: user.email ?? '',
-    firstName,
-    lastName,
-    permitted,
+    uid: formData.get('uid') as string,
+    email: formData.get('email') as string,
+    firstName: formData.get('firstName') as string,
+    lastName: formData.get('lastName') as string,
+    permitted: formData.get('permitted') === 'true',
     createdAt: new Date().toISOString()
   };
 
   try {
-    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    const response = await fetch(`${WORKER_URL}/${userData.uid}/data.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': process.env.R2_KEY_SECRET as string
+        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
       },
       body: JSON.stringify(userData)
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create user data');
+      throw new Error(`Failed to create user data: ${response.statusText}`);
     }
 
-    return userData;
+    return json<UserActionData>({ success: true, data: userData });
   } catch (error) {
     console.error('Error creating user data:', error);
-    throw error;
+    return json<UserActionData>({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 };

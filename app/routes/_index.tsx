@@ -3,6 +3,7 @@ import type { CloudflareContext, LoaderType } from '~/types/actions';
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { loader as loginLoader } from './auth/login';
 import { action as sidebarAction, loader as sidebarLoader } from '~/components/sidebar/sidebar';
+import { action as userAction } from '~/components/actions/addUserData';
 //import { action as annotationsAction, loader as annotationsLoader } from '~/components/annotations/annotations';
 
 export { Login as default, meta } from './auth/login'
@@ -36,6 +37,8 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 
   try {
     switch (actionType) {
+      case 'user':
+        return userAction({ request, context: typedContext });
       case 'sidebar':
         return sidebarAction({ request, context: typedContext });
      // case 'annotations':
