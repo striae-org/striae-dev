@@ -55,7 +55,7 @@ export async function action({ request }: { request: Request }) {
   try {
 
     // Get API key from keys worker
-    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    const keyResponse = await fetch(`${KEYS_URL}/WDEFOIJ_EFOIJ`);
     if (!keyResponse.ok) {
       throw new Error('Failed to retrieve API key');
     }

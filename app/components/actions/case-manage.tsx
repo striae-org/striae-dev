@@ -20,57 +20,62 @@ const KEYS_URL = paths.keys_url;
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
 
 // Get API key from keys worker
-    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
-    if (!keyResponse.ok) {
-      throw new Error('Failed to retrieve API key');
-    }
-    const apiKey = await keyResponse.text();
+    export const getApiKey = () => {
+  return fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to retrieve API key');
+      }
+      return response.text();
+    })
+    .catch(error => {
+      console.error('Error fetching API key:', error);
+      throw error;
+    });
+};
 
 export const validateCaseNumber = (caseNumber: string): boolean => {
   return CASE_NUMBER_REGEX.test(caseNumber);
 };
 
-export const checkExistingCase = async (
-  user: User,
-  caseNumber: string,  
-): Promise<CaseData | null> => {
-  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': apiKey
-    }
-  });
-
-  if (response.ok) {
-    const data = await response.json();
-    const cases = Array.isArray(data) ? data : [data];
-    return cases.find(c => c.caseNumber === caseNumber) || null;
-  }
-  return null;
-};
-
-export const createNewCase = async (
-  user: User,
-  caseNumber: string,  
-): Promise<CaseData> => {
-  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': apiKey
-    },
-    body: JSON.stringify({
-      createdAt: new Date().toISOString(),
-      caseNumber,
-      userId: user.uid,
-      files: []
+export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseData | null> => 
+  getApiKey()
+    .then(apiKey => 
+      fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        }
+      })
+    )
+    .then(response => {
+      if (!response.ok) return null;
+      return response.json();
     })
-  });
+    .then(data => {
+      const cases = Array.isArray(data) ? data : [data];
+      return cases.find(c => c.caseNumber === caseNumber) || null;
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to create case: ${response.statusText}`);
-  }
-
-  return await response.json();
-};
+export const createNewCase = (user: User, caseNumber: string): Promise<CaseData> =>
+  getApiKey()
+    .then(apiKey =>
+      fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify({
+          createdAt: new Date().toISOString(),
+          caseNumber,
+          userId: user.uid,
+          files: []
+        })
+      })
+    )
+    .then(response => {
+      if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);
+      return response.json();
+    });
