@@ -5,8 +5,7 @@ import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
-import type { CloudflareContext } from '~/types/actions';
-
+import type { CloudflareContext, CustomLoaderArgs } from '~/types/actions';
  
   interface CaseData {
   uid: string;
@@ -37,7 +36,11 @@ interface ActionData {
 
 const WORKER_URL = paths.data_worker_url;
 
-export const loader = async ({ context, user }: { context: CloudflareContext; user: User }) => {
+export const loader = async ({ context, user }: CustomLoaderArgs) => {
+  if (!user) {
+    return json<LoaderData>({ cases: [] });
+  }
+
   try {
     const response = await fetch(`${WORKER_URL}/${user.uid}/cases.json`, {
       method: 'GET',

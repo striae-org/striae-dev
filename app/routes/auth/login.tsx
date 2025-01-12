@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
+import type { CustomLoaderArgs } from '~/types/actions';
 import { addUserData } from '~/components/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
@@ -33,14 +34,6 @@ export const meta = () => {
   });
 };
 
-interface CloudflareContext {  
-    cloudflare: {
-      env: {
-        R2_KEY_SECRET: string;
-      };
-    };
-  }
-
   interface Data {
     email: string;
     firstName: string;
@@ -51,8 +44,7 @@ interface CloudflareContext {
   }
 
   interface LoaderData {
-    data: Data[];
-    context: CloudflareContext;
+    data: Data[];    
   }
 
   const WORKER_URL = paths.data_worker_url;
@@ -64,14 +56,13 @@ const actionCodeSettings = {
 
 const provider = new GoogleAuthProvider();
 
-export const loader = async ({ context }: { request: Request; context: CloudflareContext }) => {  
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    return json<LoaderData>({ data: [], context });
-  }
-
+export const loader = async ({ context, user }: CustomLoaderArgs) => {
   try {
-    const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
+    if (!user) {
+      return json<LoaderData>({ data: [] });
+    }
+
+    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -81,19 +72,17 @@ export const loader = async ({ context }: { request: Request; context: Cloudflar
     
     if (!response.ok) {
       console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [], context });
+      return json<LoaderData>({ data: [] });
     }
 
     const data = await response.json();
-    console.log('Loader data:', data); // Debug log
     return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : [],
-      context 
+      data: Array.isArray(data) ? data.filter(Boolean) : []       
     });
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    return json<LoaderData>({ data: [] });
   }
 };
 
@@ -115,11 +104,10 @@ export const Login = () => {
   const handleGoogleSignIn = async () => {
   setIsLoading(true);
   setError('');
-  
-  
   try {
     const result = await signInWithPopup(auth, provider);
     const additionalInfo = getAdditionalUserInfo(result);
+    
     
     if (!result.user.emailVerified) {
       await handleSignOut();
@@ -131,7 +119,7 @@ export const Login = () => {
       await addUserData({
         user: result.user,
         firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || ''        
+        lastName: additionalInfo.profile?.family_name || '',        
       });
     }
 
@@ -317,7 +305,9 @@ export const Login = () => {
             } else {
             // Add user data to R2
             await addUserData({
-              user: result.user              
+              user: result.user,
+              firstName: result.user.displayName?.split(' ')[0] || '',
+              lastName: result.user.displayName?.split(' ')[1] || ''
             });
             setUser(result.user);
           }
