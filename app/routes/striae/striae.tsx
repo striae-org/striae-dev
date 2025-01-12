@@ -12,7 +12,7 @@ interface StriaePage {
 interface CloudflareContext {  
     cloudflare: {
       env: {
-        R2_KEY_SECRET: string;
+        FWJIO_WFOLIWLF_WFOUIH: string;
       };
     };
   }

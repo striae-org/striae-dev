@@ -53,7 +53,7 @@ export const Turnstile = ({ className, onWidgetId, success, theme, ...rest }: Tu
     script.async = true;
     script.onload = () => {
       const id = window.turnstile.render('#cf-turnstile', {
-        sitekey: `${keys.cft_public_key}`,
+        sitekey: `${keys.JOCVKJWEW}`,
         theme: theme
       });
        setWidgetId(id);

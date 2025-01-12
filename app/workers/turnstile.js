@@ -17,7 +17,7 @@ const createResponse = (/** @type {{ success: boolean; error: string; }} */ body
 export default {
   /**
    * @param {{ method: string; json: () => PromiseLike<{ "cf-turnstile-response": any; }> | { "cf-turnstile-response": any; }; headers: { get: (arg0: string) => string; }; }} request
-   * @param {{ CFT_SECRET_KEY: any; }} env
+   * @param {{ EFJIOJVMEW: any; }} env
    */
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -42,7 +42,7 @@ export default {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            secret: env.CFT_SECRET_KEY,
+            secret: env.EFJIOJVMEW,
             response: token,
             remoteip: ip,
           }),

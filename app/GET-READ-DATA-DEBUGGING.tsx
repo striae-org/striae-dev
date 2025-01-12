@@ -15,7 +15,7 @@ export const meta = () => {
 interface CloudflareContext {  
     cloudflare: {
       env: {
-        R2_KEY_SECRET: string;
+        FWJIO_WFOLIWLF_WFOUIH: string;
       };
     };
   }
@@ -50,7 +50,7 @@ export const loader = async ({ request, context }: { request: Request; context: 
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH,
       }
     });
     

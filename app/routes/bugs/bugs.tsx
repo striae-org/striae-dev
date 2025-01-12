@@ -23,7 +23,7 @@ interface ActionData {
 interface Env {
   cloudflare: {
     env: {
-      SL_API_KEY: string;
+      WDEFOIJ_EFOIJ: string;
     };
   };
 }
@@ -73,7 +73,7 @@ export async function action({ request, context }: { request: Request; context: 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${context.cloudflare.env.SL_API_KEY}`,
+        'Authorization': `Bearer ${context.cloudflare.env.WDEFOIJ_EFOIJ}`,
       },
       body: JSON.stringify({
         "from": {

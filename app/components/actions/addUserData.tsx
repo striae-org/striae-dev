@@ -4,7 +4,7 @@ import paths from '~/config.json';
 interface CloudflareContext {
   cloudflare: {
     env: {
-      R2_KEY_SECRET: string;
+      FWJIO_WFOLIWLF_WFOUIH: string;
     };
   };
 }
@@ -20,7 +20,7 @@ interface AddUserParams {
 const WORKER_URL = paths.data_worker_url;
 
 export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false, context }: AddUserParams) => {
-  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
+  if (!context?.cloudflare?.env?.FWJIO_WFOLIWLF_WFOUIH) {
     throw new Error('Missing Cloudflare context');
   }
 
@@ -38,7 +38,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
       },
       body: JSON.stringify(userData)
     });

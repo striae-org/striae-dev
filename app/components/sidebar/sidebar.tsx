@@ -8,7 +8,7 @@ import paths from '~/config.json';
 interface CloudflareContext {  
     cloudflare: {
       env: {
-        R2_KEY_SECRET: string;
+        FWJIO_WFOLIWLF_WFOUIH: string;
       };
     };
   }
@@ -50,7 +50,7 @@ export const loader = async ({ user, context, caseNumber }: {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET,
+        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH,
       }
     });
 
@@ -104,7 +104,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
         }
       });
 
@@ -158,7 +158,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
         }
       });
 
@@ -184,7 +184,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
         },
         body: JSON.stringify({
           createdAt: new Date().toISOString(),
