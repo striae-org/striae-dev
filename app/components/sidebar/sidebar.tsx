@@ -84,9 +84,9 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
   const [caseNumber, setCaseNumber] = useState<string>('');
   const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
-  const [error, setError] = useState<string>('');  
-  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');    
   const [isLoadingCase, setIsLoadingCase] = useState<boolean>(false);
+  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | null>(null);
   //const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
   
   const loadCase = async () => {
@@ -120,11 +120,11 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         };
 
         if (isCaseData(data) && data.caseNumber === caseNumber) {
-          setCurrentCase(caseNumber);
-          setFiles(data.files || []);
-          setCaseNumber('');
-          setSuccess(true);
-          setTimeout(() => setSuccess(false), SUCCESS_MESSAGE_TIMEOUT);
+        setCurrentCase(caseNumber);
+        setFiles(data.files || []);
+        setCaseNumber('');
+        setSuccessAction('loaded');
+        setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
           return;
         }
       }
@@ -198,8 +198,8 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
       setCurrentCase(caseNumber);
       setFiles([]);
       setCaseNumber('');
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), SUCCESS_MESSAGE_TIMEOUT);
+      setSuccessAction('created');
+      setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
@@ -230,13 +230,15 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         onClick={loadCase}
         disabled={isLoadingCase || !caseNumber}
       >
-            {isLoadingCase ? 'Loading...' : 'Load Case'}
+            {isLoadingCase ? 'Loading...' : 'Load/Create Case'}
       </button>
     </div>
     {error && <p className={styles.error}>{error}</p>}
-    {success && <p className={styles.success}>
-      Case {currentCase ? 'loaded' : 'created'} successfully!
-    </p>}
+    {successAction && (
+      <p className={styles.success}>
+        Case {currentCase} {successAction} successfully!
+      </p>
+    )}
         
         <div className={styles.filesSection}>
           <h4>{currentCase || 'No Case Selected'}</h4>
