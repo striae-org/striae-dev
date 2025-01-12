@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import type { CustomLoaderArgs } from '~/types/actions';
+import { addUserData } from '~/components/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
@@ -46,38 +47,7 @@ export const meta = () => {
     data: Data[];    
   }
 
-const WORKER_URL = paths.data_worker_url;
-
-const addUserData = async ({ user, firstName, lastName }: { 
-  user: User; 
-  firstName: string; 
-  lastName: string; 
-}) => {
-  const formData = new FormData();
-  formData.append('intent', 'addUser');
-  formData.append('uid', user.uid);
-  formData.append('email', user.email || '');
-  formData.append('firstName', firstName);
-  formData.append('lastName', lastName);
-  formData.append('permitted', 'true');
-
-  try {
-    const response = await fetch('/', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add user data');
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('Error adding user data:', error);
-    throw error;
-  }
-};
+  const WORKER_URL = paths.data_worker_url;
 
 const actionCodeSettings = {
   url: 'https://striae.allyforensics.com', // Update with your domain in production
