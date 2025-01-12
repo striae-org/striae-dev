@@ -9,9 +9,4 @@ node_modules
 .wrangler
 .firebase
 firebase-debug.log
-
-config.json
-keys.json
-
-*.toml
 *.txt
