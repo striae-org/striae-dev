@@ -1,11 +1,6 @@
 import { User } from 'firebase/auth';
 import paths from '~/config.json';
 
-interface CloudflareContext {
-  cloudflare: {
-    env: Env;
-  };
-}
 
 interface UserData {
   uid: string;
@@ -21,24 +16,28 @@ interface AddUserParams {
   firstName?: string;
   lastName?: string;
   permitted?: boolean;
-  createdAt?: string;
-  context: CloudflareContext;
+  createdAt?: string;  
 }
 
 const WORKER_URL = paths.data_worker_url;
+const KEYS_URL = paths.keys_url;
 
-export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false, context }: AddUserParams) => {
-  if (!context?.cloudflare?.env?.FWJIO_WFOLIWLF_WFOUIH) {
-    throw new Error('Missing Cloudflare context');
-  }
+export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false }: AddUserParams) => {  
 
   try {
+    // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+
     // Check if user exists
     const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+        'X-Custom-Auth-Key': apiKey
       }
     });
 
@@ -73,7 +72,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+        'X-Custom-Auth-Key': apiKey
       },
       body: JSON.stringify(userData)
     });

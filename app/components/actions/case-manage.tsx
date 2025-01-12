@@ -1,14 +1,6 @@
 import { User } from 'firebase/auth';
 import paths from '~/config.json';
 
-interface CloudflareContext {
-  cloudflare: {
-    env: {
-      FWJIO_WFOLIWLF_WFOUIH: string;
-    };
-  };
-}
-
 interface CaseData {
   createdAt: string;
   caseNumber: string;
@@ -24,7 +16,15 @@ interface FileData {
 }
 
 const WORKER_URL = paths.data_worker_url;
+const KEYS_URL = paths.keys_url;
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
+
+// Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
 
 export const validateCaseNumber = (caseNumber: string): boolean => {
   return CASE_NUMBER_REGEX.test(caseNumber);
@@ -32,14 +32,13 @@ export const validateCaseNumber = (caseNumber: string): boolean => {
 
 export const checkExistingCase = async (
   user: User,
-  caseNumber: string,
-  context: CloudflareContext
+  caseNumber: string,  
 ): Promise<CaseData | null> => {
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+      'X-Custom-Auth-Key': apiKey
     }
   });
 
@@ -53,14 +52,13 @@ export const checkExistingCase = async (
 
 export const createNewCase = async (
   user: User,
-  caseNumber: string,
-  context: CloudflareContext
+  caseNumber: string,  
 ): Promise<CaseData> => {
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+      'X-Custom-Auth-Key': apiKey
     },
     body: JSON.stringify({
       createdAt: new Date().toISOString(),

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link, useLoaderData } from '@remix-run/react';
+import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import { addUserData } from '~/components/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
@@ -32,12 +32,6 @@ export const meta = () => {
   });
 };
 
-interface CloudflareContext {
-  cloudflare: {
-    env: Env;
-  };
-}
-
   interface Data {
     email: string;
     firstName: string;
@@ -48,11 +42,11 @@ interface CloudflareContext {
   }
 
   interface LoaderData {
-    data: Data[];
-    context: CloudflareContext;
+    data: Data[];    
   }
 
   const WORKER_URL = paths.data_worker_url;
+  const KEYS_URL = paths.keys_url;
 
 const actionCodeSettings = {
   url: 'https://striae.allyforensics.com', // Update with your domain in production
@@ -61,41 +55,47 @@ const actionCodeSettings = {
 
 const provider = new GoogleAuthProvider();
 
-export const loader = async ({ context }: { request: Request; context: CloudflareContext }) => {  
+export const loader = async () => {  
   const currentUser = auth.currentUser;
   if (!currentUser) {
-    return json<LoaderData>({ data: [], context });
+    return json<LoaderData>({ data: [] });
   }
 
   try {
+
+    // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+
     const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+        'X-Custom-Auth-Key': apiKey
       }
     });
     
     if (!response.ok) {
       console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [], context });
+      return json<LoaderData>({ data: [] });
     }
 
     const data = await response.json();
     console.log('Loader data:', data); // Debug log
     return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : [],
-      context 
+      data: Array.isArray(data) ? data.filter(Boolean) : []       
     });
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    return json<LoaderData>({ data: [] });
   }
 };
 
-export const Login = () => {  
-  const { context } = useLoaderData<LoaderData>();
+export const Login = () => {    
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState('');
@@ -129,8 +129,7 @@ export const Login = () => {
       await addUserData({
         user: result.user,
         firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || '',
-        context
+        lastName: additionalInfo.profile?.family_name || ''        
       });
     }
 
@@ -162,8 +161,7 @@ export const Login = () => {
           await addUserData({
             user: emailLinkUser,
             firstName,
-            lastName,
-            context
+            lastName            
           });
 
           setUser(emailLinkUser);
@@ -317,8 +315,7 @@ export const Login = () => {
             } else {
             // Add user data to R2
             await addUserData({
-              user: result.user,
-              context
+              user: result.user              
             });
             setUser(result.user);
           }
@@ -338,7 +335,7 @@ export const Login = () => {
     handleVerifyEmail(actionCode, continueUrl || undefined);
   }
    return () => unsubscribe();
-}, [navigate, context]);
+}, [navigate]);
   
   const handleEmailLink = async (email: string) => {
   try {
@@ -408,8 +405,7 @@ export const Login = () => {
       await addUserData({
         user: createCredential.user,
         firstName,
-        lastName,
-        context
+        lastName        
       });
 
         await sendEmailVerification(createCredential.user);
@@ -474,7 +470,7 @@ export const Login = () => {
     <>
       {user ? (
         user.emailVerified ? (
-          <Striae user={user} context={context} />
+          <Striae user={user} />
         ) : (
           <div className={styles.verificationPrompt}>
             <h2>Email Verification Required</h2>

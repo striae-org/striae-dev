@@ -11,13 +11,6 @@ export const meta = () => {
     description: 'Sorry, the beta is closed',
   });
 };
-
-interface CloudflareContext {
-  cloudflare: {
-    env: Env;
-  };
-}
-
   interface Data {
     email: string;
     firstName: string;
@@ -28,14 +21,14 @@ interface CloudflareContext {
   }
 
   interface LoaderData {
-    data: Data[];
-    context: CloudflareContext;
+    data: Data[];    
   }
 
   const WORKER_URL = paths.data_worker_url;
+  const KEYS_URL = paths.keys_url;
 
 
-export const loader = async ({ request, context }: { request: Request; context: CloudflareContext }) => {
+export const loader = async ({ request }: { request: Request }) => {
   const url = new URL(request.url);
   const uid = url.searchParams.get('uid');
 
@@ -44,29 +37,36 @@ export const loader = async ({ request, context }: { request: Request; context: 
   }
 
   try {
+
+    // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+
     const response = await fetch(`${WORKER_URL}/${uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH as string
+        'X-Custom-Auth-Key': apiKey
       }
     });
     
     if (!response.ok) {
       console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [], context });
+      return json<LoaderData>({ data: [] });
     }
 
     const data = await response.json();
     console.log('Loader data:', data); // Debug log
     return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : [],
-      context 
+      data: Array.isArray(data) ? data.filter(Boolean) : []      
     });
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [], context });
+    return json<LoaderData>({ data: []});
   }
 };
 
