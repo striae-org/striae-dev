@@ -1,28 +1,32 @@
 import { User } from 'firebase/auth';
 import paths from '~/config.json';
 
-interface AddUserDataParams {
-  user: User;  
+interface CloudflareContext {
+  cloudflare: {
+    env: {
+      R2_KEY_SECRET: string;
+    };
+  };
+}
+
+interface AddUserParams {
+  user: User;
   firstName?: string;
   lastName?: string;
   permitted?: boolean;
-}
-
-interface UserData {
-  uid: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  permitted: boolean;
-  createdAt: string;
+  context: CloudflareContext;
 }
 
 const WORKER_URL = paths.data_worker_url;
 
-export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false }: AddUserDataParams) => {
-  const userData: UserData = {
+export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false, context }: AddUserParams) => {
+  if (!context?.cloudflare?.env?.R2_KEY_SECRET) {
+    throw new Error('Missing Cloudflare context');
+  }
+
+  const userData = {
     uid: user.uid,
-    email: user.email ?? '',
+    email: user.email,
     firstName,
     lastName,
     permitted,
@@ -34,7 +38,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': process.env.R2_KEY_SECRET as string
+        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
       },
       body: JSON.stringify(userData)
     });

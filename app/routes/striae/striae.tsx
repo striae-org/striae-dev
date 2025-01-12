@@ -5,13 +5,22 @@ import { Annotations } from '~/components/annotations/annotations';
 import styles from './striae.module.css';
 
 interface StriaePage {
-  user: User;    
+  user: User;
+  context: CloudflareContext;  
 }
 
-export const Striae = ({ user }: StriaePage) => {
+interface CloudflareContext {  
+    cloudflare: {
+      env: {
+        R2_KEY_SECRET: string;
+      };
+    };
+  }
+
+export const Striae = ({ user, context }: StriaePage) => {
   return (
     <div className={styles.appContainer}>
-      <Sidebar user={user} />
+      <Sidebar user={user} context={context} />
       <main className={styles.mainContent}>
         <Canvas />
         <Annotations />
