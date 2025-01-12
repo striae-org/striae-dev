@@ -1,28 +1,31 @@
-// Firebase Auth Imports
-import {
-  applyActionCode, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  onAuthStateChanged, sendSignInLinkToEmail, signInWithEmailLink,
-  isSignInWithEmailLink, sendPasswordResetEmail, sendEmailVerification,
-  User, updateProfile, GoogleAuthProvider, signInWithPopup,
-} from 'firebase/auth';
-
-// React & Routing Imports
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
-
-// Local Imports
+import { useNavigate, Link, useLoaderData } from '@remix-run/react';
 import { auth } from '~/services/firebase';
-import type { CustomLoaderArgs } from '~/types/actions';
+import { addUserData } from '~/components/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
+import {
+    applyActionCode,           
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    sendSignInLinkToEmail,
+    signInWithEmailLink,
+    isSignInWithEmailLink,
+    sendPasswordResetEmail,
+    sendEmailVerification,
+    User,
+    updateProfile,
+    GoogleAuthProvider,    
+    signInWithPopup,        
+} from 'firebase/auth';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import { Interstitial } from './interstitial';
-import { Striae } from '~/routes/striae/striae';
-import { baseMeta } from '~/utils/meta';
-import paths from '~/config.json';
 import styles from './login.module.css';
+import { baseMeta } from '~/utils/meta';
+import { Striae } from '~/routes/striae/striae';
+import paths from '~/config.json';
+import { json } from '@remix-run/cloudflare';
 
-//Meta data
 export const meta = () => {
   return baseMeta({
     title: 'Welcome to Striae',
@@ -30,82 +33,45 @@ export const meta = () => {
   });
 };
 
- // Type Definitions
-interface Data {
-  email: string;
-  firstName: string;
-  lastName: string;
-  permitted: boolean;
-  createdAt: string;
-  uid: string;
-}
+interface CloudflareContext {  
+    cloudflare: {
+      env: {
+        R2_KEY_SECRET: string;
+      };
+    };
+  }
 
-interface LoaderData {
-  data: Data[];    
-}
+  interface Data {
+    email: string;
+    firstName: string;
+    lastName: string;
+    permitted: boolean;
+    createdAt: string;
+    uid: string;
+  }
 
-//Set Data Worker URL
-const WORKER_URL = paths.data_worker_url;
-//Initialize Google Auth Provider
-const provider = new GoogleAuthProvider();
+  interface LoaderData {
+    data: Data[];
+    context: CloudflareContext;
+  }
 
-/**
- * Settings for email link authentication
- */
+  const WORKER_URL = paths.data_worker_url;
+
 const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com',
+  url: 'https://striae.allyforensics.com', // Update with your domain in production
   handleCodeInApp: true,
 };
 
-/**
- * Adds new user data to the backend storage
- * @param {Object} params - User data parameters
- * @param {User} params.user - Firebase user object
- * @param {string} params.firstName - User's first name
- * @param {string} params.lastName - User's last name
- */
+const provider = new GoogleAuthProvider();
 
-const addUserData = async ({ user, firstName, lastName }: { 
-  user: User; 
-  firstName: string; 
-  lastName: string; 
-}) => {
-  const formData = new FormData();
-  formData.append('intent', 'addUser');
-  formData.append('uid', user.uid);
-  formData.append('email', user.email || '');
-  formData.append('firstName', firstName);
-  formData.append('lastName', lastName);
-  formData.append('permitted', 'true');
-
-  try {
-    const response = await fetch('/', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add user data');
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('Error adding user data:', error);
-    throw error;
+export const loader = async ({ context }: { request: Request; context: CloudflareContext }) => {  
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+    return json<LoaderData>({ data: [], context });
   }
-};
 
-/**
- * Server-side loader function to fetch user data
- */
-export const loader = async ({ context, user }: CustomLoaderArgs) => {
   try {
-    if (!user) {
-      return json<LoaderData>({ data: [] });
-    }
-
-    const response = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -115,25 +81,24 @@ export const loader = async ({ context, user }: CustomLoaderArgs) => {
     
     if (!response.ok) {
       console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [] });
+      return json<LoaderData>({ data: [], context });
     }
 
     const data = await response.json();
+    console.log('Loader data:', data); // Debug log
     return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : []       
+      data: Array.isArray(data) ? data.filter(Boolean) : [],
+      context 
     });
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [] });
+    return json<LoaderData>({ data: [], context });
   }
 };
 
-
-/**
- * Main Login component handling all authentication flows
- */
-export const Login = () => {    
+export const Login = () => {  
+  const { context } = useLoaderData<LoaderData>();
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState('');
@@ -146,117 +111,16 @@ export const Login = () => {
   const [needsProfile, setNeedsProfile] = useState(false);
   const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
 
+  
 
-  /**
-   * Monitors user authentication state
-   * 
-   */
-  useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-   if (user) {
-      if (!user.emailVerified) {
-        handleSignOut();
-        setError('Please verify your email before logging in');
-        return;
-      }      
-      console.log("Logged in user:", user.email);
-      setUser(user);      
-    } else {
-      console.log("No user logged in");
-      setUser(null);
-    }
-  });
-
-  const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
-  try {
-    await applyActionCode(auth, actionCode);
-    setError('Email verified successfully!');
-    if (continueUrl) {
-      navigate(continueUrl);
-    }
-  } catch (err) {
-    const { message } = handleAuthError(err);
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-    
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
-      }
-      if (email) {
-        setIsLoading(true);
-        signInWithEmailLink(auth, email, window.location.href)
-          .then(async (result) => {
-             const additionalInfo = getAdditionalUserInfo(result);
-        
-            if (additionalInfo?.isNewUser) {
-              setEmailLinkUser(result.user);
-              setNeedsProfile(true);
-            } else {
-            // Add user data to R2
-            await addUserData({
-              user: result.user,
-              firstName: result.user.displayName?.split(' ')[0] || '',
-              lastName: result.user.displayName?.split(' ')[1] || ''
-            });
-            setUser(result.user);
-          }
-            window.localStorage.removeItem('emailForSignIn');            
-          })
-          .catch((error) => setError(error.message))
-          .finally(() => setIsLoading(false));
-      }
-    }
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode');
-  const actionCode = urlParams.get('oobCode');
-  const continueUrl = urlParams.get('continueUrl');
-
-  if (mode === 'verifyEmail' && actionCode) {
-    handleVerifyEmail(actionCode, continueUrl || undefined);
-  }
-   return () => unsubscribe();
-}, [navigate]);
-
-/**
-   * Validates password strength requirements
-   * @param {string} password - Password to validate
-   * @returns {boolean} - Whether password meets requirements
-   */
-    const checkPasswordStrength = (password: string): boolean => {
-    const hasMinLength = password.length >= 10;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
-    setPasswordStrength(
-      `Password must contain:
-      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
-      ${!hasUpperCase ? '❌' : '✅'} Capital letters
-      ${!hasNumber ? '❌' : '✅'} Numbers
-      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
-    );
-    
-    return isStrong;
-  };  
-
-
-  /**
-   * Handles Google Sign In authentication
-   */
   const handleGoogleSignIn = async () => {
   setIsLoading(true);
   setError('');
+  
+  
   try {
     const result = await signInWithPopup(auth, provider);
     const additionalInfo = getAdditionalUserInfo(result);
-    
     
     if (!result.user.emailVerified) {
       await handleSignOut();
@@ -268,7 +132,8 @@ export const Login = () => {
       await addUserData({
         user: result.user,
         firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || '',        
+        lastName: additionalInfo.profile?.family_name || '',
+        context
       });
     }
 
@@ -300,7 +165,8 @@ export const Login = () => {
           await addUserData({
             user: emailLinkUser,
             firstName,
-            lastName            
+            lastName,
+            context
           });
 
           setUser(emailLinkUser);
@@ -341,13 +207,7 @@ export const Login = () => {
     </form>
   );
 };
-
-
-/**
- * Reset Password Form
- *  
- * 
- */  
+  
   const ResetPasswordForm = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,11 +252,97 @@ export const Login = () => {
     </form>
   );
 };
+
+    const checkPasswordStrength = (password: string): boolean => {
+    const hasMinLength = password.length >= 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    setPasswordStrength(
+      `Password must contain:
+      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
+      ${!hasUpperCase ? '❌' : '✅'} Capital letters
+      ${!hasNumber ? '❌' : '✅'} Numbers
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+    );
+    
+    return isStrong;
+  };  
+
+   useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+   if (user) {
+      if (!user.emailVerified) {
+        handleSignOut();
+        setError('Please verify your email before logging in');
+        return;
+      }      
+      console.log("Logged in user:", user.email);
+      setUser(user);      
+    } else {
+      console.log("No user logged in");
+      setUser(null);
+    }
+  });
   
-  /**
-   * Handles email link authentication
-   * @param {string} email - User's email address
-   */
+
+    const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
+  try {
+    await applyActionCode(auth, actionCode);
+    setError('Email verified successfully!');
+    if (continueUrl) {
+      navigate(continueUrl);
+    }
+  } catch (err) {
+    const { message } = handleAuthError(err);
+    setError(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+    
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      let email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+      }
+      if (email) {
+        setIsLoading(true);
+        signInWithEmailLink(auth, email, window.location.href)
+          .then(async (result) => {
+             const additionalInfo = getAdditionalUserInfo(result);
+        
+            if (additionalInfo?.isNewUser) {
+              setEmailLinkUser(result.user);
+              setNeedsProfile(true);
+            } else {
+            // Add user data to R2
+            await addUserData({
+              user: result.user,
+              context
+            });
+            setUser(result.user);
+          }
+            window.localStorage.removeItem('emailForSignIn');            
+          })
+          .catch((error) => setError(error.message))
+          .finally(() => setIsLoading(false));
+      }
+    }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const actionCode = urlParams.get('oobCode');
+  const continueUrl = urlParams.get('continueUrl');
+
+  if (mode === 'verifyEmail' && actionCode) {
+    handleVerifyEmail(actionCode, continueUrl || undefined);
+  }
+   return () => unsubscribe();
+}, [navigate, context]);
+  
   const handleEmailLink = async (email: string) => {
   try {
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
@@ -410,10 +356,6 @@ export const Login = () => {
   }
 };
 
- /**
-   * Handles form submission for password-based auth
-   * @param {React.FormEvent} e - Form event
-   */
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError('');
@@ -469,7 +411,8 @@ export const Login = () => {
       await addUserData({
         user: createCredential.user,
         firstName,
-        lastName        
+        lastName,
+        context
       });
 
         await sendEmailVerification(createCredential.user);
@@ -490,11 +433,6 @@ export const Login = () => {
   }
 };
 
-  /**
-   * Email Link Form
-   *  
-   * 
-   */
   const EmailLinkForm = () => {
   return (
     <form onSubmit={(e) => {
@@ -524,9 +462,7 @@ export const Login = () => {
   );
 };
 
-  /**
-   * Handles user sign out
-   */
+  // Add proper sign out handling
   const handleSignOut = async () => {
     try {
       await auth.signOut();      
@@ -537,12 +473,11 @@ export const Login = () => {
     }
   };  
 
-  // Component render logic
   return (
     <>
       {user ? (
         user.emailVerified ? (
-          <Striae user={user} />
+          <Striae user={user} context={context} />
         ) : (
           <Interstitial user={user} />
         )
