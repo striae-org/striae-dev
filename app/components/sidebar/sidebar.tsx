@@ -12,14 +12,12 @@ interface CloudflareContext {
       };
     };
   }
-
   interface CaseData {
   createdAt: string;
   caseNumber: string;
   userId: string;
   files: FileData[];
 }
-
   interface FileData {
   name: string;
   size: number;
@@ -38,6 +36,8 @@ interface SidebarProps {
 }
 
 const WORKER_URL = paths.data_worker_url;
+const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
+const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
 export const loader = async ({ user, context, caseNumber }: { 
   user: User; 
@@ -84,18 +84,71 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
   const [caseNumber, setCaseNumber] = useState<string>('');
   const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');  
   const [success, setSuccess] = useState<boolean>(false);
+  const [isLoadingCase, setIsLoadingCase] = useState<boolean>(false);
+  //const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
+  
+  const loadCase = async () => {
+    setIsLoadingCase(true);
+    setError('');
+    
+    if (!caseNumber.match(CASE_NUMBER_REGEX)) {
+      setError('Invalid case number format');
+      setIsLoadingCase(false);
+      return;
+    }
+
+    try {
+      const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
+        }
+      });
+
+      if (checkResponse.ok) {
+        const data = await checkResponse.json();
+        const isCaseData = (data: unknown): data is CaseData => {
+          return (
+            typeof data === 'object' &&
+            data !== null &&
+            'caseNumber' in data &&
+            typeof (data as CaseData).caseNumber === 'string'
+          );
+        };
+
+        if (isCaseData(data) && data.caseNumber === caseNumber) {
+          setCurrentCase(caseNumber);
+          setFiles(data.files || []);
+          setCaseNumber('');
+          setSuccess(true);
+          setTimeout(() => setSuccess(false), SUCCESS_MESSAGE_TIMEOUT);
+          return;
+        }
+      }
+      
+      // Case doesn't exist, create it
+      await createCase();
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load case');
+      console.error(err);
+    } finally {
+      setIsLoadingCase(false);
+    }
+  };
+
 
    const createCase = async () => {
-    setIsLoading(true);
+    setIsLoadingCase(true);
     setError('');
     
     // Validate case number
-    if (!caseNumber.match(/^[A-Za-z0-9-]+$/)) {
+    if (!caseNumber.match(CASE_NUMBER_REGEX)) {
       setError('Invalid case number format');
-      setIsLoading(false);
+      setIsLoadingCase(false);
       return;
     }
 
@@ -122,7 +175,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
         
         if (isCaseData(data) && data.caseNumber === caseNumber) {
           setError('Case already exists');
-          setIsLoading(false);
+          setIsLoadingCase(false);
           return;
         }
       }
@@ -146,12 +199,12 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
       setFiles([]);
       setCaseNumber('');
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setTimeout(() => setSuccess(false), SUCCESS_MESSAGE_TIMEOUT);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingCase(false);
     }
   };
 
@@ -174,14 +227,16 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
             placeholder="Case #"
           />
           <button 
-            onClick={createCase}
-            disabled={isLoading || !caseNumber}
-          >
-            {isLoading ? 'Creating...' : 'Create'}
-          </button>
-        </div>
-        {error && <p className={styles.error}>{error}</p>}
-        {success && <p className={styles.success}>Case created successfully!</p>}
+        onClick={loadCase}
+        disabled={isLoadingCase || !caseNumber}
+      >
+            {isLoadingCase ? 'Loading...' : 'Load Case'}
+      </button>
+    </div>
+    {error && <p className={styles.error}>{error}</p>}
+    {success && <p className={styles.success}>
+      Case {currentCase ? 'loaded' : 'created'} successfully!
+    </p>}
         
         <div className={styles.filesSection}>
           <h4>{currentCase || 'No Case Selected'}</h4>
