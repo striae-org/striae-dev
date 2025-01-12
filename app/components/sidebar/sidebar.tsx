@@ -1,3 +1,8 @@
+import { 
+  validateCaseNumber,
+  checkExistingCase, 
+  createNewCase 
+} from '~/components/actions/case-manage';
 import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
@@ -11,13 +16,7 @@ interface CloudflareContext {
         FWJIO_WFOLIWLF_WFOUIH: string;
       };
     };
-  }
-  interface CaseData {
-  createdAt: string;
-  caseNumber: string;
-  userId: string;
-  files: FileData[];
-}
+  }  
   interface FileData {
   name: string;
   size: number;
@@ -36,7 +35,6 @@ interface SidebarProps {
 }
 
 const WORKER_URL = paths.data_worker_url;
-const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
 export const loader = async ({ user, context, caseNumber }: { 
@@ -89,130 +87,41 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | null>(null);
   //const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
   
-  const loadCase = async () => {
+  const handleCase = async () => {
     setIsLoadingCase(true);
     setError('');
     
-    if (!caseNumber.match(CASE_NUMBER_REGEX)) {
+    if (!validateCaseNumber(caseNumber)) {
       setError('Invalid case number format');
       setIsLoadingCase(false);
       return;
     }
 
     try {
-      const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
-        }
-      });
-
-      if (checkResponse.ok) {
-        const data = await checkResponse.json();
-        const isCaseData = (data: unknown): data is CaseData => {
-          return (
-            typeof data === 'object' &&
-            data !== null &&
-            'caseNumber' in data &&
-            typeof (data as CaseData).caseNumber === 'string'
-          );
-        };
-
-        if (isCaseData(data) && data.caseNumber === caseNumber) {
+      const existingCase = await checkExistingCase(user, caseNumber, context);
+      
+      if (existingCase) {
         setCurrentCase(caseNumber);
-        setFiles(data.files || []);
+        setFiles(existingCase.files || []);
         setCaseNumber('');
         setSuccessAction('loaded');
         setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
-          return;
-        }
+        return;
       }
-      
-      // Case doesn't exist, create it
-      await createCase();
 
+      const newCase = await createNewCase(user, caseNumber, context);
+      setCurrentCase(caseNumber);
+      setFiles(newCase.files || []);
+      setCaseNumber('');
+      setSuccessAction('created');
+      setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load case');
+      setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
     } finally {
       setIsLoadingCase(false);
     }
   };
-
-
-   const createCase = async () => {
-    setIsLoadingCase(true);
-    setError('');
-    
-    // Validate case number
-    if (!caseNumber.match(CASE_NUMBER_REGEX)) {
-      setError('Invalid case number format');
-      setIsLoadingCase(false);
-      return;
-    }
-
-    try {
-      // Check if case exists
-      const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
-        }
-      });
-
-      if (checkResponse.ok) {
-        const data = await checkResponse.json();
-        const isCaseData = (data: unknown): data is CaseData => {
-          return (
-            typeof data === 'object' &&
-            data !== null &&
-            'caseNumber' in data &&
-            typeof (data as CaseData).caseNumber === 'string'
-          );
-        };
-        
-        if (isCaseData(data)) {
-        // Case already exists, load it instead
-        setCurrentCase(caseNumber);
-        setFiles(data.files || []);
-        setCaseNumber('');
-        setSuccessAction('loaded');
-        setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
-        setIsLoadingCase(false);
-        return;
-      }
-    }
-
-      // If we get here, case doesn't exist - create it
-    const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': context.cloudflare.env.FWJIO_WFOLIWLF_WFOUIH
-      },
-      body: JSON.stringify({
-        createdAt: new Date().toISOString(),
-        caseNumber,
-        userId: user.uid,
-        files: []
-      })
-    });
-
-    if (!response.ok) throw new Error(`Failed to create case: ${response.statusText}`);      
-    setCurrentCase(caseNumber);
-    setFiles([]);
-    setCaseNumber('');
-    setSuccessAction('created');
-    setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Failed to create case');
-    console.error(err);
-  } finally {
-    setIsLoadingCase(false);
-  }
-};
 
   return (
     <div className={styles.sidebar}>
@@ -233,7 +142,7 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
             placeholder="Case #"
           />
           <button 
-        onClick={loadCase}
+        onClick={handleCase}
         disabled={isLoadingCase || !caseNumber}
       >
             {isLoadingCase ? 'Loading...' : 'Load/Create Case'}
