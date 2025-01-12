@@ -39,7 +39,7 @@ const WORKER_URL = paths.data_worker_url;
 
 export const loader = async ({ context, user }: { context: CloudflareContext; user: User }) => {
   try {
-    const response = await fetch(`${WORKER_URL}/${user.uid}/cases.json`, {
+    const response = await fetch(`${WORKER_URL}/${user.uid}/`, {
       method: 'GET',
       headers: {        
         'Content-Type': 'application/json',
@@ -48,23 +48,14 @@ export const loader = async ({ context, user }: { context: CloudflareContext; us
     });
 
     if (!response.ok) {
-      // Handle 404 separately as it's an expected case for new users
-      if (response.status === 404) {
-        return json<LoaderData>({ cases: [] });
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return json<LoaderData>({ cases: [] });
     }
 
-    const cases: CaseData[] = await response.json();
-    
-    // Ensure cases is an array and sort by creation date
-    const sortedCases = (Array.isArray(cases) ? cases : [])
-      .filter(Boolean)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    return json<LoaderData>({ cases: sortedCases });
+    const cases = await response.json();
+    return json<LoaderData>({ 
+      cases: Array.isArray(cases) ? cases.filter(Boolean) : []
+    });
   } catch (error) {
-    console.error('Error loading cases:', error);
     return json<LoaderData>({ cases: [] });
   }
 };
@@ -75,27 +66,14 @@ export const action = async ({ request, context }: { request: Request; context: 
   const uid = formData.get('uid') as string;
   const caseNumber = formData.get('caseNumber') as string;
 
-  // Handle case deletion
   if (intent === 'delete') {
     try {
-      // First get existing cases
-      const getCases = await fetch(`${WORKER_URL}/${uid}/cases.json`, {
-        headers: {
-          'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
-        }
-      });
-      
-      const existingCases: CaseData[] = await getCases.json() || [];
-      const updatedCases = existingCases.filter(c => c.caseNumber !== caseNumber);
-
-      // Update cases.json without the deleted case
-      const response = await fetch(`${WORKER_URL}/${uid}/cases.json`, {
-        method: 'PUT',
+      const response = await fetch(`${WORKER_URL}/${uid}/${caseNumber}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
-        },
-        body: JSON.stringify(updatedCases)
+        }
       });
 
       if (!response.ok) throw new Error('Failed to delete case');
@@ -107,38 +85,17 @@ export const action = async ({ request, context }: { request: Request; context: 
 
   // Create new case
   try {
-    // First get existing cases
-    const getCases = await fetch(`${WORKER_URL}/${uid}/cases.json`, {
-      headers: {
-        'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
-      }
-    });
-    
-    const existingCases: CaseData[] = await getCases.json() || [];
-    
-    // Check if case already exists
-    if (existingCases.some(c => c.caseNumber === caseNumber)) {
-      return json({ error: 'Case number already exists' }, { status: 400 });
-    }
-
-    // Add new case
-    const newCase: CaseData = {
-      uid,
-      caseNumber,
-      createdAt: new Date().toISOString()
-    };
-
-    const updatedCases = [...existingCases, newCase].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    const response = await fetch(`${WORKER_URL}/${uid}/cases.json`, {
+    const response = await fetch(`${WORKER_URL}/${uid}/${caseNumber}.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-Custom-Auth-Key': context.cloudflare.env.R2_KEY_SECRET
       },
-      body: JSON.stringify(updatedCases)
+      body: JSON.stringify({
+        uid,
+        caseNumber,
+        createdAt: new Date().toISOString()
+      })
     });
 
     if (!response.ok) throw new Error('Failed to create case');
