@@ -1,4 +1,8 @@
-import { loadCase, createCase, validateCaseNumber } from '~/components/actions/case-manage';
+import { 
+  validateCaseNumber,
+  checkExistingCase, 
+  createNewCase 
+} from '~/components/actions/case-manage';
 import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
@@ -94,24 +98,26 @@ export const Sidebar = ({ user, context }: SidebarProps) => {
     }
 
     try {
-      const data = await loadCase(user, caseNumber, context);
+      const existingCase = await checkExistingCase(user, caseNumber, context);
+      
+      if (existingCase) {
+        setCurrentCase(caseNumber);
+        setFiles(existingCase.files || []);
+        setCaseNumber('');
+        setSuccessAction('loaded');
+        setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+        return;
+      }
+
+      const newCase = await createNewCase(user, caseNumber, context);
       setCurrentCase(caseNumber);
-      setFiles(data.files || []);
+      setFiles(newCase.files || []);
       setCaseNumber('');
-      setSuccessAction('loaded');
+      setSuccessAction('created');
       setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
     } catch (err) {
-      try {
-        const data = await createCase(user, caseNumber, context);
-        setCurrentCase(caseNumber);
-        setFiles(data.files || []);
-        setCaseNumber('');
-        setSuccessAction('created');
-        setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to handle case');
-        console.error(err);
-      }
+      setError(err instanceof Error ? err.message : 'Failed to create case');
+      console.error(err);
     } finally {
       setIsLoadingCase(false);
     }
