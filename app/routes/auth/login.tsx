@@ -1,28 +1,31 @@
-// Firebase Auth Imports
-import {
-  applyActionCode, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  onAuthStateChanged, sendSignInLinkToEmail, signInWithEmailLink,
-  isSignInWithEmailLink, sendPasswordResetEmail, sendEmailVerification,
-  User, updateProfile, GoogleAuthProvider, signInWithPopup,
-} from 'firebase/auth';
-
-// React & Routing Imports
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
-
-// Local Imports
 import { auth } from '~/services/firebase';
 import type { CustomLoaderArgs } from '~/types/actions';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
+import {
+    applyActionCode,           
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    sendSignInLinkToEmail,
+    signInWithEmailLink,
+    isSignInWithEmailLink,
+    sendPasswordResetEmail,
+    sendEmailVerification,
+    User,
+    updateProfile,
+    GoogleAuthProvider,    
+    signInWithPopup,        
+} from 'firebase/auth';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import { Interstitial } from './interstitial';
-import { Striae } from '~/routes/striae/striae';
-import { baseMeta } from '~/utils/meta';
-import paths from '~/config.json';
 import styles from './login.module.css';
+import { baseMeta } from '~/utils/meta';
+import { Striae } from '~/routes/striae/striae';
+import paths from '~/config.json';
+import { json } from '@remix-run/cloudflare';
 
-//Meta data
 export const meta = () => {
   return baseMeta({
     title: 'Welcome to Striae',
@@ -30,40 +33,20 @@ export const meta = () => {
   });
 };
 
- // Type Definitions
-interface Data {
-  email: string;
-  firstName: string;
-  lastName: string;
-  permitted: boolean;
-  createdAt: string;
-  uid: string;
-}
+  interface Data {
+    email: string;
+    firstName: string;
+    lastName: string;
+    permitted: boolean;
+    createdAt: string;
+    uid: string;
+  }
 
-interface LoaderData {
-  data: Data[];    
-}
+  interface LoaderData {
+    data: Data[];    
+  }
 
-//Set Data Worker URL
 const WORKER_URL = paths.data_worker_url;
-//Initialize Google Auth Provider
-const provider = new GoogleAuthProvider();
-
-/**
- * Settings for email link authentication
- */
-const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com',
-  handleCodeInApp: true,
-};
-
-/**
- * Adds new user data to the backend storage
- * @param {Object} params - User data parameters
- * @param {User} params.user - Firebase user object
- * @param {string} params.firstName - User's first name
- * @param {string} params.lastName - User's last name
- */
 
 const addUserData = async ({ user, firstName, lastName }: { 
   user: User; 
@@ -96,9 +79,13 @@ const addUserData = async ({ user, firstName, lastName }: {
   }
 };
 
-/**
- * Server-side loader function to fetch user data
- */
+const actionCodeSettings = {
+  url: 'https://striae.allyforensics.com', // Update with your domain in production
+  handleCodeInApp: true,
+};
+
+const provider = new GoogleAuthProvider();
+
 export const loader = async ({ context, user }: CustomLoaderArgs) => {
   try {
     if (!user) {
@@ -129,10 +116,6 @@ export const loader = async ({ context, user }: CustomLoaderArgs) => {
   }
 };
 
-
-/**
- * Main Login component handling all authentication flows
- */
 export const Login = () => {    
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
@@ -146,110 +129,8 @@ export const Login = () => {
   const [needsProfile, setNeedsProfile] = useState(false);
   const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
 
+  
 
-  /**
-   * Monitors user authentication state
-   * 
-   */
-  useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-   if (user) {
-      if (!user.emailVerified) {
-        handleSignOut();
-        setError('Please verify your email before logging in');
-        return;
-      }      
-      console.log("Logged in user:", user.email);
-      setUser(user);      
-    } else {
-      console.log("No user logged in");
-      setUser(null);
-    }
-  });
-
-  const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
-  try {
-    await applyActionCode(auth, actionCode);
-    setError('Email verified successfully!');
-    if (continueUrl) {
-      navigate(continueUrl);
-    }
-  } catch (err) {
-    const { message } = handleAuthError(err);
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-    
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
-      }
-      if (email) {
-        setIsLoading(true);
-        signInWithEmailLink(auth, email, window.location.href)
-          .then(async (result) => {
-             const additionalInfo = getAdditionalUserInfo(result);
-        
-            if (additionalInfo?.isNewUser) {
-              setEmailLinkUser(result.user);
-              setNeedsProfile(true);
-            } else {
-            // Add user data to R2
-            await addUserData({
-              user: result.user,
-              firstName: result.user.displayName?.split(' ')[0] || '',
-              lastName: result.user.displayName?.split(' ')[1] || ''
-            });
-            setUser(result.user);
-          }
-            window.localStorage.removeItem('emailForSignIn');            
-          })
-          .catch((error) => setError(error.message))
-          .finally(() => setIsLoading(false));
-      }
-    }
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode');
-  const actionCode = urlParams.get('oobCode');
-  const continueUrl = urlParams.get('continueUrl');
-
-  if (mode === 'verifyEmail' && actionCode) {
-    handleVerifyEmail(actionCode, continueUrl || undefined);
-  }
-   return () => unsubscribe();
-}, [navigate]);
-
-/**
-   * Validates password strength requirements
-   * @param {string} password - Password to validate
-   * @returns {boolean} - Whether password meets requirements
-   */
-    const checkPasswordStrength = (password: string): boolean => {
-    const hasMinLength = password.length >= 10;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
-    setPasswordStrength(
-      `Password must contain:
-      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
-      ${!hasUpperCase ? '❌' : '✅'} Capital letters
-      ${!hasNumber ? '❌' : '✅'} Numbers
-      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
-    );
-    
-    return isStrong;
-  };  
-
-
-  /**
-   * Handles Google Sign In authentication
-   */
   const handleGoogleSignIn = async () => {
   setIsLoading(true);
   setError('');
@@ -341,13 +222,7 @@ export const Login = () => {
     </form>
   );
 };
-
-
-/**
- * Reset Password Form
- *  
- * 
- */  
+  
   const ResetPasswordForm = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,11 +267,98 @@ export const Login = () => {
     </form>
   );
 };
+
+    const checkPasswordStrength = (password: string): boolean => {
+    const hasMinLength = password.length >= 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    setPasswordStrength(
+      `Password must contain:
+      ${!hasMinLength ? '❌' : '✅'} At least 10 characters
+      ${!hasUpperCase ? '❌' : '✅'} Capital letters
+      ${!hasNumber ? '❌' : '✅'} Numbers
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+    );
+    
+    return isStrong;
+  };  
+
+   useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+   if (user) {
+      if (!user.emailVerified) {
+        handleSignOut();
+        setError('Please verify your email before logging in');
+        return;
+      }      
+      console.log("Logged in user:", user.email);
+      setUser(user);      
+    } else {
+      console.log("No user logged in");
+      setUser(null);
+    }
+  });
   
-  /**
-   * Handles email link authentication
-   * @param {string} email - User's email address
-   */
+
+    const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
+  try {
+    await applyActionCode(auth, actionCode);
+    setError('Email verified successfully!');
+    if (continueUrl) {
+      navigate(continueUrl);
+    }
+  } catch (err) {
+    const { message } = handleAuthError(err);
+    setError(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+    
+    if (isSignInWithEmailLink(auth, window.location.href)) {
+      let email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+      }
+      if (email) {
+        setIsLoading(true);
+        signInWithEmailLink(auth, email, window.location.href)
+          .then(async (result) => {
+             const additionalInfo = getAdditionalUserInfo(result);
+        
+            if (additionalInfo?.isNewUser) {
+              setEmailLinkUser(result.user);
+              setNeedsProfile(true);
+            } else {
+            // Add user data to R2
+            await addUserData({
+              user: result.user,
+              firstName: result.user.displayName?.split(' ')[0] || '',
+              lastName: result.user.displayName?.split(' ')[1] || ''
+            });
+            setUser(result.user);
+          }
+            window.localStorage.removeItem('emailForSignIn');            
+          })
+          .catch((error) => setError(error.message))
+          .finally(() => setIsLoading(false));
+      }
+    }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  const actionCode = urlParams.get('oobCode');
+  const continueUrl = urlParams.get('continueUrl');
+
+  if (mode === 'verifyEmail' && actionCode) {
+    handleVerifyEmail(actionCode, continueUrl || undefined);
+  }
+   return () => unsubscribe();
+}, [navigate]);
+  
   const handleEmailLink = async (email: string) => {
   try {
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
@@ -410,10 +372,6 @@ export const Login = () => {
   }
 };
 
- /**
-   * Handles form submission for password-based auth
-   * @param {React.FormEvent} e - Form event
-   */
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setError('');
@@ -490,11 +448,6 @@ export const Login = () => {
   }
 };
 
-  /**
-   * Email Link Form
-   *  
-   * 
-   */
   const EmailLinkForm = () => {
   return (
     <form onSubmit={(e) => {
@@ -524,9 +477,7 @@ export const Login = () => {
   );
 };
 
-  /**
-   * Handles user sign out
-   */
+  // Add proper sign out handling
   const handleSignOut = async () => {
     try {
       await auth.signOut();      
@@ -537,7 +488,6 @@ export const Login = () => {
     }
   };  
 
-  // Component render logic
   return (
     <>
       {user ? (
