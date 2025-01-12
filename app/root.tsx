@@ -52,7 +52,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </main>
         <Footer />
         <ScrollRestoration />
-        <Scripts />
+        {process.env.NODE_ENV !== 'production' && <Scripts />}
       </body>
     </html>
   );
