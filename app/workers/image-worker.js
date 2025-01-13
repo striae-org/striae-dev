@@ -1,6 +1,18 @@
 const EXPIRATION = 60 * 60 * 24; // 1 day
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json'
+};
+
+const createResponse = (data, status = 200) => new Response(
+  typeof data === 'string' ? data : JSON.stringify(data), 
+  { status, headers: corsHeaders }
+);
+
 const hasValidToken = (request, env) => 
   request.headers.get("Authorization") === `Bearer ${env.API_TOKEN}`;
 
@@ -9,43 +21,45 @@ const bufferToHex = buffer =>
 
 async function handleImageUpload(request, env) {
   if (!hasValidToken(request, env)) {
-    return new Response('Unauthorized', { status: 403 });
+    return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const formData = await request.formData();
   const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1`;
-
-  return fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${env.API_TOKEN}`,
     },
     body: formData
   });
+  const data = await response.json();
+  return createResponse(data, response.status);
 }
 
 async function handleImageDelete(request, env) {
   if (!hasValidToken(request, env)) {
-    return new Response('Unauthorized', { status: 403 });
+    return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const url = new URL(request.url);
   const imageId = url.pathname.split('/').pop();
   const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1/${imageId}`;
-
-  return fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${env.API_TOKEN}`,
     }
   });
+  const data = await response.json();
+  return createResponse(data, response.status);
 }
 
 async function handleImageServing(request, env) {
   const url = new URL(request.url);
   const imageUrl = new URL(url.pathname.slice(1));
   const signedUrl = await generateSignedUrl(imageUrl, env.PRIVATE_KEY);
-  return new Response(signedUrl);
+  return createResponse(signedUrl);
 }
 
 async function generateSignedUrl(url, key) {
@@ -72,8 +86,11 @@ async function generateSignedUrl(url, key) {
 
 export default {
   async fetch(request, env) {
-    try {     
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
 
+    try {
       switch (request.method) {
         case 'POST':
           return handleImageUpload(request, env);
@@ -82,10 +99,10 @@ export default {
         case 'DELETE':
           return handleImageDelete(request, env);
         default:
-          return new Response('Method not allowed', { status: 405 });
+          return createResponse({ error: 'Method not allowed' }, 405);
       }
     } catch (error) {
-      return new Response(error.message, { status: 500 });
+      return createResponse({ error: error.message }, 500);
     }
   }
 };
