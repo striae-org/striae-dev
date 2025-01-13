@@ -6,6 +6,10 @@ const IMAGE_URL = paths.image_worker_url;
 const KEYS_URL = paths.keys_url;
 const DEFAULT_VARIANT = 'public';
 
+interface CaseData {
+    files?: FileData[];
+    [key: string]: unknown;
+  }
 interface FileData {
   id: string;
   originalFilename: string;
@@ -78,15 +82,30 @@ export const uploadFile = async (user: User, caseNumber: string, file: File): Pr
   };
 
   const apiKey = await getApiKey();
-  const existingFiles = await fetchFiles(user, caseNumber);
-  
+
+  // First get the entire existing case data
+  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+  const existingData = await response.json() as CaseData;
+
+  // Create updated data object that preserves existing fields
+  const updatedData = {
+    ...existingData,              // Keep all existing case data
+    files: [                      // Update files array
+      ...(existingData.files || []), // Keep existing files or use empty array
+      newFile                        // Add new file
+    ]
+  };
+
+  // Save the updated data
   await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
     method: 'PUT',
     headers: {
       'X-Custom-Auth-Key': apiKey,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ files: [...existingFiles, newFile] })
+    body: JSON.stringify(updatedData)
   });
 
   return newFile;
@@ -102,16 +121,27 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   });
 
   const apiKey = await getApiKey();
-  const existingFiles = await fetchFiles(user, caseNumber);
-  const updatedFiles = existingFiles.filter(f => f.id !== fileId);
+  
+  // Get full case data
+  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+  const existingData = await response.json() as CaseData;
+
+  // Create updated data preserving existing fields
+
+  const updatedData: CaseData = {
+    ...existingData,
+    files: (existingData.files || []).filter((f: FileData) => f.id !== fileId)
+  };
 
   await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    method: 'PUT',
+    method: 'PUT', 
     headers: {
       'X-Custom-Auth-Key': apiKey,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ files: updatedFiles })
+    body: JSON.stringify(updatedData)
   });
 };
 
