@@ -5,6 +5,7 @@ import {
   createNewCase 
 } from '~/components/actions/case-manage';
 import { CasesModal } from '~/components/sidebar/cases-modal';
+import { ManageProfile } from '~/components/user/manage-profile';
 import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
@@ -88,6 +89,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
   // UI states
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [error, setError] = useState<string>('');
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | null>(null);
 
@@ -152,8 +154,21 @@ export const Sidebar = ({ user }: SidebarProps) => {
         <h3 className={styles.userTitle}>
           {`${user.displayName?.split(' ')[0] || 'User'}'s Striae`}
         </h3>
+        <div className={styles.userActions}>
+          <button 
+            onClick={() => setIsProfileModalOpen(true)}
+            className={styles.profileButton}
+          >
+            Manage Profile
+          </button>
         <SignOut />
+        </div>
       </div>
+
+      <ManageProfile 
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
       
      <div className={styles.caseSection}>
         <h4>Case Management</h4>

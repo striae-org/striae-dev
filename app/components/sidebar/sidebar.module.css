@@ -28,6 +28,27 @@
   margin: 0;
 }
 
+.userActions {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.profileButton {
+  padding: 0.5rem 1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profileButton:hover {
+  background-color: #5c636a;
+}
+
 /* Case Management */
 .caseSection {
   margin-bottom: 2rem;
