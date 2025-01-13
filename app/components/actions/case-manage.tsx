@@ -92,7 +92,7 @@ export const validateCaseNumber = (caseNumber: string): boolean => {
          caseNumber.length <= MAX_CASE_NUMBER_LENGTH;
 };
 
-export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseData | null> => 
+export const checkExistingCase = (user: User, caseNumber: string): Promise<FileData | null> => 
   getApiKey()
     .then(apiKey => 
       fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
@@ -108,8 +108,10 @@ export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseD
       return response.json();
     })
     .then(data => {
-      const cases = Array.isArray(data) ? data : [data];
-      return cases.find(c => c.caseNumber === caseNumber) || null;
+      if (data && typeof data === 'object' && 'id' in data && 'originalFilename' in data && 'uploadedAt' in data) {
+        return data as FileData;
+      }
+      return null;
     });
 
 export const createNewCase = (user: User, caseNumber: string): Promise<CaseData> =>
