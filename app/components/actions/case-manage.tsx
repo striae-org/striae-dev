@@ -121,6 +121,11 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
       const newCase: Omit<CaseData, 'files'> = {
         createdAt: new Date().toISOString(),
         caseNumber
+      };      
+
+      const rootCaseData: Omit<CaseData, 'files'> = {
+        createdAt: newCase.createdAt,
+        caseNumber: newCase.caseNumber
       };
 
       // Initialize case file with just files array if it doesn't exist
@@ -133,7 +138,7 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
         body: JSON.stringify({ files: [] })
       });
 
-      // Update root data.json with case metadata
+      // Update root data.json without files array
       const updateUserData = fetch(`${WORKER_URL}/${user.uid}/data.json`, {
         method: 'GET',
         headers: {
@@ -146,8 +151,8 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
         const userData = Array.isArray(existingData) ? existingData[0] : existingData;
         const cases = userData.cases || [];
         
-        if (!cases.some((c: CaseData) => c.caseNumber === caseNumber)) {
-          cases.push(newCase as CaseData);
+        if (!cases.some((c: Omit<CaseData, 'files'>) => c.caseNumber === caseNumber)) {
+          cases.push(rootCaseData);
         }
 
         return fetch(`${WORKER_URL}/${user.uid}/data.json`, {
