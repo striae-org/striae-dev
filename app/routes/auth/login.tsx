@@ -223,7 +223,11 @@ export const Login = () => {
 };
 
   return (
-    <div className={styles.formWrapper}>
+    <div className={styles.container}>
+          <Link to="/" className={styles.logoLink}>
+            <div className={styles.logo} />
+          </Link>
+          <div className={styles.formWrapper}>
   <form ref={formRef} onSubmit={handleReset} className={styles.form}>
     <h2 className={styles.title}>Reset Password</h2>
     <input
@@ -246,6 +250,7 @@ export const Login = () => {
       Back to Login
     </button>
   </form>
+</div>
 </div>
   );
 };
