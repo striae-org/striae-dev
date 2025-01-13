@@ -10,14 +10,14 @@ import {
     onAuthStateChanged,
     sendSignInLinkToEmail,
     signInWithEmailLink,
-    isSignInWithEmailLink,
-    sendPasswordResetEmail,
+    isSignInWithEmailLink,    
     sendEmailVerification,
     User,
     updateProfile,
     GoogleAuthProvider,    
     signInWithPopup,        
 } from 'firebase/auth';
+import { PasswordReset } from '~/routes/auth/passwordReset';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
@@ -43,7 +43,7 @@ export const meta = () => {
 
   interface LoaderData {
     data: Data[];    
-  }
+  }  
 
   const WORKER_URL = paths.data_worker_url;
   const KEYS_URL = paths.keys_url;
@@ -201,59 +201,7 @@ export const Login = () => {
       </button>
     </form>
   );
-};
-  
-  const ResetPasswordForm = () => {
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = formRef.current?.email.value;
-    if (email) {
-      setIsLoading(true);
-      try {
-      await sendPasswordResetEmail(auth, email);
-      setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
-      setTimeout(() => setIsResetting(false), 2000);
-    } catch (err) {
-      const { message } = handleAuthError(err);
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-};
-
-  return (
-    <div className={styles.container}>
-          <Link to="/" className={styles.logoLink}>
-            <div className={styles.logo} />
-          </Link>
-          <div className={styles.formWrapper}>
-  <form ref={formRef} onSubmit={handleReset} className={styles.form}>
-    <h2 className={styles.title}>Reset Password</h2>
-    <input
-      type="email"
-      name="email"
-      placeholder="Email"
-      autoComplete="email"
-      className={styles.input}
-      required
-    />
-    {error && <p className={styles.error}>{error}</p>}
-    <button type="submit" className={styles.button} disabled={isLoading}>
-      {isLoading ? 'Sending...' : 'Send Reset Link'}
-    </button>
-    <button 
-      type="button" 
-      onClick={() => setIsResetting(false)}
-      className={styles.secondaryButton}
-    >
-      Back to Login
-    </button>
-  </form>
-</div>
-</div>
-  );
-};
+};  
 
     const checkPasswordStrength = (password: string): boolean => {
     const hasMinLength = password.length >= 10;
@@ -493,7 +441,7 @@ export const Login = () => {
       ) : needsProfile ? (
         <NameCollectionForm />
       ) : isResetting ? (
-        <ResetPasswordForm />
+        <PasswordReset onBack={() => setIsResetting(false)}/>
       ) : (
         <div className={styles.container}>
           <Link to="/" className={styles.logoLink}>
@@ -501,7 +449,7 @@ export const Login = () => {
           </Link>
           <div className={styles.formWrapper}>
         {isResetting ? (
-          <ResetPasswordForm />
+          <PasswordReset onBack={() => setIsResetting(false)}/>
         ) : (
           <>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>

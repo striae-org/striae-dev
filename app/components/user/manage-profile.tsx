@@ -1,12 +1,11 @@
 import { useState, useContext } from 'react';
 import { 
   updateProfile, 
-  updateEmail, 
-  sendPasswordResetEmail, 
+  updateEmail,   
   reauthenticateWithCredential, 
-  EmailAuthProvider,
-  getAuth 
+  EmailAuthProvider,  
 } from 'firebase/auth';
+import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
 import styles from './manage-profile.module.css';
 
@@ -16,14 +15,14 @@ interface ManageProfileProps {
 }
 
 export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
-  const { user } = useContext(AuthContext);
-  
+  const { user } = useContext(AuthContext);  
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showResetForm, setShowResetForm] = useState(false);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,30 +48,23 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     } finally {
       setIsLoading(false);
     }
-  };
-  const handlePasswordReset = async () => {
-    if (!user?.email) return;
-    
-    try {
-      const auth = getAuth();
-      await sendPasswordResetEmail(auth, user.email);
-      setSuccess('Password reset email sent');      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send reset email');
-    }
-  };
+  };  
 
   if (!isOpen) return null;
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <header className={styles.modalHeader}>
-          <h2>Manage Profile</h2>
-          <button onClick={onClose} className={styles.closeButton}>&times;</button>
-        </header>
+        {showResetForm ? (
+          <PasswordReset onBack={() => setShowResetForm(false)}/>
+        ) : (
+          <>
+            <header className={styles.modalHeader}>
+              <h2>Manage Profile</h2>
+              <button onClick={onClose} className={styles.closeButton}>&times;</button>
+            </header>
 
-        <form onSubmit={handleUpdateProfile} className={styles.form}>
+            <form onSubmit={handleUpdateProfile} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="displayName">Display Name</label>
             <input
@@ -112,28 +104,30 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           {success && <p className={styles.success}>{success}</p>}
 
           <div className={styles.buttonGroup}>
-            <button 
-              type="submit" 
-              className={styles.primaryButton}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Updating...' : 'Update Profile'}
-            </button>
-            <button
-              type="button"
-              onClick={handlePasswordReset}
-              className={styles.secondaryButton}
-            >
-              Send Password Reset Email
-            </button>
-          </div>
-          <p className={styles.deleteNotice}>
-            To delete your account, please contact{' '}
-            <a href="mailto:info@allyforensics.com" className={styles.deleteLink}>
-              info@allyforensics.com
-            </a>
-          </p>
-        </form>
+                <button 
+                  type="submit" 
+                  className={styles.primaryButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Updating...' : 'Update Profile'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowResetForm(true)}
+                  className={styles.secondaryButton}
+                >
+                  Reset Password
+                </button>
+              </div>
+              <p className={styles.deleteNotice}>
+                To delete your account, please contact{' '}
+                <a href="mailto:info@allyforensics.com" className={styles.deleteLink}>
+                  info@allyforensics.com
+                </a>
+              </p>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );
