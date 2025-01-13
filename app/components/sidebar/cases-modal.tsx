@@ -1,17 +1,64 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { User } from 'firebase/auth';
+import { getApiKey } from '~/components/actions/case-manage';
 import styles from './cases-modal.module.css';
+import paths from '~/config/config.json';
 
 interface CasesModalProps {
-  cases: string[];
   isOpen: boolean;
   onClose: () => void;
   onSelectCase: (caseNum: string) => void;
   currentCase: string;
+  user: User;
 }
 
-export const CasesModal = ({ cases, isOpen, onClose, onSelectCase, currentCase }: CasesModalProps) => {
+const WORKER_URL = paths.data_worker_url;
+
+export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }: CasesModalProps) => {
+  const [cases, setCases] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(0);
   const CASES_PER_PAGE = 5;
+
+  useEffect(() => {
+    if (isOpen && user) {
+      setIsLoading(true);
+      setError('');
+      
+      getApiKey()
+        .then(apiKey =>
+          fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Custom-Auth-Key': apiKey
+            }
+          })
+        )
+        .then(response => response.json())
+        .then(data => {
+          const userData = Array.isArray(data) ? data[0] : data;
+            interface Case {
+            caseNumber: string;
+            }
+            
+            interface UserData {
+            cases?: Case[];
+            }
+            
+            const caseNumbers: string[] = (userData as UserData)?.cases?.map(c => c.caseNumber) || [];
+          setCases(caseNumbers);
+        })
+        .catch(err => {
+          console.error('Failed to load cases:', err);
+          setError('Failed to load cases');
+          setCases([]);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [isOpen, user]);
 
   const paginatedCases = cases.slice(
     currentPage * CASES_PER_PAGE,
@@ -31,7 +78,11 @@ export const CasesModal = ({ cases, isOpen, onClose, onSelectCase, currentCase }
         </header>
         
         <div className={styles.modalContent}>
-          {cases.length === 0 ? (
+          {isLoading ? (
+            <p className={styles.loading}>Loading cases...</p>
+          ) : error ? (
+            <p className={styles.error}>{error}</p>
+          ) : cases.length === 0 ? (
             <p className={styles.emptyState}>No cases found</p>
           ) : (
             <>
