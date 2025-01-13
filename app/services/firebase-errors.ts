@@ -25,6 +25,9 @@ export const ERROR_MESSAGES = {
   
   // General
   GENERAL_ERROR: 'New registrations are currently disabled',
+  NO_USER: 'No user found',
+  VERIFICATION_SENT: 'Verification email sent! Check your inbox',
+  PROFILE_UPDATED: 'Profile updated successfully'
 };
 
 interface AuthErrorData {

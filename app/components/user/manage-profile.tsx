@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
+import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
 
 interface ManageProfileProps {
@@ -34,29 +35,36 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     setVerificationSent(false);
     
     try {
-      if (!user) throw new Error('No user logged in');
+      if (!user) throw new Error(ERROR_MESSAGES.NO_USER);
 
       if (email !== user.email && password) {
-        const credential = EmailAuthProvider.credential(user.email!, password);
-        await reauthenticateWithCredential(user, credential);
-        await updateEmail(user, email);
-        await sendEmailVerification(user);
-        setVerificationSent(true);
-        setSuccess('Verification email sent. Please check your inbox.');
-        return; // Exit early to prevent profile update until email is verified
+        try {
+          const credential = EmailAuthProvider.credential(user.email!, password);
+          await reauthenticateWithCredential(user, credential);
+          await updateEmail(user, email);
+          await sendEmailVerification(user);
+          setVerificationSent(true);
+          setSuccess(ERROR_MESSAGES.VERIFICATION_SENT);
+          return;
+        } catch (err) {
+          const { message } = handleAuthError(err);
+          setError(message);
+          return;
+        }
       }
 
       await updateProfile(user, {
         displayName
       });
 
-      setSuccess('Profile updated successfully');
+      setSuccess(ERROR_MESSAGES.PROFILE_UPDATED);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
+      const { message } = handleAuthError(err);
+      setError(message);
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   if (!isOpen) return null;
 
