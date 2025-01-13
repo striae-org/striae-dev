@@ -1,5 +1,5 @@
 import {
-  getApiKey, 
+  listCases, 
   validateCaseNumber,
   checkExistingCase, 
   createNewCase 
@@ -15,6 +15,7 @@ import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { useState, useEffect, useRef } from 'react';
+import { json } from '@remix-run/cloudflare';
 import paths from '~/config/config.json';
 
 
@@ -25,6 +26,12 @@ import paths from '~/config/config.json';
 }
 
 interface CaseData {
+  createdAt: string;
+  caseNumber: string;
+  files?: FileData[];
+}
+
+interface LoaderData {
   files: FileData[];
 }
 
@@ -33,13 +40,60 @@ interface SidebarProps {
 }
 
 const WORKER_URL = paths.data_worker_url;
+const KEYS_URL = paths.keys_url;
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
+export const loader = async ({ user, caseNumber }: { 
+  user: User;   
+  caseNumber: string;
+}) => {
+    try {
+
+      // Get API key from keys worker
+    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    if (!keyResponse.ok) {
+      throw new Error('Failed to retrieve API key');
+    }
+    const apiKey = await keyResponse.text();
+    
+    // First fetch case directory listing
+    const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch files:', response.status);
+      return json<LoaderData>({ files: [] });
+    }
+
+    const fileList: { name: string; size: number; lastModified: string; type: string; }[] = await response.json();
+    
+    // Format file data
+    const files = fileList.map((file) => ({
+      id: file.name, // Using filename as ID
+      originalFilename: file.name,
+      uploadedAt: file.lastModified
+    }));
+
+    return json<LoaderData>({ 
+      files: files.filter(Boolean)       
+    });
+
+  } catch (error) {
+    console.error('Loader error:', error);
+    return json<LoaderData>({ files: [] });
+  }
+};
 
 export const Sidebar = ({ user }: SidebarProps) => {
   // Case management states
   const [caseNumber, setCaseNumber] = useState<string>('');
-  const [currentCase, setCurrentCase] = useState<string>('');  
+  const [currentCase, setCurrentCase] = useState<string>('');
+  const [allCases, setAllCases] = useState<string[]>([]);
 
   // UI states
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -55,30 +109,20 @@ export const Sidebar = ({ user }: SidebarProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
 
-  // Load files when case changes
+  // Load cases effect
   useEffect(() => {
-  if (currentCase) {
-    getApiKey()
-      .then(apiKey =>
-        fetch(`${WORKER_URL}/${user.uid}/${currentCase}/data.json`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Custom-Auth-Key': apiKey
-          }
-        })
-      )
-      .then(response => response.json())
-      .then((data: unknown) => {
-        // Type check the response data
-        const caseData = data as CaseData;
-        setFiles(caseData.files || []);
+    setIsLoading(true);
+    listCases(user)
+      .then(cases => {
+        setAllCases(cases);
       })
       .catch(err => {
-        console.error('Failed to load files:', err);
-        setFiles([]);
+        console.error('Failed to load cases:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-  }
-}, [user, currentCase]);
+  }, [user, currentCase]);
   
   const handleCase = async () => {
     setIsLoading(true);
@@ -95,16 +139,16 @@ export const Sidebar = ({ user }: SidebarProps) => {
       
       if (existingCase) {
         setCurrentCase(caseNumber);
-        setFiles(existingCase.files || []); // Use files from case data
+        setFiles(existingCase.files || []);
         setCaseNumber('');
         setSuccessAction('loaded');
         setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
         return;
       }
 
-      const newCase = await createNewCase(user, caseNumber);
+      const newCase: CaseData = await createNewCase(user, caseNumber);
       setCurrentCase(caseNumber);
-      setFiles(newCase.files || []); // Initialize empty files array      
+      setFiles(newCase.files || []);
       setCaseNumber('');
       setSuccessAction('created');
       setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
@@ -210,11 +254,11 @@ export const Sidebar = ({ user }: SidebarProps) => {
       </p>
     )}  
     <CasesModal
+        cases={allCases}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelectCase={setCaseNumber}
         currentCase={currentCase}
-        user={user}  // Add user prop for data fetching
       />
         <div className={styles.filesSection}>
       <h4>{currentCase || 'No Case Selected'}</h4>
