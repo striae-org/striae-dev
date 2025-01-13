@@ -4,12 +4,17 @@ import {
   checkExistingCase, 
   createNewCase 
 } from '~/components/actions/case-manage';
+import {  
+  uploadFile,
+  deleteFile,
+  //getImageUrl
+} from '~/components/actions/image-manage';
 import { CasesModal } from '~/components/sidebar/cases-modal';
 import { ManageProfile } from '~/components/user/manage-profile';
 import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config/config.json';
 
@@ -99,7 +104,10 @@ export const Sidebar = ({ user }: SidebarProps) => {
 
   // File management state
   const [files, setFiles] = useState<FileData[]>([]);
-  //const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [fileError, setFileError] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
   // Load cases effect
   useEffect(() => {
@@ -149,6 +157,49 @@ export const Sidebar = ({ user }: SidebarProps) => {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentCase) return;
+
+    // Clear previous errors
+    setFileError('');
+    setIsUploadingFile(true);
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setFileError('Only image files are allowed');
+      return;
+    }
+
+    // Validate file size (100MB limit)
+    if (file.size > 100 * 1024 * 1024) {
+      setFileError('File size must be less than 100MB');
+      return;
+    }
+
+    try {
+      const uploadedFile = await uploadFile(user, currentCase, file);
+      setFiles(prev => [...prev, uploadedFile]);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (err) {
+      setFileError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleFileDelete = async (fileId: string) => {
+    if (!currentCase) return;
+    
+    setFileError('');
+    try {
+      await deleteFile(user, currentCase, fileId);
+      setFiles(prev => prev.filter(f => f.id !== fileId));
+    } catch (err) {
+      setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
   };
 
@@ -211,6 +262,23 @@ export const Sidebar = ({ user }: SidebarProps) => {
       />
         <div className={styles.filesSection}>
       <h4>{currentCase || 'No Case Selected'}</h4>
+      {currentCase && (
+        <div className={styles.fileUpload}>
+      <label htmlFor="file-upload">Upload Image:</label>
+      <input
+        id="file-upload"
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        disabled={isUploadingFile}
+        className={styles.fileInput}
+        aria-label="Upload image file"
+      />
+      {isUploadingFile && <span className={styles.uploadingText}>Uploading...</span>}
+      {fileError && <p className={styles.error}>{fileError}</p>}
+    </div>
+      )}
       {!currentCase ? (
         <p className={styles.emptyState}>Create or select a case to view files</p>
       ) : files.length === 0 ? (
@@ -219,10 +287,17 @@ export const Sidebar = ({ user }: SidebarProps) => {
         <ul className={styles.fileList}>
           {files.map((file) => (
             <li key={file.id} className={styles.fileItem}>
-              {file.originalFilename}
+              <span className={styles.fileName}>{file.originalFilename}</span>
               <span className={styles.uploadDate}>
                 {new Date(file.uploadedAt).toLocaleDateString()}
               </span>
+              <button
+                onClick={() => handleFileDelete(file.id)}
+                className={styles.deleteButton}
+                aria-label="Delete file"
+              >
+                ×
+              </button>
             </li>
           ))}
         </ul>
