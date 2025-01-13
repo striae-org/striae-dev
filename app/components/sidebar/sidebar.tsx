@@ -67,29 +67,16 @@ export const Sidebar = ({ user }: SidebarProps) => {
           }
         })
       )
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to load case data');
-        return response.json();
-      })
+      .then(response => response.json())
       .then((data: unknown) => {
+        // Type check the response data
         const caseData = data as CaseData;
-        // Check if files exist and are different from current state
-        if (caseData.files && Array.isArray(caseData.files)) {
-          setFiles(prevFiles => {
-            // Only update if files are different
-            const currentIds = new Set(prevFiles.map(f => f.id));
-            const newFiles = caseData.files.filter(f => !currentIds.has(f.id));
-            return newFiles.length > 0 ? [...prevFiles, ...newFiles] : prevFiles;
-          });
-        }
+        setFiles(caseData.files || []);
       })
       .catch(err => {
         console.error('Failed to load files:', err);
         setFiles([]);
       });
-  } else {
-    // Clear files when no case is selected
-    setFiles([]);
   }
 }, [user, currentCase]);
   
