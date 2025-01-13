@@ -2,6 +2,7 @@ import {
   validateCaseNumber,
   checkExistingCase, 
   createNewCase,
+  renameCase,
   deleteCase, 
 } from '~/components/actions/case-manage';
 import {
@@ -34,7 +35,9 @@ export const Sidebar = ({ user }: SidebarProps) => {
   // Case management states
   const [caseNumber, setCaseNumber] = useState<string>('');
   const [currentCase, setCurrentCase] = useState<string>('');
-  const [isDeletingCase, setIsDeletingCase] = useState(false);  
+  const [isDeletingCase, setIsDeletingCase] = useState(false);
+  const [newCaseName, setNewCaseName] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);  
 
   // UI states
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -149,6 +152,30 @@ export const Sidebar = ({ user }: SidebarProps) => {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
   };
+
+  const handleRenameCase = async () => {
+  if (!currentCase || !newCaseName) return;
+  
+  if (!validateCaseNumber(newCaseName)) {
+    setError('Invalid new case number format');
+    return;
+  }
+  
+  setIsRenaming(true);
+  setError('');
+  
+  try {
+    await renameCase(user, currentCase, newCaseName);
+    setCurrentCase(newCaseName);
+    setNewCaseName('');
+    setSuccessAction('loaded');
+    setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to rename case');
+  } finally {
+    setIsRenaming(false);
+  }
+};
 
   const handleDeleteCase = async () => {
   if (!currentCase) return;
@@ -275,6 +302,24 @@ export const Sidebar = ({ user }: SidebarProps) => {
         </ul>
       )}
     </div>
+          {currentCase && (
+        <div className={styles.renameCaseSection}>
+          <input
+            type="text"
+            value={newCaseName}
+            onChange={(e) => setNewCaseName(e.target.value)}
+            placeholder="New Case Number"
+            className={styles.renameInput}
+          />
+          <button
+            onClick={handleRenameCase}
+            disabled={isRenaming || !newCaseName}
+            className={styles.renameButton}
+          >
+            {isRenaming ? 'Renaming...' : 'Rename Case'}
+          </button>
+        </div>
+      )}
         {currentCase && (
           <div className={styles.deleteCaseSection}>
             <button

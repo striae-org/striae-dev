@@ -208,6 +208,43 @@
   white-space: nowrap;
 }
 
+.renameCaseSection {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.renameInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.renameButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.renameButton:hover:not(:disabled) {
+  background-color: #ffca2c;
+}
+
+.renameButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
 .deleteButton {
   background: none;
   border: none;

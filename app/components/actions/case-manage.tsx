@@ -183,6 +183,86 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
         .then(() => newCase);
     });
 
+    export const renameCase = async (
+  user: User, 
+  oldCaseNumber: string, 
+  newCaseNumber: string
+): Promise<void> => {
+  // Validate both case numbers
+  if (!validateCaseNumber(oldCaseNumber) || !validateCaseNumber(newCaseNumber)) {
+    throw new Error('Invalid case number format');
+  }
+
+  const apiKey = await getApiKey();
+
+  // Check if new case number already exists
+  const existingCase = await checkExistingCase(user, newCaseNumber);
+  if (existingCase) {
+    throw new Error('New case number already exists');
+  }
+
+  // Get existing case data
+  const oldCaseResponse = await fetch(`${WORKER_URL}/${user.uid}/${oldCaseNumber}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+
+  if (!oldCaseResponse.ok) {
+    throw new Error('Original case not found');
+  }
+
+  const oldCaseData = await oldCaseResponse.json() as CaseData;
+
+  // Create new case with existing data but new case number
+  const newCaseData: CaseData = {
+    ...oldCaseData,
+    caseNumber: newCaseNumber
+  };
+
+  // Save new case data
+  await fetch(`${WORKER_URL}/${user.uid}/${newCaseNumber}/data.json`, {
+    method: 'PUT',
+    headers: {
+      'X-Custom-Auth-Key': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newCaseData)
+  });
+
+  // Update root data.json
+  const rootResponse = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+  
+  const rootData = await rootResponse.json();
+  const userData = Array.isArray(rootData) ? rootData[0] : rootData;
+
+  // Replace old case with new case in cases array
+  const updatedData = {
+    ...userData,
+    cases: (userData.cases || []).map((c: CaseData) => 
+      c.caseNumber === oldCaseNumber 
+        ? { ...c, caseNumber: newCaseNumber }
+        : c
+    )
+  };
+
+  // Save updated root data
+  await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    method: 'PUT',
+    headers: {
+      'X-Custom-Auth-Key': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updatedData)
+  });
+
+  // Delete old case data file
+  await fetch(`${WORKER_URL}/${user.uid}/${oldCaseNumber}/data.json`, {
+    method: 'DELETE',
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+};
+
     export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
   if (!validateCaseNumber(caseNumber)) {
     throw new Error('Invalid case number');
