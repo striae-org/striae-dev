@@ -52,15 +52,15 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
 
   if (!isOpen) return null;
 
+  if (showResetForm) {
+    return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
+  }
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        {showResetForm ? (
-          <PasswordReset onBack={() => setShowResetForm(false)}/>
-        ) : (
-          <>
             <header className={styles.modalHeader}>
-              <h2>Manage Profile</h2>
+              <h1>Manage Profile</h1>
               <button onClick={onClose} className={styles.closeButton}>&times;</button>
             </header>
 
@@ -126,8 +126,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 </a>
               </p>
             </form>
-          </>
-        )}
       </div>
     </div>
   );

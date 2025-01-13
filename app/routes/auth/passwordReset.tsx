@@ -59,7 +59,13 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
   );
 
   if (isModal) {
-    return FormContent;
+    return (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modal}>          
+          {FormContent}
+        </div>
+      </div>
+    );
   }
 
   return (
