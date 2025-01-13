@@ -188,6 +188,27 @@
   color: #2563eb;
 }
 
+.secondaryButton {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+}
+
+.secondaryButton:hover {
+  background-color: #f8f9fa;
+}
+
+.secondaryButton:disabled {
+  border-color: #cccccc;
+  color: #cccccc;
+  cursor: not-allowed;
+}
+
 .googleButton {
   width: 100%;
   padding: 0.75rem 1rem;

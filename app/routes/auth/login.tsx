@@ -223,28 +223,30 @@ export const Login = () => {
 };
 
   return (
-    <form ref={formRef} onSubmit={handleReset} className={styles.form}>
-      <h2>Reset Password</h2>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        autoComplete="email"
-        className={styles.input}
-        required
-      />
-      {error && <p className={styles.error}>{error}</p>}
-      <button type="submit" className={styles.button} disabled={isLoading}>
-        {isLoading ? 'Sending...' : 'Send Reset Link'}
-      </button>
-      <button 
-        type="button" 
-        onClick={() => setIsResetting(false)}
-        className={styles.secondaryButton}
-      >
-        Back to Login
-      </button>
-    </form>
+    <div className={styles.formWrapper}>
+  <form ref={formRef} onSubmit={handleReset} className={styles.form}>
+    <h2 className={styles.title}>Reset Password</h2>
+    <input
+      type="email"
+      name="email"
+      placeholder="Email"
+      autoComplete="email"
+      className={styles.input}
+      required
+    />
+    {error && <p className={styles.error}>{error}</p>}
+    <button type="submit" className={styles.button} disabled={isLoading}>
+      {isLoading ? 'Sending...' : 'Send Reset Link'}
+    </button>
+    <button 
+      type="button" 
+      onClick={() => setIsResetting(false)}
+      className={styles.secondaryButton}
+    >
+      Back to Login
+    </button>
+  </form>
+</div>
   );
 };
 
