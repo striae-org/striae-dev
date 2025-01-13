@@ -1,7 +1,8 @@
 import {   
   validateCaseNumber,
   checkExistingCase, 
-  createNewCase 
+  createNewCase,
+  deleteCase, 
 } from '~/components/actions/case-manage';
 import {
   fetchFiles,  
@@ -32,14 +33,15 @@ const SUCCESS_MESSAGE_TIMEOUT = 3000;
 export const Sidebar = ({ user }: SidebarProps) => {
   // Case management states
   const [caseNumber, setCaseNumber] = useState<string>('');
-  const [currentCase, setCurrentCase] = useState<string>('');  
+  const [currentCase, setCurrentCase] = useState<string>('');
+  const [isDeletingCase, setIsDeletingCase] = useState(false);  
 
   // UI states
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [error, setError] = useState<string>('');
-  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | null>(null);
+  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
 
   // File management state
   const [files, setFiles] = useState<FileData[]>([]);
@@ -148,6 +150,31 @@ export const Sidebar = ({ user }: SidebarProps) => {
     }
   };
 
+  const handleDeleteCase = async () => {
+  if (!currentCase) return;
+  
+  const confirmed = window.confirm(
+    `Are you sure you want to delete case ${currentCase}? This will permanently delete all associated files and cannot be undone.`
+  );
+  
+  if (!confirmed) return;
+  
+  setIsDeletingCase(true);
+  setError('');
+  
+  try {
+    await deleteCase(user, currentCase);
+    setCurrentCase('');
+    setFiles([]);
+    setSuccessAction('deleted');
+    setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to delete case');
+  } finally {
+    setIsDeletingCase(false);
+  }
+};
+
   return (
     <div className={styles.sidebar}>
       <div className={styles.userInfo}>
@@ -248,6 +275,17 @@ export const Sidebar = ({ user }: SidebarProps) => {
         </ul>
       )}
     </div>
+        {currentCase && (
+          <div className={styles.deleteCaseSection}>
+            <button
+              onClick={handleDeleteCase}
+              disabled={isDeletingCase}
+              className={styles.deleteWarningButton}
+            >
+              {isDeletingCase ? 'Deleting...' : 'Delete Case'}
+            </button>
+          </div>
+        )}
       </div>
     </div>  
   );

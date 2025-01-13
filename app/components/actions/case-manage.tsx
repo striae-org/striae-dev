@@ -1,5 +1,6 @@
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
+import { deleteFile } from './image-manage';
 
 interface CaseData {
   createdAt: string;
@@ -181,3 +182,61 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
       return Promise.all([createCaseFile, updateUserData])
         .then(() => newCase);
     });
+
+    export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
+  if (!validateCaseNumber(caseNumber)) {
+    throw new Error('Invalid case number');
+  }
+
+  const apiKey = await getApiKey();
+
+  // First get the case data to find all files
+  const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+
+  if (!caseResponse.ok) {
+    throw new Error('Case not found');
+  }
+
+  const caseData = await caseResponse.json() as CaseData;
+
+  // Delete all files first
+  if (caseData.files && caseData.files.length > 0) {
+    await Promise.all(
+      caseData.files.map(file => 
+        deleteFile(user, caseNumber, file.id)
+      )
+    );
+  }
+
+  // Delete the case data file
+  await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    method: 'DELETE',
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+
+  // Update root data.json to remove case from list
+  const rootResponse = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    headers: { 'X-Custom-Auth-Key': apiKey }
+  });
+  
+  const rootData = await rootResponse.json();
+  const userData = Array.isArray(rootData) ? rootData[0] : rootData;
+
+  // Remove case from cases array
+  const updatedData = {
+    ...userData,
+    cases: (userData.cases || []).filter((c: CaseData) => c.caseNumber !== caseNumber)
+  };
+
+  // Save updated root data
+  await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    method: 'PUT',
+    headers: {
+      'X-Custom-Auth-Key': apiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updatedData)
+  });
+};
