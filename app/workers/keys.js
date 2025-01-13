@@ -14,7 +14,7 @@ export default {
    */
   async fetch(request, env) {
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': 'https://striae.allyforensics.com',
       'Access-Control-Allow-Methods': 'GET,OPTIONS',
       'Access-Control-Allow-Headers': '*',
     };

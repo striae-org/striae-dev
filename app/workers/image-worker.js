@@ -2,7 +2,7 @@ const EXPIRATION = 60 * 60 * 24; // 1 day
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://striae.allyforensics.com',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json'

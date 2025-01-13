@@ -3,7 +3,7 @@
 
 const CORS_HEADERS = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*', // CHANGE THIS TO YOUR DOMAIN
+  'Access-Control-Allow-Origin': 'https://striae.allyforensics.com', // CHANGE THIS TO YOUR DOMAIN
   'Access-Control-Allow-Methods': 'POST',
   'Access-Control-Allow-Headers': 'Content-Type'
 };
