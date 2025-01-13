@@ -3,7 +3,7 @@ import { useLoaderData, Link } from '@remix-run/react';
 import styles from './interstitial.module.css';
 import { baseMeta } from '~/utils/meta';
 import { SignOut } from '~/components/actions/signout';
-import paths from '~/config.json';
+import paths from '~/config/config.json';
 
 export const meta = () => {
   return baseMeta({

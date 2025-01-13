@@ -4,7 +4,7 @@ import { verifyTurnstileToken } from '~/utils/turnstile';
 import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import styles from './bugs.module.css';
-import paths from '~/config.json';
+import paths from '~/config/config.json';
 
 const MAX_NAME_LENGTH = 128;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

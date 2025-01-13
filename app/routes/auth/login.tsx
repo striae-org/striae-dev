@@ -22,7 +22,7 @@ import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
-import paths from '~/config.json';
+import paths from '~/config/config.json';
 import { json } from '@remix-run/cloudflare';
 
 export const meta = () => {

@@ -11,7 +11,7 @@ import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
 import { useState, useEffect } from 'react';
 import { json } from '@remix-run/cloudflare';
-import paths from '~/config.json';
+import paths from '~/config/config.json';
 
 
   interface FileData {

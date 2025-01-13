@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import paths from '~/config.json';
+import paths from '~/config/config.json';
 
 
 interface UserData {
