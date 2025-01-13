@@ -49,16 +49,38 @@ export const listCases = (user: User): Promise<string[]> =>
       return response.json();
     })
     .then(data => {
-      // Handle array or single object response
       const userData = Array.isArray(data) ? data[0] : data;
-      
-      // Return case numbers if cases exist, empty array if not
-      return (userData as { cases?: CaseData[] })?.cases?.map(c => c.caseNumber) || [];
+      const cases = (userData as { cases?: CaseData[] })?.cases?.map(c => c.caseNumber) || [];
+      return sortCaseNumbers(cases);
     })
     .catch(error => {
       console.error('Error listing cases:', error);
       return [];
     });
+
+    /**
+     * Sorts case numbers in ascending order, first by numbers and then by letters.
+     */
+
+    const sortCaseNumbers = (cases: string[]): string[] => {
+  return cases.sort((a, b) => {
+    // Extract numbers and letters
+    const aMatch = a.match(/([^\d]+)?(\d+)?/);
+    const bMatch = b.match(/([^\d]+)?(\d+)?/);
+    
+    if (!aMatch || !bMatch) return 0;
+    
+    const [, aLetters = '', aNumbers = ''] = aMatch;
+    const [, bLetters = '', bNumbers = ''] = bMatch;
+    
+    // Compare numbers first
+    const numCompare = parseInt(aNumbers || '0') - parseInt(bNumbers || '0');
+    if (numCompare !== 0) return numCompare;
+    
+    // If numbers are equal, compare letters
+    return aLetters.localeCompare(bLetters);
+  });
+};
 
 export const validateCaseNumber = (caseNumber: string): boolean => {
   return CASE_NUMBER_REGEX.test(caseNumber);
