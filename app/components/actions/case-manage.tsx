@@ -3,15 +3,14 @@ import paths from '~/config/config.json';
 
 interface CaseData {
   createdAt: string;
-  caseNumber: string;  
-  files: FileData[];
+  caseNumber: string;
+  files?: FileData[];  // Optional since we don't store in root data.json
 }
 
 interface FileData {
-  name: string;
-  size: number;
-  lastModified: string;
-  type: string;
+  id: string;
+  originalFilename: string;
+  uploadedAt: string;
 }
 
 const WORKER_URL = paths.data_worker_url;
@@ -115,24 +114,35 @@ export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseD
 
 export const createNewCase = (user: User, caseNumber: string): Promise<CaseData> =>
   getApiKey()
-    .then(apiKey =>{
+    .then(apiKey => {
       const newCase: CaseData = {
         createdAt: new Date().toISOString(),
-        caseNumber,        
+        caseNumber,
+        files: []  // Initialize empty files array only in case file
+      };
+
+      const caseOnlyData: CaseData = {
+        createdAt: newCase.createdAt,
+        caseNumber: newCase.caseNumber,
         files: []
       };
 
-      // First create individual case file
+      const rootCaseData: Omit<CaseData, 'files'> = {
+        createdAt: newCase.createdAt,
+        caseNumber: newCase.caseNumber
+      };
+
+      // Create individual case file with files array
       const createCaseFile = fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Custom-Auth-Key': apiKey
         },
-        body: JSON.stringify(newCase)
+        body: JSON.stringify(caseOnlyData)
       });
 
-      // Then update user's data.json with cases array
+      // Update root data.json without files array
       const updateUserData = fetch(`${WORKER_URL}/${user.uid}/data.json`, {
         method: 'GET',
         headers: {
@@ -148,13 +158,13 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
 
         // Store all existing user properties
         const newData = {
-          ...baseUserData,                    // Keep all existing properties
-          cases: baseUserData.cases || [],    // Initialize or keep existing cases array               
+          ...baseUserData,      // Copy all existing properties
+          cases: baseUserData.cases || [],    // Initialize cases array if not present
         };
         
         // Add new case if not already present
-        if (!newData.cases.some((c: CaseData) => c.caseNumber === newCase.caseNumber)) {
-          newData.cases.push(newCase);
+        if (!newData.cases.some((c: CaseData) => c.caseNumber === rootCaseData.caseNumber)) {
+          newData.cases.push(rootCaseData);
         }
         
         // Always replace with single user object
@@ -164,7 +174,7 @@ export const createNewCase = (user: User, caseNumber: string): Promise<CaseData>
             'Content-Type': 'application/json',
             'X-Custom-Auth-Key': apiKey
           },
-          body: JSON.stringify(newData)  // Single object with consolidated cases
+          body: JSON.stringify(newData)   // Update with new case
         });
       });
       // Wait for both operations

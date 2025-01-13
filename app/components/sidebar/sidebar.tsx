@@ -15,14 +15,19 @@ import paths from '~/config/config.json';
 
 
   interface FileData {
-  name: string;
-  size: number;
-  lastModified: string;
-  type: string;
+  id: string;
+  originalFilename: string;
+  uploadedAt: string;
+}
+
+interface CaseData {
+  createdAt: string;
+  caseNumber: string;
+  files?: FileData[];
 }
 
 interface LoaderData {
-  files: FileData[];  
+  files: FileData[];
 }
 
 interface SidebarProps {
@@ -64,10 +69,9 @@ export const loader = async ({ user, caseNumber }: {
     
     // Format file data
     const files = fileList.map((file) => ({
-      name: file.name,
-      size: file.size,
-      lastModified: file.lastModified,
-      type: file.type
+      id: file.name, // Using filename as ID
+      originalFilename: file.name,
+      uploadedAt: file.lastModified
     }));
 
     return json<LoaderData>({ 
@@ -134,7 +138,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
         return;
       }
 
-      const newCase = await createNewCase(user, caseNumber);
+      const newCase: CaseData = await createNewCase(user, caseNumber);
       setCurrentCase(caseNumber);
       setFiles(newCase.files || []);
       setCaseNumber('');
@@ -206,21 +210,24 @@ export const Sidebar = ({ user }: SidebarProps) => {
         currentCase={currentCase}
       />
         <div className={styles.filesSection}>
-          <h4>{currentCase || 'No Case Selected'}</h4>
-          {!currentCase ? (
-            <p className={styles.emptyState}>Create or select a case to view files</p>
-          ) : files.length === 0 ? (
-            <p className={styles.emptyState}>No files found for {currentCase}</p>
-          ) : (
-            <ul className={styles.fileList}>
-              {files.map((file) => (
-                <li key={file.name} className={styles.fileItem}>
-                  {file.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+      <h4>{currentCase || 'No Case Selected'}</h4>
+      {!currentCase ? (
+        <p className={styles.emptyState}>Create or select a case to view files</p>
+      ) : files.length === 0 ? (
+        <p className={styles.emptyState}>No files found for {currentCase}</p>
+      ) : (
+        <ul className={styles.fileList}>
+          {files.map((file) => (
+            <li key={file.id} className={styles.fileItem}>
+              {file.originalFilename}
+              <span className={styles.uploadDate}>
+                {new Date(file.uploadedAt).toLocaleDateString()}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
       </div>
     </div>  
   );
