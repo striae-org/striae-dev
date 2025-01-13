@@ -17,6 +17,7 @@ interface FileData {
 const WORKER_URL = paths.data_worker_url;
 const KEYS_URL = paths.keys_url;
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
+const MAX_CASE_NUMBER_LENGTH = 25;
 
 // Get API key from keys worker
     export const getApiKey = () => {
@@ -64,26 +65,32 @@ export const listCases = (user: User): Promise<string[]> =>
 
     const sortCaseNumbers = (cases: string[]): string[] => {
   return cases.sort((a, b) => {
-    // Extract numbers and letters
-    const aMatch = a.match(/([^\d]+)?(\d+)?/);
-    const bMatch = b.match(/([^\d]+)?(\d+)?/);
-    
-    if (!aMatch || !bMatch) return 0;
-    
-    const [, aLetters = '', aNumbers = ''] = aMatch;
-    const [, bLetters = '', bNumbers = ''] = bMatch;
-    
+    // Extract all numbers and letters
+    const getComponents = (str: string) => {
+      const numbers = str.match(/\d+/g)?.map(Number) || [];
+      const letters = str.match(/[A-Za-z]+/g)?.join('') || '';
+      return { numbers, letters };
+    };
+
+    const aComponents = getComponents(a);
+    const bComponents = getComponents(b);
+
     // Compare numbers first
-    const numCompare = parseInt(aNumbers || '0') - parseInt(bNumbers || '0');
-    if (numCompare !== 0) return numCompare;
-    
-    // If numbers are equal, compare letters
-    return aLetters.localeCompare(bLetters);
+    const maxLength = Math.max(aComponents.numbers.length, bComponents.numbers.length);
+    for (let i = 0; i < maxLength; i++) {
+      const aNum = aComponents.numbers[i] || 0;
+      const bNum = bComponents.numbers[i] || 0;
+      if (aNum !== bNum) return aNum - bNum;
+    }
+
+    // If all numbers match, compare letters
+    return aComponents.letters.localeCompare(bComponents.letters);
   });
 };
 
 export const validateCaseNumber = (caseNumber: string): boolean => {
-  return CASE_NUMBER_REGEX.test(caseNumber);
+  return CASE_NUMBER_REGEX.test(caseNumber) && 
+         caseNumber.length <= MAX_CASE_NUMBER_LENGTH;
 };
 
 export const checkExistingCase = (user: User, caseNumber: string): Promise<CaseData | null> => 
