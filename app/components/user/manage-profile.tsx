@@ -3,7 +3,8 @@ import {
   updateProfile, 
   updateEmail,   
   reauthenticateWithCredential, 
-  EmailAuthProvider,  
+  EmailAuthProvider,
+  sendEmailVerification  
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
@@ -23,11 +24,14 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {    
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setSuccess('');
+    setVerificationSent(false);
     
     try {
       if (!user) throw new Error('No user logged in');
@@ -36,6 +40,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         const credential = EmailAuthProvider.credential(user.email!, password);
         await reauthenticateWithCredential(user, credential);
         await updateEmail(user, email);
+        await sendEmailVerification(user);
+        setVerificationSent(true);
+        setSuccess('Verification email sent. Please check your inbox.');
+        return; // Exit early to prevent profile update until email is verified
       }
 
       await updateProfile(user, {
@@ -107,9 +115,11 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 <button 
                   type="submit" 
                   className={styles.primaryButton}
-                  disabled={isLoading}
+                  disabled={isLoading || verificationSent}
                 >
-                  {isLoading ? 'Updating...' : 'Update Profile'}
+                  {isLoading ? 'Updating...' : 
+                  verificationSent ? 'Verification Email Sent' : 
+                  'Update Profile'}
                 </button>
                 <button
                   type="button"
