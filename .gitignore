@@ -10,5 +10,3 @@ node_modules
 .firebase
 firebase-debug.log
 *.txt
-
-worker-configuration.d.ts
