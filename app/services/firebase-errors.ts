@@ -5,6 +5,7 @@ export const ERROR_MESSAGES = {
   // Auth Errors
   INVALID_EMAIL: 'Invalid email address',
   INVALID_PASSWORD: 'Invalid password',
+  INVALID_CREDENTIALS: 'Invalid credentials',
   USER_NOT_FOUND: 'No account found with this email',
   EMAIL_IN_USE: 'An account with this email already exists',
   REGISTRATION_DISABLED: 'New registrations are currently disabled',
@@ -50,8 +51,8 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
     
     switch (err.code) {
       // Standard Auth Errors
-      case 'auth/invalid-credentials':
-        return { message: ERROR_MESSAGES.USER_NOT_FOUND, data: errorData };
+      case 'auth/invalid-credential':
+        return { message: ERROR_MESSAGES.INVALID_CREDENTIALS, data: errorData };
       case 'auth/wrong-password':
         return { message: ERROR_MESSAGES.INVALID_PASSWORD, data: errorData };
       case 'auth/user-not-found':
