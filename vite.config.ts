@@ -17,12 +17,7 @@ export default defineConfig({
   },
   plugins: [
     remixCloudflareDevProxy(),
-    remix({
-      routes(defineRoutes) {
-        return defineRoutes(route => {
-          route('/', 'routes/auth/route.ts', { index: true });
-        });
-      },
+    remix({      
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
