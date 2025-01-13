@@ -7,6 +7,47 @@ const hasValidToken = (request, env) =>
 const bufferToHex = buffer => 
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
 
+async function handleImageUpload(request, env) {
+  if (!hasValidToken(request, env)) {
+    return new Response('Unauthorized', { status: 403 });
+  }
+
+  const formData = await request.formData();
+  const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1`;
+
+  return fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.API_TOKEN}`,
+    },
+    body: formData
+  });
+}
+
+async function handleImageDelete(request, env) {
+  if (!hasValidToken(request, env)) {
+    return new Response('Unauthorized', { status: 403 });
+  }
+
+  const url = new URL(request.url);
+  const imageId = url.pathname.split('/').pop();
+  const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1/${imageId}`;
+
+  return fetch(endpoint, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${env.API_TOKEN}`,
+    }
+  });
+}
+
+async function handleImageServing(request, env) {
+  const url = new URL(request.url);
+  const imageUrl = new URL(url.pathname.slice(1));
+  const signedUrl = await generateSignedUrl(imageUrl, env.PRIVATE_KEY);
+  return new Response(signedUrl);
+}
+
 async function generateSignedUrl(url, key) {
   const encoder = new TextEncoder();
   const secretKeyData = encoder.encode(key);
@@ -31,36 +72,15 @@ async function generateSignedUrl(url, key) {
 
 export default {
   async fetch(request, env) {
-    try {
-      const url = new URL(request.url);
+    try {     
 
       switch (request.method) {
         case 'POST':
-        case 'DELETE': {
-          if (!hasValidToken(request, env)) {
-            return new Response('Unauthorized', { status: 403 });
-          }
-          
-          const endpoint = request.method === 'POST' 
-            ? `${API_BASE}/${env.ACCOUNT_ID}/images/v1`
-            : `${API_BASE}/${env.ACCOUNT_ID}/images/v1/${url.pathname.split('/').pop()}`;
-
-          const response = await fetch(endpoint, {
-            method: request.method,
-            headers: {
-              'Authorization': `Bearer ${env.API_TOKEN}`,
-            },
-            body: request.method === 'POST' ? await request.formData() : undefined
-          });
-          return response;
-        }
-
-        case 'GET': {
-          const imageUrl = new URL(url.pathname.slice(1));
-          const signedUrl = await generateSignedUrl(imageUrl, env.PRIVATE_KEY);
-          return new Response(signedUrl);
-        }
-
+          return handleImageUpload(request, env);
+        case 'GET':
+          return handleImageServing(request, env);
+        case 'DELETE':
+          return handleImageDelete(request, env);
         default:
           return new Response('Method not allowed', { status: 405 });
       }
