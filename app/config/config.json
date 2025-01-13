@@ -3,5 +3,6 @@
   "title": "AllyForensics",  
   "url": "https://striae.allyforensics.com",    
   "data_worker_url": "https://data.striae.allyforensics.com",
-  "keys_url": "https://keys.striae.allyforensics.com"
+  "keys_url": "https://keys.striae.allyforensics.com",
+  "image_worker_url": "https://images.striae.allyforensics.com"
 }
