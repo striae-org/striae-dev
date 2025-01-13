@@ -33,6 +33,33 @@ const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
     });
 };
 
+export const listCases = (user: User): Promise<string[]> =>
+  getApiKey()
+    .then(apiKey =>
+      fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        }
+      })
+    )
+    .then(response => {
+      if (!response.ok) return [];
+      return response.json();
+    })
+    .then(data => {
+      // Handle array or single object response
+      const userData = Array.isArray(data) ? data[0] : data;
+      
+      // Return case numbers if cases exist, empty array if not
+      return (userData as { cases?: CaseData[] })?.cases?.map(c => c.caseNumber) || [];
+    })
+    .catch(error => {
+      console.error('Error listing cases:', error);
+      return [];
+    });
+
 export const validateCaseNumber = (caseNumber: string): boolean => {
   return CASE_NUMBER_REGEX.test(caseNumber);
 };

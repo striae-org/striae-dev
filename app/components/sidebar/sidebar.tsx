@@ -1,14 +1,17 @@
-import { 
+import {
+  listCases, 
   validateCaseNumber,
   checkExistingCase, 
   createNewCase 
 } from '~/components/actions/case-manage';
+import { CasesModal } from '~/components/sidebar/cases-modal';
 import { User } from 'firebase/auth';
 import { SignOut } from '~/components/actions/signout';
 import styles from './sidebar.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { json } from '@remix-run/cloudflare';
 import paths from '~/config.json';
+
 
   interface FileData {
   name: string;
@@ -77,21 +80,43 @@ export const loader = async ({ user, caseNumber }: {
 };
 
 export const Sidebar = ({ user }: SidebarProps) => {
+  // Case management states
   const [caseNumber, setCaseNumber] = useState<string>('');
   const [currentCase, setCurrentCase] = useState<string>('');
-  const [files, setFiles] = useState<FileData[]>([]);
-  const [error, setError] = useState<string>('');    
-  const [isLoadingCase, setIsLoadingCase] = useState<boolean>(false);
+  const [allCases, setAllCases] = useState<string[]>([]);
+
+  // UI states
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState<string>('');
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | null>(null);
+
+  // File management state
+  const [files, setFiles] = useState<FileData[]>([]);
   //const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
+
+  // Load cases effect
+  useEffect(() => {
+    setIsLoading(true);
+    listCases(user)
+      .then(cases => {
+        setAllCases(cases);
+      })
+      .catch(err => {
+        console.error('Failed to load cases:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [user, currentCase]);
   
   const handleCase = async () => {
-    setIsLoadingCase(true);
+    setIsLoading(true);
     setError('');
     
     if (!validateCaseNumber(caseNumber)) {
       setError('Invalid case number format');
-      setIsLoadingCase(false);
+      setIsLoading(false);
       return;
     }
 
@@ -117,7 +142,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
       setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
     } finally {
-      setIsLoadingCase(false);
+      setIsLoading(false);
     }
   };
 
@@ -141,18 +166,30 @@ export const Sidebar = ({ user }: SidebarProps) => {
           />
           <button 
         onClick={handleCase}
-        disabled={isLoadingCase || !caseNumber}
+        disabled={isLoading || !caseNumber}
       >
-            {isLoadingCase ? 'Loading...' : 'Load/Create Case'}
+            {isLoading ? 'Loading...' : 'Load/Create Case'}
       </button>
+      <button 
+            onClick={() => setIsModalOpen(true)}
+            className={styles.listButton}
+          >
+            List All Cases
+          </button>
     </div>
     {error && <p className={styles.error}>{error}</p>}
     {successAction && (
       <p className={styles.success}>
         Case {currentCase} {successAction} successfully!
       </p>
-    )}
-        
+    )}  
+    <CasesModal
+        cases={allCases}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectCase={setCaseNumber}
+        currentCase={currentCase}
+      />
         <div className={styles.filesSection}>
           <h4>{currentCase || 'No Case Selected'}</h4>
           {!currentCase ? (
@@ -170,6 +207,6 @@ export const Sidebar = ({ user }: SidebarProps) => {
           )}
         </div>
       </div>
-    </div>
+    </div>  
   );
 };

@@ -1,3 +1,4 @@
+/* Layout */
 .sidebar {
   width: 15%;
   min-width: 250px;
@@ -9,6 +10,7 @@
   overflow-x: hidden;
 }
 
+/* User Section */
 .userInfo {
   display: flex;
   flex-direction: column;
@@ -26,6 +28,7 @@
   margin: 0;
 }
 
+/* Case Management */
 .caseSection {
   margin-bottom: 2rem;
 }
@@ -57,6 +60,7 @@
   box-shadow: 0 0 0 2px rgba(13,110,253,.25);
 }
 
+/* Buttons */
 .caseInput button {
   width: 100%;
   padding: 0.75rem;
@@ -71,7 +75,6 @@
 
 .caseInput button:hover:not(:disabled) {
   background-color: #0b5ed7;
-  transform: translateY(-1px);
 }
 
 .caseInput button:disabled {
@@ -80,37 +83,43 @@
   cursor: not-allowed;
 }
 
-.signOutButton {
-  padding: 0.5rem 1rem;
-  background-color: #dc3545;
+.listButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6c757d;
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.signOutButton:hover {
-  background-color: #bb2d3b;
+.listButton:hover {
+  background-color: #5c636a;
+}
+
+/* Status Messages */
+.error, .success {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
 }
 
 .error {
   color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
   background-color: rgba(220,53,69,0.1);
-  border-radius: 4px;
 }
 
 .success {
   color: #198754;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
   background-color: rgba(25,135,84,0.1);
-  border-radius: 4px;
+}
+
+/* Files Section */
+.filesSection {
+  margin-top: 2rem;
 }
 
 .emptyState {
@@ -124,10 +133,6 @@
   margin: 1rem 0;
 }
 
-.filesSection {
-  margin-top: 2rem;
-}
-
 .fileList {
   list-style: none;
   padding: 0;
@@ -138,17 +143,18 @@
 }
 
 .fileItem {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid #dee2e6;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   background: white;
   transition: background-color 0.2s;
-}
-
-.fileItem:hover {
-  background-color: #f8f9fa;
+  cursor: pointer;
 }
 
 .fileItem:last-child {
   border-bottom: none;
+}
+
+.fileItem:hover {
+  background-color: #f8f9fa;
 }
