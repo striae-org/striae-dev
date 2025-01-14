@@ -251,7 +251,7 @@ return (
         id="file-upload"
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
         onChange={handleFileUpload}
         disabled={isUploadingFile}
         className={styles.fileInput}
