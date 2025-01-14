@@ -209,7 +209,7 @@ return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
         <h4>Case Management</h4>
-        <div className={styles.caseInput}>
+        <div className={styles.caseLoad}>
           <input
             type="text"
             value={caseNumber}
@@ -222,6 +222,8 @@ return (
       >
             {isLoading ? 'Loading...' : 'Load/Create Case'}
       </button>
+      </div>
+      <div className={styles.caseInput}>
       <button 
             onClick={() => setIsModalOpen(true)}
             className={styles.listButton}
