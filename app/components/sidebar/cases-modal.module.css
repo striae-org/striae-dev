@@ -54,14 +54,12 @@
 
 .caseItem {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;  
   border-radius: 6px;
   text-align: left;
   background: white;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-bottom: none;
+  transition: all 0.2s ease;  
 }
 
 .caseItem:hover {
