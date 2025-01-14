@@ -46,12 +46,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
           httpEquiv="Content-Security-Policy"
           content={`
             default-src 'self';
-            script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com;
+            script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://challenges.cloudflare.com;
             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
             img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com https://*.striae.allyforensics.com;
             font-src 'self' https://fonts.gstatic.com;
-            connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://*.striae.allyforensics.com;
-            frame-src 'self' https://*.firebaseauth.com;
+            connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://*.striae.allyforensics.com https://challenges.cloudflare.com;
+            frame-src 'self' https://*.firebaseauth.com https://challenges.cloudflare.com;
             frame-ancestors 'none';
             form-action 'self';
             base-uri 'self';
