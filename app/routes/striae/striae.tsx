@@ -40,6 +40,7 @@ export const Striae = ({ user }: StriaePage) => {
     setSelectedImage(undefined);
     
     const signedUrl = await getImageUrl(file);
+    if (!signedUrl) throw new Error('No URL returned');
     setSelectedImage(signedUrl);
   } catch (err) {
     setError('Failed to load image. Please try again.');

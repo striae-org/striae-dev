@@ -168,21 +168,14 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
   return { accountHash };
 };
 
-interface ImageUrlResponse {
-  url: string;
-}
-
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const { accountHash } = await getImageConfig();
-  
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
+  const response = await fetch(`${IMAGE_URL}/${encodeURIComponent(imageDeliveryUrl)}`);
   
-  const response = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`);
-  if (!response.ok) throw new Error('Failed to get signed image URL');
+  if (!response.ok) {
+    throw new Error('Failed to get signed image URL');
+  }
   
-  // Parse response object to get URL string
-  const responseData = await response.json() as ImageUrlResponse;
-  if (!responseData.url) throw new Error('Invalid URL response');
-  
-  return responseData.url;
+  return response.text();
 };
