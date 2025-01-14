@@ -69,17 +69,18 @@ async function handleImageDelete(request, env) {
  * Handle Signed URL generation
  */
 
+const KEY = '9JhGmtnWuO2o2lGoiq3ObXmK5u8N78U0';
 const EXPIRATION = 60 * 60 * 24; // 1 day
 
 const bufferToHex = buffer =>
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
 
-async function generateSignedUrl(url, env) {
+async function generateSignedUrl(url) {
   // `url` is a full imagedelivery.net URL
   // e.g. https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile
 
   const encoder = new TextEncoder();
-  const secretKeyData = encoder.encode(env.SIGNING_KEY);
+  const secretKeyData = encoder.encode(KEY);
   const key = await crypto.subtle.importKey(
     'raw',
     secretKeyData,
@@ -110,8 +111,8 @@ async function generateSignedUrl(url, env) {
 async function handleImageServing(request, env) {
   const url = new URL(request.url);
   const imageDeliveryURL = new URL(
-    url.pathname.slice(1)  // Remove leading slash
-  );
+    url.pathname.slice(1).replace('https:/imagedelivery.net', 'https://imagedelivery.net')
+    );
   const signedUrl = await generateSignedUrl(imageDeliveryURL, env);
   return createResponse(signedUrl.toString());
 }
