@@ -17,6 +17,7 @@ import {
 
 interface CaseSidebarProps {
   user: User;
+  onImageSelect: (file: FileData) => void;
 }
 
 interface FileData {
@@ -27,7 +28,7 @@ interface FileData {
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
-export const CaseSidebar = ({ user }: CaseSidebarProps) => {
+export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
   // Case management states
     const [caseNumber, setCaseNumber] = useState<string>('');
     const [currentCase, setCurrentCase] = useState<string>('');
@@ -287,8 +288,15 @@ return (
       ) : (
         <ul className={styles.fileList}>
           {files.map((file) => (
-            <li key={file.id} className={styles.fileItem}>
-              <span className={styles.fileName}>{file.originalFilename}</span>              
+            <li key={file.id}
+              className={styles.fileItem}>
+                <button
+                  className={styles.fileButton}
+                  onClick={() => onImageSelect(file)}
+                  onKeyDown={(e) => e.key === 'Enter' && onImageSelect(file)}
+                >
+                <span className={styles.fileName}>{file.originalFilename}</span>
+              </button>              
               <button
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {

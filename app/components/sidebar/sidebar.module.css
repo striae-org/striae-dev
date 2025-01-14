@@ -192,6 +192,7 @@
   background: white;
   transition: background-color 0.2s;
   cursor: pointer;
+  user-select: none;
 }
 
 .fileItem:last-child {
@@ -200,6 +201,18 @@
 
 .fileItem:hover {
   background-color: #f8f9fa;
+}
+
+.fileItem[role="button"] {
+  cursor: pointer;
+}
+
+.fileItem[role="button"]:hover {
+  background-color: #e9ecef;
+}
+
+.fileItem[role="button"]:active {
+  background-color: #dee2e6;
 }
 
 /* Files and Case Management */

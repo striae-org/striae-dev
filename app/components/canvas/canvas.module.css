@@ -1,0 +1,32 @@
+.canvasContainer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  position: relative;
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+}
+
+.placeholder {
+  color: #6c757d;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.image {
+  max-width: 100%;
+  max-height: calc(80vh - 2rem); /* Leave ~20% space for annotations */
+  object-fit: contain;
+}
+
+.error {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}

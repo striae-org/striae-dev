@@ -5,11 +5,18 @@ import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './case-sidebar';
 
-interface SidebarProps {
-  user: User;
+interface FileData {
+  id: string;
+  originalFilename: string;
+  uploadedAt: string;
 }
 
-export const Sidebar = ({ user }: SidebarProps) => {
+interface SidebarProps {
+  user: User;
+  onImageSelect: (file: FileData) => void;  // Add this prop
+}
+
+export const Sidebar = ({ user, onImageSelect }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
@@ -34,7 +41,7 @@ export const Sidebar = ({ user }: SidebarProps) => {
         onClose={() => setIsProfileModalOpen(false)}
       />
 
-      <CaseSidebar user={user} />
+      <CaseSidebar user={user} onImageSelect={onImageSelect} />
     </div>
   );
 };
