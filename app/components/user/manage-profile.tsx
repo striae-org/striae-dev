@@ -87,8 +87,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               id="displayName"
               type="text"
               value={displayName}
+              autoComplete="name"
               onChange={(e) => setDisplayName(e.target.value)}
               className={styles.input}
+              required
             />
           </div>
 
@@ -98,8 +100,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               id="email"
               type="email"
               value={email}
+              autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
               className={styles.input}
+              required
             />
           </div>
 
@@ -110,6 +114,8 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 id="password"
                 type="password"
                 value={password}
+                required={email !== user?.email}
+                autoComplete="current-password"
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.input}
               />
