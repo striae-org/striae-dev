@@ -22,6 +22,7 @@
 
 .modalHeader {
   display: flex;
+  font-size: 1.25rem;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
