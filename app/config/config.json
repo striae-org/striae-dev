@@ -2,7 +2,7 @@
   "name": "Striae",
   "title": "AllyForensics",  
   "url": "https://striae.allyforensics.com",    
-  "data_worker_url": "https://na5zzdpfuxcqqxgudwk4.striae.allyforensics.com",
-  "keys_url": "https://wu4yk7zbzxekdbg2y4uu.striae.allyforensics.com",
-  "image_worker_url": "https://6whts3w3yxrnfqgt7ma5.striae.allyforensics.com"
+  "data_worker_url": "https://origin2.striae.allyforensics.com",
+  "keys_url": "https://origin.striae.allyforensics.com",
+  "image_worker_url": "https://origin3.striae.allyforensics.com"
 }
