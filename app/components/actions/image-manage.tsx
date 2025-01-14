@@ -171,7 +171,8 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
 
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const { accountHash } = await getImageConfig();
-  const apiToken = await getApiKey();
+  // Use imagesApiToken instead of apiKey
+  const imagesApiToken = await getImagesApiToken();
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
   
   console.log('Requesting URL:', `${IMAGE_URL}/${imageDeliveryUrl}`);
@@ -179,8 +180,7 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',      
+      'Authorization': `Bearer ${imagesApiToken}`
     }
   });
   

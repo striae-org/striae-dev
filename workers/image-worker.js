@@ -15,8 +15,15 @@ const createResponse = (data, status = 200) => new Response(
   { status, headers: corsHeaders }
 );
 
-const hasValidToken = (request, env) => 
-  request.headers.get("Authorization") === `Bearer ${env.API_TOKEN}`;
+const hasValidToken = (request, env) => {
+  const authHeader = request.headers.get("Authorization");
+  const expectedToken = `Bearer ${env.API_TOKEN}`;
+  console.log('Auth check:', {
+    received: authHeader,
+    expected: expectedToken
+  });
+  return authHeader === expectedToken;
+};
 
 /**
  * Handle image upload requests
