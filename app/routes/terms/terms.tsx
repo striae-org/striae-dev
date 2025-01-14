@@ -212,7 +212,21 @@ You agree that the original English text shall prevail in the case of a dispute.
 <ul>
 <li>
 <p><strong>Data Storage: Secure and Private</strong></p>
-<p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize your privacy and make sure your information is kept private and confidential.</p>
+<p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize your privacy and make sure your information is kept private and confidential. A few of the measures in place include:</p>
+<ul>
+  <li><p><strong>AES-256 Encryption</strong></p>
+  <p>At rest, your Data is securely stored and inaccessible to unauthorized users or applications.</p></li>
+  <li><p><strong>Transport Layer Security</strong></p>
+  <p>When accessed, your Data is encrypted during transfer, ensuring security in transit.</p></li>
+  <li><p><strong>Signed URLs</strong></p>
+  <p>We implement signed URLs to provide a time limit on access to all of your images and Data, generated only when you request them. This helps to prevent unauthorized access to the Data when you are not using it.</p></li>
+  <li><p><strong>Logging and Monitoring</strong></p>
+  <p>All access requests and transfers are logged in order to provide detailed records of access. This allows us to monitor and perform security audits, revealing any potential security breach.</p></li>
+  <li><p><strong>Cross-Origin Resource Sharing (CORS) Support</strong></p>
+  <p>Data may only be accessed through our domain and application. Requests from outside of Striae are strictly forbidden.</p></li>
+  <li><p><strong>Security Policy</strong></p>
+  <p>We maintain an open security policy, where users and researchers may report security vulnerabilities to us safely and responsibly. Please refer to our <a href="/security-policy">Security Policy</a> for more information.</p></li>
+</ul>
 </li>
 <li>
 <p><strong>Access to Data</strong></p>
@@ -231,7 +245,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>If you choose to delete your account, all associated Data and information will be permanently and completely removed from Striae. This means that no Data will remain stored in the system once your account is deleted, and you will no longer have access to any of your previous Data.</p>
 </li>
 </ul>
-<p>At Striae, we are committed to ensuring that your Data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
+<p>We are committed to ensuring that your Data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
 </section>
         <section className={styles.section}>
           <h2>Contact Us</h2>

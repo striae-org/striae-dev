@@ -52,8 +52,6 @@ export const Policy = () => {
             <li>Physical security attacks</li>
           </ul>
         </section>
-
-        <Link to="/" className={styles.backLink}>Return to Striae</Link>
       </div>
     </div>
   );
