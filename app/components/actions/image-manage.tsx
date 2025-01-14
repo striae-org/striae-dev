@@ -171,17 +171,25 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
 
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const { accountHash } = await getImageConfig();
+  const apiToken = await getApiKey();
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
   
   console.log('Requesting URL:', `${IMAGE_URL}/${imageDeliveryUrl}`);
   
-  const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`);
+  const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
+  
   if (!workerResponse.ok) throw new Error('Failed to get signed image URL');
   
   const responseContent = await workerResponse.text();
   console.log('Worker response:', responseContent);
 
-  // If response is already a valid URL, return it directly
   if (responseContent.startsWith('https://')) {
     return responseContent;
   }
