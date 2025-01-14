@@ -166,18 +166,13 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   });
 };
 
-interface ImageUrlResponse {
-  signedUrl?: string;
-}
 
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const response = await fetch(`${IMAGE_URL}/${fileData.id}`);
   if (!response.ok) throw new Error('Failed to get signed image URL');
   
-  // Parse JSON response from worker
-  const data = (await response.json()) as ImageUrlResponse;
-  if (!data) throw new Error('Invalid response from image worker');
+  const signedUrl = await response.text();
+  if (!signedUrl) throw new Error('No URL returned');
   
-  // Return clean URL
-  return data.signedUrl || data as unknown as string;
+  return signedUrl;
 };

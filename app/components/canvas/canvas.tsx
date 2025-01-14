@@ -13,28 +13,29 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
 
   // Handle image loading states
   useEffect(() => {
-    if (!imageUrl) return;
-    
-    setIsLoading(true);
-    setLoadError(undefined);
+  if (!imageUrl) return;
+  
+  setIsLoading(true);
+  setLoadError(undefined);
 
-    const img = new Image();
-    img.src = imageUrl;
-    
-    img.onload = () => {
-      setIsLoading(false);
-    };
-    
-    img.onerror = () => {
-      setLoadError('Failed to load image');
-      setIsLoading(false);
-    };
+  const img = new Image();
+  img.src = imageUrl;
+  
+  img.onload = () => {
+    setIsLoading(false);
+  };
+  
+  img.onerror = () => {
+    setLoadError('Failed to load image');
+    setIsLoading(false);
+    console.error('Image load error:', imageUrl);
+  };
 
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [imageUrl]);
+  return () => {
+    img.onload = null;
+    img.onerror = null;
+  };
+}, [imageUrl]);
 
   // Handle window resizing
   useEffect(() => {
