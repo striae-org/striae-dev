@@ -265,8 +265,7 @@ return (
         disabled={isUploadingFile}
         className={styles.fileInput}
         aria-label="Upload image file"
-      />
-      {isUploadingFile && <span className={styles.uploadingText}>Uploading...</span>}
+      />      
       {isUploadingFile && (
         <div className={styles.progressBar}>
           <div 
