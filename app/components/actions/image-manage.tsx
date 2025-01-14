@@ -173,18 +173,18 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const { accountHash } = await getImageConfig();
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
   
+  console.log('Requesting URL:', `${IMAGE_URL}/${imageDeliveryUrl}`);
+  
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`);
   if (!workerResponse.ok) throw new Error('Failed to get signed image URL');
   
-  // Parse worker response to get URL string
   const responseContent = await workerResponse.text();
-  
-  // Convert response content to URL object and get its string representation
-  try {
-    const parsedUrl = new URL(responseContent);
-    return parsedUrl.toString();
-  } catch (err) {
-    console.error('Failed to parse URL:', responseContent);
-    throw new Error('Invalid URL returned from worker');
+  console.log('Worker response:', responseContent);
+
+  // If response is already a valid URL, return it directly
+  if (responseContent.startsWith('https://')) {
+    return responseContent;
   }
+
+  throw new Error('Worker did not return a valid URL');
 };
