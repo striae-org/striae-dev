@@ -209,21 +209,19 @@ return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
         <h4>Case Management</h4>
-        <div className={`${styles.caseLoad} mb-4`}>
+        <div className={styles.caseInput}>
           <input
             type="text"
             value={caseNumber}
             onChange={(e) => setCaseNumber(e.target.value)}
             placeholder="Case #"
           />
-          <button 
+          <button className={`${styles.caseLoad} mb-4`}
         onClick={handleCase}
         disabled={isLoading || !caseNumber}
       >
             {isLoading ? 'Loading...' : 'Load/Create Case'}
-      </button>
-      </div>
-      <div className={styles.caseInput}>
+      </button>            
       <button 
             onClick={() => setIsModalOpen(true)}
             className={styles.listButton}
