@@ -15,7 +15,7 @@
   background: white;
   border-radius: 8px;
   width: 90%;
-  max-width: 500px;
+  max-width: 700px; /* Increased from 500px */
   max-height: 80vh;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -46,16 +46,21 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
 .caseItem {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: none;
-  border-bottom: 1px solid #dee2e6;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
   text-align: left;
   background: white;
   cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: none;
 }
 
 .caseItem:hover {

@@ -16,7 +16,7 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(0);
-  const CASES_PER_PAGE = 5;
+  const CASES_PER_PAGE = 10;
 
   useEffect(() => {
     if (isOpen) {
