@@ -21,14 +21,14 @@ interface ImageDeliveryConfig {
 }
 
 const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
-  const response = await fetch(`${KEYS_URL}/ACCOUNT_HASH`);
+  const response = await fetch(`${KEYS_URL}/1568486544161`);
   if (!response.ok) throw new Error('Failed to retrieve account hash');
   const accountHash = await response.text();
   return { accountHash };
 };
 
 const getImagesApiToken = async (): Promise<string> => {
-  const response = await fetch(`${KEYS_URL}/IMAGES_API_TOKEN`);
+  const response = await fetch(`${KEYS_URL}/1156884684684`);
   if (!response.ok) throw new Error('Failed to retrieve images API token');
   return response.text();
 };
