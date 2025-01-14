@@ -1,25 +1,25 @@
 .canvasContainer {
   flex: 1;
-  min-height: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f8f9fa;
+  background-color: #444444;
   padding: 1rem;
   position: relative;
-  width: var(--canvas-width);
-  height: var(--canvas-height);
+  overflow: hidden;
 }
 
 .placeholder {
-  color: #6c757d;
+  color: #e0e0e0;
   font-size: 1.1rem;
   text-align: center;
 }
 
 .image {
   max-width: 100%;
-  max-height: calc(80vh - 2rem); /* Leave ~20% space for annotations */
+  max-height: 80%; /* Leave space for annotations */
   object-fit: contain;
 }
 
