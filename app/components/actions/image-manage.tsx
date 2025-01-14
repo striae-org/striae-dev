@@ -180,8 +180,7 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Content-Type': 'application/json',      
     }
   });
   
