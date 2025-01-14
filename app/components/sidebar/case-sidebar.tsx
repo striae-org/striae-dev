@@ -47,6 +47,15 @@ export const CaseSidebar = ({ user }: CaseSidebarProps) => {
     const [fileError, setFileError] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Image File Types
+    const allowedTypes = [
+      'image/png',
+      'image/gif', 
+      'image/jpeg',
+      'image/webp',
+      'image/svg+xml'
+    ];
+
    // Load files effect
   useEffect(() => {
     if (currentCase) {
@@ -113,14 +122,14 @@ export const CaseSidebar = ({ user }: CaseSidebarProps) => {
     setIsUploadingFile(true);
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setFileError('Only image files are allowed');
+    if (!allowedTypes.includes(file.type)) {
+      setFileError('Only PNG, GIF, JPEG, WEBP, or SVG files are allowed');
       return;
     }
 
-    // Validate file size (100MB limit)
-    if (file.size > 100 * 1024 * 1024) {
-      setFileError('File size must be less than 100MB');
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      setFileError('File size must be less than 10 MB');
       return;
     }
 
