@@ -216,12 +216,16 @@ return (
             onChange={(e) => setCaseNumber(e.target.value)}
             placeholder="Case #"
           />
-          <button className={`${styles.caseLoad} mb-4`}
+          </div>
+          <div className={`${styles.caseLoad} mb-4`}>
+          <button
         onClick={handleCase}
         disabled={isLoading || !caseNumber}
       >
             {isLoading ? 'Loading...' : 'Load/Create Case'}
-      </button>            
+      </button>      
+      </div>
+      <div className={styles.caseInput}>            
       <button 
             onClick={() => setIsModalOpen(true)}
             className={styles.listButton}
