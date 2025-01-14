@@ -16,20 +16,6 @@ interface FileData {
   uploadedAt: string;
 }
 
-/*
-const DEFAULT_VARIANT = 'striae';
-interface ImageDeliveryConfig {
-  accountHash: string;
-}
-
-const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
-  const response = await fetch(`${KEYS_URL}/1568486544161`);
-  if (!response.ok) throw new Error('Failed to retrieve account hash');
-  const accountHash = await response.text();
-  return { accountHash };
-};
-*/
-
 const getImagesApiToken = async (): Promise<string> => {
   const response = await fetch(`${KEYS_URL}/1156884684684`);
   if (!response.ok) throw new Error('Failed to retrieve images API token');
@@ -166,9 +152,31 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   });
 };
 
+/**
+ * Get signed image URL from Image Delivery service
+ */
+
+const DEFAULT_VARIANT = 'striae';
+interface ImageDeliveryConfig {
+  accountHash: string;
+}
+
+const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
+  const response = await fetch(`${KEYS_URL}/1568486544161`);
+  if (!response.ok) throw new Error('Failed to retrieve account hash');
+  const accountHash = await response.text();
+  return { accountHash };
+};
 
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
-  const response = await fetch(`${IMAGE_URL}/${fileData.id}`);
+  // Get account hash first
+  const { accountHash } = await getImageConfig();
+  
+  // Construct proper imagedelivery URL
+  const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
+  
+  // Send to image worker for signing
+  const response = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`);
   if (!response.ok) throw new Error('Failed to get signed image URL');
   
   const signedUrl = await response.text();
