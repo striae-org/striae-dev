@@ -85,7 +85,7 @@
 .caseInput button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #0d6efd;
+  background-color: #4a90e2;
   color: white;
   border: none;
   border-radius: 6px;
@@ -95,7 +95,7 @@
 }
 
 .caseInput button:hover:not(:disabled) {
-  background-color: #0b5ed7;
+  background-color: #357abd;
 }
 
 .caseInput button:disabled {
