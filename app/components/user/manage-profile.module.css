@@ -87,13 +87,13 @@
 }
 
 .primaryButton {
-  background-color: #0d6efd;
+  background-color: #4a90e2;
   color: white;
   border: none;
 }
 
 .primaryButton:hover:not(:disabled) {
-  background-color: #0b5ed7;
+  background-color: #357abd;
 }
 
 .secondaryButton {
