@@ -209,7 +209,7 @@ return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
         <h4>Case Management</h4>
-        <div className={styles.caseInput}>
+        <div className={`${styles.caseInput} mb-4`}>
           <input
             type="text"
             value={caseNumber}
