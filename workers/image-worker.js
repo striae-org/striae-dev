@@ -1,6 +1,8 @@
-const EXPIRATION = 60 * 60 * 24; // 1 day
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
+/**
+ * CORS headers to allow requests from the Striae app
+ */
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://striae.allyforensics.com',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
@@ -16,9 +18,9 @@ const createResponse = (data, status = 200) => new Response(
 const hasValidToken = (request, env) => 
   request.headers.get("Authorization") === `Bearer ${env.API_TOKEN}`;
 
-const bufferToHex = buffer => 
-  [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
-
+/**
+ * Handle image upload requests
+ */
 async function handleImageUpload(request, env) {
   if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
@@ -41,6 +43,10 @@ async function handleImageUpload(request, env) {
   return createResponse(data, response.status);
 }
 
+/**
+ * Handle image delete requests
+ */
+
 async function handleImageDelete(request, env) {
   if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
@@ -59,16 +65,23 @@ async function handleImageDelete(request, env) {
   return createResponse(data, response.status);
 }
 
-async function handleImageServing(request, env) {
-  const url = new URL(request.url);
-  const imageUrl = new URL(url.pathname.slice(1));
-  const signedUrl = await generateSignedUrl(imageUrl, env.PRIVATE_KEY);
-  return createResponse(signedUrl);
-}
+/**
+ * Handle Signed URL generation
+ */
 
-async function generateSignedUrl(url, key) {
+const EXPIRATION = 60 * 60 * 24; // 1 day
+
+const bufferToHex = buffer => 
+  [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
+
+
+async function generateSignedUrl(url, env) {
+
+  // `url` is a full imagedelivery.net URL
+  // e.g. https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/striae
+
   const encoder = new TextEncoder();
-  const secretKeyData = encoder.encode(key);
+  const secretKeyData = encoder.encode(env.SIGNING_KEY);
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
     secretKeyData,
@@ -77,16 +90,41 @@ async function generateSignedUrl(url, key) {
     ['sign']
   );
 
+  // Attach the expiration value to the `url`
   const expiry = Math.floor(Date.now() / 1000) + EXPIRATION;
   url.searchParams.set('exp', expiry.toString());
 
+  // `url` now looks like
+  // https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/striae?exp=1631289275
+
+
   const stringToSign = url.pathname + '?' + url.searchParams.toString();
+  // for example, /cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile?exp=1631289275
+
   const mac = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(stringToSign));
   const sig = bufferToHex(mac);
+
+  // And attach it to the `url`
   url.searchParams.set('sig', sig);
 
   return url.toString();
 }
+
+async function handleImageServing(request, env) {
+  const url = new URL(request.url);
+  const imageId = url.pathname.slice(1); // Remove leading slash
+  
+  const imageUrl = new URL(
+    `https://imagedelivery.net/${env.ACCOUNT_HASH}/${imageId}/striae`
+  );
+  
+  const signedUrl = await generateSignedUrl(imageUrl, env.SIGNING_KEY);
+  return createResponse(signedUrl);
+}
+
+/**
+ * Main worker functions
+ */
 
 export default {
   async fetch(request, env) {
@@ -110,3 +148,4 @@ export default {
     }
   }
 };
+

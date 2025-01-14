@@ -30,14 +30,25 @@ export const Striae = ({ user }: StriaePage) => {
 
 
   const handleImageSelect = async (file: FileData) => {
-    try {
-      const url = await getImageUrl(file);
-      setSelectedImage(url);
-    } catch (err) {
-      setError('Failed to load image');
-      console.error(err);
-    }
-  };
+  if (!file?.id) {
+    setError('Invalid file selected');
+    return;
+  }
+
+  try {
+    setError(undefined);
+    setSelectedImage(undefined);
+    
+    const url = await getImageUrl(file);
+    if (!url) throw new Error('No URL returned from server');
+    
+    setSelectedImage(url);
+  } catch (err) {
+    setError('Failed to load image. Please try again.');
+    console.error('Image selection error:', err);
+    setSelectedImage(undefined);
+  }
+};
 
   return (
     <div className={styles.appContainer}>

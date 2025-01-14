@@ -4,7 +4,7 @@ import paths from '~/config/config.json';
 const WORKER_URL = paths.data_worker_url;
 const IMAGE_URL = paths.image_worker_url;
 const KEYS_URL = paths.keys_url;
-const DEFAULT_VARIANT = 'striae';
+
 
 interface CaseData {
     files?: FileData[];
@@ -16,6 +16,8 @@ interface FileData {
   uploadedAt: string;
 }
 
+/*
+const DEFAULT_VARIANT = 'striae';
 interface ImageDeliveryConfig {
   accountHash: string;
 }
@@ -26,6 +28,7 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
   const accountHash = await response.text();
   return { accountHash };
 };
+*/
 
 const getImagesApiToken = async (): Promise<string> => {
   const response = await fetch(`${KEYS_URL}/1156884684684`);
@@ -163,13 +166,18 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   });
 };
 
+interface ImageUrlResponse {
+  signedUrl?: string;
+}
+
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
-  const { accountHash } = await getImageConfig();
-  const imageUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
-  
-  // Get signed URL from image worker
-  const response = await fetch(`${IMAGE_URL}/${encodeURIComponent(imageUrl)}`);
+  const response = await fetch(`${IMAGE_URL}/${fileData.id}`);
   if (!response.ok) throw new Error('Failed to get signed image URL');
   
-  return response.text();
+  // Parse JSON response from worker
+  const data = (await response.json()) as ImageUrlResponse;
+  if (!data) throw new Error('Invalid response from image worker');
+  
+  // Return clean URL
+  return data.signedUrl || data as unknown as string;
 };
