@@ -108,13 +108,12 @@ async function generateSignedUrl(url) {
   return new Response(url);
 }
 
-async function handleImageServing(request, env) {
+async function handleImageServing(request) {
   const url = new URL(request.url);
   const imageDeliveryURL = new URL(
     url.pathname.slice(1).replace('https:/imagedelivery.net', 'https://imagedelivery.net')
     );
-  const signedUrl = await generateSignedUrl(imageDeliveryURL, env);
-  return createResponse(signedUrl.toString());
+  return generateSignedUrl(imageDeliveryURL);  
 }
 
 /**

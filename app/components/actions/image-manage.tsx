@@ -176,13 +176,15 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`);
   if (!workerResponse.ok) throw new Error('Failed to get signed image URL');
   
-  // First parse worker Response
+  // Parse worker response to get URL string
   const responseContent = await workerResponse.text();
   
-  // Then parse inner Response content
-  const innerResponse = new Response(responseContent);
-  const signedUrl = await innerResponse.text();
-  
-  if (!signedUrl) throw new Error('No URL returned');
-  return signedUrl;
+  // Convert response content to URL object and get its string representation
+  try {
+    const parsedUrl = new URL(responseContent);
+    return parsedUrl.toString();
+  } catch (err) {
+    console.error('Failed to parse URL:', responseContent);
+    throw new Error('Invalid URL returned from worker');
+  }
 };
