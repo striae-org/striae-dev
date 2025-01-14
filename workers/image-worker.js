@@ -83,9 +83,6 @@ const bufferToHex = buffer =>
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
 
 async function generateSignedUrl(url) {
-  // `url` is a full imagedelivery.net URL
-  // e.g. https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile
-  const signedUrl = url.toString();
   const encoder = new TextEncoder();
   const secretKeyData = encoder.encode(KEY);
   const key = await crypto.subtle.importKey(
@@ -96,23 +93,19 @@ async function generateSignedUrl(url) {
     ['sign']
   );
 
-  // Attach the expiration value to the `url`
+  // Add expiration
   const expiry = Math.floor(Date.now() / 1000) + EXPIRATION;
   url.searchParams.set('exp', expiry);
-  // `url` now looks like
-  // https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile?exp=1631289275
 
   const stringToSign = url.pathname + '?' + url.searchParams.toString();
-  // for example, /cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile?exp=1631289275
-
-  // Generate the signature
   const mac = await crypto.subtle.sign('HMAC', key, encoder.encode(stringToSign));
   const sig = bufferToHex(new Uint8Array(mac).buffer);
 
-  // And attach it to the `url`
+  // Add signature
   url.searchParams.set('sig', sig);
 
-  return new Response(signedUrl, {
+  // Return the modified URL with signature and expiration
+  return new Response(url.toString(), {
     headers: corsHeaders
   });
 }
