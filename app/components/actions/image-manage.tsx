@@ -4,7 +4,7 @@ import paths from '~/config/config.json';
 const WORKER_URL = paths.data_worker_url;
 const IMAGE_URL = paths.image_worker_url;
 const KEYS_URL = paths.keys_url;
-const DEFAULT_VARIANT = 'public';
+const DEFAULT_VARIANT = 'striae';
 
 interface CaseData {
     files?: FileData[];

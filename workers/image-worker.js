@@ -26,6 +26,10 @@ async function handleImageUpload(request, env) {
 
   const formData = await request.formData();
   const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1`;
+
+  // Add requireSignedURLs to form data
+  formData.append('requireSignedURLs', 'true');
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
