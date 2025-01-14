@@ -43,6 +43,13 @@ interface ApiResponse {
   files: FileData[];
 }
 
+interface ImageUploadResponse {
+  success: boolean;
+  result: {
+    id: string;
+  };
+}
+
 export const fetchFiles = async (user: User, caseNumber: string): Promise<FileData[]> => {
   const apiKey = await getApiKey();
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
@@ -52,63 +59,74 @@ export const fetchFiles = async (user: User, caseNumber: string): Promise<FileDa
   return data.files || [];
 };
 
-export const uploadFile = async (user: User, caseNumber: string, file: File): Promise<FileData> => {
-  const formData = new FormData();
-  formData.append('file', file);
-  
+export const uploadFile = async (
+  user: User, 
+  caseNumber: string, 
+  file: File, 
+  onProgress?: (progress: number) => void
+): Promise<FileData> => {
   const imagesApiToken = await getImagesApiToken();
-  const imageResponse = await fetch(IMAGE_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${imagesApiToken}`
-    },
-    body: formData
-  });
   
-  interface ImageUploadResponse {
-    success: boolean;
-    result: {
-      id: string;
-    };
-  }
-  
-  const imageData = await imageResponse.json() as ImageUploadResponse;
-  if (!imageData.success) throw new Error('Upload failed');
-  
-  const newFile: FileData = {
-    id: imageData.result.id,
-    originalFilename: file.name,
-    uploadedAt: new Date().toISOString()
-  };
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const apiKey = await getApiKey();
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable && onProgress) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        onProgress(progress);
+      }
+    });
 
-  // First get the entire existing case data
-  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    headers: { 'X-Custom-Auth-Key': apiKey }
+    xhr.addEventListener('load', async () => {
+      if (xhr.status === 200) {
+        try {
+          const imageData = JSON.parse(xhr.responseText) as ImageUploadResponse;
+          if (!imageData.success) throw new Error('Upload failed');
+
+          const newFile: FileData = {
+            id: imageData.result.id,
+            originalFilename: file.name,
+            uploadedAt: new Date().toISOString()
+          };
+
+          // Update case data
+          const apiKey = await getApiKey();
+          const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+            headers: { 'X-Custom-Auth-Key': apiKey }
+          });
+          const existingData = await response.json() as CaseData;
+
+          const updatedData = {
+            ...existingData,
+            files: [...(existingData.files || []), newFile]
+          };
+
+          await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+            method: 'PUT',
+            headers: {
+              'X-Custom-Auth-Key': apiKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+          });
+
+          resolve(newFile);
+        } catch (error) {
+          reject(error);
+        }
+      } else {
+        reject(new Error('Upload failed'));
+      }
+    });
+
+    xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+
+    xhr.open('POST', IMAGE_URL);
+    xhr.setRequestHeader('Authorization', `Bearer ${imagesApiToken}`);
+    xhr.send(formData);
   });
-  const existingData = await response.json() as CaseData;
-
-  // Create updated data object that preserves existing fields
-  const updatedData = {
-    ...existingData,              // Keep all existing case data
-    files: [                      // Update files array
-      ...(existingData.files || []), // Keep existing files or use empty array
-      newFile                        // Add new file
-    ]
-  };
-
-  // Save the updated data
-  await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    method: 'PUT',
-    headers: {
-      'X-Custom-Auth-Key': apiKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedData)
-  });
-
-  return newFile;
 };
 
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {

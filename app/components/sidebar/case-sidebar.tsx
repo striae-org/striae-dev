@@ -44,6 +44,7 @@ export const CaseSidebar = ({ user }: CaseSidebarProps) => {
     // File management state
     const [files, setFiles] = useState<FileData[]>([]);
     const [isUploadingFile, setIsUploadingFile] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [fileError, setFileError] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -120,6 +121,7 @@ export const CaseSidebar = ({ user }: CaseSidebarProps) => {
     // Clear previous errors
     setFileError('');
     setIsUploadingFile(true);
+    setUploadProgress(0);
 
     // Validate file type
     if (!allowedTypes.includes(file.type)) {
@@ -134,15 +136,18 @@ export const CaseSidebar = ({ user }: CaseSidebarProps) => {
     }
 
     try {
-      const uploadedFile = await uploadFile(user, currentCase, file);
-      setFiles(prev => [...prev, uploadedFile]);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    } catch (err) {
-      setFileError(err instanceof Error ? err.message : 'Upload failed');
-    } finally {
-      setIsUploadingFile(false);
-    }
-  };
+    const uploadedFile = await uploadFile(user, currentCase, file, (progress) => {
+      setUploadProgress(progress);
+    });
+    setFiles(prev => [...prev, uploadedFile]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  } catch (err) {
+    setFileError(err instanceof Error ? err.message : 'Upload failed');
+  } finally {
+    setIsUploadingFile(false);
+    setUploadProgress(0);
+  }
+};
 
   const handleFileDelete = async (fileId: string) => {
     if (!currentCase) return;
@@ -262,6 +267,17 @@ return (
         aria-label="Upload image file"
       />
       {isUploadingFile && <span className={styles.uploadingText}>Uploading...</span>}
+      {isUploadingFile && (
+        <div className={styles.progressBar}>
+          <div 
+            className={styles.progressFill} 
+            style={{ width: `${uploadProgress}%` }}
+          />
+          <span className={styles.uploadingText}>
+            {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
+          </span>
+        </div>
+      )}
       {fileError && <p className={styles.error}>{fileError}</p>}
     </div>
       )}
