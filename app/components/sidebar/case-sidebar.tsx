@@ -260,12 +260,13 @@ return (
         <ul className={styles.fileList}>
           {files.map((file) => (
             <li key={file.id} className={styles.fileItem}>
-              <span className={styles.fileName}>{file.originalFilename}</span>
-              <span className={styles.uploadDate}>
-                {new Date(file.uploadedAt).toLocaleDateString()}
-              </span>
+              <span className={styles.fileName}>{file.originalFilename}</span>              
               <button
-                onClick={() => handleFileDelete(file.id)}
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                    handleFileDelete(file.id);
+                  }
+                }}
                 className={styles.deleteButton}
                 aria-label="Delete file"
               >
