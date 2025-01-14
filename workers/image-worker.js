@@ -6,7 +6,7 @@ const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://striae.allyforensics.com',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
@@ -78,7 +78,7 @@ const bufferToHex = buffer =>
 async function generateSignedUrl(url) {
   // `url` is a full imagedelivery.net URL
   // e.g. https://imagedelivery.net/cheeW4oKsx5ljh8e8BoL2A/bc27a117-9509-446b-8c69-c81bfeac0a01/mobile
-
+  const signedUrl = url.toString();
   const encoder = new TextEncoder();
   const secretKeyData = encoder.encode(KEY);
   const key = await crypto.subtle.importKey(
@@ -105,15 +105,21 @@ async function generateSignedUrl(url) {
   // And attach it to the `url`
   url.searchParams.set('sig', sig);
 
-  return new Response(url);
+  return new Response(signedUrl, {
+    headers: corsHeaders
+  });
 }
 
-async function handleImageServing(request) {
+async function handleImageServing(request, env) {
+  if (!hasValidToken(request, env)) {
+    return createResponse({ error: 'Unauthorized' }, 403);
+  }
+
   const url = new URL(request.url);
   const imageDeliveryURL = new URL(
     url.pathname.slice(1).replace('https:/imagedelivery.net', 'https://imagedelivery.net')
-    );
-  return generateSignedUrl(imageDeliveryURL);  
+  );
+  return generateSignedUrl(imageDeliveryURL);
 }
 
 /**
@@ -131,7 +137,7 @@ export default {
         case 'POST':
           return handleImageUpload(request, env);
         case 'GET':
-          return handleImageServing(request);
+          return handleImageServing(request, env);
         case 'DELETE':
           return handleImageDelete(request, env);
         default:
