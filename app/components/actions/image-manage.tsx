@@ -180,18 +180,17 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${imagesApiToken}`
+      'Authorization': `Bearer ${imagesApiToken}`,
+      'Accept': 'text/plain'
     }
   });
   
   if (!workerResponse.ok) throw new Error('Failed to get signed image URL');
   
-  const responseContent = await workerResponse.text();
-  console.log('Worker response:', responseContent);
-
-  if (responseContent.startsWith('https://')) {
-    return responseContent;
+  const signedUrl = await workerResponse.text();
+  if (!signedUrl.includes('sig=') || !signedUrl.includes('exp=')) {
+    throw new Error('Invalid signed URL returned');
   }
-
-  throw new Error('Worker did not return a valid URL');
+  
+  return signedUrl;
 };
