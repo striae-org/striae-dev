@@ -29,7 +29,6 @@ export const Striae = ({ user }: StriaePage) => {
   }, [currentCase]);
 
   const handleCaseChange = (caseNumber: string) => {
-    window.location.reload();
     setCurrentCase(caseNumber);
   };
 
