@@ -13,11 +13,10 @@ interface FileData {
 
 interface SidebarProps {
   user: User;
-  onImageSelect: (file: FileData) => void;
-  onToggleImage: () => void;
+  onImageSelect: (file: FileData) => void;  // Add this prop
 }
 
-export const Sidebar = ({ user, onImageSelect, onToggleImage }: SidebarProps) => {
+export const Sidebar = ({ user, onImageSelect }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
@@ -32,12 +31,6 @@ export const Sidebar = ({ user, onImageSelect, onToggleImage }: SidebarProps) =>
             className={styles.profileButton}
           >
             Manage Profile
-          </button>
-          <button 
-            onClick={onToggleImage}
-            className={styles.profileButton}
-          >
-            Clear Canvas
           </button>
           <SignOut />
         </div>
