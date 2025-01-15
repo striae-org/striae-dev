@@ -159,8 +159,7 @@ export const CaseSidebar = ({ user, onImageSelect, onCaseChange }: CaseSidebarPr
     setFileError('');
     try {
       await deleteFile(user, currentCase, fileId);
-      setFiles(prev => prev.filter(f => f.id !== fileId));
-      onCaseChange(currentCase);
+      setFiles(prev => prev.filter(f => f.id !== fileId));      
     } catch (err) {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
