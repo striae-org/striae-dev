@@ -77,7 +77,7 @@ async function handleImageDelete(request, env) {
  */
 
 const KEY = '9JhGmtnWuO2o2lGoiq3ObXmK5u8N78U0';
-const EXPIRATION = 60 * 60 * 24; // 1 day
+const EXPIRATION = 60 * 60; // 1 hour
 
 const bufferToHex = buffer =>
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
