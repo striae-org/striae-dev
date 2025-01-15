@@ -165,6 +165,12 @@
   margin-top: 2rem;
 }
 
+.filesSection h4 {  
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 .emptyState {
   color: #6c757d;
   font-size: 0.9rem;
