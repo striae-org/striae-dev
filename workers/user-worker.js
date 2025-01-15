@@ -11,62 +11,88 @@ async function authenticate(request, env) {
 }
 
 async function handleGetUser(env, userUid) {
-  const userData = await env.USER_DB.get(userUid);
-  if (!userData) {
-    return new Response('User not found', { 
-      status: 404, 
+  try {
+    const value = await env.USER_DB.get(userUid);
+    if (value === null) {
+      return new Response('User not found', { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+    return new Response(value, { 
+      status: 200, 
+      headers: corsHeaders 
+    });
+  } catch (error) {
+    return new Response('Failed to get user data', { 
+      status: 500, 
       headers: corsHeaders 
     });
   }
-  return new Response(userData, { 
-    status: 200, 
-    headers: corsHeaders 
-  });
 }
 
 async function handleAddUser(request, env, userUid) {
-  const { email, firstName, lastName, permitted = false } = await request.json();
-  
-  // Check for existing user
-  const existingData = await env.USER_DB.get(userUid);
-  
-  let userData;
-  if (existingData) {
-    // Update existing user
-    const existing = JSON.parse(existingData);
-    userData = {
-      ...existing,
-      email: email || existing.email,
-      firstName: firstName || existing.firstName,
-      lastName: lastName || existing.lastName,
-      permitted: permitted !== undefined ? permitted : existing.permitted,
-      updatedAt: new Date().toISOString()
-    };
-  } else {
-    // Create new user
-    userData = {
-      uid: userUid,
-      email,
-      firstName,
-      lastName,
-      permitted,
-      createdAt: new Date().toISOString()
-    };
-  }
+  try {
+    const { email, firstName, lastName, permitted = false } = await request.json();
+    
+    // Check for existing user
+    const value = await env.USER_DB.get(userUid);
+    
+    let userData;
+    if (value !== null) {
+      // Update existing user
+      const existing = JSON.parse(value);
+      userData = {
+        ...existing,
+        email: email || existing.email,
+        firstName: firstName || existing.firstName,
+        lastName: lastName || existing.lastName,
+        permitted: permitted !== undefined ? permitted : existing.permitted,
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      // Create new user
+      userData = {
+        uid: userUid,
+        email,
+        firstName,
+        lastName,
+        permitted,
+        cases: [],
+        createdAt: new Date().toISOString()
+      };
+    }
 
-  await env.USER_DB.put(userUid, JSON.stringify(userData));
-  return new Response(JSON.stringify(userData), {
-    status: existingData ? 200 : 201,
-    headers: corsHeaders
-  });
+    // Store value in KV
+    await env.USER_DB.put(userUid, JSON.stringify(userData));
+
+    return new Response(JSON.stringify(userData), {
+      status: value !== null ? 200 : 201,
+      headers: corsHeaders
+    });
+  } catch (error) {
+    return new Response('Failed to save user data', { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
 }
 
 async function handleDeleteUser(env, userUid) {
-  await env.USER_DB.delete(userUid);
-  return new Response(null, {
-    status: 204,
-    headers: corsHeaders
-  });
+  try {
+    
+    await env.USER_DB.delete(userUid);
+    
+    return new Response('Successful delete', {
+      status: 200,
+      headers: corsHeaders
+    });
+  } catch (error) {
+    return new Response('Failed to delete user', { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
 }
 
 export default {
