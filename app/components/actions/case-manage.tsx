@@ -141,7 +141,6 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     const dataApiKey = await getDataApiKey();
     const userApiKey = await getUserApiKey();
 
-    // Create case data objects
     const newCase: CaseData = {
       createdAt: new Date().toISOString(),
       caseNumber,
@@ -182,32 +181,38 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       throw new Error('Failed to get user data');
     }
 
-    const userData = await getUserResponse.json() as UserData;
-    console.log('Current user data:', userData);
+    const userData = (await getUserResponse.json()) as UserData;
+    console.log('Current user data before update:', JSON.stringify(userData, null, 2));
+    console.log('Root case data to add:', JSON.stringify(rootCaseData, null, 2));
 
-    // Initialize cases array if it doesn't exist
-    const existingCases = userData.cases || [];
-    
-    // Prepare updated user data with proper typing
-    const updatedUserData: UserData = {
+    // Ensure cases is an array
+    if (!Array.isArray(userData.cases)) {
+      userData.cases = [];
+    }
+
+    // Create updated user data
+    const updatedUserData = {
       ...userData,
-      cases: [...existingCases, rootCaseData],
+      cases: [...userData.cases, rootCaseData],
       updatedAt: new Date().toISOString()
     };
 
-     // Update KV store directly without OPTIONS
-    console.log('Updating KV store...');
+    console.log('Updated user data to save:', JSON.stringify(updatedUserData, null, 2));
+
+    // Update KV store
     const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': userApiKey,
-        'Accept': 'application/json'
+        'X-Custom-Auth-Key': userApiKey
       },
       body: JSON.stringify(updatedUserData)
     });
 
-    console.log('Update response:', updateResponse.status);
+    console.log('Update response status:', updateResponse.status);
+    const responseData = await updateResponse.json();
+    console.log('Update response data:', JSON.stringify(responseData, null, 2));
+
     if (!updateResponse.ok) {
       throw new Error('Failed to update user data');
     }
