@@ -175,8 +175,6 @@ export const getImageUrl = async (fileData: FileData): Promise<string> => {
   const imagesApiToken = await getImagesApiToken();
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
   
-  console.log('Requesting URL:', `${IMAGE_URL}/${imageDeliveryUrl}`);
-  
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
     method: 'GET',
     headers: {

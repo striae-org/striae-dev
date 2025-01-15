@@ -83,8 +83,7 @@ export const loader = async () => {
       return json<LoaderData>({ data: [] });
     }
 
-    const data = await response.json();
-    console.log('Loader data:', data); // Debug log
+    const data = await response.json();    
     return json<LoaderData>({ 
       data: Array.isArray(data) ? data.filter(Boolean) : []       
     });
