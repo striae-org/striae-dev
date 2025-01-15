@@ -412,30 +412,76 @@ if (additionalInfo?.isNewUser) {
 
   const EmailLinkForm = () => {
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get('email') as string;
-      handleEmailLink(email);
-    }} className={styles.form}>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        autoComplete="email"
-        className={styles.input}
-        required
-        disabled={isLoading}
-      />
-      {error && <p className={styles.error}>{error}</p>}
-      <button 
-        type="submit" 
-        className={styles.button}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Sending...' : 'Send Login Link'}
-      </button>
-    </form>
+    <>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get('email') as string;
+        const firstName = formData.get('firstName') as string;
+        const lastName = formData.get('lastName') as string;
+        
+        // Store name data for registration flow
+        if (!isLogin) {
+          window.localStorage.setItem('firstName', firstName);
+          window.localStorage.setItem('lastName', lastName);
+        }
+        
+        handleEmailLink(email);
+      }} className={styles.form}>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          autoComplete="email"
+          className={styles.input}
+          required
+          disabled={isLoading}
+        />
+        
+        {!isLogin && (
+          <>
+            <input
+              type="text"
+              name="firstName"
+              required
+              placeholder="First Name (required)"
+              className={styles.input}
+              disabled={isLoading}
+              autoComplete="given-name"
+            />
+            <input
+              type="text"
+              name="lastName"
+              required
+              placeholder="Last Name (required)"
+              className={styles.input}
+              disabled={isLoading}
+              autoComplete="family-name"
+            />
+          </>
+        )}
+        
+        {error && <p className={styles.error}>{error}</p>}
+        <button 
+          type="submit" 
+          className={styles.button}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Sending...' : 'Send Login Link'}
+        </button>
+      </form>
+      
+      <p className={styles.toggle}>
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <button 
+          onClick={() => setIsLogin(!isLogin)}
+          className={styles.toggleButton}
+          disabled={isLoading}
+        >
+          {isLogin ? 'Register' : 'Login'}
+        </button>
+      </p>
+    </>
   );
 };
 
