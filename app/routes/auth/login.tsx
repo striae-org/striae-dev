@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
-import { addUserDataAction } from '~/server/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
@@ -32,20 +31,20 @@ export const meta = () => {
   });
 };
 
-  interface Data {
-    email: string;
-    firstName: string;
-    lastName: string;
-    permitted: boolean;
-    createdAt: string;
-    uid: string;
-  }
+  interface UserData {
+  uid: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  permitted: boolean;
+  createdAt: string;
+}
 
-  interface LoaderData {
-    data: Data[];    
-  }  
+interface LoaderData {
+  data: UserData | null;    
+}  
 
-  const WORKER_URL = paths.data_worker_url;
+  const USER_WORKER_URL = paths.user_worker_url;  
   const KEYS_URL = paths.keys_url;
 
 const actionCodeSettings = {
@@ -58,19 +57,19 @@ const provider = new GoogleAuthProvider();
 export const loader = async () => {  
   const currentUser = auth.currentUser;
   if (!currentUser) {
-    return json<LoaderData>({ data: [] });
+    return json<LoaderData>({ data: null });
   }
 
   try {
-
-    // Get API key from keys worker
-    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
+    // Get API key from keys worker with new path
+    const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
     if (!keyResponse.ok) {
       throw new Error('Failed to retrieve API key');
     }
     const apiKey = await keyResponse.text();
 
-    const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
+    // Use USER_WORKER_URL for KV database
+    const response = await fetch(`${USER_WORKER_URL}/${currentUser.uid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -79,18 +78,16 @@ export const loader = async () => {
     });
     
     if (!response.ok) {
-      console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [] });
+      console.error('Failed to fetch user:', response.status);
+      return json<LoaderData>({ data: null });
     }
 
-    const data = await response.json();    
-    return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : []       
-    });
+    const userData = await response.json() as UserData;    
+    return json<LoaderData>({ data: userData });
      
   } catch (error) {
     console.error('Loader error:', error);
-    return json<LoaderData>({ data: [] });
+    return json<LoaderData>({ data: null });
   }
 };
 
@@ -124,13 +121,32 @@ export const Login = () => {
       return;
     }
     
-    if (additionalInfo.isNewUser) {
-      await addUserDataAction({
-        userUid: result.user.uid,
-        email: result.user.email,
-        firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || ''       
+    if (additionalInfo?.isNewUser) {
+      // Get API key
+      const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
+      if (!keyResponse.ok) {
+        throw new Error('Failed to retrieve API key');
+      }
+      const apiKey = await keyResponse.text();
+
+      // Add user to KV database
+      const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify({
+          email: result.user.email,
+          firstName: additionalInfo.profile?.given_name || '',
+          lastName: additionalInfo.profile?.family_name || '',
+          permitted: false
+        })
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to create user data');
+      }
     }
 
     setUser(result.user);
@@ -157,13 +173,31 @@ export const Login = () => {
           await updateProfile(emailLinkUser, {
             displayName: `${firstName} ${lastName}`
           });
+          // Get API key
+          const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
+          if (!keyResponse.ok) {
+            throw new Error('Failed to retrieve API key');
+          }
+          const apiKey = await keyResponse.text();
 
-          await addUserDataAction({
-            userUid: emailLinkUser.uid,
-            email: emailLinkUser.email,
-            firstName,
-            lastName            
+          // Add to KV database
+          const response = await fetch(`${USER_WORKER_URL}/${emailLinkUser.uid}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Custom-Auth-Key': apiKey
+            },
+            body: JSON.stringify({
+              email: emailLinkUser.email,
+              firstName,
+              lastName,
+              permitted: false
+            })
           });
+
+          if (!response.ok) {
+            throw new Error('Failed to create user data');
+          }
 
           setUser(emailLinkUser);
           setNeedsProfile(false);
@@ -269,21 +303,40 @@ export const Login = () => {
               setEmailLinkUser(result.user);
               setNeedsProfile(true);
             } else {
-            // Add user data to R2
-            await addUserDataAction({
-              userUid: result.user.uid,
-              email: result.user.email,
-              firstName: additionalInfo.profile?.given_name || '',
-              lastName: additionalInfo.profile?.family_name || ''                          
-            });
-            setUser(result.user);
+             // Get API key
+          const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
+          if (!keyResponse.ok) {
+            throw new Error('Failed to retrieve API key');
           }
-            window.localStorage.removeItem('emailForSignIn');            
-          })
-          .catch((error) => setError(error.message))
-          .finally(() => setIsLoading(false));
-      }
-    }
+          const apiKey = await keyResponse.text();
+
+          // Add to KV database
+          const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Custom-Auth-Key': apiKey
+            },
+            body: JSON.stringify({
+              email: result.user.email,
+              firstName: result.user.displayName?.split(' ')[0] || '',
+              lastName: result.user.displayName?.split(' ')[1] || '',
+              permitted: false
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to create user data');
+          }
+          
+          setUser(result.user);
+        }
+        window.localStorage.removeItem('emailForSignIn');            
+      })
+      .catch((error) => setError(error.message))
+      .finally(() => setIsLoading(false));
+  }
+}
 
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get('mode');
@@ -311,72 +364,55 @@ export const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  setError('');
   setIsLoading(true);
+  setError('');
 
-  const formData = new FormData(formRef.current!);
+  const formData = new FormData(e.currentTarget as HTMLFormElement);
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const confirmPassword = formData.get('confirmPassword') as string;
+  const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
 
   try {
-    if (isLogin) {
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        if (!userCredential.user.emailVerified) {
-          await handleSignOut();
-          setError('Please verify your email before logging in');
-          return;
-        }
-        setUser(userCredential.user);
-      } catch (err) {
-        const { message } = handleAuthError(err);
-        setError(message);
-        return;
-      }
-    } else {
-      // Registration validation
-      if (password !== confirmPassword) {
-        setError(ERROR_MESSAGES.PASSWORDS_MISMATCH);
-        return;
-      }
-      
-      if (!checkPasswordStrength(password)) {
-        setError(ERROR_MESSAGES.WEAK_PASSWORD);
-        return;
-      }
-
-      const firstName = formData.get('firstName') as string;
-      const lastName = formData.get('lastName') as string;
-
-      if (!firstName || !lastName) {
-        setError('First and last name are required');
-        return;
-      }
-
-      try {
-        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(createCredential.user, {
-          displayName: `${firstName} ${lastName}`
-        });
-
-        // Add user data to R2
-      await addUserDataAction({
-        userUid: createCredential.user.uid,
-        email: createCredential.user.email,
-        firstName,
-        lastName        
+    if (!isLogin) {
+      // Registration
+      const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(createCredential.user, {
+        displayName: `${firstName} ${lastName}`
       });
 
-        await sendEmailVerification(createCredential.user);
-        await handleSignOut();
-        setError('Registration successful! Please verify your email before logging in.');
-        setIsLogin(true);
-      } catch (err) {
-        const { message } = handleAuthError(err);
-        setError(message);
-        return;
+      // Get API key
+      const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
+      if (!keyResponse.ok) {
+        throw new Error('Failed to retrieve API key');
       }
+      const apiKey = await keyResponse.text();
+
+      // Add to KV database
+      const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify({
+          email: createCredential.user.email,
+          firstName,
+          lastName,
+          permitted: false
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create user data');
+      }
+
+      await sendEmailVerification(createCredential.user);
+      setError('Please check your email to verify your account');
+      handleSignOut();
+    } else {
+      // Login
+      await signInWithEmailAndPassword(auth, email, password);
     }
   } catch (err) {
     const { message } = handleAuthError(err);

@@ -4,5 +4,6 @@
   "url": "https://striae.allyforensics.com",    
   "data_worker_url": "https://origin2.striae.allyforensics.com",
   "keys_url": "https://origin.striae.allyforensics.com",
-  "image_worker_url": "https://origin3.striae.allyforensics.com"
+  "image_worker_url": "https://origin3.striae.allyforensics.com",
+  "user_worker_url": "https://origin4.striae.allyforensics.com"
 }
