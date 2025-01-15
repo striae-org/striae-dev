@@ -27,11 +27,6 @@
   background-color: #357abd;
 }
 
-.toggleButton:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
 /* User Section */
 .userInfo {
   display: flex;
