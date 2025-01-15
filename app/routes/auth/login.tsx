@@ -21,31 +21,17 @@ import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
+import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
-import { json } from '@remix-run/cloudflare';
 
 export const meta = () => {
   return baseMeta({
     title: 'Welcome to Striae',
     description: 'Login to your Striae account to access your projects and data',
   });
-};
+}; 
 
-  interface UserData {
-  uid: string;
-  email: string | null;
-  firstName: string;
-  lastName: string;
-  permitted: boolean;
-  createdAt: string;
-}
-
-interface LoaderData {
-  data: UserData | null;    
-}  
-
-  const USER_WORKER_URL = paths.user_worker_url;  
-  const KEYS_URL = paths.keys_url;
+const USER_WORKER_URL = paths.user_worker_url;  
 
 const actionCodeSettings = {
   url: 'https://striae.allyforensics.com', // Update with your domain in production
@@ -53,43 +39,6 @@ const actionCodeSettings = {
 };
 
 const provider = new GoogleAuthProvider();
-
-export const loader = async () => {  
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    return json<LoaderData>({ data: null });
-  }
-
-  try {
-    // Get API key from keys worker with new path
-    const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
-    if (!keyResponse.ok) {
-      throw new Error('Failed to retrieve API key');
-    }
-    const apiKey = await keyResponse.text();
-
-    // Use USER_WORKER_URL for KV database
-    const response = await fetch(`${USER_WORKER_URL}/${currentUser.uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch user:', response.status);
-      return json<LoaderData>({ data: null });
-    }
-
-    const userData = await response.json() as UserData;    
-    return json<LoaderData>({ data: userData });
-     
-  } catch (error) {
-    console.error('Loader error:', error);
-    return json<LoaderData>({ data: null });
-  }
-};
 
 export const Login = () => {    
   const navigate = useNavigate();
@@ -122,13 +71,8 @@ export const Login = () => {
     }
     
     if (additionalInfo?.isNewUser) {
-      // Get API key
-      const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
-      if (!keyResponse.ok) {
-        throw new Error('Failed to retrieve API key');
-      }
-      const apiKey = await keyResponse.text();
-
+      // Get API key      
+      const apiKey = await getUserApiKey();
       // Add user to KV database
       const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
         method: 'PUT',
@@ -173,13 +117,8 @@ export const Login = () => {
           await updateProfile(emailLinkUser, {
             displayName: `${firstName} ${lastName}`
           });
-          // Get API key
-          const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
-          if (!keyResponse.ok) {
-            throw new Error('Failed to retrieve API key');
-          }
-          const apiKey = await keyResponse.text();
-
+          // Get API key      
+          const apiKey = await getUserApiKey();
           // Add to KV database
           const response = await fetch(`${USER_WORKER_URL}/${emailLinkUser.uid}`, {
             method: 'PUT',
@@ -303,12 +242,8 @@ export const Login = () => {
               setEmailLinkUser(result.user);
               setNeedsProfile(true);
             } else {
-             // Get API key
-          const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
-          if (!keyResponse.ok) {
-            throw new Error('Failed to retrieve API key');
-          }
-          const apiKey = await keyResponse.text();
+          // Get API key      
+          const apiKey = await getUserApiKey();
 
           // Add to KV database
           const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
@@ -381,12 +316,8 @@ export const Login = () => {
         displayName: `${firstName} ${lastName}`
       });
 
-      // Get API key
-      const keyResponse = await fetch(`${KEYS_URL}/1156868486435`);
-      if (!keyResponse.ok) {
-        throw new Error('Failed to retrieve API key');
-      }
-      const apiKey = await keyResponse.text();
+      // Get API key      
+      const apiKey = await getUserApiKey();
 
       // Add to KV database
       const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
