@@ -25,3 +25,11 @@ export async function getImageApiKey(): Promise<string> {
   }
   return keyResponse.text();
 }
+
+export async function getAccountHash(): Promise<string> {
+  const keyResponse = await fetch(`${KEYS_URL}/1568486544161`);
+  if (!keyResponse.ok) {
+    throw new Error('Failed to retrieve API key');
+  }
+  return keyResponse.text();
+}

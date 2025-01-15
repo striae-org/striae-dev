@@ -1,9 +1,13 @@
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
+import { 
+  getImageApiKey,
+  getDataApiKey,
+  getAccountHash 
+} from '~/utils/auth';
 
 const WORKER_URL = paths.data_worker_url;
 const IMAGE_URL = paths.image_worker_url;
-const KEYS_URL = paths.keys_url;
 
 
 interface CaseData {
@@ -15,18 +19,6 @@ interface FileData {
   originalFilename: string;
   uploadedAt: string;
 }
-
-const getImagesApiToken = async (): Promise<string> => {
-  const response = await fetch(`${KEYS_URL}/1156884684684`);
-  if (!response.ok) throw new Error('Failed to retrieve images API token');
-  return response.text();
-};
-
-const getApiKey = async (): Promise<string> => {
-  const response = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
-  if (!response.ok) throw new Error('Failed to retrieve API key');
-  return response.text();
-};
 
 interface ApiResponse {
   files: FileData[];
@@ -40,7 +32,7 @@ interface ImageUploadResponse {
 }
 
 export const fetchFiles = async (user: User, caseNumber: string): Promise<FileData[]> => {
-  const apiKey = await getApiKey();
+  const apiKey = await getDataApiKey();
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
     headers: { 'X-Custom-Auth-Key': apiKey }
   });
@@ -54,7 +46,7 @@ export const uploadFile = async (
   file: File, 
   onProgress?: (progress: number) => void
 ): Promise<FileData> => {
-  const imagesApiToken = await getImagesApiToken();
+  const imagesApiToken = await getImageApiKey();
   
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -81,7 +73,7 @@ export const uploadFile = async (
           };
 
           // Update case data
-          const apiKey = await getApiKey();
+          const apiKey = await getDataApiKey();
           const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
             headers: { 'X-Custom-Auth-Key': apiKey }
           });
@@ -119,7 +111,7 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
-  const imagesApiToken = await getImagesApiToken();
+  const imagesApiToken = await getImageApiKey();
   await fetch(`${IMAGE_URL}/${fileId}`, {
     method: 'DELETE',
     headers: {
@@ -127,7 +119,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     }
   });
 
-  const apiKey = await getApiKey();
+  const apiKey = await getDataApiKey();
   
   // Get full case data
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
@@ -162,17 +154,14 @@ interface ImageDeliveryConfig {
 }
 
 const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
-  const response = await fetch(`${KEYS_URL}/1568486544161`);
-  if (!response.ok) throw new Error('Failed to retrieve account hash');
-  const accountHash = await response.text();
+  const accountHash = await getAccountHash();
   return { accountHash };
 };
 
 
 export const getImageUrl = async (fileData: FileData): Promise<string> => {
-  const { accountHash } = await getImageConfig();
-  // Use imagesApiToken instead of apiKey
-  const imagesApiToken = await getImagesApiToken();
+  const { accountHash } = await getImageConfig();  
+  const imagesApiToken = await getImageApiKey();
   const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
   
   const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
