@@ -24,11 +24,12 @@ export const Striae = ({ user }: StriaePage) => {
   useEffect(() => {
     if (!currentCase) {
       setSelectedImage(undefined);
-      setError(undefined);      
+      setError(undefined);
     }
   }, [currentCase]);
 
-  const handleCaseChange = (caseNumber: string) => {    
+  const handleCaseChange = (caseNumber: string) => {
+    window.location.reload();
     setCurrentCase(caseNumber);
   };
 
