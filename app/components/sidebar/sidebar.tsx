@@ -13,11 +13,10 @@ interface FileData {
 
 interface SidebarProps {
   user: User;
-  onImageSelect: (file: FileData) => void;
-  onCaseChange: (caseNumber: string) => void;
+  onImageSelect: (file: FileData) => void;  // Add this prop
 }
 
-export const Sidebar = ({ user, onImageSelect, onCaseChange }: SidebarProps) => {
+export const Sidebar = ({ user, onImageSelect }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
@@ -42,7 +41,7 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange }: SidebarProps) => 
         onClose={() => setIsProfileModalOpen(false)}
       />
 
-      <CaseSidebar user={user} onImageSelect={onImageSelect} onCaseChange={onCaseChange} />
+      <CaseSidebar user={user} onImageSelect={onImageSelect} />
     </div>
   );
 };

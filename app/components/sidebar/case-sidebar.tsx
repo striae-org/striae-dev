@@ -18,7 +18,6 @@ import {
 interface CaseSidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
-  onCaseChange: (caseNumber: string) => void;
 }
 
 interface FileData {
@@ -29,7 +28,7 @@ interface FileData {
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
-export const CaseSidebar = ({ user, onImageSelect, onCaseChange }: CaseSidebarProps) => {
+export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
   // Case management states
     const [caseNumber, setCaseNumber] = useState<string>('');
     const [currentCase, setCurrentCase] = useState<string>('');
@@ -78,10 +77,6 @@ export const CaseSidebar = ({ user, onImageSelect, onCaseChange }: CaseSidebarPr
       setFiles([]);
     }
   }, [user, currentCase]);
-
-   useEffect(() => {
-    onCaseChange(currentCase);
-  }, [currentCase, onCaseChange]);
   
   const handleCase = async () => {
     setIsLoading(true);
