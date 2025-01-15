@@ -10,6 +10,23 @@
   flex-shrink: 0; /* Prevent sidebar from shrinking */
 }
 
+.toggleButton {
+  padding: 0.5rem 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.toggleButton:hover {
+  background-color: #357abd;
+}
+
 /* User Section */
 .userInfo {
   display: flex;

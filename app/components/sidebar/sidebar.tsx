@@ -32,15 +32,15 @@ export const Sidebar = ({ user, onImageSelect, onToggleImage }: SidebarProps) =>
             className={styles.profileButton}
           >
             Manage Profile
-          </button>
-          <button 
+          </button>          
+          <SignOut />
+        </div>
+        <button 
             onClick={onToggleImage}
-            className={styles.profileButton}
+            className={styles.toggleButton}
           >
             Clear Canvas
           </button>
-          <SignOut />
-        </div>
       </div>
 
       <ManageProfile 
