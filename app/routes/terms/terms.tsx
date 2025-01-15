@@ -214,6 +214,8 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p><strong>Data Storage: Secure and Private</strong></p>
 <p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize your privacy and make sure your information is kept private and confidential. A few of the measures in place include:</p>
 <ul>
+  <li><p><strong>Data Segregation/Isolation</strong></p>
+  <p>We utilize multiple, separate, and distinct systems to store your Data. Data segregation/isolation enhances security by preventing unauthorized access to sensitive information, even if one system is compromised. This practice reduces the risk of data breaches and maintains integrity.</p></li>
   <li><p><strong>AES-256 Encryption</strong></p>
   <p>At rest, your Data is securely stored and inaccessible to unauthorized users or applications.</p></li>
   <li><p><strong>Transport Layer Security</strong></p>
