@@ -19,6 +19,18 @@ interface FileData {
 export const Striae = ({ user }: StriaePage) => {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [error, setError] = useState<string>();
+  const [currentCase, setCurrentCase] = useState<string>('');
+
+  useEffect(() => {
+    if (!currentCase) {
+      setSelectedImage(undefined);
+      setError(undefined);
+    }
+  }, [currentCase]);
+
+  const handleCaseChange = (caseNumber: string) => {
+    setCurrentCase(caseNumber);
+  };
 
   useEffect(() => {
     // Cleanup function to clear image when component unmounts
@@ -62,7 +74,10 @@ export const Striae = ({ user }: StriaePage) => {
 
   return (
     <div className={styles.appContainer}>
-      <Sidebar user={user} onImageSelect={handleImageSelect} />
+      <Sidebar 
+        user={user} 
+        onImageSelect={handleImageSelect}
+        onCaseChange={handleCaseChange} />
       <main className={styles.mainContent}>
         <Canvas imageUrl={selectedImage} error={error} />
         <Annotations />
