@@ -167,8 +167,9 @@
 
 .filesSection h4 {  
   margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-align: center;
 }
 
 .emptyState {
