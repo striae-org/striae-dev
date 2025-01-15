@@ -1,9 +1,11 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import { useEffect, useState } from 'react';
 import styles from './canvas.module.css';
 
 interface CanvasProps {
   imageUrl?: string;
-  error?: string;  
+  error?: string;
+  isHidden?: boolean;  
 }
 
 export const Canvas = ({ imageUrl, error }: CanvasProps) => {
@@ -86,7 +88,7 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
         <div className={isHidden ? styles.hidden : ''}>
         <img 
           src={imageUrl}
-          alt="Case evidence"
+          alt="Case Image"
           className={styles.image}
         />
         </div>

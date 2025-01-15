@@ -19,10 +19,10 @@ interface FileData {
 export const Striae = ({ user }: StriaePage) => {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [error, setError] = useState<string>();
-  const [isImageHidden, setIsImageHidden] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
-  const toggleImageVisibility = () => {
-    setIsImageHidden(prev => !prev);
+  const handleToggleHide = (hidden: boolean) => {
+    setIsHidden(hidden);
   };
 
   useEffect(() => {
@@ -59,9 +59,9 @@ export const Striae = ({ user }: StriaePage) => {
       <Sidebar 
         user={user} 
         onImageSelect={handleImageSelect}
-        onToggleImage={toggleImageVisibility} />
+        onToggleHide={handleToggleHide} />
       <main className={styles.mainContent}>
-        <Canvas imageUrl={selectedImage} error={error} isHidden={isImageHidden} />
+        <Canvas imageUrl={selectedImage} error={error} isHidden={isHidden} />
         <Annotations />
       </main>
     </div>
