@@ -20,6 +20,7 @@ interface UserData {
   permitted: boolean;
   cases?: CaseData[];
   createdAt: string;
+  updatedAt: string;
 }
 
 interface FileData {
@@ -141,7 +142,6 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
 
 export const createNewCase = async (user: User, caseNumber: string): Promise<CaseData> => {
   try {
-    // Get both API keys
     const dataApiKey = await getDataApiKey();
     const userApiKey = await getUserApiKey();
 
@@ -180,7 +180,17 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       }
     });
 
-    const userData = await getUserData.json() as UserData;
+    let userData = await getUserData.json() as UserData;
+    
+    // Ensure userData has required fields
+    userData = {
+      ...userData,
+      cases: Array.isArray(userData.cases) ? userData.cases : [],
+      updatedAt: new Date().toISOString()
+    };
+
+    // Add new case
+    userData.cases!.push(rootCaseData);
     
     // Update user data in KV store
     const updateUserData = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
@@ -189,10 +199,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
         'Content-Type': 'application/json',
         'X-Custom-Auth-Key': userApiKey
       },
-      body: JSON.stringify({
-        ...userData,
-        cases: [...(userData.cases || []), rootCaseData]
-      })
+      body: JSON.stringify(userData)
     });
 
     if (!updateUserData.ok) {

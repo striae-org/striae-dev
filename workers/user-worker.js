@@ -11,7 +11,7 @@ async function authenticate(request, env) {
 }
 
 async function handleGetUser(env, userUid) {
-  const userData = await env.USER_DB.get(`user:${userUid}`);
+  const userData = await env.USER_DB.get(userUid);
   if (!userData) {
     return new Response('User not found', { 
       status: 404, 
@@ -28,7 +28,7 @@ async function handleAddUser(request, env, userUid) {
   const { email, firstName, lastName, permitted = false } = await request.json();
   
   // Check for existing user
-  const existingData = await env.USER_DB.get(`user:${userUid}`);
+  const existingData = await env.USER_DB.get(userUid);
   
   let userData;
   if (existingData) {
@@ -54,7 +54,7 @@ async function handleAddUser(request, env, userUid) {
     };
   }
 
-  await env.USER_DB.put(`user:${userUid}`, JSON.stringify(userData));
+  await env.USER_DB.put(userUid, JSON.stringify(userData));
   return new Response(JSON.stringify(userData), {
     status: existingData ? 200 : 201,
     headers: corsHeaders
@@ -62,7 +62,7 @@ async function handleAddUser(request, env, userUid) {
 }
 
 async function handleDeleteUser(env, userUid) {
-  await env.USER_DB.delete(`user:${userUid}`);
+  await env.USER_DB.delete(userUid);
   return new Response(null, {
     status: 204,
     headers: corsHeaders
