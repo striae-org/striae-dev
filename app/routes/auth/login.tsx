@@ -29,7 +29,21 @@ export const meta = () => {
     title: 'Welcome to Striae',
     description: 'Login to your Striae account to access your projects and data',
   });
-}; 
+};
+
+interface UserData {
+  uid: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  permitted: boolean;
+  cases: Array<{
+    caseNumber: string;
+    createdAt: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const USER_WORKER_URL = paths.user_worker_url;  
 
@@ -39,6 +53,22 @@ const actionCodeSettings = {
 };
 
 const provider = new GoogleAuthProvider();
+
+const createUserData = (
+  uid: string,
+  email: string | null,
+  firstName: string,
+  lastName: string
+): UserData => ({
+  uid,
+  email,
+  firstName,
+  lastName,
+  permitted: false,
+  cases: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
 
 export const Login = () => {    
   const navigate = useNavigate();
@@ -70,25 +100,25 @@ export const Login = () => {
       return;
     }
     
-    if (additionalInfo?.isNewUser) {
-      // Get API key      
-      const apiKey = await getUserApiKey();
-      // Add user to KV database
-      const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': apiKey
-        },
-        body: JSON.stringify({
-          email: result.user.email,
-          firstName: additionalInfo.profile?.given_name || '',
-          lastName: additionalInfo.profile?.family_name || '',
-          permitted: false
-        })
-      });
+if (additionalInfo?.isNewUser) {
+  const apiKey = await getUserApiKey();
+  const userData = createUserData(
+    result.user.uid,
+    result.user.email,
+    additionalInfo.profile?.given_name || '',
+    additionalInfo.profile?.family_name || ''
+  );
 
-      if (!response.ok) {
+  const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Custom-Auth-Key': apiKey
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
         throw new Error('Failed to create user data');
       }
     }
@@ -120,18 +150,20 @@ export const Login = () => {
           // Get API key      
           const apiKey = await getUserApiKey();
           // Add to KV database
+          const userData = createUserData(
+            emailLinkUser.uid,
+            emailLinkUser.email,
+            firstName,
+            lastName
+          );
+
           const response = await fetch(`${USER_WORKER_URL}/${emailLinkUser.uid}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               'X-Custom-Auth-Key': apiKey
             },
-            body: JSON.stringify({
-              email: emailLinkUser.email,
-              firstName,
-              lastName,
-              permitted: false
-            })
+            body: JSON.stringify(userData)
           });
 
           if (!response.ok) {
@@ -228,36 +260,35 @@ export const Login = () => {
 };
     
     if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
-      }
-      if (email) {
-        setIsLoading(true);
-        signInWithEmailLink(auth, email, window.location.href)
-          .then(async (result) => {
-             const additionalInfo = getAdditionalUserInfo(result);
-        
-            if (additionalInfo?.isNewUser) {
-              setEmailLinkUser(result.user);
-              setNeedsProfile(true);
-            } else {
-          // Get API key      
+  let email = window.localStorage.getItem('emailForSignIn');
+  if (!email) {
+    email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+  }
+  if (email) {
+    setIsLoading(true);
+    signInWithEmailLink(auth, email, window.location.href)
+      .then(async (result) => {
+        const additionalInfo = getAdditionalUserInfo(result);
+    
+        if (additionalInfo?.isNewUser) {
+          setEmailLinkUser(result.user);
+          setNeedsProfile(true);
+        } else {
           const apiKey = await getUserApiKey();
-
-          // Add to KV database
+          const userData = createUserData(
+            result.user.uid,
+            result.user.email,
+            result.user.displayName?.split(' ')[0] || '',
+            result.user.displayName?.split(' ')[1] || ''
+          );
+                
           const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               'X-Custom-Auth-Key': apiKey
             },
-            body: JSON.stringify({
-              email: result.user.email,
-              firstName: result.user.displayName?.split(' ')[0] || '',
-              lastName: result.user.displayName?.split(' ')[1] || '',
-              permitted: false
-            })
+            body: JSON.stringify(userData)
           });
 
           if (!response.ok) {
@@ -320,18 +351,20 @@ export const Login = () => {
       const apiKey = await getUserApiKey();
 
       // Add to KV database
+      const userData = createUserData(
+        createCredential.user.uid,
+        createCredential.user.email,
+        firstName,
+        lastName
+      );
+
       const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Custom-Auth-Key': apiKey
         },
-        body: JSON.stringify({
-          email: createCredential.user.email,
-          firstName,
-          lastName,
-          permitted: false
-        })
+        body: JSON.stringify(userData)
       });
 
       if (!response.ok) {
