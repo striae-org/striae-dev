@@ -6,79 +6,79 @@ interface CanvasProps {
   error?: string;
 }
 
+type ImageLoadError = {
+  type: 'load' | 'network' | 'invalid';
+  message: string;
+}
+
 export const Canvas = ({ imageUrl, error }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [loadError, setLoadError] = useState<string>();
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
 
-  // Handle image loading states
   useEffect(() => {
-  if (!imageUrl) return;
-  
-  console.log('Canvas loading image URL:', imageUrl);
-  setIsLoading(true);
-  setLoadError(undefined);
+    if (!imageUrl) {
+      setLoadError(undefined);
+      setIsLoading(false);
+      return;
+    }
+    
+    setIsLoading(true);
+    setLoadError(undefined);
 
-  const img = new Image();
-  img.onload = () => {
-    console.log('Image loaded successfully');
-    setIsLoading(false);
-  };
-  
-  img.onerror = (e) => {
-    console.error('Image load error:', e);
-    setLoadError('Failed to load image');
-    setIsLoading(false);
-  };
-
-  img.src = imageUrl;
-  
-  return () => {
-    img.onload = null;
-    img.onerror = null;
-  };
-}, [imageUrl]);
-
-  // Handle window resizing
-  useEffect(() => {
-    const handleResize = () => {
-      const container = document.querySelector(`.${styles.canvasContainer}`);
-      if (!container) return;
-
-      // Calculate available space (80% height for image, 20% for annotations)
-      const availableHeight = container.clientHeight * 0.8;
-      
-      setDimensions({
-        width: container.clientWidth,
-        height: availableHeight
+    const img = new Image();
+    
+    img.onload = () => {
+      setIsLoading(false);
+      setLoadError(undefined);
+    };
+    
+    img.onerror = (e) => {
+      setLoadError({
+        type: 'load',
+        message: `Failed to load image: ${e instanceof Error ? e.message : 'Unknown error'}`
       });
+      setIsLoading(false);
     };
 
-    window.addEventListener('resize', handleResize);
-    // Initial calculation
-    handleResize();
+    try {
+      img.src = imageUrl;
+    } catch (e) {
+      setLoadError({
+        type: 'invalid',
+        message: 'Invalid image URL provided'
+      });
+      setIsLoading(false);
+    }
+    
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+      setLoadError(undefined);
+      setIsLoading(false);
+    };
+  }, [imageUrl]);
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
+  const getErrorMessage = () => {
+    if (error) return error;
+    if (loadError) return loadError.message;
+    return 'An error occurred';
+  };
 
   return (
-    <div 
-      className={styles.canvasContainer}
-      style={{
-        '--canvas-width': `${dimensions.width}px`,
-        '--canvas-height': `${dimensions.height}px`
-      } as React.CSSProperties}
-    >
-      {loadError || error ? (
-        <p className={styles.error}>{loadError || error}</p>
+    <div className={styles.canvasContainer}>
+      {(loadError || error) ? (
+        <p className={styles.error}>{getErrorMessage()}</p>
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
-      ) : imageUrl ? (
+      ) : imageUrl && imageUrl !== '/clear.jpg' ? (
         <img 
           src={imageUrl}
           alt="Case evidence"
           className={styles.image}
+          onError={() => setLoadError({
+            type: 'network',
+            message: 'Failed to load image from network'
+          })}
         />
       ) : (
         <p className={styles.placeholder}>

@@ -18,6 +18,7 @@ import {
 interface CaseSidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
+  onCaseChange: (caseNumber: string) => void;
 }
 
 interface FileData {
@@ -28,7 +29,7 @@ interface FileData {
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
-export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
+export const CaseSidebar = ({ user, onImageSelect, onCaseChange }: CaseSidebarProps) => {
   // Case management states
     const [caseNumber, setCaseNumber] = useState<string>('');
     const [currentCase, setCurrentCase] = useState<string>('');
@@ -93,6 +94,7 @@ export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
       
       if (existingCase) {
         setCurrentCase(caseNumber);
+        onCaseChange(caseNumber);
         const files = await fetchFiles(user, caseNumber);
         setFiles(files);
         setCaseNumber('');
@@ -103,6 +105,7 @@ export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
 
       const newCase = await createNewCase(user, caseNumber);
       setCurrentCase(newCase.caseNumber);
+      onCaseChange(newCase.caseNumber);
       setFiles([]); // New case starts with empty files
       setCaseNumber('');
       setSuccessAction('created');
@@ -176,6 +179,7 @@ export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
   try {
     await renameCase(user, currentCase, newCaseName);
     setCurrentCase(newCaseName);
+    onCaseChange(newCaseName);
     setNewCaseName('');
     setSuccessAction('loaded');
     setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
@@ -201,6 +205,7 @@ export const CaseSidebar = ({ user, onImageSelect }: CaseSidebarProps) => {
   try {
     await deleteCase(user, currentCase);
     setCurrentCase('');
+    onCaseChange('');
     setFiles([]);
     setSuccessAction('deleted');
     setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
