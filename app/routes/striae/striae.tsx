@@ -19,6 +19,11 @@ interface FileData {
 export const Striae = ({ user }: StriaePage) => {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [error, setError] = useState<string>();
+  const [isImageHidden, setIsImageHidden] = useState(false);
+
+  const toggleImageVisibility = () => {
+    setIsImageHidden(prev => !prev);
+  };
 
   useEffect(() => {
     // Cleanup function to clear image when component unmounts
@@ -51,9 +56,12 @@ export const Striae = ({ user }: StriaePage) => {
 
   return (
     <div className={styles.appContainer}>
-      <Sidebar user={user} onImageSelect={handleImageSelect} />
+      <Sidebar 
+        user={user} 
+        onImageSelect={handleImageSelect}
+        onToggleImage={toggleImageVisibility} />
       <main className={styles.mainContent}>
-        <Canvas imageUrl={selectedImage} error={error} />
+        <Canvas imageUrl={selectedImage} error={error} isHidden={isImageHidden} />
         <Annotations />
       </main>
     </div>

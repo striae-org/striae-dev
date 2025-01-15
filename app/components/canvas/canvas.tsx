@@ -4,9 +4,10 @@ import styles from './canvas.module.css';
 interface CanvasProps {
   imageUrl?: string;
   error?: string;
+  isHidden?: boolean;
 }
 
-export const Canvas = ({ imageUrl, error }: CanvasProps) => {
+export const Canvas = ({ imageUrl, error, isHidden }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -75,11 +76,13 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl ? (
+        <div className={isHidden ? styles.hidden : ''}>
         <img 
           src={imageUrl}
           alt="Case evidence"
           className={styles.image}
         />
+        </div>
       ) : (
         <p className={styles.placeholder}>
           Upload or select an image to get started
