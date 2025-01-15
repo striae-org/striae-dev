@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { deleteFile } from './image-manage';
@@ -9,18 +10,13 @@ import {
 interface CaseData {
   createdAt: string;
   caseNumber: string;
-  files?: FileData[];  // Optional since we don't store in root data.json
+  files: FileData[];
 }
 
 interface UserData {
-  uid: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  permitted: boolean;
-  cases?: CaseData[];
-  createdAt: string;
+  cases: Omit<CaseData, 'files'>[];
   updatedAt: string;
+  [key: string]: any;
 }
 
 interface FileData {
@@ -158,6 +154,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     };
 
     // Create case file in data worker
+    console.log('Creating case file...');
     const createCaseFile = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
       method: 'PUT',
       headers: {
@@ -172,7 +169,8 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     }
 
     // Get current user data from KV
-    const getUserData = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    console.log('Getting user data...');
+    const getUserResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -180,29 +178,37 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       }
     });
 
-    let userData = await getUserData.json() as UserData;
+    if (!getUserResponse.ok) {
+      throw new Error('Failed to get user data');
+    }
+
+    const userData = await getUserResponse.json() as UserData;
+    console.log('Current user data:', userData);
+
+    // Initialize cases array if it doesn't exist
+    const existingCases = userData.cases || [];
     
-    // Ensure userData has required fields
-    userData = {
+    // Prepare updated user data with proper typing
+    const updatedUserData: UserData = {
       ...userData,
-      cases: Array.isArray(userData.cases) ? userData.cases : [],
+      cases: [...existingCases, rootCaseData],
       updatedAt: new Date().toISOString()
     };
 
-    // Add new case
-    userData.cases!.push(rootCaseData);
-    
-    // Update user data in KV store
-    const updateUserData = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+     // Update KV store directly without OPTIONS
+    console.log('Updating KV store...');
+    const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': userApiKey
+        'X-Custom-Auth-Key': userApiKey,
+        'Accept': 'application/json'
       },
-      body: JSON.stringify(userData)
+      body: JSON.stringify(updatedUserData)
     });
 
-    if (!updateUserData.ok) {
+    console.log('Update response:', updateResponse.status);
+    if (!updateResponse.ok) {
       throw new Error('Failed to update user data');
     }
 
