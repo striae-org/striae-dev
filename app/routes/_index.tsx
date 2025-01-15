@@ -1,6 +1,6 @@
-import { Login, meta, loader } from './auth/login'
+import { Login, meta } from './auth/login'
 
-export { meta, loader }
+export { meta }
 
 export default function App() {
     return (
