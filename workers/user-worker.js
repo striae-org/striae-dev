@@ -40,7 +40,7 @@ async function handleAddUser(request, env, userUid) {
     
     let userData;
     if (value !== null) {
-      // Update existing user
+      // Update existing user, preserving cases
       const existing = JSON.parse(value);
       userData = {
         ...existing,
@@ -95,34 +95,118 @@ async function handleDeleteUser(env, userUid) {
   }
 }
 
+async function handleAddCases(request, env, userUid) {
+  try {
+    const { cases = [] } = await request.json();
+    
+    // Get current user data
+    const value = await env.USER_DB.get(userUid);
+    if (!value) {
+      return new Response('User not found', { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    // Update cases
+    const userData = JSON.parse(value);
+    const existingCases = userData.cases || [];
+    
+    // Filter out duplicates
+    const newCases = cases.filter(newCase => 
+      !existingCases.some(existingCase => 
+        existingCase.caseNumber === newCase.caseNumber
+      )
+    );
+
+    // Update user data
+    userData.cases = [...existingCases, ...newCases];
+    userData.updatedAt = new Date().toISOString();
+
+    // Save to KV
+    await env.USER_DB.put(userUid, JSON.stringify(userData));
+
+    return new Response(JSON.stringify(userData), {
+      status: 200,
+      headers: corsHeaders
+    });
+  } catch (error) {
+    return new Response('Failed to add cases', { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
+
+async function handleDeleteCases(request, env, userUid) {
+  try {
+    const { casesToDelete } = await request.json();
+    
+    // Get current user data
+    const value = await env.USER_DB.get(userUid);
+    if (!value) {
+      return new Response('User not found', { 
+        status: 404, 
+        headers: corsHeaders 
+      });
+    }
+
+    // Update user data
+    const userData = JSON.parse(value);
+    userData.cases = userData.cases.filter(c => 
+      !casesToDelete.includes(c.caseNumber)
+    );
+    userData.updatedAt = new Date().toISOString();
+
+    // Save to KV
+    await env.USER_DB.put(userUid, JSON.stringify(userData));
+
+    return new Response(JSON.stringify(userData), {
+      status: 200,
+      headers: corsHeaders
+    });
+  } catch (error) {
+    return new Response('Failed to delete cases', { 
+      status: 500, 
+      headers: corsHeaders 
+    });
+  }
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
-
-    try {
       await authenticate(request, env);
       
       const url = new URL(request.url);
-      const userUid = url.pathname.split('/')[1];
-      
-      if (!userUid) {
-        return new Response('Not Found', { status: 404 });
-      }
+    const parts = url.pathname.split('/');
+    const userUid = parts[1];
+    const isCasesEndpoint = parts[2] === 'cases';
+    
+    if (!userUid) {
+      return new Response('Not Found', { status: 404 });
+    }
 
+    if (isCasesEndpoint) {
       switch (request.method) {
-        case 'GET': return handleGetUser(env, userUid);
-        case 'PUT': return handleAddUser(request, env, userUid);
-        case 'DELETE': return handleDeleteUser(env, userUid);
-        default: return new Response('Method not allowed', { 
-          status: 405, 
-          headers: corsHeaders 
+        case 'PUT': return handleAddCases(request, env, userUid);
+        case 'DELETE': return handleDeleteCases(request, env, userUid);
+        default: return new Response('Method not allowed', {
+          status: 405,
+          headers: corsHeaders
         });
       }
-    } catch (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: error.message === 'Unauthorized' ? 401 : 500,
+    }
+
+    // Handle user operations
+    switch (request.method) {
+      case 'GET': return handleGetUser(env, userUid);
+      case 'PUT': return handleAddUser(request, env, userUid);
+      case 'DELETE': return handleDeleteUser(env, userUid);
+      default: return new Response('Method not allowed', {
+        status: 405,
         headers: corsHeaders
       });
     }
