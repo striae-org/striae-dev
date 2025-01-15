@@ -1,6 +1,6 @@
-import { User } from 'firebase/auth';
-import paths from '~/config/config.json';
+'use server'
 
+import paths from '~/config/config.json';
 
 interface UserData {
   uid: string;
@@ -12,20 +12,25 @@ interface UserData {
 }
 
 interface AddUserParams {
-  user: User;
+  userUid: string;
+  email: string | null;
   firstName?: string;
   lastName?: string;
-  permitted?: boolean;  
-  createdAt?: string;  
+  permitted?: boolean;
+  createdAt?: string;
 }
 
 const WORKER_URL = paths.data_worker_url;
 const KEYS_URL = paths.keys_url;
 
-export const addUserData = async ({ user, firstName = '', lastName = '', permitted = false }: AddUserParams) => {  
-
+export async function addUserDataAction({
+  userUid,
+  email,
+  firstName = '',
+  lastName = '',
+  permitted = false
+}: AddUserParams): Promise<UserData> {
   try {
-    // Get API key from keys worker
     const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
     if (!keyResponse.ok) {
       throw new Error('Failed to retrieve API key');
@@ -33,7 +38,7 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
     const apiKey = await keyResponse.text();
 
     // Check if user exists
-    const checkResponse = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    const checkResponse = await fetch(`${WORKER_URL}/${userUid}/data.json`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -42,33 +47,23 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
     });
 
     if (checkResponse.ok) {
-      const existingData = await checkResponse.json();
-      // Type guard to verify the shape of existingData
-      const isUserData = (data: unknown): data is UserData => {
-        return (
-          typeof data === 'object' &&
-          data !== null &&
-          'uid' in data &&
-          typeof data.uid === 'string'
-        );
-      };
-
-      if (isUserData(existingData) && existingData.uid === user.uid) {
-        return existingData;
+      const existingData = await checkResponse.json() as Partial<UserData>;
+      if (existingData?.uid === userUid) {
+        return existingData as UserData;
       }
     }
 
-    // Create new user if not exists
-    const userData = {
-      uid: user.uid,
-      email: user.email,
+    // Create new user
+    const userData: UserData = {
+      uid: userUid,
+      email,
       firstName,
       lastName,
       permitted,
       createdAt: new Date().toISOString()
     };
 
-    const createResponse = await fetch(`${WORKER_URL}/${user.uid}/data.json`, {
+    const createResponse = await fetch(`${WORKER_URL}/${userUid}/data.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -82,9 +77,8 @@ export const addUserData = async ({ user, firstName = '', lastName = '', permitt
     }
 
     return userData;
-    
   } catch (error) {
-    console.error('Error in addUserData:', error);
+    console.error('Error in addUserDataAction:', error);
     throw error;
   }
-};
+}

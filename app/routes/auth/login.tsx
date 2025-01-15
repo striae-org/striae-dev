@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
-import { addUserData } from '~/components/actions/addUserData';
+import { addUserDataAction } from '~/server/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
@@ -126,10 +126,11 @@ export const Login = () => {
     }
     
     if (additionalInfo.isNewUser) {
-      await addUserData({
-        user: result.user,
+      await addUserDataAction({
+        userUid: result.user.uid,
+        email: result.user.email,
         firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || ''        
+        lastName: additionalInfo.profile?.family_name || ''       
       });
     }
 
@@ -158,8 +159,9 @@ export const Login = () => {
             displayName: `${firstName} ${lastName}`
           });
 
-          await addUserData({
-            user: emailLinkUser,
+          await addUserDataAction({
+            userUid: emailLinkUser.uid,
+            email: emailLinkUser.email,
             firstName,
             lastName            
           });
@@ -269,8 +271,11 @@ export const Login = () => {
               setNeedsProfile(true);
             } else {
             // Add user data to R2
-            await addUserData({
-              user: result.user              
+            await addUserDataAction({
+              userUid: result.user.uid,
+              email: result.user.email,
+              firstName: additionalInfo.profile?.given_name || '',
+              lastName: additionalInfo.profile?.family_name || ''                          
             });
             setUser(result.user);
           }
@@ -357,8 +362,9 @@ export const Login = () => {
         });
 
         // Add user data to R2
-      await addUserData({
-        user: createCredential.user,
+      await addUserDataAction({
+        userUid: createCredential.user.uid,
+        email: createCredential.user.email,
         firstName,
         lastName        
       });
