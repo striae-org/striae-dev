@@ -22,32 +22,43 @@ export const Striae = ({ user }: StriaePage) => {
 
   useEffect(() => {
     // Cleanup function to clear image when component unmounts
-    return () => {
+    // or when no file is selected
+    const clearImage = () => {
       setSelectedImage(undefined);
       setError(undefined);
     };
+
+    // Call clearImage for cleanup
+    return clearImage;
   }, []); // Empty dependency array means this runs only on mount/unmount
 
 
   const handleImageSelect = async (file: FileData) => {
-  if (!file?.id) {
-    setError('Invalid file selected');
-    return;
-  }
+    // If no file is provided, clear the image
+    if (!file) {
+      setSelectedImage(undefined);
+      setError(undefined);
+      return;
+    }
 
-  try {
-    setError(undefined);
-    setSelectedImage(undefined);
-    
-    const signedUrl = await getImageUrl(file);
-    if (!signedUrl) throw new Error('No URL returned');
-    setSelectedImage(signedUrl);
-  } catch (err) {
-    setError('Failed to load image. Please try again.');
-    console.error('Image selection error:', err);
-    setSelectedImage(undefined);
-  }
-};
+    if (!file?.id) {
+      setError('Invalid file selected');
+      return;
+    }
+
+    try {
+      setError(undefined);
+      setSelectedImage(undefined);
+      
+      const signedUrl = await getImageUrl(file);
+      if (!signedUrl) throw new Error('No URL returned');
+      setSelectedImage(signedUrl);
+    } catch (err) {
+      setError('Failed to load image. Please try again.');
+      console.error('Image selection error:', err);
+      setSelectedImage(undefined);
+    }
+  };
 
   return (
     <div className={styles.appContainer}>
