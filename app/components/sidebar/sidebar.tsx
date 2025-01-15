@@ -13,12 +13,16 @@ interface FileData {
 
 interface SidebarProps {
   user: User;
-  onImageSelect: (file: FileData) => void;
-  onToggleImage: () => void;
+  onImageSelect: (file: FileData) => void;  
 }
 
-export const Sidebar = ({ user, onImageSelect, onToggleImage }: SidebarProps) => {
+export const Sidebar = ({ user, onImageSelect }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+
+  const handleHideImage = () => {
+    setIsHidden(true);  // One-way toggle
+  };
 
   return (
     <div className={styles.sidebar}>
@@ -36,8 +40,9 @@ export const Sidebar = ({ user, onImageSelect, onToggleImage }: SidebarProps) =>
           <SignOut />
         </div>
         <button 
-            onClick={onToggleImage}
+            onClick={handleHideImage}
             className={styles.toggleButton}
+            disabled={isHidden}
           >
             Clear Canvas
           </button>

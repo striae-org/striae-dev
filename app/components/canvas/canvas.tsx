@@ -3,15 +3,22 @@ import styles from './canvas.module.css';
 
 interface CanvasProps {
   imageUrl?: string;
-  error?: string;
-  isHidden?: boolean;
+  error?: string;  
 }
 
-export const Canvas = ({ imageUrl, error, isHidden }: CanvasProps) => {
+export const Canvas = ({ imageUrl, error }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isHidden, setIsHidden] = useState(false);
 
+  // Reset visibility when new image loads
+  useEffect(() => {
+    if (imageUrl) {
+      setIsHidden(false);
+    }
+  }, [imageUrl]);
+  
   // Handle image loading states
   useEffect(() => {
   if (!imageUrl) return;
