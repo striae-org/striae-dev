@@ -11,7 +11,7 @@
   overflow: hidden;
 }
 
-.placeholder {
+.placeholder, .loading {
   color: #e0e0e0;
   font-size: 1.1rem;
   text-align: center;
