@@ -3,6 +3,14 @@ import styles from './home.module.css';
 import { useState } from 'react';
 import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
+import { baseMeta } from '~/utils/meta';
+
+export const meta = () => {
+  return baseMeta({
+    title: "Welcome to Striae",
+    description: "A Firearms Examiner's Comparison Companion",
+  });
+};
 
 export default function Home() {
   const [isNoticeOpen, setNoticeOpen] = useState(false);
