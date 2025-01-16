@@ -1,36 +1,35 @@
 .mobileWarning {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 9999;
-  padding: 2rem;
+  inset: 0;
+  background: color-mix(in lab, var(--background) 90%, transparent);
+  z-index: var(--zIndex5);
+  padding: var(--spaceL);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .content {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
+  background: var(--backgroundLight);
+  padding: var(--spaceL);
+  border-radius: var(--spaceXS);
   text-align: center;
   max-width: 90%;
   margin: 20vh auto 0;
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .content h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #333;
+  font-size: var(--fontSizeH4);
+  margin-bottom: var(--spaceM);
+  color: var(--textTitle);
 }
 
 .content p {
-  color: #666;
-  line-height: 1.6;
+  color: var(--textBody);
+  line-height: var(--lineHeightBody);
 }
 
-@media (max-width: 768px) {
+@media (--mediaMobile) {
   .mobileWarning {
     display: block;
   }
