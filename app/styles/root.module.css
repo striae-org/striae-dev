@@ -1,0 +1,79 @@
+@layer layout {
+
+  .container {
+    width: 100%;
+    position: relative;
+    transition: opacity 0.8s var(--bezierFastoutSlowin);    
+
+    &[data-loading='true'] {
+      opacity: 0;
+    }
+  }
+
+  .skip {
+    isolation: isolate;
+    color: var(--background);
+    z-index: var(--zIndex4);
+
+    &:focus {
+      padding: var(--spaceS) var(--spaceM);
+      position: fixed;
+      top: var(--spaceM);
+      left: var(--spaceM);
+      text-decoration: none;
+      font-weight: var(--fontWeightMedium);
+      line-height: 1;
+      box-shadow: 0 0 0 4px var(--background), 0 0 0 8px var(--text);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: var(--primary);
+      clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 8px),
+        calc(100% - 8px) 100%,
+        0 100%
+      );
+      z-index: -1;
+    }
+  }
+
+  .errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.errorTitle {
+  font-size: 8rem;
+  color: #333;
+  margin: 0;
+}
+
+.errorMessage {
+  font-size: 1.5rem;
+  color: #666;
+  margin: 1rem 0 2rem;
+}
+
+.errorLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.errorLink:hover {
+  color: #2563eb;
+}
+
+}

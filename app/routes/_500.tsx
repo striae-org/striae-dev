@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 import { baseMeta } from '~/utils/meta';
-import styles from '~/styles/error.module.css';
+import styles from '~/styles/root.module.css';
 
 export const meta = () => {
   return baseMeta({

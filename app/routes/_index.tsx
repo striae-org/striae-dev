@@ -1,9 +1,7 @@
-import { Login, meta } from './auth/login'
-
-export { meta }
+import Home from './home/home';
 
 export default function App() {
     return (
-        <Login />
+        <Home />
     );
 }
