@@ -22,7 +22,7 @@ export const Policy = () => {
         <section>
           <h2>Reporting Security Issues</h2>
           <p>We take the security of Striae seriously. If you believe you have found a security vulnerability, please report it to us responsibly.</p>
-          <p>Please email security findings to: <a href="mailto:info@allyforensics.com">info@allyforensics.com</a></p>
+          <p>Please email security findings to: <Link to="mailto:info@allyforensics.com">info@allyforensics.com</Link></p>
         </section>
 
         <section>

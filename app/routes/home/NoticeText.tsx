@@ -1,3 +1,5 @@
+import { Link } from '@remix-run/react';
+
 const NoticeText = () => {
   return (
     <div>
@@ -22,7 +24,7 @@ const NoticeText = () => {
       </ul>
       <p><strong>Security Features of Striae:</strong></p>
       <p>
-        Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. Striae is designed with security as a top priority, and we plan to apply for <a href="https://cloudsecurityalliance.org/star" target="_blank" rel="noopener noreferrer">CSA STAR certification</a> to ensure that our security practices meet the highest industry standards.
+        Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. Striae is designed with security as a top priority, and we plan to apply for <Link to="https://cloudsecurityalliance.org/star" target="_blank" rel="noopener noreferrer">CSA STAR certification</Link> to ensure that our security practices meet the highest industry standards.
         <p>
             In preparation for compliance, we have implemented the following security features in Striae:
         </p>
@@ -47,7 +49,7 @@ const NoticeText = () => {
             <strong>Control Over Your Data:</strong> Sharing data with other Striae users is entirely optional (to be developed in future releases). Deleting your account ensures all associated data is permanently removed from our systems.
         </li>        
       </ul>
-      <p>If you have any questions or concerns regarding our security protocols, please refer to the <a href="/terms#storage">Data Storage Addendum</a> in the Terms & Conditions, or contact us at <a href="mailto:info@allyforensics.com" target="_blank" rel="noopener noreferrer">info@allyforensics.com</a>.</p>
+      <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@allyforensics.com" target="_blank" rel="noopener noreferrer">info@allyforensics.com</Link>.</p>
       <p>
         Striae is currently in active development, and we are conducting alpha testing to refine its functionality and ensure it meets the needs of Forensic Firearms Examiners. Beta testing is expected to launch near the end of Q1 or early Q2 2025.
       </p>
