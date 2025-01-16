@@ -45,8 +45,8 @@
   }
 
   ::selection {
-    background: var(--accent);
-    color: var(--black);
+    background: var(--primary);
+    color: var(--white);
   }
 
   :focus {
