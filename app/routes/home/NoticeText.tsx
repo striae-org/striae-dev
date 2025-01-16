@@ -51,7 +51,7 @@ const NoticeText = () => {
       </ul>
       <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@allyforensics.com" target="_blank" rel="noopener noreferrer">info@allyforensics.com</Link>.</p>
       <p>
-        Striae is currently in active development, and we are conducting alpha testing to refine its functionality and ensure it meets the needs of Forensic Firearms Examiners. Beta testing is expected to launch near the end of Q1 or early Q2 2025.
+        Striae is currently in active development, and we are conducting alpha testing to refine its functionality and ensure it meets the needs of forensic firearms examiners. Beta testing is expected to launch near the end of Q1 or early Q2 2025.
       </p>
       <p>
         If you’re interested in participating in the beta testing phase or want to stay updated on Striae’s progress, please let us know. Your feedback will be invaluable as we continue to develop and perfect this tool.
