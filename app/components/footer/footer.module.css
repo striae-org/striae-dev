@@ -25,6 +25,7 @@
 .link {
   color: var(--textLight);
   text-decoration: none;
+  text-align: center;
   font-size: var(--fontSizeBodyXS);
   transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
