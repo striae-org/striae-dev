@@ -248,7 +248,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         <p><strong>256-bit Encryption</strong> refers to the length of the encryption key. The longer the key, the more secure the encryption, as it increases the complexity of potential decryption attempts exponentially.</p>
       </li>
       <li>
-        <p><strong>Used by the U.S. Government:</strong> AES-256 has been adopted as the encryption standard by the U.S. government for securing classified information. Specifically, it is approved by the National Institute of Standards and Technology (NIST) and used to protect sensitive Data.</p>
+        <p><strong>Used by the U.S. Government:</strong> AES-256 has been adopted as the encryption standard by the U.S. government for securing classified information. Specifically, it is approved by the National Institute of Standards and Technology (NIST) and used to protect sensitive information.</p>
       </li>
     </ul>
     </li>
