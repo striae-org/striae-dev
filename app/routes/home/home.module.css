@@ -15,7 +15,7 @@
   gap: var(--spaceXL);
   padding: var(--spaceM);
   text-align: center;
-  max-width: var(--maxWidthM);
+  max-width: var(--maxWidthL);
   margin: 0 var(--spaceOuter);
 }
 
@@ -36,8 +36,8 @@
 .title {
   font-size: var(--fontSizeH2);
   font-weight: var(--fontWeightMedium);
-  color: var(--textTitle);
-  max-width: 600px;
+  color: var(--background);
+  max-width: 1000px;
   line-height: var(--lineHeightTitle);
 }
 
