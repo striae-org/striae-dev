@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 /* Media Query Definitions */
-@custom-media --mediaDesktop (max-width: 2080px);
-@custom-media --mediaLaptop (max-width: 1680px);
-@custom-media --mediaTablet (max-width: 1040px);
-@custom-media --mediaMobile (max-width: 696px);
-@custom-media --mediaMobileLS (max-height: 696px);
-@custom-media --mediaMobileS (max-width: 400px);
+@custom-media --mediaDesktop (max-width: 2560px);  /* 4K/2K displays */
+@custom-media --mediaLaptop (max-width: 1920px);   /* Standard desktop */
+@custom-media --mediaTablet (max-width: 1024px);   /* iPad Pro/tablets */
+@custom-media --mediaMobile (max-width: 768px);    /* Mobile landscape */
+@custom-media --mediaMobileLS (max-height: 768px); /* Mobile landscape height */
+@custom-media --mediaMobileS (max-width: 480px);   /* Mobile portrait */
 @custom-media --mediaUseMotion (prefers-reduced-motion: no-preference);
 @custom-media --mediaReduceMotion (prefers-reduced-motion: reduce);
 @custom-media --mediaTouch (pointer: coarse);
