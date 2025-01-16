@@ -1,10 +1,12 @@
 import { Link } from '@remix-run/react';
 import styles from './footer.module.css';
+import { ThemeProvider } from '~/components/theme-provider/theme-provider';
 
 export default function Footer() {
   const year = new Date().getFullYear();
   
   return (
+    <ThemeProvider>
     <footer className={styles.footer}>
       <div className={styles.container}>
         <nav className={styles.nav}>
@@ -26,5 +28,6 @@ export default function Footer() {
         </p>
       </div>
     </footer>
+    </ThemeProvider>
   );
 }

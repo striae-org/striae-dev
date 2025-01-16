@@ -5,10 +5,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #444444;
-  padding: 1rem;
+  background-color: var(--backgroundLight);
+  padding: var(--spaceM);
   position: relative;
   overflow: hidden;
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .image {
@@ -18,15 +19,15 @@
 }
 
 .placeholder, .loading {
-  color: #e0e0e0;
-  font-size: 1.1rem;
+  color: var(--textLight);
+  font-size: var(--fontSizeBodyM);
   text-align: center;
 }
 
 .error {
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
-  padding: 1rem;
-  border-radius: 4px;
+  color: var(--error);
+  background-color: color-mix(in lab, var(--error) 10%, transparent);
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
   text-align: center;
 }

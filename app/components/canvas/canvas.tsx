@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './canvas.module.css';
+import { ThemeProvider } from '~/components/theme-provider/theme-provider';
 
 interface CanvasProps {
   imageUrl?: string;
@@ -65,6 +66,7 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
   };
 
   return (
+    <ThemeProvider>
     <div className={styles.canvasContainer}>
       {(loadError || error) ? (
         <p className={styles.error}>{getErrorMessage()}</p>
@@ -86,5 +88,6 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
         </p>
       )}
     </div>
+    </ThemeProvider>
   );
 };
