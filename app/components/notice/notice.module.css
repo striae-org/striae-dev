@@ -7,18 +7,20 @@
   align-items: center;
   z-index: var(--zIndex5);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+  animation: fadeIn var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modal {
-  background: var(--backgroundLight);
+  background: color-mix(in lab, var(--backgroundLight) 95%, transparent);
   padding: var(--space2XL);
   border-radius: var(--spaceXS);
-  max-width: var(--maxWidthS);
+  max-width: var(--maxWidthL);
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
+  animation: slideIn var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .closeButton {
@@ -31,6 +33,7 @@
   cursor: pointer;
   color: var(--textLight);
   transition: color var(--durationS) var(--bezierFastoutSlowin);
+  padding: var(--spaceXS);
 }
 
 .closeButton:hover {
@@ -42,52 +45,85 @@
 }
 
 .content h1 {
-  font-size: var(--fontSizeH4);
-  margin-bottom: var(--spaceL);
+  text-align: center;
   color: var(--textTitle);
+  margin-bottom: var(--spaceXL);
+  font-size: var(--fontSizeH3);
 }
 
 .content h2 {
-  font-size: var(--fontSizeH5);
-  margin-bottom: var(--spaceL);
+  text-align: left;
   color: var(--textTitle);
+  margin-bottom: var(--spaceXL);
+  font-size: var(--fontSizeH4);
 }
 
 .content p {
-  margin: var(--spaceS) 0;
   color: var(--textBody);
   line-height: var(--lineHeightBody);
-}
-
-.content a {
-  color: var(--linkColor);
-  transition: color var(--durationS) var(--bezierFastoutSlowin);
+  font-size: var(--fontSizeBodyS);
+  margin: var(--spaceM) 0;
 }
 
 .content ul {
-  margin: var(--spaceL) 0;
-  padding-left: var(--spaceXL);
   list-style-type: disc;
+  padding-left: var(--spaceXL);
+  margin: var(--spaceM) 0;
 }
 
 .content li {
-  margin: var(--spaceS) 0;
   color: var(--textBody);
+  line-height: var(--lineHeightBody);
+  font-size: var(--fontSizeBodyS);
+  margin: var(--spaceS) 0;
+  padding-left: var(--spaceS);
+}
+
+.content li strong {
+  color: var(--textTitle);
+  font-weight: var(--fontWeightMedium);
 }
 
 .confirmButton {
-  width: 100%;
+  display: block;
+  width: 75%;
   padding: var(--spaceM) var(--spaceL);
-  background: var(--primary);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  cursor: pointer;
+  background-color: var(--primary);
   color: var(--white);
   border: none;
-  border-radius: var(--spaceXS);
-  cursor: pointer;
-  margin-top: var(--spaceL);
-  font-size: var(--fontSizeBodyM);
-  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  margin: var(--spaceL) auto 0;
 }
 
 .confirmButton:hover {
-  background: color-mix(in lab, var(--primary) 85%, var(--black));
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--spaceM)));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    padding: var(--spaceL);
+  }
 }

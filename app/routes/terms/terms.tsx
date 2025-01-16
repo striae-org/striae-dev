@@ -11,7 +11,7 @@ export const meta = () => {
 };
 
 export const Terms = () => {
-  return (
+  return (    
     <div className={styles.container}>
       <Link to="/" className={styles.logoLink}>
   <div className={styles.logo} />
@@ -74,20 +74,20 @@ export const Terms = () => {
 <p>These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.</p>
 <p>Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions. These Terms and Conditions apply to all visitors, users and others who access or use the Service.</p>
 <p>By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.</p>
-<p>You represent that you are over the age of 18. The Company does not permit those under 18 to use the Service.</p>
+<p>You represent that You are over the age of 18. The Company does not permit those under 18 to use the Service.</p>
 <p>Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company. Our Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your personal information when You use the Application or the Website and tells You about Your privacy rights and how the law protects You. Please read Our Privacy Policy carefully before using Our Service.</p>
         </section>
         <section className={styles.section}>
           <h2>Subscriptions</h2>
 <h3>Subscription period</h3>
-<p>The Service or some parts of the Service are available only with a paid Subscription. You will be billed in advance on a recurring and periodic basis (such as daily, weekly, monthly or annually), depending on the type of Subscription plan you select when purchasing the Subscription.</p>
+<p>The Service or some parts of the Service are available only with a paid Subscription. You will be billed in advance on a recurring and periodic basis (such as daily, weekly, monthly or annually), depending on the type of Subscription plan You select when purchasing the Subscription.</p>
 <p>At the end of each period, Your Subscription will automatically renew under the exact same conditions unless You cancel it or the Company cancels it.</p>
 <h3>Subscription cancellations</h3>
 <p>You may cancel Your Subscription renewal either through Your Account settings page or by contacting the Company.
 You will not receive a refund for the fees You already paid for Your current Subscription period and You will be able to access the Service until the end of Your current Subscription period.</p>
 <h3>Billing</h3>
 <p>You shall provide the Company with accurate and complete billing information including full name, address, state, zip code, telephone number, and a valid payment method information.</p>
-<p>Should automatic billing fail to occur for any reason, the Company will issue an electronic invoice indicating that you must proceed manually, within a certain deadline date, with the full payment corresponding to the billing period as indicated on the invoice.</p>
+<p>Should automatic billing fail to occur for any reason, the Company will issue an electronic invoice indicating that You must proceed manually, within a certain deadline date, with the full payment corresponding to the billing period as indicated on the invoice.</p>
 <h3>Fee Changes</h3>
 <p>The Company, in its sole discretion and at any time, may modify the Subscription fees. Any Subscription fee change will become effective at the end of the then-current Subscription period.</p>
 <p>The Company will provide You with reasonable prior notice of any change in Subscription fees to give You an opportunity to terminate Your Subscription before such change becomes effective.</p>
@@ -181,7 +181,7 @@ Upon receipt of a notification, the Company will take whatever action, in its so
         </section>
         <section className={styles.section}>
           <h2>For European Union (EU) Users</h2>
-<p>If You are a European Union consumer, you will benefit from any mandatory provisions of the law of the country in which You are resident.</p>
+<p>If You are a European Union consumer, You will benefit from any mandatory provisions of the law of the country in which You are resident.</p>
 <h2>United States Federal Government End Use Provisions</h2>
 <p>If You are a U.S. federal government end user, our Service is a &quot;Commercial Item&quot; as that term is defined at 48 C.F.R. §2.101.</p>
         </section>
@@ -208,50 +208,98 @@ You agree that the original English text shall prevail in the case of a dispute.
         </section>
         <section id="storage" className={styles.section}>
           <h2>Data Storage Addendum</h2>
-<p>At AllyForensics, we take your privacy and Data security seriously. We understand the sensitive nature of the Data that you may store with us. This Data Storage Addendum outlines how we handle and store your Data within the app.</p>
+<p>At AllyForensics, we take Your privacy and Data security seriously. We understand the sensitive nature of the Data that You may store with Us. This Data Storage Addendum outlines how we handle and store Your Data within the app.</p>
 <ul>
+  <li>
+<p><strong>Authentication and Password Security</strong></p>
+<p>Striae relies on Firebase Authentication, a highly secure and trusted platform, developed by Google, to handle user authentication. Key features of Firebase Authentication include:</p>
+<ul>
+  <li><p><strong>Hashed Authentication Data</strong></p>
+  <p>Firebase secures passwords and authentication details using industry-standard hashing algorithms. This ensures that Your credentials are stored in a secure, unreadable format.</p></li>
+  <li><p><strong>Advanced Threat Detection</strong></p>
+  <p>Firebase employs machine learning models to detect and mitigate suspicious activity, such as brute-force attacks or unauthorized login attempts.</p></li>
+  <li><p><strong>Multi-Factor Authentication (Future)</strong></p>
+  <p>Firebase supports multi-factor authentication (MFA), providing an additional layer of security for Your account.</p></li>  
+</ul>
+</li>
 <li>
 <p><strong>Data Storage: Secure and Private</strong></p>
-<p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize your privacy and make sure your information is kept private and confidential. A few of the measures in place include:</p>
+<p>Your Data is secured in off-site storage, using industry-standard security protocols to ensure it is protected from unauthorized access and physical theft. We prioritize Your privacy and make sure Your information is kept private and confidential. A few of the measures in place include:</p>
 <ul>
-  <li><p><strong>Data Segregation/Isolation</strong></p>
-  <p>We utilize multiple, separate, and distinct systems to store your Data. Data segregation/isolation enhances security by preventing unauthorized access to sensitive information, even if one system is compromised. This practice reduces the risk of data breaches and maintains integrity.</p></li>
-  <li><p><strong>AES-256 Encryption</strong></p>
-  <p>At rest, your Data is securely stored and inaccessible to unauthorized users or applications.</p></li>
+  <li>
+    <p><strong>No Exposed Plain Text</strong></p>
+    <p>User profile information and all Data stored by Striae are encrypted and never stored in exposed plain text. Instead, all sensitive information is stored securely behind secret keys, further isolating Your Data from potential breaches.</p>
+  </li>
+  <li>
+    <p><strong>Data Segregation/Isolation</strong></p>
+    <p>Striae utilizes separate and distinct systems to store Your Data. This segregation enhances security by limiting access points and isolating sensitive information from unrelated systems.</p>
+  </li>
+  <li>
+    <p><strong>AES-256 Encryption</strong></p>
+    <p>Striae uses AES-256 encryption to safeguard Your Data at rest. This encryption standard is one of the most secure methods available, ensuring that even if Data storage is breached, the information remains unreadable and protected.</p>
+  </li>
+  <li>
+    <p><strong>What is AES-256?</strong></p>
+    <ul>
+      <li>
+        <p><strong>Advanced Encryption Standard (AES)</strong> is a symmetric encryption algorithm that has been extensively tested and proven to provide a high level of security.</p>
+      </li>
+      <li>
+        <p><strong>256-bit Encryption</strong> refers to the length of the encryption key. The longer the key, the more secure the encryption, as it increases the complexity of potential decryption attempts exponentially.</p>
+      </li>
+      <li>
+        <p><strong>Used by the U.S. Government:</strong> AES-256 has been adopted as the encryption standard by the U.S. government for securing classified information. Specifically, it is approved by the National Institute of Standards and Technology (NIST) and used to protect sensitive Data.</p>
+      </li>
+    </ul>
+    </li>
+    <li>
+    <p><strong>Why AES-256 is Secure</strong></p>
+    <ul>
+      <li>
+        <p><strong>Key Size:</strong> A 256-bit key length means there are 2^256 possible key combinations, making it virtually impossible to break using current computing capabilities.</p>
+      </li>
+      <li>
+        <p><strong>Resistance to Brute Force:</strong> Even with advanced computational power, it would take billions of years to attempt all possible key combinations.</p>
+      </li>
+      <li>
+        <p><strong>Global Trust:</strong> AES-256 is trusted worldwide by governments, financial institutions, and security-focused organizations for its unparalleled ability to secure Data.</p>
+      </li>
+    </ul>
+    </li>
   <li><p><strong>Transport Layer Security</strong></p>
-  <p>When accessed, your Data is encrypted during transfer, ensuring security in transit.</p></li>
+  <p>All Data transfers are encrypted using TLS, ensuring protection from interception or tampering while in transit.</p></li>
   <li><p><strong>Signed URLs</strong></p>
-  <p>We implement signed URLs to provide a time limit on access to all of your images and Data, generated only when you request them. This helps to prevent unauthorized access to the Data when you are not using it.</p></li>
+  <p>Temporary signed URLs provide secure access to Your images and files. These URLs expire after a set time, ensuring that Your Data cannot be accessed indefinitely or without Your authorization.</p></li>
   <li><p><strong>Logging and Monitoring</strong></p>
-  <p>All access requests and transfers are logged in order to provide detailed records of access. This allows us to monitor and perform security audits, revealing any potential security breach.</p></li>
+  <p>Access requests and Data transfers are logged in detail, allowing Us to audit activities and identify any unauthorized access attempts.</p></li>
   <li><p><strong>Cross-Origin Resource Sharing (CORS) Support</strong></p>
-  <p>Data may only be accessed through our domain and application. Requests from outside of Striae are strictly forbidden.</p></li>
+  <p>To prevent unauthorized access, Striae restricts Data requests to its domain exclusively.</p></li>
   <li><p><strong>Security Policy</strong></p>
-  <p>We maintain an open security policy, where users and researchers may report security vulnerabilities to us safely and responsibly. Please refer to our <a href="/security-policy">Security Policy</a> for more information.</p></li>
+  <p>The open security policy encourages users and researchers to safely and responsibly report vulnerabilities. This collaborative approach ensures the security measures remain robust and up-to-date. Please refer to our <a href="/security-policy">Security Policy</a> for more information.</p></li>
 </ul>
 </li>
 <li>
 <p><strong>Access to Data</strong></p>
-<p>Your Data is strictly accessible only by you, the user, and by AllyForensics as necessary. AllyForensics may access your Data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to your Data.</p>
+<p>Your Data is strictly accessible only by You, the user, and by AllyForensics as necessary. AllyForensics may access Your Data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to Your Data.</p>
 </li>
 <li>
 <p><strong>No Sharing of Sensitive Information</strong></p>
-<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, your Data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of your Data are paramount to us.</p>
+<p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, Your Data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of Your Data are paramount to Us.</p>
 </li>
 <li>
 <p><strong>User Data Sharing</strong></p>
-<p>You have the option to share Data with other Striae users at your discretion. This may include sharing images, specific case information, or other Data relevant to your use of the app. However, you retain full control over what Data is shared and with whom.</p>
+<p>Sharing Data with other Striae users is entirely optional. You have complete discretion over what to share, with whom, and under what circumstances. In addition, existing users will not be displayed. In order to share Data, You'll need to enter their email address and You won't be notified if the recipient is actually a user.</p>
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>
-<p>If you choose to delete your account, all associated Data and information will be permanently and completely removed from Striae. This means that no Data will remain stored in the system once your account is deleted, and you will no longer have access to any of your previous Data.</p>
+<p>If You choose to delete Your account, all associated Data and information will be permanently and completely removed from Striae. Once deleted, Your Data cannot be recovered by You or any third party.</p>
 </li>
 </ul>
-<p>We are committed to ensuring that your Data is stored safely and only used for the purpose of providing you with a seamless and secure experience.</p>
+<p>Striae’s security measures are designed to keep Your Data secure, private, and under Your control. Should You have any questions, concerns, or feedback about these security protocols, We encourage You to reach out to Us. </p>
 </section>
         <section className={styles.section}>
           <h2>Contact Us</h2>
-<p>If you have any questions about these Terms and Conditions, You can contact us:</p>
+<p>If You have any questions about these Terms and Conditions, You can contact Us:</p>
 <ul>
 <li>
 <p>By email: info@allyforensics.com</p>
@@ -261,7 +309,8 @@ You agree that the original English text shall prevail in the case of a dispute.
 </li>
 </ul>
         </section>
-      </div>
+      </div>      
     </div>
+    
   );
 }

@@ -41,7 +41,7 @@ export function Notice({ isOpen, onClose, notice }: NoticeProps) {
           {notice.content}
         </div>
         <button className={styles.confirmButton} onClick={onClose}>
-          {notice.buttonText || 'I Understand'}
+          {notice.buttonText || 'Got it!'}
         </button>
       </div>    
     </div>
