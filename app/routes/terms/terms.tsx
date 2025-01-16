@@ -35,7 +35,7 @@ export const Terms = () => {
 <p><strong>Affiliate</strong> means an entity that controls, is controlled by or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</p>
 </li>
 <li>
-<p><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</p>
+<p><strong>Account</strong> means a unique account created for You to access Our Service or parts of Our Service.</p>
 </li>
 <li>
 <p><strong>Country</strong> refers to: California, United States</p>
@@ -50,7 +50,7 @@ export const Terms = () => {
 <p><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</p>
 </li>
 <li>
-<p><strong>Feedback</strong> means feedback, innovations or suggestions sent by You regarding the attributes, performance or features of our Service.</p>
+<p><strong>Feedback</strong> means feedback, innovations or suggestions sent by You regarding the attributes, performance or features of Our Service.</p>
 </li>
 <li>
 <p><strong>Service</strong> refers to the Application.</p>
@@ -127,10 +127,10 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <h2>Copyright Policy</h2>
 <h3>Intellectual Property Infringement</h3>
 <p>We respect the intellectual property rights of others. It is Our policy to respond to any claim that Data posted on the Service infringes a copyright or other intellectual property infringement of any person.</p>
-<p>If You are a copyright owner, or authorized on behalf of one, and You believe that the copyrighted work has been copied in a way that constitutes copyright infringement that is taking place through the Service, You must submit Your notice in writing to the attention of our copyright agent via email at info@allyforensics.com and include in Your notice a detailed description of the alleged infringement.</p>
+<p>If You are a copyright owner, or authorized on behalf of one, and You believe that the copyrighted work has been copied in a way that constitutes copyright infringement that is taking place through the Service, You must submit Your notice in writing to the attention of Our copyright agent via email at info@allyforensics.com and include in Your notice a detailed description of the alleged infringement.</p>
 <p>You may be held accountable for damages (including costs and attorneys' fees) for misrepresenting that any Data is infringing Your copyright.</p>
 <h3>DMCA Notice and DMCA Procedure for Copyright Infringement Claims</h3>
-<p>You may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by providing our Copyright Agent with the following information in writing (see 17 U.S.C 512(c)(3) for further detail):</p>
+<p>You may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by providing Our Copyright Agent with the following information in writing (see 17 U.S.C 512(c)(3) for further detail):</p>
 <ul>
 <li>An electronic or physical signature of the person authorized to act on behalf of the owner of the copyright's interest.</li>
 <li>A description of the copyrighted work that You claim has been infringed, including the URL (i.e., web page address) of the location where the copyrighted work exists or a copy of the copyrighted work.</li>
@@ -139,7 +139,7 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <li>A statement by You that You have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law.</li>
 <li>A statement by You, made under penalty of perjury, that the above information in Your notice is accurate and that You are the copyright owner or authorized to act on the copyright owner's behalf.</li>
 </ul>
-<p>You can contact our copyright agent via email at info@allyforensics.com.
+<p>You can contact Our copyright agent via email at info@allyforensics.com.
 Upon receipt of a notification, the Company will take whatever action, in its sole discretion, it deems appropriate, including removal of the challenged content from the Service.</p>          
         </section>
 <section className={styles.section}>
@@ -183,7 +183,7 @@ Upon receipt of a notification, the Company will take whatever action, in its so
           <h2>For European Union (EU) Users</h2>
 <p>If You are a European Union consumer, You will benefit from any mandatory provisions of the law of the country in which You are resident.</p>
 <h2>United States Federal Government End Use Provisions</h2>
-<p>If You are a U.S. federal government end user, our Service is a &quot;Commercial Item&quot; as that term is defined at 48 C.F.R. §2.101.</p>
+<p>If You are a U.S. federal government end user, Our Service is a &quot;Commercial Item&quot; as that term is defined at 48 C.F.R. §2.101.</p>
         </section>
         <section className={styles.section}>
           <h2>United States Legal Compliance</h2>
@@ -198,7 +198,7 @@ Upon receipt of a notification, the Company will take whatever action, in its so
         </section>
         <section className={styles.section}>
           <h2>Translation Interpretation</h2>
-<p>These Terms and Conditions may have been translated if We have made them available to You on our Service.
+<p>These Terms and Conditions may have been translated if We have made them available to You on Our Service.
 You agree that the original English text shall prevail in the case of a dispute.</p>
         </section>
         <section className={styles.section}>
@@ -208,7 +208,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         </section>
         <section className={styles.section}>
           <h2 id="storage">Data Storage Addendum</h2>
-<p>At AllyForensics, we take Your privacy and Data security seriously. We understand the sensitive nature of the Data that You may store with Us. This Data Storage Addendum outlines how we handle and store Your Data within the app.</p>
+<p>At AllyForensics, We take Your privacy and Data security seriously. We understand the sensitive nature of the Data that You may store with Us. This Data Storage Addendum outlines how We handle and store Your Data within the app.</p>
 <ul>
   <li>
 <p><strong>Authentication and Password Security</strong></p>
@@ -275,7 +275,7 @@ You agree that the original English text shall prevail in the case of a dispute.
   <li><p><strong>Cross-Origin Resource Sharing (CORS) Support</strong></p>
   <p>To prevent unauthorized access, Striae restricts Data requests to its domain exclusively.</p></li>
   <li><p><strong>Security Policy</strong></p>
-  <p>The open security policy encourages users and researchers to safely and responsibly report vulnerabilities. This collaborative approach ensures the security measures remain robust and up-to-date. Please refer to our <Link to="/security-policy">Security Policy</Link> for more information.</p></li>
+  <p>The open security policy encourages users and researchers to safely and responsibly report vulnerabilities. This collaborative approach ensures the security measures remain robust and up-to-date. Please refer to Our <Link to="/security-policy">Security Policy</Link> for more information.</p></li>
 </ul>
 </li>
 <li>
