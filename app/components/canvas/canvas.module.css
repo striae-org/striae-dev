@@ -5,11 +5,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--backgroundLight);
-  padding: var(--spaceM);
+  background-color: #444444;
+  padding: 1rem;
   position: relative;
   overflow: hidden;
-  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .image {
@@ -19,15 +18,15 @@
 }
 
 .placeholder, .loading {
-  color: var(--textLight);
-  font-size: var(--fontSizeBodyM);
+  color: #e0e0e0;
+  font-size: 1.1rem;
   text-align: center;
 }
 
 .error {
-  color: var(--error);
-  background-color: color-mix(in lab, var(--error) 10%, transparent);
-  padding: var(--spaceM);
-  border-radius: var(--spaceXS);
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 1rem;
+  border-radius: 4px;
   text-align: center;
 }
