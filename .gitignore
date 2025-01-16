@@ -5,7 +5,7 @@ node_modules
 .env
 .dev.vars
 .dns
-/config
+/app/config
 
 .wrangler
 .firebase
