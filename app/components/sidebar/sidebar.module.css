@@ -1,207 +1,141 @@
 /* Layout */
 .sidebar {
-  width: 300px; /* Fixed width instead of percentage */
+  width: 300px;
   min-width: 250px;
   height: 100vh;
-  background-color: #f8f9fa;
-  border-right: 1px solid #dee2e6;
-  padding: 1.5rem;
+  background-color: var(--backgroundLight);
+  border-right: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  padding: var(--spaceXL);
   overflow-y: auto;
-  flex-shrink: 0; /* Prevent sidebar from shrinking */
+  flex-shrink: 0;
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
-/* User Section */
 .userInfo {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #e9ecef;
-  margin-bottom: 2rem;
+  gap: var(--spaceM);
+  padding-bottom: var(--spaceM);
+  border-bottom: 2px solid color-mix(in lab, var(--text) 10%, transparent);
+  margin-bottom: var(--space2XL);
 }
 
 .userTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #212529;
+  font-size: var(--fontSizeBodyL);
+  font-weight: var(--fontWeightMedium);
+  color: var(--textTitle);
   margin: 0;
 }
 
 .userActions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spaceS);
   width: 100%;
 }
 
-.profileButton {
-  padding: 0.5rem 1rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.profileButton:hover {
-  background-color: #5c636a;
-}
-
-/* Case Management */
 .caseSection {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space2XL);
 }
 
 .caseSection h4 {
-  color: #495057;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  color: var(--textBody);
+  margin-bottom: var(--spaceM);
+  font-size: var(--fontSizeBodyM);
 }
 
 .caseInput {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--spaceM);
 }
 
 .caseInput input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1.5px solid #ced4da;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
+  padding: var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .caseInput input:focus {
   outline: none;
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 2px rgba(13,110,253,.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
 }
 
 /* Buttons */
-.caseInput button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #4a90e2;
-  color: white;
+.profileButton,
+.caseInput button,
+.listButton {
+  padding: var(--spaceM);
+  background-color: var(--primary);
+  color: var(--white);
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--spaceXS);
+  font-weight: var(--fontWeightMedium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.caseInput button:hover:not(:disabled) {
-  background-color: #357abd;
-}
-
-.caseInput button:disabled {
-  background-color: #e9ecef;
-  color: #6c757d;
-  cursor: not-allowed;
+.profileButton:hover,
+.caseInput button:hover:not(:disabled),
+.listButton:hover {
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
 }
 
 .caseLoad button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #198754;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+  background-color: var(--accent);
 }
 
 .caseLoad button:hover:not(:disabled) {
-  background-color: #105032;
-}
-
-.caseLoad button:disabled {
-  background-color: #e9ecef;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-.listButton {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.listButton:hover {
-  background-color: #5c636a;
+  background-color: color-mix(in lab, var(--accent) 85%, var(--black));
 }
 
 /* Status Messages */
-.error, .success {
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
 .error {
-  color: #dc3545;
-  background-color: rgba(220,53,69,0.1);
+  color: var(--error);
+  background-color: color-mix(in lab, var(--error) 10%, transparent);
 }
 
 .success {
-  color: #198754;
-  background-color: rgba(25,135,84,0.1);
+  color: var(--accent);
+  background-color: color-mix(in lab, var(--accent) 10%, transparent);
 }
 
 /* Files Section */
-.filesSection {
-  margin-top: 2rem;
-}
-
-.filesSection h4 {  
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-  font-weight: 900;
-  text-align: center;
+.filesSection h4 {
+  font-size: var(--fontSizeBodyL);
+  font-weight: var(--fontWeightBold);
 }
 
 .emptyState {
-  color: #6c757d;
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border: 1px dashed #dee2e6;
-  border-radius: 6px;
-  margin: 1rem 0;
+  color: var(--textLight);
+  font-size: var(--fontSizeBodyS);
+  border: 1px dashed color-mix(in lab, var(--text) 20%, transparent);
 }
 
 .fileItem {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #dee2e6;
-  background: white;
-  transition: background-color 0.2s;
+  padding: var(--spaceS) var(--spaceL);
+  border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  background: var(--backgroundLight);
+  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .fileButton {
   flex: 1;
   text-align: left;
-  padding: 0.5rem;
+  padding: var(--spaceS);
   background: none;
   border: none;
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--textBody);
 }
 
 .fileItem:last-child {
@@ -209,40 +143,35 @@
 }
 
 .fileItem:hover {
-  background-color: #f8f9fa;
-}
-
-.fileItem[role="button"] {
-  cursor: pointer;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
 }
 
 .fileItem[role="button"]:hover {
-  background-color: #e9ecef;
+  background-color: color-mix(in lab, var(--background) 90%, transparent);
 }
 
 .fileItem[role="button"]:active {
-  background-color: #dee2e6;
+  background-color: color-mix(in lab, var(--background) 85%, transparent);
 }
 
-/* Files and Case Management */
 .fileUpload {
-  margin: 1rem 0;
+  margin: var(--spaceL) 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spaceS);
 }
 
 .fileInput {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  padding: var(--spaceS);
+  border: 1px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyXS);
 }
 
 .uploadingText {
-  font-size: 0.875rem;
-  color: #0d6efd;
+  font-size: var(--fontSizeBodyXS);
+  color: var(--primary);
 }
 
 .fileName {
@@ -250,42 +179,43 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--textBody);
 }
 
 .renameCaseSection {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 2px solid #e9ecef;
+  margin-top: var(--space2XL);
+  padding-top: var(--spaceL);
+  border-top: 2px solid color-mix(in lab, var(--text) 10%, transparent);
 }
 
 .renameInput {
   width: 100%;
-  padding: 0.75rem;
-  border: 1.5px solid #ced4da;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
+  padding: var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  margin-bottom: var(--spaceM);
 }
 
 .renameButton {
   width: 100%;
-  padding: 0.75rem;
-  background-color: #ffc107;
-  color: #000;
+  padding: var(--spaceM);
+  background-color: var(--accent);
+  color: var(--white);
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--spaceXS);
+  font-weight: var(--fontWeightMedium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .renameButton:hover:not(:disabled) {
-  background-color: #ffca2c;
+  background-color: color-mix(in lab, var(--accent) 85%, var(--black));
 }
 
 .renameButton:disabled {
-  background-color: #e9ecef;
-  color: #6c757d;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
   cursor: not-allowed;
 }
 
@@ -293,47 +223,48 @@
   margin-left: auto;
   background: none;
   border: none;
-  color: #dc3545;
-  font-size: 1.2rem;
+  color: var(--error);
+  font-size: var(--fontSizeBodyL);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--spaceS);
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   height: 32px;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .deleteButton:hover {
-  color: #bd2130;
-  background-color: rgba(220, 53, 69, 0.1);
-  border-radius: 4px;
+  color: color-mix(in lab, var(--error) 85%, var(--black));
+  background-color: color-mix(in lab, var(--error) 10%, transparent);
+  border-radius: var(--spaceXS);
 }
 
 .deleteCaseSection {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 2px solid #e9ecef;
+  margin-top: var(--space2XL);
+  padding-top: var(--spaceL);
+  border-top: 2px solid color-mix(in lab, var(--text) 10%, transparent);
 }
 
 .deleteWarningButton {
   width: 100%;
-  padding: 0.75rem;
-  background-color: #dc3545;
-  color: white;
+  padding: var(--spaceM);
+  background-color: var(--error);
+  color: var(--white);
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--spaceXS);
+  font-weight: var(--fontWeightMedium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .deleteWarningButton:hover:not(:disabled) {
-  background-color: #bd2130;
+  background-color: color-mix(in lab, var(--error) 85%, var(--black));
 }
 
 .deleteWarningButton:disabled {
-  background-color: #e9ecef;
-  color: #6c757d;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
   cursor: not-allowed;
 }

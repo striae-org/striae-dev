@@ -2,11 +2,11 @@
  * Media query breakpoints
  */
 export const media: { [key: string]: number } = {
-  desktop: 2080,
-  laptop: 1680,
-  tablet: 1040,
-  mobile: 696,
-  mobileS: 400,
+  desktop: 2560,    // 4K/2K displays
+  laptop: 1920,     // FHD displays
+  tablet: 1024,     // iPad Pro/Large tablets
+  mobile: 768,      // Phones landscape/Small tablets
+  mobileS: 480,     // Phones portrait
 };
 
 /**

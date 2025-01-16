@@ -1,141 +1,150 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: color-mix(in lab, var(--background) 50%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--zIndex5);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modal {
-  background: white;
-  border-radius: 8px;
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding-bottom: 1rem; /* Add bottom padding */
+  max-width: var(--maxWidthS);
+  box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
+  padding-bottom: var(--spaceL);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.3rem;
-  font-size: 1.5rem;
-  border-bottom: 1px solid #dee2e6;
+  padding: var(--spaceL);
+  font-size: var(--fontSizeH5);
+  border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  color: var(--textTitle);
 }
 
 .closeButton {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: var(--fontSizeH5);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--spaceS);
+  color: var(--textLight);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.closeButton:hover {
+  color: var(--text);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spaceL);
   width: 100%;
-  max-width: 450px; /* Slightly wider for profile form */
-  padding: 1.5rem;
-  margin: 0 auto; /* Center the form */
+  max-width: var(--maxWidthS);
+  padding: var(--spaceXL);
+  margin: 0 auto;
 }
 
 .formGroup {
-  margin-bottom: 0.3rem;
+  margin-bottom: var(--spaceXS);
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #495057;
+  margin-bottom: var(--spaceS);
+  color: var(--textBody);
 }
 
 .input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1.5px solid #ced4da;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
+  padding: var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  background: var(--backgroundLight);
+  color: var(--textBody);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .input:focus {
   outline: none;
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 2px rgba(13,110,253,.25);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
 }
 
 .buttonGroup {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  gap: var(--spaceS);
+  margin-top: var(--spaceL);
 }
 
 .primaryButton, .secondaryButton {
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  font-weight: var(--fontWeightMedium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .primaryButton {
-  background-color: #4a90e2;
-  color: white;
+  background-color: var(--primary);
+  color: var(--white);
   border: none;
 }
 
 .primaryButton:hover:not(:disabled) {
-  background-color: #357abd;
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
 }
 
 .secondaryButton {
   background-color: transparent;
-  border: 1px solid #0d6efd;
-  color: #0d6efd;
+  border: 1px solid var(--primary);
+  color: var(--primary);
 }
 
 .secondaryButton:hover {
-  background-color: #f8f9fa;
+  background-color: color-mix(in lab, var(--primary) 10%, transparent);
 }
 
 .error, .success {
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-top: 1rem;
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
+  margin-top: var(--spaceL);
 }
 
 .error {
-  background-color: #f8d7da;
-  color: #842029;
-  border: 1px solid #f5c2c7;
+  background-color: color-mix(in lab, var(--error) 10%, transparent);
+  color: var(--error);
+  border: 1px solid color-mix(in lab, var(--error) 25%, transparent);
 }
 
 .success {
-  background-color: #d1e7dd;
-  color: #0f5132;
-  border: 1px solid #badbcc;
+  background-color: color-mix(in lab, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in lab, var(--accent) 25%, transparent);
 }
 
 .deleteNotice {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
+  margin-top: var(--spaceXL);
+  font-size: var(--fontSizeBodyXS);
   text-align: center;
-  color: #6c757d;
+  color: var(--textLight);
 }
 
 .deleteLink {
-  color: #dc3545;
+  color: var(--error);
   text-decoration: underline;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .deleteLink:hover {
-  color: #bb2d3b;
+  color: color-mix(in lab, var(--error) 85%, var(--black));
 }

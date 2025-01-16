@@ -39,7 +39,7 @@
   font-size: var(--fontSizeBodyXS);
 }
 
-@media (--mediaMobile) {
+@media (max-width: 768px) {
   .nav {
     flex-direction: column;
     gap: var(--spaceM);

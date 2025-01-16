@@ -1,81 +1,93 @@
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: color-mix(in lab, var(--background) 50%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--zIndex5);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modal {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 600px;
+  background: var(--backgroundLight);
+  padding: var(--space2XL);
+  border-radius: var(--spaceXS);
+  max-width: var(--maxWidthS);
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .closeButton {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: var(--spaceL);
+  right: var(--spaceL);
   border: none;
   background: none;
-  font-size: 1.5rem;
+  font-size: var(--fontSizeH5);
   cursor: pointer;
-  color: #666;
+  color: var(--textLight);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.closeButton:hover {
+  color: var(--text);
 }
 
 .content {
-  margin: 1rem 0;
+  margin: var(--spaceL) 0;
 }
 
 .content h1 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: var(--fontSizeH4);
+  margin-bottom: var(--spaceL);
+  color: var(--textTitle);
 }
 
 .content h2 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+  font-size: var(--fontSizeH5);
+  margin-bottom: var(--spaceL);
+  color: var(--textTitle);
 }
 
 .content p {
-  margin: 0.5rem 0;
+  margin: var(--spaceS) 0;
+  color: var(--textBody);
+  line-height: var(--lineHeightBody);
 }
 
 .content a {
-  color: #3b82f6;
+  color: var(--linkColor);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .content ul {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
+  margin: var(--spaceL) 0;
+  padding-left: var(--spaceXL);
   list-style-type: disc;
 }
 
 .content li {
-  margin: 0.5rem 0;
+  margin: var(--spaceS) 0;
+  color: var(--textBody);
 }
 
 .confirmButton {
   width: 100%;
-  padding: 0.75rem;
-  background: #3b82f6;
-  color: white;
+  padding: var(--spaceM) var(--spaceL);
+  background: var(--primary);
+  color: var(--white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--spaceXS);
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: var(--spaceL);
+  font-size: var(--fontSizeBodyM);
+  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .confirmButton:hover {
-  background: #2563eb;
+  background: color-mix(in lab, var(--primary) 85%, var(--black));
 }
