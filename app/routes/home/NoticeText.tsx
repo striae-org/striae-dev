@@ -3,7 +3,7 @@ const NoticeText = () => {
     <div>
       <h2>Introducing Striae – A New Tool for Firearms Examiners</h2>
       <p>
-        We are excited to announce Striae, an innovative web app designed to assist firearms examiners in creating detailed annotations for their comparison images. Striae aims to streamline the processes of labeling, note-taking, and printing, making the review process a little bit easier.
+        We are excited to announce Striae, an innovative web app designed to assist firearms examiners in creating detailed annotations for your comparison images. Striae aims to streamline the processes of labeling, note-taking, and printing, making the review process a little bit easier.
       </p>
       <p><strong>Features of Striae:</strong></p>
       <ul>
