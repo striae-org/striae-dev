@@ -15,6 +15,7 @@ interface FileData {
 interface SidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
+  imageId?: string;
   onCaseChange: (caseNumber: string) => void;
   currentCase: string;
   setCurrentCase: (caseNumber: string) => void;
@@ -34,7 +35,8 @@ interface SidebarProps {
 
 export const Sidebar = ({ 
   user, 
-  onImageSelect, 
+  onImageSelect,
+  imageId, 
   onCaseChange,
   currentCase,
   setCurrentCase,
@@ -77,6 +79,8 @@ export const Sidebar = ({
         <NotesSidebar 
           currentCase={currentCase}
           onReturn={() => setShowNotes(false)}
+          user={user}
+          imageId={imageId || ''}
         />
       ) : (
         <CaseSidebar 

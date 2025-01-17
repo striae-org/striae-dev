@@ -1,18 +1,39 @@
 import { useState, useEffect } from 'react';
+import { User } from 'firebase/auth';
 import { ColorSelector } from '~/components/colors/colors';
 import { NotesModal } from './notes-modal';
+import { saveNotes } from '~/components/actions/notes-manage';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
   currentCase: string;
   onReturn: () => void;
+  user: User;
+  imageId: string;
+}
+
+interface NotesData {
+  leftCase: string;
+  rightCase: string;
+  leftItem: string;
+  rightItem: string;
+  classType: ClassType;
+  customClass?: string;
+  classNote: string;
+  indexType: IndexType;
+  indexNumber?: string;
+  indexColor?: string;
+  supportLevel: SupportLevel;
+  includeConfirmation: boolean;
+  additionalNotes: string;
+  updatedAt: string;
 }
 
 type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
-export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
+export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSidebarProps) => {
   // Case numbers state
   const [leftCase, setLeftCase] = useState('');
   const [rightCase, setRightCase] = useState('');
@@ -47,6 +68,39 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
       setRightCase(currentCase);
     }
   }, [useCurrentCaseLeft, useCurrentCaseRight, currentCase]);
+
+  const handleSave = async () => {
+
+    if (!imageId) {
+      console.error('No image selected');
+      return;
+    }
+
+    try {
+      const notesData: NotesData = {
+        leftCase,
+        rightCase,
+        leftItem,
+        rightItem,
+        classType,
+        customClass: classType === 'Other' ? customClass : undefined,
+        classNote,
+        indexType,
+        indexNumber: indexType === 'number' ? indexNumber : undefined,
+        indexColor: indexType === 'color' ? indexColor : undefined,
+        supportLevel,
+        includeConfirmation,
+        additionalNotes,
+        updatedAt: new Date().toISOString()
+      };
+
+      await saveNotes(user, currentCase, imageId, notesData);
+      // Add success message or handler
+    } catch (error) {
+      // Add error handling
+      console.error('Failed to save notes:', error);
+    }
+  };
 
   return (
     <div className={styles.notesSidebar}>
@@ -221,14 +275,21 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
       >
         Additional Notes
       </button>
+      </div> 
+      <div className={styles.buttonGroup}>     
+        <button 
+          onClick={handleSave}
+          className={styles.saveButton}
+        >
+          Save Notes
+        </button>
+        <button 
+          onClick={onReturn}
+          className={styles.returnButton}
+        >
+          Return to Case Management
+        </button>      
       </div>
-      <button 
-        onClick={onReturn}
-        className={styles.returnButton}
-      >
-        Return to Case Management
-      </button>
-
       <NotesModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

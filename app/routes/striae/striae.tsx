@@ -20,6 +20,7 @@ interface FileData {
 export const Striae = ({ user }: StriaePage) => {
   // Image and error states
   const [selectedImage, setSelectedImage] = useState<string>();
+  const [imageId, setImageId] = useState<string>();
   const [error, setError] = useState<string>();
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -65,7 +66,11 @@ export const Striae = ({ user }: StriaePage) => {
     
     const signedUrl = await getImageUrl(file);
     if (!signedUrl) throw new Error('No URL returned');
+
     setSelectedImage(signedUrl);
+      setImageId(file.id); 
+      setImageLoaded(true);
+
   } catch (err) {
     setError('Failed to load image. Please try again.');
     console.error('Image selection error:', err);
@@ -78,6 +83,7 @@ export const Striae = ({ user }: StriaePage) => {
      <Sidebar 
         user={user} 
         onImageSelect={handleImageSelect}
+        imageId={imageId}
         onCaseChange={handleCaseChange}
         currentCase={currentCase}
         setCurrentCase={setCurrentCase}

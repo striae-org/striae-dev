@@ -201,6 +201,12 @@ textarea:focus {
   margin-bottom: 1rem;
 }
 
+.buttonGroup {
+  display: flex;
+  gap: var(--spaceS);
+  margin-top: var(--spaceL);
+}
+
 .notesButton:hover {
   background-color: color-mix(in lab, var(--primary) 95%, transparent);  
   transform: translateY(-1px);
