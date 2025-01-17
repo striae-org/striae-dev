@@ -259,7 +259,7 @@
 
 .uploadingText {
   font-size: 0.875rem;
-  color: #0d6efd;
+  color: var(--textBody);
 }
 
 .fileName {
