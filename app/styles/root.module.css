@@ -57,7 +57,7 @@
     font-size: var(--fontSizeH0);
     font-weight: var(--fontWeightBold);
     color: var(--textTitle);
-    margin: 0;
+    margin-bottom: var(--spaceXL);
     line-height: 1;
   }
 
