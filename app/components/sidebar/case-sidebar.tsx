@@ -273,15 +273,17 @@ return (
         aria-label="Upload image file"
       />      
       {isUploadingFile && (
+        <>
         <div className={styles.progressBar}>
           <div 
             className={styles.progressFill} 
             style={{ width: `${uploadProgress}%` }}
-          />
-          <span className={styles.uploadingText}>
+          />          
+        </div>
+        <span className={styles.uploadingText}>
             {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
           </span>
-        </div>
+          </>
       )}
       {fileError && <p className={styles.error}>{fileError}</p>}
     </div>
