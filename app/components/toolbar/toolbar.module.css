@@ -1,3 +1,7 @@
+.toolbarContainer {
+  position: relative;
+}
+
 .toolbar {
   display: flex;
   gap: var(--spaceS);
@@ -5,4 +9,25 @@
   background: var(--background);
   border-radius: var(--radiusL);
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
+  transition: opacity var(--durationM) var(--bezierFastoutSlowin),
+              transform var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.toggleButton {
+  position: absolute;
+  left: var(--spaceM);
+  top: var(--spaceM);
+  z-index: var(--zIndex3);
+}
+
+.toolbarContent {
+  display: flex;
+  gap: var(--spaceS);
+  margin-left: calc(40px + var(--spaceS));
+  transition: opacity var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.hidden .toolbarContent {
+  opacity: 0;
+  pointer-events: none;
 }

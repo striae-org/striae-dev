@@ -2,18 +2,26 @@ import { useState } from 'react';
 import { Button } from '../button/button';
 import styles from './toolbar.module.css';
 
-type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print';
+type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibility';
 
 interface ToolbarProps {
   onToolSelect?: (toolId: ToolId, active: boolean) => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
-export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
+export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
+  const [isVisible, setIsVisible] = useState(true);
 
   const handleToolClick = (toolId: ToolId) => {
     if (toolId === 'print') {
       onToolSelect?.('print', true);
+      return;
+    }
+
+    if (toolId === 'visibility') {
+      setIsVisible(!isVisible);
+      onVisibilityChange?.(!isVisible);
       return;
     }
 
@@ -30,11 +38,17 @@ export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
   };
 
   return (
-    <div 
-      className={styles.toolbar}
-      role="toolbar"
-      aria-label="Annotation tools"
-    >
+    <div className={styles.toolbarContainer}>
+      <div className={`${styles.toolbar} ${!isVisible ? styles.hidden : ''}`}>
+        <div className={styles.toggleButton}>
+          <Button
+            iconId={isVisible ? 'eye-off' : 'eye'}
+            isActive={false}
+            onClick={() => handleToolClick('visibility')}
+            ariaLabel={isVisible ? "Hide toolbar" : "Show toolbar"}
+          />
+        </div>
+      <div className={styles.toolbarContent} role="toolbar" aria-label="Annotation tools">         
       <Button
         iconId="number"
         isActive={activeTools.has('number')}
@@ -72,5 +86,7 @@ export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
         ariaLabel="Print tool"
       />
     </div>
+      </div>
+    </div>
   );
-}
+};
