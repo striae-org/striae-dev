@@ -43,17 +43,7 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, curren
           </button>
           <SignOut />
         </div>
-      </div>
-
-      <div className={styles.sidebarToggle}>
-        <button
-          onClick={() => setShowNotes(true)}
-          disabled={!imageLoaded}
-          className={styles.toggleButton}
-        >
-          Image Notes
-        </button>
-      </div>
+      </div>      
 
       <ManageProfile 
         isOpen={isProfileModalOpen}
@@ -72,6 +62,16 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, curren
           onCaseChange={onCaseChange}
         />
       )}
+
+      <div className={styles.sidebarToggle}>
+        <button
+          onClick={() => setShowNotes(true)}
+          disabled={!imageLoaded}
+          className={styles.toggleButton}
+        >
+          Image Notes
+        </button>
+      </div>
       
     </div>
   );
