@@ -105,7 +105,7 @@ export function ErrorBoundary() {
           <ThemeProvider theme="light" className="">          
           <main className="flex-grow">
             <div className={styles.errorContainer}>
-              <h1 className={styles.errorTitle}>{error.status}</h1>
+              <div className={styles.errorTitle}>{error.status}</div>
               <p className={styles.errorMessage}>{error.statusText}</p>
               <Link to="/" className={styles.errorLink}>Return Home</Link>
             </div>
@@ -125,7 +125,7 @@ export function ErrorBoundary() {
         <ThemeProvider theme="light" className="">        
         <main className="flex-grow">
           <div className={styles.errorContainer}>
-            <h1 className={styles.errorTitle}>500</h1>
+            <div className={styles.errorTitle}>500</div>
             <p className={styles.errorMessage}>Something went wrong. Please try again later.</p>
             <Link to="/" className={styles.errorLink}>Return Home</Link>
           </div>
