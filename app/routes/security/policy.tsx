@@ -47,7 +47,7 @@ export const Policy = () => {
         <section>
           <h2>Out of Scope</h2>
           <ul>
-            <li>DOS/DDOS attacks</li>
+            <li>DoS/DDoS attacks</li>
             <li>Spam or social engineering</li>
             <li>Physical security attacks</li>
           </ul>

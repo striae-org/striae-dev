@@ -275,7 +275,7 @@ You agree that the original English text shall prevail in the case of a dispute.
   <li><p><strong>Cross-Origin Resource Sharing (CORS) Support</strong></p>
   <p>To prevent unauthorized access, Striae restricts Data requests to its domain exclusively.</p></li>
   <li><p><strong>Security Policy</strong></p>
-  <p>The open security policy encourages users and researchers to safely and responsibly report vulnerabilities. This collaborative approach ensures the security measures remain robust and up-to-date. Please refer to Our <Link to="/security-policy">Security Policy</Link> for more information.</p></li>
+  <p>The open security policy encourages users and researchers to safely and responsibly report vulnerabilities. This collaborative approach ensures the security measures remain robust and up-to-date. Please refer to Our <Link to="/security">Security Policy</Link> for more information.</p></li>
 </ul>
 </li>
 <li>

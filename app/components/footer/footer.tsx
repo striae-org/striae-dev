@@ -14,7 +14,7 @@ export default function Footer() {
           <Link to="/terms" className={styles.link}>
             Terms & Conditions
           </Link>          
-          <Link to="/security-policy" className={styles.link}>
+          <Link to="/security" className={styles.link}>
             Security Policy
           </Link>
           <Link to="/bugs" className={styles.link}>
