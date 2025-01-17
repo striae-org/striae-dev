@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import { Sidebar } from '~/components/sidebar/sidebar';
+import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
 import { Annotations } from '~/components/annotations/annotations';
 import { getImageUrl } from '~/components/actions/image-manage';
@@ -65,9 +66,15 @@ export const Striae = ({ user }: StriaePage) => {
       <Sidebar 
         user={user} 
         onImageSelect={handleImageSelect}
-        onCaseChange={handleCaseChange} />
+        onCaseChange={handleCaseChange} 
+      />
       <main className={styles.mainContent}>
-        <Canvas imageUrl={selectedImage} error={error} />
+        <div className={styles.canvasArea}>
+          <div className={styles.toolbarWrapper}>
+            <Toolbar />
+          </div>
+          <Canvas imageUrl={selectedImage} error={error} />
+        </div>
         <Annotations />
       </main>
     </div>
