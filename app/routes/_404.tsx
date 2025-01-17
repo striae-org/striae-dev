@@ -12,7 +12,7 @@ export const meta = () => {
 export default function NotFound() {
   return (
     <div className={styles.errorContainer}>
-      <h1 className={styles.errorTitle}>404</h1>
+      <div className={styles.errorTitle}>404</div>
       <p className={styles.errorMessage}>Page not found</p>
       <Link to="/" className={styles.errorLink}>Return Home</Link>
     </div>

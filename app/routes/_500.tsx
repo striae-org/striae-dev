@@ -12,7 +12,7 @@ export const meta = () => {
 export default function ServerError() {
   return (
     <div className={styles.errorContainer}>
-      <h1 className={styles.errorTitle}>500</h1>
+      <div className={styles.errorTitle}>500</div>
       <p className={styles.errorMessage}>Something went wrong. Please try again later.</p>
       <Link to="/" className={styles.errorLink}>Return Home</Link>
     </div>
