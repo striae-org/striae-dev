@@ -17,7 +17,7 @@
 .toggleButton {
   width: 40px;
   flex-shrink: 0;
-  margin-right: var(--spaceL);
+  margin-right: var(--spaceM);
 }
 
 .toolbarContent {
@@ -27,7 +27,7 @@
 }
 
 .hidden {
-  width: calc(40px + var(--spaceL) * 2);
+  width: calc(40px + (var(--spaceM) * 2));
 }
 
 .hidden .toolbarContent {
