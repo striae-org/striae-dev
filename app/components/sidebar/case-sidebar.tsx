@@ -358,13 +358,12 @@ return (
           Image Notes
         </button>
           {currentCase && (
-        <div className={styles.renameCaseSection}>
+        <div className={`${styles.caseInput} mb-4`}>
           <input
             type="text"
             value={newCaseName}
             onChange={(e) => setNewCaseName(e.target.value)}
-            placeholder="New Case Number"
-            className={styles.caseInput}
+            placeholder="New Case Number"            
           />
           <button
             onClick={handleRenameCase}
