@@ -65,7 +65,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 disabled={useCurrentCaseLeft}                
               />
             </div>
-            <label className={styles.checkboxLabel}>
+            <label className={`${styles.checkboxLabel} mb-4`}>
               <input
                 type="checkbox"
                 checked={useCurrentCaseLeft}
@@ -97,7 +97,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 disabled={useCurrentCaseRight}                
               />
             </div>
-            <label className={styles.checkboxLabel}>
+            <label className={`${styles.checkboxLabel} mb-4`}>
               <input
                 type="checkbox"
                 checked={useCurrentCaseRight}
