@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import styles from './canvas.module.css';
-import { Toolbar } from '../toolbar/toolbar';
 
 interface CanvasProps {
   imageUrl?: string;
@@ -11,13 +10,6 @@ type ImageLoadError = {
   type: 'load' | 'network' | 'invalid';
   message: string;
 }
-
-type Tool = 'number' |'index' | 'class' | 'id' | 'notes' | 'print';
-
-const handleToolSelect = (tool: Tool) => {
-    console.log('Selected tool:', tool);
-    // Tool handling logic will go here TODO
-  };
 
 export const Canvas = ({ imageUrl, error }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -74,9 +66,6 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
 
   return (    
     <div className={styles.canvasContainer}>
-      <div className={styles.toolbarWrapper}>
-        <Toolbar onToolSelect={handleToolSelect} />
-      </div>
       {(loadError || error) ? (
         <p className={styles.error}>{getErrorMessage()}</p>
       ) : isLoading ? (
