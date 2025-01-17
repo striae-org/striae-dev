@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { ColorSelector } from '~/components/colors/colors';
 import { NotesModal } from './notes-modal';
-import { saveNotes } from '~/components/actions/notes-manage';
+import { getNotes, saveNotes } from '~/components/actions/notes-manage';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
@@ -34,6 +34,9 @@ type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
 export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSidebarProps) => {
+  // Loading Existing Notes State
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string>();
   // Case numbers state
   const [leftCase, setLeftCase] = useState('');
   const [rightCase, setRightCase] = useState('');
@@ -59,6 +62,43 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
   // Additional Notes Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [additionalNotes, setAdditionalNotes] = useState('');
+
+  useEffect(() => {
+    const loadExistingNotes = async () => {
+      if (!imageId || !currentCase) return;
+      
+      setIsLoading(true);
+      setLoadError(undefined);
+      
+      try {
+        const existingNotes = await getNotes(user, currentCase, imageId);
+        
+        if (existingNotes) {
+          // Update all form fields with existing data
+          setLeftCase(existingNotes.leftCase);
+          setRightCase(existingNotes.rightCase);
+          setLeftItem(existingNotes.leftItem);
+          setRightItem(existingNotes.rightItem);
+          setClassType(existingNotes.classType);
+          setCustomClass(existingNotes.customClass || '');
+          setClassNote(existingNotes.classNote);
+          setIndexType(existingNotes.indexType);
+          setIndexNumber(existingNotes.indexNumber || '');
+          setIndexColor(existingNotes.indexColor || '#000000');
+          setSupportLevel(existingNotes.supportLevel);
+          setIncludeConfirmation(existingNotes.includeConfirmation);
+          setAdditionalNotes(existingNotes.additionalNotes);
+        }
+      } catch (error) {
+        setLoadError('Failed to load existing notes');
+        console.error('Error loading notes:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadExistingNotes();
+  }, [imageId, currentCase, user]);
 
  useEffect(() => {
     if (useCurrentCaseLeft) {
@@ -104,6 +144,12 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
 
   return (
     <div className={styles.notesSidebar}>
+      {isLoading ? (
+        <div className={styles.loading}>Loading notes...</div>
+      ) : loadError ? (
+        <div className={styles.error}>{loadError}</div>
+      ) : (
+        <>
       <div className={styles.section}>
         <h5 className={styles.sectionTitle}>Case Information</h5>
         <hr />
@@ -296,7 +342,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
         notes={additionalNotes}
         onSave={setAdditionalNotes}
       />
-
+      </>
+        )}
     </div>
   );
 };
