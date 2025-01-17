@@ -101,14 +101,16 @@ export function ErrorBoundary() {
         <head>
           <title>{`${error.status} ${error.statusText}`}</title>          
         </head>
-        <body className="flex flex-col min-h-screen">          
+        <body className="flex flex-col min-h-screen">
+          <ThemeProvider theme="light" className="">          
           <main className="flex-grow">
             <div className={styles.errorContainer}>
               <h1 className={styles.errorTitle}>{error.status}</h1>
               <p className={styles.errorMessage}>{error.statusText}</p>
               <Link to="/" className={styles.errorLink}>Return Home</Link>
             </div>
-          </main>          
+          </main>
+          </ThemeProvider>          
         </body>
       </html>
     );
@@ -119,14 +121,16 @@ export function ErrorBoundary() {
       <head>
         <title>Oops! Something went wrong</title>       
       </head>
-      <body className="flex flex-col min-h-screen">        
+      <body className="flex flex-col min-h-screen">
+        <ThemeProvider theme="light" className="">        
         <main className="flex-grow">
           <div className={styles.errorContainer}>
             <h1 className={styles.errorTitle}>500</h1>
             <p className={styles.errorMessage}>Something went wrong. Please try again later.</p>
             <Link to="/" className={styles.errorLink}>Return Home</Link>
           </div>
-        </main>        
+        </main>
+        </ThemeProvider>        
       </body>
     </html>
   );
