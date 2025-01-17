@@ -60,19 +60,10 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, curren
           user={user} 
           onImageSelect={onImageSelect}
           onCaseChange={onCaseChange}
+          imageLoaded={imageLoaded}
+          onNotesClick={() => setShowNotes(true)}
         />
       )}
-
-      <div className={styles.sidebarToggle}>
-        <button
-          onClick={() => setShowNotes(true)}
-          disabled={!imageLoaded}
-          className={styles.toggleButton}
-        >
-          Image Notes
-        </button>
-      </div>
-      
     </div>
   );
 };

@@ -19,6 +19,8 @@ interface CaseSidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
+  imageLoaded?: boolean;
+  onNotesClick?: () => void;
 }
 
 interface FileData {
@@ -29,7 +31,13 @@ interface FileData {
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
 
-export const CaseSidebar = ({ user, onImageSelect, onCaseChange }: CaseSidebarProps) => {
+export const CaseSidebar = ({ 
+  user, 
+  onImageSelect, 
+  onCaseChange, 
+  imageLoaded,
+  onNotesClick 
+}: CaseSidebarProps) => {
   // Case management states
     const [caseNumber, setCaseNumber] = useState<string>('');
     const [currentCase, setCurrentCase] = useState<string>('');
@@ -320,6 +328,13 @@ return (
         </ul>
       )}
     </div>
+    <button
+          onClick={onNotesClick}
+          disabled={!imageLoaded}
+          className={styles.toggleButton}
+        >
+          Image Notes
+        </button>
           {currentCase && (
         <div className={styles.renameCaseSection}>
           <input
