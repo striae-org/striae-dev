@@ -1,63 +1,65 @@
 import { useState } from 'react';
-import { ToolbarButton } from '../button/button';
+import { Button } from '../button/button';
 import styles from './toolbar.module.css';
 
-type Tool = 'print' | 'number' | 'index' | 'id' | 'class' | 'notes';
+type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print';
 
 interface ToolbarProps {
-  onToolSelect?: (tool: Tool) => void;
+  onToolSelect?: (toolId: ToolId) => void;
 }
 
 export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
-  const [activeTool, setActiveTool] = useState<Tool | null>(null);
+  const [activeTool, setActiveTool] = useState<ToolId | null>(null);
 
-  const handleToolClick = (tool: Tool) => {
-    setActiveTool(activeTool === tool ? null : tool);
-    onToolSelect?.(tool);
+  const handleToolClick = (toolId: ToolId) => {
+    setActiveTool(activeTool === toolId ? null : toolId);
+    onToolSelect?.(toolId);
   };
 
   return (
     <div 
       className={styles.toolbar}
       role="toolbar"
-      aria-label="Image annotation tools"
+      aria-label="Annotation tools"
     >
-        <ToolbarButton
-        type="number"
+      <Button
+        iconId="number"
         isActive={activeTool === 'number'}
         onClick={() => handleToolClick('number')}
-        ariaLabel="Case/Item Numbers"
+        ariaLabel="Numbering tool"
       />
-        <ToolbarButton
-        type="index"
-        isActive={activeTool === 'index'}
-        onClick={() => handleToolClick('index')}
-        ariaLabel="Index Color/Number"
-      />
-      <ToolbarButton
-        type="class"
+      <Button
+        iconId="class"
         isActive={activeTool === 'class'}
         onClick={() => handleToolClick('class')}
-        ariaLabel="Class Characteristics"
+        ariaLabel="Classification tool"
       />
-      <ToolbarButton
-        type="id"
+      <Button
+        iconId="index"
+        isActive={activeTool === 'index'}
+        onClick={() => handleToolClick('index')}
+        ariaLabel="Index tool"
+      />
+      <Button
+        iconId="id"
         isActive={activeTool === 'id'}
         onClick={() => handleToolClick('id')}
-        ariaLabel="ID/Exclusion/Inc"
+        ariaLabel="ID tool"
       />
-      <ToolbarButton
-        type="annotate"
+      <Button
+        iconId="notes"
         isActive={activeTool === 'notes'}
         onClick={() => handleToolClick('notes')}
-        ariaLabel="Other Notes"
+        ariaLabel="Notes tool"
       />
-      <ToolbarButton
-        type="print"
+      <Button
+        iconId="print"
         isActive={activeTool === 'print'}
         onClick={() => handleToolClick('print')}
-        ariaLabel="Save/Print to PDF"
+        ariaLabel="Print tool"
       />
     </div>
   );
 };
+
+Toolbar.displayName = 'Toolbar';
