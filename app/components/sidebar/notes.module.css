@@ -201,12 +201,6 @@ textarea:focus {
   margin-bottom: 1rem;
 }
 
-.buttonGroup {
-  display: flex;
-  gap: var(--spaceS);
-  margin-top: var(--spaceL);
-}
-
 .notesButton:hover {
   background-color: color-mix(in lab, var(--primary) 95%, transparent);  
   transform: translateY(-1px);
@@ -275,7 +269,41 @@ textarea:focus {
   cursor: pointer;
 }
 
+.saveButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.saveButton:hover {
+  background-color: color-mix(in lab, var(--primary) 95%, transparent);
+  transform: translateY(-1px);
+}
+
 .saveButton:hover,
 .cancelButton:hover {
   transform: translateY(-1px);
+}
+
+.successMessage {
+  color: #198754;
+  background-color: #d1e7dd;
+  border: 1px solid #badbcc;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

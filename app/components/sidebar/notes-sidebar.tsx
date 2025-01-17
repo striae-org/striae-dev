@@ -34,9 +34,10 @@ type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
 export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSidebarProps) => {
-  // Loading Existing Notes State
+  // Loading/Saving Notes States
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
+  const [saveSuccess, setSaveSuccess] = useState(false);
   // Case numbers state
   const [leftCase, setLeftCase] = useState('');
   const [rightCase, setRightCase] = useState('');
@@ -135,9 +136,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       };
 
       await saveNotes(user, currentCase, imageId, notesData);
-      // Add success message or handler
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
-      // Add error handling
       console.error('Failed to save notes:', error);
     }
   };
@@ -321,21 +322,26 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       >
         Additional Notes
       </button>
-      </div> 
-      <div className={styles.buttonGroup}>     
+      </div>            
         <button 
-          onClick={handleSave}
-          className={styles.saveButton}
-        >
-          Save Notes
-        </button>
+            onClick={handleSave}
+            className={styles.saveButton}
+          >
+            Save Notes
+          </button>
+          
+          {saveSuccess && (
+            <div className={styles.successMessage}>
+              Notes saved successfully!
+            </div>
+          )}
+          
         <button 
           onClick={onReturn}
           className={styles.returnButton}
         >
           Return to Case Management
-        </button>      
-      </div>
+        </button>            
       <NotesModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
