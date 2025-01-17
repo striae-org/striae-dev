@@ -16,18 +16,14 @@
 }
 
 .button.active {
-  background: var(--successLight);
+  background: var(--success);
 }
 
 .button.active:hover {
-  background: color-mix(in lab, var(--successLight) 85%, var(--black));
+  background: color-mix(in lab, var(--errorLight) 85%, var(--black));
 }
 
 .icon {  
   color: var(--text);
   transition: color var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.button.active .icon {
-  color: var(--success);
 }

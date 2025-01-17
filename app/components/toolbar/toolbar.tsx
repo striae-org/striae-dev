@@ -5,15 +5,28 @@ import styles from './toolbar.module.css';
 type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print';
 
 interface ToolbarProps {
-  onToolSelect?: (toolId: ToolId) => void;
+  onToolSelect?: (toolId: ToolId, active: boolean) => void;
 }
 
 export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
-  const [activeTool, setActiveTool] = useState<ToolId | null>(null);
+  const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
 
   const handleToolClick = (toolId: ToolId) => {
-    setActiveTool(activeTool === toolId ? null : toolId);
-    onToolSelect?.(toolId);
+    if (toolId === 'print') {
+      onToolSelect?.('print', true);
+      return;
+    }
+
+    setActiveTools(prev => {
+      const next = new Set(prev);
+      if (next.has(toolId)) {
+        next.delete(toolId);
+      } else {
+        next.add(toolId);
+      }
+      onToolSelect?.(toolId, next.has(toolId));
+      return next;
+    });
   };
 
   return (
@@ -24,42 +37,40 @@ export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
     >
       <Button
         iconId="number"
-        isActive={activeTool === 'number'}
+        isActive={activeTools.has('number')}
         onClick={() => handleToolClick('number')}
         ariaLabel="Numbering tool"
       />
       <Button
         iconId="class"
-        isActive={activeTool === 'class'}
+        isActive={activeTools.has('class')}
         onClick={() => handleToolClick('class')}
         ariaLabel="Classification tool"
       />
       <Button
         iconId="index"
-        isActive={activeTool === 'index'}
+        isActive={activeTools.has('index')}
         onClick={() => handleToolClick('index')}
         ariaLabel="Index tool"
       />
       <Button
         iconId="id"
-        isActive={activeTool === 'id'}
+        isActive={activeTools.has('id')}
         onClick={() => handleToolClick('id')}
         ariaLabel="ID tool"
       />
       <Button
         iconId="notes"
-        isActive={activeTool === 'notes'}
+        isActive={activeTools.has('notes')}
         onClick={() => handleToolClick('notes')}
         ariaLabel="Notes tool"
       />
       <Button
         iconId="print"
-        isActive={activeTool === 'print'}
+        isActive={false}
         onClick={() => handleToolClick('print')}
         ariaLabel="Print tool"
       />
     </div>
   );
-};
-
-Toolbar.displayName = 'Toolbar';
+}
