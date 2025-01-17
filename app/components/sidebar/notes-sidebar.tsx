@@ -74,8 +74,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 className={styles.checkbox}
               />
               <span>Use current case number</span>
-            </label>
-            <hr />
+            </label>            
             <div className={styles.caseInput}>
               <label htmlFor="leftItem">Left Side Item #</label>
               <input
@@ -86,7 +85,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               />
             </div>            
           </div>
-
+          <hr />
           {/* Right side inputs */}
           <div className={styles.inputGroup}>
             <div className={styles.caseInput}>
