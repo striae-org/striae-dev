@@ -21,11 +21,13 @@ export const Striae = ({ user }: StriaePage) => {
   const [selectedImage, setSelectedImage] = useState<string>();
   const [error, setError] = useState<string>();
   const [currentCase, setCurrentCase] = useState<string>();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
     setSelectedImage('/clear.jpg');
     setError(undefined);
+    setImageLoaded(false);
   }, [currentCase]);
 
   const handleCaseChange = (caseNumber: string) => {
@@ -37,6 +39,7 @@ export const Striae = ({ user }: StriaePage) => {
     return () => {
       setSelectedImage(undefined);
       setError(undefined);
+      setImageLoaded(false);
     };
   }, []); // Empty dependency array means this runs only on mount/unmount
 
@@ -48,8 +51,9 @@ export const Striae = ({ user }: StriaePage) => {
   }
 
   try {
-    setError(undefined);
-    setSelectedImage(undefined);
+      setError(undefined);
+      setSelectedImage(undefined);
+      setImageLoaded(false);
     
     const signedUrl = await getImageUrl(file);
     if (!signedUrl) throw new Error('No URL returned');
@@ -66,7 +70,10 @@ export const Striae = ({ user }: StriaePage) => {
       <Sidebar 
         user={user} 
         onImageSelect={handleImageSelect}
-        onCaseChange={handleCaseChange} 
+        onCaseChange={handleCaseChange}
+        currentCase={currentCase}
+        imageLoaded={imageLoaded}
+        setImageLoaded={setImageLoaded}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
