@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ColorSelector } from '~/components/colors/colors';
+import { NotesModal } from './notes-modal';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
@@ -33,6 +34,10 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
   // Support level and confirmation
   const [supportLevel, setSupportLevel] = useState<SupportLevel>('ID');
   const [includeConfirmation, setIncludeConfirmation] = useState(false);
+
+  // Additional Notes Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [additionalNotes, setAdditionalNotes] = useState('');
 
  useEffect(() => {
     if (useCurrentCaseLeft) {
@@ -134,7 +139,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               type="text"
               value={customClass}
               onChange={(e) => setCustomClass(e.target.value)}
-              placeholder="Specify class characteristic"              
+              placeholder="Specify object type"              
             />
           )}
 
@@ -199,11 +204,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
             <option value="Exclusion">Exclusion</option>
             <option value="Inconclusive">Inconclusive</option>
           </select>
-        </div>
-      </div>
-
-      <div className={`${styles.section} ${styles.confirmation}`}>
-        <label className={styles.checkboxLabel}>
+          <label className={styles.checkboxLabel}>
           <input
             type="checkbox"
             checked={includeConfirmation}
@@ -212,14 +213,28 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
           />
           <span>Include Confirmation Field</span>
         </label>
+        </div>
+        <button 
+        onClick={() => setIsModalOpen(true)}
+        className={styles.notesButton}
+      >
+        Additional Notes
+      </button>
       </div>
-
       <button 
         onClick={onReturn}
         className={styles.returnButton}
       >
         Return to Case Management
       </button>
+
+      <NotesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        notes={additionalNotes}
+        onSave={setAdditionalNotes}
+      />
+
     </div>
   );
 };
