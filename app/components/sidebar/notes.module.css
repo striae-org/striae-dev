@@ -1,11 +1,45 @@
 .notesSidebar {
-  padding: 1.5rem;
+  padding: 0.5rem;
 }
 
-.notesSidebar h4 {
+.section {
+  margin-bottom: 2rem;  /* Increased for better section separation */
+  padding: 0 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;  /* Increased weight to match case-sidebar */
   color: #495057;
   margin-bottom: 1rem;
-  font-size: 1rem;
+}
+
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: white;
+  margin-bottom: 1rem;
+}
+
+.select:focus,
+input[type="text"]:focus,
+input[type="color"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,.25);
 }
 
 .caseNumbers {
@@ -33,6 +67,16 @@
   border-color: #0d6efd;
   box-shadow: 0 0 0 2px rgba(13,110,253,.25);
 }
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+
 
 .classCharacteristics {
   margin-bottom: 2rem;
@@ -62,6 +106,17 @@
 
 .indexing {
   margin-bottom: 2rem;
+}
+
+.colorLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.colorInput {
+  height: 40px;
+  padding: 0.25rem;
 }
 
 .radioGroup {
@@ -98,12 +153,7 @@
   margin-top: 0.5rem;
 }
 
-.support {
-  margin-bottom: 2rem;
-}
-
-.confirmation {
-  margin-bottom: 2rem;
+.confirmation {  
   padding: 0.75rem;
   background-color: #f8f9fa;
   border-radius: 6px;
@@ -124,4 +174,5 @@
 
 .returnButton:hover {
   background-color: #5c636a;
+  transform: translateY(-1px);
 }

@@ -44,10 +44,6 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
 
   return (
     <div className={styles.notesSidebar}>
-      <div className={styles.sectionHeader}>
-        <h4>Comparison Notes</h4>
-      </div>
-      
       <div className={styles.section}>
         <h5 className={styles.sectionTitle}>Case Information</h5>
         <div className={styles.caseNumbers}>
@@ -60,8 +56,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 type="text"
                 value={leftCase}
                 onChange={(e) => setLeftCase(e.target.value)}
-                disabled={useCurrentCaseLeft}
-                className={styles.textInput}
+                disabled={useCurrentCaseLeft}                
               />
             </div>
             <div className={styles.caseInput}>
@@ -70,8 +65,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 id="leftItem"
                 type="text"
                 value={leftItem}
-                onChange={(e) => setLeftItem(e.target.value)}
-                className={styles.textInput}
+                onChange={(e) => setLeftItem(e.target.value)}                
               />
             </div>
             <label className={styles.checkboxLabel}>
@@ -94,8 +88,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 type="text"
                 value={rightCase}
                 onChange={(e) => setRightCase(e.target.value)}
-                disabled={useCurrentCaseRight}
-                className={styles.textInput}
+                disabled={useCurrentCaseRight}                
               />
             </div>
             <div className={styles.caseInput}>
@@ -104,8 +97,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 id="rightItem"
                 type="text"
                 value={rightItem}
-                onChange={(e) => setRightItem(e.target.value)}
-                className={styles.textInput}
+                onChange={(e) => setRightItem(e.target.value)}                
               />
             </div>
             <label className={styles.checkboxLabel}>
@@ -141,8 +133,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               type="text"
               value={customClass}
               onChange={(e) => setCustomClass(e.target.value)}
-              placeholder="Specify class characteristic"
-              className={styles.textInput}
+              placeholder="Specify class characteristic"              
             />
           )}
 
@@ -182,8 +173,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               type="text"
               value={indexNumber}
               onChange={(e) => setIndexNumber(e.target.value)}
-              placeholder="Enter index number"
-              className={styles.textInput}
+              placeholder="Enter index number"              
             />
           ) : (
             <label className={styles.colorLabel}>
