@@ -262,7 +262,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         <p><strong>Resistance to Brute Force:</strong> Even with advanced computational power, it would take billions of years to attempt all possible key combinations.</p>
       </li>
       <li>
-        <p><strong>Global Trust:</strong> AES-256 is trusted worldwide by governments, financial institutions, and security-focused organizations for its unparalleled ability to secure Data.</p>
+        <p><strong>Global Trust:</strong> AES-256 is trusted worldwide by governments, financial institutions, and security-focused organizations for its unparalleled ability to secure data.</p>
       </li>
     </ul>
     </li>
