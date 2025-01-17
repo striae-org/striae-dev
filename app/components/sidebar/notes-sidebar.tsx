@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ColorSelector } from '~/components/colors/colors';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
@@ -75,7 +76,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 onChange={(e) => setUseCurrentCaseLeft(e.target.checked)}
                 className={styles.checkbox}
               />
-              <span>Use current case number for left side</span>
+              <span>Use current case number</span>
             </label>
           </div>
 
@@ -107,7 +108,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 onChange={(e) => setUseCurrentCaseRight(e.target.checked)}
                 className={styles.checkbox}
               />
-              <span>Use current case number for right side</span>
+              <span>Use current case number</span>
             </label>
           </div>
         </div>
@@ -176,17 +177,10 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               placeholder="Enter index number"              
             />
           ) : (
-            <label className={styles.colorLabel}>
-              <span>Select index color</span>
-              <input
-                type="color"
-                value={indexColor}
-                onChange={(e) => setIndexColor(e.target.value)}
-                className={styles.colorInput}
-                title="Color picker for index"
-                aria-label="Select index color"
-              />
-            </label>
+            <ColorSelector
+              selectedColor={indexColor}
+              onColorSelect={setIndexColor}
+            />
           )}
         </div>
       </div>

@@ -1,0 +1,29 @@
+.colorSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.colorSwatch {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.1);
+}
+
+.colorSwatch.selected {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,.25);
+}
