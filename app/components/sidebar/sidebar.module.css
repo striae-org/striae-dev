@@ -224,6 +224,23 @@
   background-color: #dee2e6;
 }
 
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #0d6efd;
+  border-radius: 2px;
+  transition: width 0.3s ease-in-out;
+}
+
 /* Files and Case Management */
 .fileUpload {
   margin: 1rem 0;
