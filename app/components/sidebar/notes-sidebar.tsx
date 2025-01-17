@@ -52,6 +52,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
     <div className={styles.notesSidebar}>
       <div className={styles.section}>
         <h5 className={styles.sectionTitle}>Case Information</h5>
+        <hr />
         <div className={styles.caseNumbers}>
           {/* Left side inputs */}
           <div className={styles.inputGroup}>
@@ -74,6 +75,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               />
               <span>Use current case number</span>
             </label>
+            <hr />
             <div className={styles.caseInput}>
               <label htmlFor="leftItem">Left Side Item #</label>
               <input
