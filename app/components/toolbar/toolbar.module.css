@@ -1,15 +1,11 @@
-.toolbarContainer {
-  position: relative;
-}
-
 .toolbar {
   display: flex;
+  flex-direction: column;
   gap: var(--spaceS);
   padding: var(--spaceS);
-  
   background: var(--background);
   border-radius: 5px;
-  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);  
+  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
   width: auto;
   overflow: hidden;
 }
@@ -17,13 +13,14 @@
 .toggleButton {
   width: 40px;
   flex-shrink: 0;
-  margin-right: var(--spaceM);
+  margin-bottom: var(--spaceM);
 }
 
 .toolbarContent {
   display: flex;
+  flex-direction: column;
   gap: var(--spaceS);
-  width: auto;  
+  width: auto;
 }
 
 .hidden {
@@ -33,5 +30,5 @@
 .hidden .toolbarContent {
   opacity: 0;
   pointer-events: none;
-  width: 0;  
+  width: 0;
 }
