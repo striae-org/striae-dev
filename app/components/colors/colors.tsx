@@ -25,18 +25,18 @@ export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorPro
   return (
     <div className={styles.colorSelector}>
       <div className={styles.colorHeader}>
-        <span className={styles.colorLabel}>Select index color</span>
+        <span className={styles.colorLabel}>Select color</span>
         <button 
           onClick={() => setShowColorWheel(!showColorWheel)}
           className={styles.toggleButton}
         >
-          {showColorWheel ? 'Show Presets' : 'Show Color Wheel'}
+          {showColorWheel ? 'Presets' : 'Color Wheel'}
         </button>
       </div>
       
       {showColorWheel ? (
         <>
-          <label htmlFor="colorWheelInput">Color:</label>
+          <label htmlFor="colorWheelInput">Color</label>
           <input
             id="colorWheelInput"
             type="color"
