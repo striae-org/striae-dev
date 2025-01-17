@@ -358,7 +358,7 @@ return (
           Image Notes
         </button>
           {currentCase && (
-        <div className={`${styles.caseInput} mb-4`}>
+        <div className={`${styles.caseRename} mb-4`}>
           <input
             type="text"
             value={newCaseName}
@@ -367,8 +367,7 @@ return (
           />
           <button
             onClick={handleRenameCase}
-            disabled={isRenaming || !newCaseName}
-            className={styles.renameButton}
+            disabled={isRenaming || !newCaseName}            
           >
             {isRenaming ? 'Renaming...' : 'Rename Case'}
           </button>
