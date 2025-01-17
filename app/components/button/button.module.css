@@ -23,9 +23,7 @@
   background: color-mix(in lab, var(--successLight) 85%, var(--black));
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
+.icon {  
   color: var(--text);
   transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
