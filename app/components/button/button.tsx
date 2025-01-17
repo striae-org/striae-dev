@@ -22,7 +22,9 @@ export const Button = ({
       aria-label={ariaLabel}
       aria-pressed={isActive}
     >
-      <Icon 
+      <Icon
+        width={50}
+        height={50} 
         icon={iconId} 
         className={styles.icon}
       />
