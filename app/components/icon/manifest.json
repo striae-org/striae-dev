@@ -94,5 +94,13 @@
   "tictactoe": {
     "width": 24,
     "height": 24
+  },
+  "eye": {
+    "width": 24,
+    "height": 24
+  },
+  "eye-off": {
+    "width": 24,
+    "height": 24
   }
 }
