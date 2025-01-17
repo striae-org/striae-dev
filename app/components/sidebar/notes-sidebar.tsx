@@ -118,22 +118,33 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
     }
 
     try {
-      const notesData: NotesData = {
-        leftCase,
-        rightCase,
-        leftItem,
-        rightItem,
-        classType,
-        customClass: classType === 'Other' ? customClass : undefined,
-        classNote,
-        indexType,
-        indexNumber: indexType === 'number' ? indexNumber : undefined,
-        indexColor: indexType === 'color' ? indexColor : undefined,
-        supportLevel,
-        includeConfirmation,
-        additionalNotes,
-        updatedAt: new Date().toISOString()
-      };
+    const notesData: NotesData = {
+      // Case Information
+      leftCase: leftCase || '',
+      rightCase: rightCase || '',
+      leftItem: leftItem || '',
+      rightItem: rightItem || '',
+      
+      // Class Characteristics
+      classType: classType,
+      customClass: customClass,  // Save even if empty
+      classNote: classNote || '',
+      
+      // Index Information
+      indexType: indexType,
+      indexNumber: indexNumber,  // Save even if empty
+      indexColor: indexColor,    // Save even if empty
+      
+      // Support Level & Confirmation
+      supportLevel: supportLevel,
+      includeConfirmation: includeConfirmation,
+      
+      // Additional Notes
+      additionalNotes: additionalNotes || '',
+      
+      // Metadata
+      updatedAt: new Date().toISOString()
+    };
 
       await saveNotes(user, currentCase, imageId, notesData);
       setSaveSuccess(true);
@@ -335,7 +346,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               Notes saved successfully!
             </div>
           )}
-          
+
         <button 
           onClick={onReturn}
           className={styles.returnButton}
