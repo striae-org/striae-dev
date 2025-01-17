@@ -31,7 +31,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
   const [indexColor, setIndexColor] = useState('#000000');
 
   // Support level and confirmation
-  const [supportLevel, setSupportLevel] = useState<SupportLevel>('Inconclusive');
+  const [supportLevel, setSupportLevel] = useState<SupportLevel>('ID');
   const [includeConfirmation, setIncludeConfirmation] = useState(false);
 
  useEffect(() => {
