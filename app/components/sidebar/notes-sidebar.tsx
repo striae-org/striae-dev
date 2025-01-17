@@ -65,15 +65,6 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 disabled={useCurrentCaseLeft}                
               />
             </div>
-            <div className={styles.caseInput}>
-              <label htmlFor="leftItem">Left Side Item #</label>
-              <input
-                id="leftItem"
-                type="text"
-                value={leftItem}
-                onChange={(e) => setLeftItem(e.target.value)}                
-              />
-            </div>
             <label className={styles.checkboxLabel}>
               <input
                 type="checkbox"
@@ -83,6 +74,15 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               />
               <span>Use current case number</span>
             </label>
+            <div className={styles.caseInput}>
+              <label htmlFor="leftItem">Left Side Item #</label>
+              <input
+                id="leftItem"
+                type="text"
+                value={leftItem}
+                onChange={(e) => setLeftItem(e.target.value)}                
+              />
+            </div>            
           </div>
 
           {/* Right side inputs */}
@@ -97,15 +97,6 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
                 disabled={useCurrentCaseRight}                
               />
             </div>
-            <div className={styles.caseInput}>
-              <label htmlFor="rightItem">Right Side Item #</label>
-              <input
-                id="rightItem"
-                type="text"
-                value={rightItem}
-                onChange={(e) => setRightItem(e.target.value)}                
-              />
-            </div>
             <label className={styles.checkboxLabel}>
               <input
                 type="checkbox"
@@ -115,6 +106,15 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
               />
               <span>Use current case number</span>
             </label>
+            <div className={styles.caseInput}>
+              <label htmlFor="rightItem">Right Side Item #</label>
+              <input
+                id="rightItem"
+                type="text"
+                value={rightItem}
+                onChange={(e) => setRightItem(e.target.value)}                
+              />
+            </div>            
           </div>
         </div>
       </div>
