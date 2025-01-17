@@ -22,6 +22,15 @@ interface CaseSidebarProps {
   imageLoaded?: boolean;
   setImageLoaded: (loaded: boolean) => void;
   onNotesClick?: () => void;
+  files: FileData[];
+  setFiles: (files: FileData[]) => void;
+  caseNumber: string;
+  currentCase?: string;
+  setCaseNumber: (caseNumber: string) => void;
+  error: string;
+  setError: (error: string) => void;
+  successAction: 'loaded' | 'created' | 'deleted' | null;
+  setSuccessAction: (action: 'loaded' | 'created' | 'deleted' | null) => void;
 }
 
 interface FileData {

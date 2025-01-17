@@ -31,9 +31,16 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  
+  // Preserve case management state
+  const [files, setFiles] = useState<FileData[]>([]);
+  const [caseNumber, setCaseNumber] = useState('');
+  const [error, setError] = useState('');
+  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
 
   const handleReturn = () => {
     setShowNotes(false);
+    // Don't reset other state
   };
 
   return (
@@ -60,7 +67,7 @@ export const Sidebar = ({
 
       {showNotes ? (
         <NotesSidebar 
-          currentCase={currentCase || ''}
+          currentCase={currentCase}
           onReturn={handleReturn}
         />
       ) : (
@@ -68,8 +75,17 @@ export const Sidebar = ({
           user={user} 
           onImageSelect={onImageSelect}
           onCaseChange={onCaseChange}
+          currentCase={currentCase}
           imageLoaded={imageLoaded}
           setImageLoaded={setImageLoaded}
+          files={files}
+          setFiles={setFiles}
+          caseNumber={caseNumber}
+          setCaseNumber={setCaseNumber}
+          error={error}
+          setError={setError}
+          successAction={successAction}
+          setSuccessAction={setSuccessAction}
           onNotesClick={() => setShowNotes(true)}
         />
       )}
