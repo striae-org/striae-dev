@@ -43,37 +43,53 @@
   }
 
   .errorContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 2rem;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.95);
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--space2XL);
+    text-align: center;
+    background: var(--background);
+  }
 
-.errorTitle {
-  font-size: 8rem;
-  color: #333;
-  margin: 0;
-}
+  .errorTitle {
+    font-size: var(--fontSizeDisplay);
+    font-weight: var(--fontWeightBold);
+    color: var(--textTitle);
+    margin: 0;
+    line-height: 1;
+  }
 
-.errorMessage {
-  font-size: 1.5rem;
-  color: #666;
-  margin: 1rem 0 2rem;
-}
+  .errorMessage {
+    font-size: var(--fontSizeH4);
+    color: var(--textBody);
+    margin: var(--spaceL) 0 var(--spaceXL);
+    max-width: 600px;
+  }
 
-.errorLink {
-  color: #3b82f6;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.2s;
-}
+  .errorLink {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: var(--fontSizeBodyL);
+    font-weight: var(--fontWeightMedium);
+    padding: var(--spaceM) var(--spaceL);
+    border-radius: var(--radiusS);
+    transition: all var(--durationS) var(--bezierFastoutSlowin);
+  }
 
-.errorLink:hover {
-  color: #2563eb;
-}
+  .errorLink:hover {
+    background: color-mix(in lab, var(--primary) 10%, transparent);
+    color: color-mix(in lab, var(--primary) 85%, var(--black));
+  }
 
+  @media (max-width: 768px) {
+    .errorTitle {
+      font-size: var(--fontSizeH1);
+    }
+
+    .errorMessage {
+      font-size: var(--fontSizeBodyL);
+    }
+  }
 }
