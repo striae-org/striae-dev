@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-Please refer to our [Security Policy](https://striae.allyforensics.com/security-policy) for information on how to report vulnerabilities
+Please refer to our [Security Policy](https://striae.allyforensics.com/security) for information on how to report vulnerabilities

@@ -1,9 +1,9 @@
-import { Login, meta, loader } from './auth/login'
+import Home, { meta } from './home/home';
 
-export { meta, loader }
+export { meta };
 
 export default function App() {
     return (
-        <Login />
+        <Home />
     );
 }

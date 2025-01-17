@@ -185,7 +185,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>  I agree to receive emails from allyforensics.com</span>
+            <span>I agree to receive emails from allyforensics.com</span>
           </label>
 
           <label className={styles.toggle}>
@@ -195,7 +195,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>  I have read the notice and agree to provide feedback during beta testing in exchange for free access upon release</span>
+            <span>I have read the notice and agree to provide feedback during beta testing in exchange for free access upon release</span>
           </label>
 
           <Turnstile
@@ -203,19 +203,16 @@ export const BetaSignup = () => {
             theme="light"
           />
           <button 
-          type="submit" 
-          className={`${styles.button} ${styles.buttonDisabled}`}
-          disabled
-          //className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
-          //disabled={sending || !hasReadNotice}
+          type="submit"                     
+          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
+          disabled={sending || !hasReadNotice}
           title={!hasReadNotice ? 'Please read the notice first' : undefined}
-          >Beta Signups Closed. Please check back later.
-          {/* {!hasReadNotice 
+          >
+          {!hasReadNotice 
             ? 'Please read the notice first'
             : sending 
               ? 'Submitting...' 
-              : 'Request Beta Access'}
-              */}
+              : 'Request Beta Access'}              
         </button>
       </Form>
         {actionData?.success && (

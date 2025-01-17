@@ -2,25 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  @apply bg-black;
-  @apply text-gray-900;
-  @apply bg-[url('/assets/striae.jpg')] bg-cover bg-center bg-no-repeat bg-fixed;
-  @apply min-h-screen;
-  @apply bg-opacity-5 bg-blend-overlay;
-  color-scheme: light;
-  z-index: -999;
-}
 
-/* Force light mode */
-:root {
-  color-scheme: light;
-}
 
-/* Override dark mode */
-@media (prefers-color-scheme: dark) {
-  html {
+@layer base {
+  :root {
     color-scheme: light;
+    --mobileNavOffset: calc(var(--spaceOuter) * 2 + var(--space2XL));
+  }
+
+  html,
+  body {
+    height: 100vh;
+    width: 100vw;
+    min-height: screen;
+    overflow-x: hidden;
+    font-family: var(--fontStack);
+    font-weight: var(--fontWeightRegular);
+    color: var(--textBody);
+    background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.95)),
+                url('/assets/striae.jpg') center/cover no-repeat fixed;
+    background-blend-mode: normal;
+    transition: background var(--durationM) ease,
+                opacity var(--durationM) ease;
+    opacity: 1;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: dotted;
+    transition: color var(--durationS) ease;
+
+    &:hover,
+    &:focus,
+    &:active {
+      text-decoration: dotted;
+    }
+  }
+
+  code,
+  pre {
+    font-family: var(--monoFontStack);
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--white);
+  }
+
+  :focus {
+    outline: 4px solid var(--text);
+    outline-offset: 4px;
+
+    &:not(:focus-visible) {
+      outline: none;
+    }
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes reveal {
+  0% {
+    transform: scale3d(0, 1, 1);
+    transform-origin: left;
+  }
+  50% {
+    transform: scale3d(1, 1, 1);
+    transform-origin: left;
+  }
+  51% {
+    transform: scale3d(1, 1, 1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scale3d(0, 1, 1);
+    transform-origin: right;
   }
 }

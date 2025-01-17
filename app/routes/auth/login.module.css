@@ -4,142 +4,134 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
-  z-index: 0;
+  padding: var(--spaceL);
+  z-index: var(--zIndex0);
 }
 
 .logo {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: var(--spaceL);
+  left: var(--spaceL);
   width: 150px;
   height: 150px;
   background-image: url('/logo-dark.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  z-index: 2;
+  z-index: var(--zIndex2);
+  transition: transform var(--durationM) var(--bezierFastoutSlowin);
 }
 
-@media (max-width: 768px) {
-  .logo {
-    display: none;
-  }
-}
-
-.logoLink {
-  display: block;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.logoLink:hover {
-  opacity: 0.8;
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .formWrapper {
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: color-mix(in lab, var(--backgroundLight) 95%, transparent);
+  padding: var(--space2XL);
+  border-radius: var(--spaceXS);
+  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
   width: 100%;
-  max-width: 400px;
+  max-width: var(--maxWidthS);
 }
 
 .title {
   text-align: center;
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-size: 1.75rem;
+  color: var(--textTitle);
+  margin-bottom: var(--spaceXL);
+  font-size: var(--fontSizeH4);
 }
 
 .subtitle {
   text-align: center;
-  color: #7688ff;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: var(--spaceXL);
+  font-size: var(--fontSizeBodyM);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spaceM);
 }
 
 .input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  padding: var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyM);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .input:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
 }
 
 .input:disabled {
-  background-color: #f5f5f5;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
   cursor: not-allowed;
 }
 
 .button {
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
   cursor: pointer;
-  transition: all 0.2s ease;
-  background-color: #4a90e2;
-  color: white;
+  background-color: var(--primary);
+  color: var(--white);
   border: none;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.button:hover {
-  background-color: #357abd;
+.button:hover:not(:disabled) {
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
 }
 
 .button:disabled {
-  background-color: #cccccc;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
   cursor: not-allowed;
 }
 
 .error {
-  color: #dc3545;
+  color: var(--error);
   text-align: center;
-  margin: 0.5rem 0;
-  font-size: 0.875rem;
+  margin: var(--spaceS) 0;
+  font-size: var(--fontSizeBodyXS);
 }
 
 .toggle {
   text-align: center;
-  margin-top: 1rem;
-  color: #666;
+  margin-top: var(--spaceL);
+  color: var(--textLight);
 }
 
 .toggleButton {
   background: none;
   border: none;
-  color: #4a90e2;
+  color: var(--primary);
   cursor: pointer;
   font-size: inherit;
   padding: 0;
   text-decoration: underline;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.toggleButton:hover {
-  color: #357abd;
+.toggleButton:hover:not(:disabled) {
+  color: color-mix(in lab, var(--primary) 85%, var(--black));
 }
 
 .toggleButton:disabled {
-  color: #999;
+  color: var(--textLight);
   cursor: not-allowed;
 }
 
 .passwordStrength {
-  font-size: 0.875rem;
-  color: #666;
-  margin-top: 0.5rem;
+  font-size: var(--fontSizeBodyXS);
+  color: var(--textLight);
+  margin-top: var(--spaceS);
   white-space: pre-line;
 }
 
@@ -147,86 +139,70 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  gap: var(--spaceL);
+  margin: var(--spaceXL) 0;
   width: 100%;
 }
 
 .authToggleButton, 
 .emailLinkButton {
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
+  padding: var(--spaceM) var(--spaceL);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
   background: transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
+  font-size: var(--fontSizeBodyXS);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .active {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: color-mix(in lab, var(--background) 95%, transparent);
+  border-color: color-mix(in lab, var(--text) 30%, transparent);
 }
 
 .divider {
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.resetLink {
-  background: none;
-  border: none;
-  color: #3b82f6;
-  font-size: 0.875rem;
-  padding: 0;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.resetLink:hover {
-  color: #2563eb;
-}
-
-.secondaryButton {
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background-color: transparent;
-  color: #4a90e2;
-  border: 1px solid #4a90e2;
-}
-
-.secondaryButton:hover {
-  background-color: #f8f9fa;
-}
-
-.secondaryButton:disabled {
-  border-color: #cccccc;
-  color: #cccccc;
-  cursor: not-allowed;
+  color: var(--textLight);
+  font-size: var(--fontSizeBodyXS);
 }
 
 .googleButton {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  color: #333;
-  font-size: 1rem;
+  padding: var(--spaceM) var(--spaceL);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  background-color: var(--backgroundLight);
+  color: var(--textBody);
+  font-size: var(--fontSizeBodyM);
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin: 1rem 0;
+  margin: var(--spaceL) 0;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.googleButton:hover {
-  background-color: #f5f5f5;
+.googleButton:hover:not(:disabled) {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
 }
 
 .googleButton:disabled {
-  background-color: #eee;
+  background-color: color-mix(in lab, var(--background) 98%, transparent);
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    display: none;
+  }
+
+  .formWrapper {
+    padding: var(--spaceL);
+  }
+
+  .authToggle {
+    flex-direction: column;
+    gap: var(--spaceM);
+  }
+
+  .authToggleButton, 
+  .emailLinkButton {
+    width: 100%;
+  }
 }

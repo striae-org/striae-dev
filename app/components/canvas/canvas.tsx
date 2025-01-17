@@ -64,7 +64,7 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
     return 'An error occurred';
   };
 
-  return (
+  return (    
     <div className={styles.canvasContainer}>
       {(loadError || error) ? (
         <p className={styles.error}>{getErrorMessage()}</p>
@@ -85,6 +85,6 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
           Upload or select an image to get started
         </p>
       )}
-    </div>
+    </div>    
   );
 };

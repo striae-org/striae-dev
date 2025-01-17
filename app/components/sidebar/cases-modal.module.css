@@ -1,46 +1,52 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: color-mix(in lab, var(--background) 50%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: var(--zIndex5);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modal {
-  background: white;
-  border-radius: 8px;
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
   width: 90%;
-  max-width: 700px; /* Increased from 500px */
+  max-width: var(--maxWidthL);
   max-height: 80vh;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .modalHeader {
   display: flex;
-  font-size: 1.25rem;
+  font-size: var(--fontSizeBodyL);
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
+  padding: var(--spaceL);
+  border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  color: var(--textTitle);
 }
 
 .modalContent {
-  padding: 1rem;
+  padding: var(--spaceL);
   overflow-y: auto;
-  max-height: calc(80vh - 60px);
+  max-height: calc(80vh - var(--space3XL));
 }
 
 .closeButton {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: var(--fontSizeH5);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--spaceS);
+  color: var(--textLight);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.closeButton:hover {
+  color: var(--text);
 }
 
 .casesList {
@@ -49,33 +55,34 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: var(--spaceL);
 }
 
 .caseItem {
   width: 100%;
-  padding: 0.75rem 1rem;  
-  border-radius: 6px;
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
   text-align: left;
-  background: white;
+  background: var(--backgroundLight);
   cursor: pointer;
-  transition: all 0.2s ease;  
+  color: var(--textBody);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
 
 .caseItem:hover {
-  background-color: #f8f9fa;
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
 }
 
 .caseItem.active {
-  background-color: #e9ecef;
-  font-weight: 500;
+  background-color: color-mix(in lab, var(--background) 90%, transparent);
+  font-weight: var(--fontWeightMedium);
 }
 
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0 0;
-  margin-top: 1rem;
-  border-top: 1px solid #dee2e6;
+  padding: var(--spaceL) 0 0;
+  margin-top: var(--spaceL);
+  border-top: 1px solid color-mix(in lab, var(--text) 10%, transparent);
 }

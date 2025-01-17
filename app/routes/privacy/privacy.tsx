@@ -31,7 +31,7 @@ export const Privacy = () => {
 <p>For the purposes of this Privacy Policy:</p>
 <ul>
 <li>
-<p><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</p>
+<p><strong>Account</strong> means a unique account created for You to access Our Service or parts of Our Service.</p>
 </li>
 <li>
 <p><strong>Affiliate</strong> means an entity that controls, is controlled by or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</p>
@@ -96,14 +96,14 @@ export const Privacy = () => {
 </ul>
 <h4>Usage Data</h4>
 <p>Usage Data is collected automatically when using the Service.</p>
-<p>Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
+<p>Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of Our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
 <p>When You access the Service by or through a mobile device, We may collect certain information automatically, including, but not limited to, the type of mobile device You use, Your mobile device unique ID, the IP address of Your mobile device, Your mobile operating system, the type of mobile Internet browser You use, unique device identifiers and other diagnostic data.</p>
-<p>We may also collect information that Your browser sends whenever You visit our Service or when You access the Service by or through a mobile device.</p>
+<p>We may also collect information that Your browser sends whenever You visit Our Service or when You access the Service by or through a mobile device.</p>
 <h3>Use of Your Personal Data</h3>
 <p>The Company may use Personal Data for the following purposes:</p>
 <ul>
 <li>
-<p><strong>To provide and maintain our Service</strong>, including to monitor the usage of our Service.</p>
+<p><strong>To provide and maintain Our Service</strong>, including to monitor the usage of Our Service.</p>
 </li>
 <li>
 <p><strong>To manage Your Account:</strong> to manage Your registration as a user of the Service. The Personal Data You provide can give You access to different functionalities of the Service that are available to You as a registered user.</p>
@@ -115,29 +115,29 @@ export const Privacy = () => {
 <p><strong>To contact You:</strong> To contact You by email, telephone calls, SMS, or other equivalent forms of electronic communication, such as a mobile application's push notifications regarding updates or informative communications related to the functionalities, products or contracted services, including the security updates, when necessary or reasonable for their implementation.</p>
 </li>
 <li>
-<p><strong>To provide You</strong> with news, special offers and general information about other goods, services and events which we offer that are similar to those that you have already purchased or enquired about unless You have opted not to receive such information.</p>
+<p><strong>To provide You</strong> with news, special offers and general information about other goods, services and events which We offer that are similar to those that You have already purchased or enquired about unless You have opted not to receive such information.</p>
 </li>
 <li>
 <p><strong>To manage Your requests:</strong> To attend and manage Your requests to Us.</p>
 </li>
 <li>
-<p><strong>For business transfers:</strong> We may use Your information to evaluate or conduct a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Our assets, whether as a going concern or as part of bankruptcy, liquidation, or similar proceeding, in which Personal Data held by Us about our Service users is among the assets transferred.</p>
+<p><strong>For business transfers:</strong> We may use Your information to evaluate or conduct a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Our assets, whether as a going concern or as part of bankruptcy, liquidation, or similar proceeding, in which Personal Data held by Us about Our Service users is among the assets transferred.</p>
 </li>
 <li>
-<p><strong>For other purposes</strong>: We may use Your information for other purposes, such as data analysis, identifying usage trends, determining the effectiveness of our promotional campaigns and to evaluate and improve our Service, products, services, marketing and your experience.</p>
+<p><strong>For other purposes</strong>: We may use Your information for other purposes, such as data analysis, identifying usage trends, determining the effectiveness of Our promotional campaigns and to evaluate and improve Our Service, products, services, marketing and Your experience.</p>
 </li>
 </ul>
 <p>We may share Your personal information in the following situations:</p>
 <ul>
-<li><strong>With Service Providers:</strong> We may share Your personal information with Service Providers to monitor and analyze the use of our Service, for payment processing,  to contact You.</li>
+<li><strong>With Service Providers:</strong> We may share Your personal information with Service Providers to monitor and analyze the use of Our Service, for payment processing,  to contact You.</li>
 <li><strong>For business transfers:</strong> We may share or transfer Your personal information in connection with, or during negotiations of, any merger, sale of Company assets, financing, or acquisition of all or a portion of Our business to another company.</li>
-<li><strong>With Affiliates:</strong> We may share Your information with Our affiliates, in which case we will require those affiliates to honor this Privacy Policy. Affiliates include Our parent company and any other subsidiaries, joint venture partners or other companies that We control or that are under common control with Us.</li>
+<li><strong>With Affiliates:</strong> We may share Your information with Our affiliates, in which case We will require those affiliates to honor this Privacy Policy. Affiliates include Our parent company and any other subsidiaries, joint venture partners or other companies that We control or that are under common control with Us.</li>
 <li><strong>With business partners:</strong> We may share Your information with Our business partners to offer You certain products, services or promotions.</li>
 <li><strong>With other users:</strong> when You share personal information or otherwise interact in the public areas with other users, such information may be viewed by all users and may be publicly distributed outside.</li>
 <li><strong>With Your consent</strong>: We may disclose Your personal information for any other purpose with Your consent.</li>
 </ul>
 <h3>Retention of Your Personal Data</h3>
-<p>The Company will retain Your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use Your Personal Data to the extent necessary to comply with our legal obligations (for example, if we are required to retain your data to comply with applicable laws), resolve disputes, and enforce our legal agreements and policies.</p>
+<p>The Company will retain Your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use Your Personal Data to the extent necessary to comply with Our legal obligations (for example, if We are required to retain Your data to comply with applicable laws), resolve disputes, and enforce Our legal agreements and policies.</p>
 <p>The Company will also retain Usage Data for internal analysis purposes. Usage Data is generally retained for a shorter period of time, except when this data is used to strengthen the security or to improve the functionality of Our Service, or We are legally obligated to retain this data for longer time periods.</p>
 <h3>Transfer of Your Personal Data</h3>
 <p>Your information, including Personal Data, is processed at the Company's operating offices and in any other places where the parties involved in the processing are located. It means that this information may be transferred to — and maintained on — computers located outside of Your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from Your jurisdiction.</p>
@@ -146,8 +146,8 @@ export const Privacy = () => {
 <h3>Delete Your Personal Data</h3>
 <p>You have the right to delete or request that We assist in deleting the Personal Data that We have collected about You.</p>
 <p>Our Service may give You the ability to delete certain information about You from within the Service.</p>
-<p>You may update, amend, or delete Your information at any time by signing in to Your Account, if you have one, and visiting the account settings section that allows you to manage Your personal information. You may also contact Us to request access to, correct, or delete any personal information that You have provided to Us.</p>
-<p>Please note, however, that We may need to retain certain information when we have a legal obligation or lawful basis to do so.</p>
+<p>You may update, amend, or delete Your information at any time by signing in to Your Account, if You have one, and visiting the account settings section that allows You to manage Your personal information. You may also contact Us to request access to, correct, or delete any personal information that You have provided to Us.</p>
+<p>Please note, however, that We may need to retain certain information when We have a legal obligation or lawful basis to do so.</p>
 <h3>Disclosure of Your Personal Data</h3>
 <h4>Business Transactions</h4>
 <p>If the Company is involved in a merger, acquisition or asset sale, Your Personal Data may be transferred. We will provide notice before Your Personal Data is transferred and becomes subject to a different Privacy Policy.</p>
@@ -170,14 +170,14 @@ export const Privacy = () => {
           <p>The Service Providers We use may have access to Your Personal Data. These third-party vendors collect, store, use, process and transfer information about Your activity on Our Service in accordance with their Privacy Policies.</p>
 
           <h3>Analytics</h3>
-          <p>We may use third-party Service providers to monitor and analyze the use of our Service.</p>
+          <p>We may use third-party Service providers to monitor and analyze the use of Our Service.</p>
 <ul>
 <li>
 <p><strong>Firebase</strong></p>
 <p>Firebase is an analytics service provided by Google Inc.</p>
-<p>You may opt-out of certain Firebase features through your mobile device settings, such as your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">https://policies.google.com/privacy</a></p>
-<p>We also encourage you to review the Google's policy for safeguarding your data: <a href="https://support.google.com/analytics/answer/6004245" rel="noopener noreferrer" target="_blank">https://support.google.com/analytics/answer/6004245</a></p>
-<p>For more information on what type of information Firebase collects, please visit the How Google uses data when you use our partners' sites or apps webpage: <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">https://policies.google.com/technologies/partner-sites</a></p>
+<p>You may opt-out of certain Firebase features through Your mobile device settings, such as Your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <Link to="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">https://policies.google.com/privacy</Link></p>
+<p>We also encourage You to review the Google's policy for safeguarding Your data: <Link to="https://support.google.com/analytics/answer/6004245" rel="noopener noreferrer" target="_blank">https://support.google.com/analytics/answer/6004245</Link></p>
+<p>For more information on what type of information Firebase collects, please visit the How Google uses data when You use Our partners' sites or apps webpage: <Link to="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">https://policies.google.com/technologies/partner-sites</Link></p>
 </li>
 </ul>
 <h3>Email Marketing</h3>
@@ -186,16 +186,16 @@ export const Privacy = () => {
 <ul>
 <li>
 <p><strong>SendLayer</strong></p>
-<p>Their Privacy Policy can be viewed at <a href="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</a></p>
+<p>Their Privacy Policy can be viewed at <Link to="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</Link></p>
 </li>
 </ul>
 <h3>Payments</h3>
-<p>We may provide paid products and/or services within the Service. In that case, we may use third-party services for payment processing (e.g. payment processors).</p>
+<p>We may provide paid products and/or services within the Service. In that case, We may use third-party services for payment processing (e.g. payment processors).</p>
 <p>We will not store or collect Your payment card details. That information is provided directly to Our third-party payment processors whose use of Your personal information is governed by their Privacy Policy. These payment processors adhere to the standards set by PCI-DSS as managed by the PCI Security Standards Council, which is a joint effort of brands like Visa, Mastercard, American Express and Discover. PCI-DSS requirements help ensure the secure handling of payment information.</p>
 <ul>
 <li>
 <p><strong>Stripe</strong></p>
-<p>Their Privacy Policy can be viewed at <a href="https://stripe.com/us/privacy" rel="noopener noreferrer" target="_blank">https://stripe.com/us/privacy</a></p>
+<p>Their Privacy Policy can be viewed at <Link to="https://stripe.com/Us/privacy" rel="noopener noreferrer" target="_blank">https://stripe.com/Us/privacy</Link></p>
 </li>
 </ul>
         </section>
@@ -203,8 +203,8 @@ export const Privacy = () => {
           <h2>CCPA/CPRA Privacy Notice</h2>
 <p>This privacy notice section for California residents supplements the information contained in Our Privacy Policy and it applies solely to all visitors, users, and others who reside in the State of California.</p>
 <h3>Categories of Personal Information Collected</h3>
-<p>We collect information that identifies, relates to, describes, references, is capable of being associated with, or could reasonably be linked, directly or indirectly, with a particular Consumer or Device. The following is a list of categories of personal information which we may collect or may have been collected from California residents within the last twelve (12) months.</p>
-<p>Please note that the categories and examples provided in the list below are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact collected by Us, but reflects our good faith belief to the best of Our knowledge that some of that information from the applicable category may be and may have been collected. For example, certain categories of personal information would only be collected if You provided such personal information directly to Us.</p>
+<p>We collect information that identifies, relates to, describes, references, is capable of being associated with, or could reasonably be linked, directly or indirectly, with a particular Consumer or Device. The following is a list of categories of personal information which We may collect or may have been collected from California residents within the last twelve (12) months.</p>
+<p>Please note that the categories and examples provided in the list below are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact collected by Us, but reflects Our good faith belief to the best of Our knowledge that some of that information from the applicable category may be and may have been collected. For example, certain categories of personal information would only be collected if You provided such personal information directly to Us.</p>
 <ul>
 <li>
 <p><strong>Category A: Identifiers.</strong></p>
@@ -233,7 +233,7 @@ export const Privacy = () => {
 </li>
 <li>
 <p><strong>Category F: Internet or other similar network activity.</strong></p>
-<p>Examples: Interaction with our Service or advertisement.</p>
+<p>Examples: Interaction with Our Service or advertisement.</p>
 <p>Collected: Yes.</p>
 </li>
 <li>
@@ -281,24 +281,24 @@ export const Privacy = () => {
 <h3>Sources of Personal Information</h3>
 <p>We obtain the categories of personal information listed above from the following categories of sources:</p>
 <ul>
-<li><strong>Directly from You</strong>. For example, from the forms You complete on our Service, preferences You express or provide through our Service, or from Your purchases on our Service.</li>
-<li><strong>Indirectly from You</strong>. For example, from observing Your activity on our Service.</li>
-<li><strong>Automatically from You</strong>. For example, through cookies We or our Service Providers set on Your Device as You navigate through our Service.</li>
-<li><strong>From Service Providers</strong>. For example, third-party vendors to monitor and analyze the use of our Service, third-party vendors for payment processing,  or other third-party vendors that We use to provide the Service to You.</li>
+<li><strong>Directly from You</strong>. For example, from the forms You complete on Our Service, preferences You express or provide through Our Service, or from Your purchases on Our Service.</li>
+<li><strong>Indirectly from You</strong>. For example, from observing Your activity on Our Service.</li>
+<li><strong>Automatically from You</strong>. For example, through cookies We or Our Service Providers set on Your Device as You navigate through Our Service.</li>
+<li><strong>From Service Providers</strong>. For example, third-party vendors to monitor and analyze the use of Our Service, third-party vendors for payment processing,  or other third-party vendors that We use to provide the Service to You.</li>
 </ul>
 <h3>Use of Personal Information</h3>
 <p>We may use or disclose personal information We collect for &quot;business purposes&quot; or &quot;commercial purposes&quot; (as defined under the CCPA/CPRA), which may include the following examples:</p>
 <ul>
-<li>To operate our Service and provide You with Our Service.</li>
-<li>To provide You with support and to respond to Your inquiries, including to investigate and address Your concerns and monitor and improve our Service.</li>
-<li>To fulfill or meet the reason You provided the information. For example, if You share Your contact information to ask a question about our Service, We will use that personal information to respond to Your inquiry. If You provide Your personal information to purchase a product or service, We will use that information to process Your payment and facilitate delivery.</li>
+<li>To operate Our Service and provide You with Our Service.</li>
+<li>To provide You with support and to respond to Your inquiries, including to investigate and address Your concerns and monitor and improve Our Service.</li>
+<li>To fulfill or meet the reason You provided the information. For example, if You share Your contact information to ask a question about Our Service, We will use that personal information to respond to Your inquiry. If You provide Your personal information to purchase a product or service, We will use that information to process Your payment and facilitate delivery.</li>
 <li>To respond to law enforcement requests and as required by applicable law, court order, or governmental regulations.</li>
 <li>As described to You when collecting Your personal information or as otherwise set forth in the CCPA/CPRA.</li>
 <li>For internal administrative and auditing purposes.</li>
 <li>To detect security incidents and protect against malicious, deceptive, fraudulent or illegal activity, including, when necessary, to prosecute those responsible for such activities.</li>
 <li>Other one-time uses.</li>
 </ul>
-<p>Please note that the examples provided above are illustrative and not intended to be exhaustive. For more details on how we use this information, please refer to the &quot;Use of Your Personal Data&quot; section.</p>
+<p>Please note that the examples provided above are illustrative and not intended to be exhaustive. For more details on how We use this information, please refer to the &quot;Use of Your Personal Data&quot; section.</p>
 <p>If We decide to collect additional categories of personal information or use the personal information We collected for materially different, unrelated, or incompatible purposes We will update this Privacy Policy.</p>
 <h3>Disclosure of Personal Information</h3>
 <p>We may use or disclose and may have used or disclosed in the last twelve (12) months the following categories of personal information for business or commercial purposes:</p>
@@ -308,7 +308,7 @@ export const Privacy = () => {
 <li>Category D: Commercial information</li>
 <li>Category F: Internet or other similar network activity</li>
 </ul>
-<p>Please note that the categories listed above are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact disclosed, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been disclosed.</p>
+<p>Please note that the categories listed above are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact disclosed, but reflects Our good faith belief to the best of Our knowledge that some of that information from the applicable category may be and may have been disclosed.</p>
 <p>When We disclose personal information for a business purpose or a commercial purpose, We enter a contract that describes the purpose and requires the recipient to both keep that personal information confidential and not use it for any purpose except performing the contract.</p>
 <h3>Share of Personal Information</h3>
 <p>We may share, and have shared in the last twelve (12) months, Your personal information identified in the above categories with the following categories of third parties:</p>
@@ -329,9 +329,9 @@ export const Privacy = () => {
 <li>Category D: Commercial information</li>
 <li>Category F: Internet or other similar network activity</li>
 </ul>
-<p>Please note that the categories listed above are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact sold, but reflects our good faith belief to the best of Our knowledge that some of that information from the applicable category may be and may have been shared for value in return.</p>
+<p>Please note that the categories listed above are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact sold, but reflects Our good faith belief to the best of Our knowledge that some of that information from the applicable category may be and may have been shared for value in return.</p>
 <h3>Sale of Personal Information of Minors Under 16 Years of Age</h3>
-<p>We do not knowingly collect personal information from minors under the age of 16 through our Service, although certain third party websites that we link to may do so. These third-party websites have their own terms of use and privacy policies and We encourage parents and legal guardians to monitor their children's Internet usage and instruct their children to never provide information on other websites without their permission.</p>
+<p>We do not knowingly collect personal information from minors under the age of 16 through Our Service, although certain third party websites that We link to may do so. These third-party websites have their own terms of use and privacy policies and We encourage parents and legal guardians to monitor their children's Internet usage and instruct their children to never provide information on other websites without their permission.</p>
 <p>We do not sell the personal information of Consumers We actually know are less than 16 years of age, unless We receive affirmative authorization (the &quot;right to opt-in&quot;) from either the Consumer who is between 13 and 16 years of age, or the parent or guardian of a Consumer less than 13 years of age. Consumers who opt-in to the sale of personal information may opt-out of future sales at any time. To exercise the right to opt-out, You (or Your authorized representative) may submit a request to Us by contacting Us.</p>
 <p>If You have reason to believe that a child under the age of 13 (or 16) has provided Us with personal information, please contact Us with sufficient detail to enable Us to delete that information.</p>
 <h3>Your Rights under the CCPA/CPRA</h3>
@@ -345,7 +345,7 @@ export const Privacy = () => {
 <li>Our business or commercial purposes for collecting or selling that personal information</li>
 <li>The categories of third parties with whom We share that personal information</li>
 <li>The specific pieces of personal information We collected about You</li>
-<li>If we sold Your personal information or disclosed Your personal information for a business purpose, We will disclose to You:
+<li>If We sold Your personal information or disclosed Your personal information for a business purpose, We will disclose to You:
 <ul>
 <li>The categories of personal information categories sold</li>
 <li>The categories of personal information categories disclosed</li>
@@ -354,11 +354,11 @@ export const Privacy = () => {
 </ul>
 </li>
 <li><strong>The right to say no to the sale or sharing of Personal Data (opt-out).</strong> You have the right to direct Us to not sell Your personal information. To submit an opt-out request, please see the &quot;Do Not Sell My Personal Information&quot; section or contact Us.</li>
-<li><strong>The right to correct Personal Data.</strong> You have the right to correct or rectify any inaccurate personal information about You that We collected. Once We receive and confirm Your request, We will use commercially reasonable efforts to correct (and direct our Service Providers to correct) Your personal information, unless an exception applies.</li>
+<li><strong>The right to correct Personal Data.</strong> You have the right to correct or rectify any inaccurate personal information about You that We collected. Once We receive and confirm Your request, We will use commercially reasonable efforts to correct (and direct Our Service Providers to correct) Your personal information, unless an exception applies.</li>
 <li><strong>The right to limit use and disclosure of sensitive Personal Data.</strong> You have the right to request to limit the use or disclosure of certain sensitive personal information We collected about You, unless an exception applies. To submit, please see the &quot;Limit the Use or Disclosure of My Sensitive Personal Information&quot; section or contact Us.</li>
-<li><strong>The right to delete Personal Data.</strong> You have the right to request the deletion of Your Personal Data under certain circumstances, subject to certain exceptions. Once We receive and confirm Your request, We will delete (and direct Our Service Providers to delete) Your personal information from our records, unless an exception applies. We may deny Your deletion request if retaining the information is necessary for Us or Our Service Providers to:
+<li><strong>The right to delete Personal Data.</strong> You have the right to request the deletion of Your Personal Data under certain circumstances, subject to certain exceptions. Once We receive and confirm Your request, We will delete (and direct Our Service Providers to delete) Your personal information from Our records, unless an exception applies. We may deny Your deletion request if retaining the information is necessary for Us or Our Service Providers to:
 <ul>
-<li>Complete the transaction for which We collected the personal information, provide a good or service that You requested, take actions reasonably anticipated within the context of our ongoing business relationship with You, or otherwise perform our contract with You.</li>
+<li>Complete the transaction for which We collected the personal information, provide a good or service that You requested, take actions reasonably anticipated within the context of Our ongoing business relationship with You, or otherwise perform Our contract with You.</li>
 <li>Detect security incidents, protect against malicious, deceptive, fraudulent, or illegal activity, or prosecute those responsible for such activities.</li>
 <li>Debug products to identify and repair errors that impair existing intended functionality.</li>
 <li>Exercise free speech, ensure the right of another consumer to exercise their free speech rights, or exercise another right provided for by law.</li>
@@ -406,18 +406,18 @@ export const Privacy = () => {
 <h3>Do Not Sell My Personal Information</h3>
 <p>As defined in the CCPA/CPRA, &quot;sell&quot; and &quot;sale&quot; mean selling, renting, releasing, disclosing, disseminating, making available, transferring, or otherwise communicating orally, in writing, or by electronic or other means, a Consumer's personal information by the Business to a third party for valuable consideration. This means that We may have received some kind of benefit in return for sharing personal information, but not necessarily a monetary benefit.</p>
 <p>We do not sell personal information as the term sell is commonly understood. We do allow Service Providers to use Your personal information for the business purposes described in Our Privacy Policy, for activities such as advertising, marketing, and analytics, and these may be deemed a sale under CCPA/CPRA.</p>
-<p>You have the right to opt-out of the sale of Your personal information. Once We receive and confirm a verifiable consumer request from You, we will stop selling Your personal information. To exercise Your right to opt-out, please contact Us.</p>
-<p>The Service Providers we partner with (for example, our analytics or advertising partners) may use technology on the Service that sells personal information as defined by the CCPA/CPRA law. If you wish to opt out of the use of Your personal information for interest-based advertising purposes and these potential sales as defined under CCPA/CPRA law, you may do so by following the instructions below.</p>
+<p>You have the right to opt-out of the sale of Your personal information. Once We receive and confirm a verifiable consumer request from You, We will stop selling Your personal information. To exercise Your right to opt-out, please contact Us.</p>
+<p>The Service Providers We partner with (for example, Our analytics or advertising partners) may use technology on the Service that sells personal information as defined by the CCPA/CPRA law. If You wish to opt out of the use of Your personal information for interest-based advertising purposes and these potential sales as defined under CCPA/CPRA law, You may do so by following the instructions below.</p>
 <p>Please note that any opt out is specific to the browser You use. You may need to opt out on every browser that You use.</p>
 <h4>Website</h4>
-<p>If applicable, click &quot;Privacy Preferences&quot;, &quot;Update Privacy Preferences&quot; or &quot;Do Not Sell My Personal Information&quot; buttons listed on the Service to review your privacy preferences and opt out of cookies and other technologies that We may use. Please note that You will need to opt out from each browser that You use to access the Service.</p>
-<p>Additionally, You can opt out of receiving ads that are personalized as served by our Service Providers by following our instructions presented on the Service:</p>
+<p>If applicable, click &quot;Privacy Preferences&quot;, &quot;Update Privacy Preferences&quot; or &quot;Do Not Sell My Personal Information&quot; buttons listed on the Service to review Your privacy preferences and opt out of cookies and other technologies that We may use. Please note that You will need to opt out from each browser that You use to access the Service.</p>
+<p>Additionally, You can opt out of receiving ads that are personalized as served by Our Service Providers by following Our instructions presented on the Service:</p>
 <ul>
-<li>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/" rel="noopener noreferrer" target="_blank">http://www.networkadvertising.org/choices/</a></li>
-<li>The EDAA's opt-out platform <a href="http://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">http://www.youronlinechoices.com/</a></li>
-<li>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" rel="noopener noreferrer" target="_blank">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
+<li>The NAI's opt-out platform: <Link to="http://www.networkadvertising.org/choices/" rel="noopener noreferrer" target="_blank">http://www.networkadvertising.org/choices/</Link></li>
+<li>The EDAA's opt-out platform <Link to="http://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">http://www.youronlinechoices.com/</Link></li>
+<li>The DAA's opt-out platform: <Link to="http://optout.aboutads.info/?c=2&amp;lang=EN" rel="noopener noreferrer" target="_blank">http://optout.aboutads.info/?c=2&amp;lang=EN</Link></li>
 </ul>
-<p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If you change browsers or delete the cookies saved by your browser, You will need to opt out again.</p>
+<p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If You change browsers or delete the cookies saved by Your browser, You will need to opt out again.</p>
 <h4>Mobile Devices</h4>
 <p>Your mobile device may give You the ability to opt out of the use of information about the apps You use in order to serve You ads that are targeted to Your interests:</p>
 <ul>
@@ -427,7 +427,7 @@ export const Privacy = () => {
 <p>You can also stop the collection of location information from Your mobile device by changing the preferences on Your mobile device.</p>
 <h3>Limit the Use or Disclosure of My Sensitive Personal Information</h3>
 <p>If You are a California resident, You have the right to limit the use and disclosure of Your sensitive personal information to that use which is necessary to perform the services or provide the goods reasonably expected by an average Consumer who requests such services or goods.</p>
-<p>We collect, use and disclose sensitive personal information in ways that are necessary to provide the Service. For more information on how We use Your personal information, please see the &quot;Use of Your Personal Data&quot; section or contact us.</p>
+<p>We collect, use and disclose sensitive personal information in ways that are necessary to provide the Service. For more information on how We use Your personal information, please see the &quot;Use of Your Personal Data&quot; section or contact Us.</p>
 
         </section>
         <section className={styles.section}>
@@ -435,8 +435,8 @@ export const Privacy = () => {
 <p>Our Service does not respond to Do Not Track signals.</p>
 <p>However, some third party websites do keep track of Your browsing activities. If You are visiting such websites, You can set Your preferences in Your web browser to inform websites that You do not want to be tracked. You can enable or disable DNT by visiting the preferences or settings page of Your web browser.</p>
 <h2>Your California Privacy Rights (California's Shine the Light law)</h2>
-<p>Under California Civil Code Section 1798 (California's Shine the Light law), California residents with an established business relationship with us can request information once a year about sharing their Personal Data with third parties for the third parties' direct marketing purposes.</p>
-<p>If you'd like to request more information under the California Shine the Light law, and if You are a California resident, You can contact Us using the contact information provided below.</p>
+<p>Under California Civil Code Section 1798 (California's Shine the Light law), California residents with an established business relationship with Us can request information once a year about sharing their Personal Data with third parties for the third parties' direct marketing purposes.</p>
+<p>If You'd like to request more information under the California Shine the Light law, and if You are a California resident, You can contact Us using the contact information provided below.</p>
 <h2>California Privacy Rights for Minor Users (California Business and Professions Code Section 22581)</h2>
 <p>California Business and Professions Code Section 22581 allows California residents under the age of 18 who are registered users of online sites, services or applications to request and obtain removal of content or information they have publicly posted.</p>
 <p>To request removal of such data, and if You are a California resident, You can contact Us using the contact information provided below, and include the email address associated with Your account.</p>
@@ -454,7 +454,7 @@ export const Privacy = () => {
         </section>
         <section className={styles.section}>
           <h2>Contact Us</h2>
-<p>If you have any questions about this Privacy Policy, You can contact us:</p>
+<p>If You have any questions about this Privacy Policy, You can contact Us:</p>
 <ul>
 <li>
 <p>By email: info@allyforensics.com</p>

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
-import { addUserDataAction } from '~/server/actions/addUserData';
 import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
@@ -22,8 +21,8 @@ import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
+import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
-import { json } from '@remix-run/cloudflare';
 
 export const meta = () => {
   return baseMeta({
@@ -32,21 +31,21 @@ export const meta = () => {
   });
 };
 
-  interface Data {
-    email: string;
-    firstName: string;
-    lastName: string;
-    permitted: boolean;
+interface UserData {
+  uid: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  permitted: boolean;
+  cases: Array<{
+    caseNumber: string;
     createdAt: string;
-    uid: string;
-  }
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
 
-  interface LoaderData {
-    data: Data[];    
-  }  
-
-  const WORKER_URL = paths.data_worker_url;
-  const KEYS_URL = paths.keys_url;
+const USER_WORKER_URL = paths.user_worker_url;  
 
 const actionCodeSettings = {
   url: 'https://striae.allyforensics.com', // Update with your domain in production
@@ -55,45 +54,21 @@ const actionCodeSettings = {
 
 const provider = new GoogleAuthProvider();
 
-export const loader = async () => {  
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    return json<LoaderData>({ data: [] });
-  }
-
-  try {
-
-    // Get API key from keys worker
-    const keyResponse = await fetch(`${KEYS_URL}/FWJIO_WFOLIWLF_WFOUIH`);
-    if (!keyResponse.ok) {
-      throw new Error('Failed to retrieve API key');
-    }
-    const apiKey = await keyResponse.text();
-
-    const response = await fetch(`${WORKER_URL}/${currentUser.uid}/data.json`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch:', response.status);
-      return json<LoaderData>({ data: [] });
-    }
-
-    const data = await response.json();
-    console.log('Loader data:', data); // Debug log
-    return json<LoaderData>({ 
-      data: Array.isArray(data) ? data.filter(Boolean) : []       
-    });
-     
-  } catch (error) {
-    console.error('Loader error:', error);
-    return json<LoaderData>({ data: [] });
-  }
-};
+const createUserData = (
+  uid: string,
+  email: string | null,
+  firstName: string,
+  lastName: string
+): UserData => ({
+  uid,
+  email,
+  firstName,
+  lastName,
+  permitted: false,
+  cases: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
 
 export const Login = () => {    
   const navigate = useNavigate();
@@ -125,13 +100,27 @@ export const Login = () => {
       return;
     }
     
-    if (additionalInfo.isNewUser) {
-      await addUserDataAction({
-        userUid: result.user.uid,
-        email: result.user.email,
-        firstName: additionalInfo.profile?.given_name || '',
-        lastName: additionalInfo.profile?.family_name || ''       
-      });
+if (additionalInfo?.isNewUser) {
+  const apiKey = await getUserApiKey();
+  const userData = createUserData(
+    result.user.uid,
+    result.user.email,
+    additionalInfo.profile?.given_name || '',
+    additionalInfo.profile?.family_name || ''
+  );
+
+  const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Custom-Auth-Key': apiKey
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+        throw new Error('Failed to create user data');
+      }
     }
 
     setUser(result.user);
@@ -145,65 +134,92 @@ export const Login = () => {
 
   const NameCollectionForm = () => {
   return (
-    <form onSubmit={async (e) => {
-      e.preventDefault();
-      setIsLoading(true);
-      
-      const formData = new FormData(e.currentTarget);
-      const firstName = formData.get('firstName') as string;
-      const lastName = formData.get('lastName') as string;
+    <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+        <div className={styles.logo} />
+      </Link>
+      <div className={styles.formWrapper}>
+        <h1 className={styles.title}>Complete Your Profile</h1>
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          setIsLoading(true);
+          setError('');
+          
+          const formData = new FormData(e.currentTarget);
+          const firstName = formData.get('firstName') as string;
+          const lastName = formData.get('lastName') as string;
 
-      try {
-        if (emailLinkUser) {
-          await updateProfile(emailLinkUser, {
-            displayName: `${firstName} ${lastName}`
-          });
+          try {
+            if (emailLinkUser) {
+              // Update Firebase profile
+              await updateProfile(emailLinkUser, {
+                displayName: `${firstName} ${lastName}`
+              });
 
-          await addUserDataAction({
-            userUid: emailLinkUser.uid,
-            email: emailLinkUser.email,
-            firstName,
-            lastName            
-          });
+              // Get API key and create user data
+              const apiKey = await getUserApiKey();
+              const userData = createUserData(
+                emailLinkUser.uid,
+                emailLinkUser.email,
+                firstName,
+                lastName
+              );
 
-          setUser(emailLinkUser);
-          setNeedsProfile(false);
-        }
-      } catch (err) {
-        const { message } = handleAuthError(err);
-        setError(message);
-      } finally {
-        setIsLoading(false);
-      }
-    }} className={styles.form}>
-      <h2>Complete Your Profile</h2>
-      <input
-        type="text"
-        name="firstName"
-        required
-        placeholder="First Name (required)"
-        className={styles.input}
-        disabled={isLoading}
-      />
-      <input
-        type="text"
-        name="lastName"
-        required
-        placeholder="Last Name (required)"
-        className={styles.input}
-        disabled={isLoading}
-      />
-      {error && <p className={styles.error}>{error}</p>}
-      <button
-        type="submit"
-        className={styles.button}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Saving...' : 'Continue'}
-      </button>
-    </form>
+              // Add to KV database
+              const response = await fetch(`${USER_WORKER_URL}/${emailLinkUser.uid}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Custom-Auth-Key': apiKey
+                },
+                body: JSON.stringify(userData)
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to create user data');
+              }
+
+              setUser(emailLinkUser);
+              setNeedsProfile(false);
+            }
+          } catch (err) {
+            const { message } = handleAuthError(err);
+            setError(message);
+          } finally {
+            setIsLoading(false);
+          }
+        }} className={styles.form}>
+          <input
+            type="text"
+            name="firstName"
+            required
+            placeholder="First Name (required)"
+            className={styles.input}
+            disabled={isLoading}
+            autoComplete="given-name"
+          />
+          <input
+            type="text"
+            name="lastName"
+            required
+            placeholder="Last Name (required)"
+            className={styles.input}
+            disabled={isLoading}
+            autoComplete="family-name"
+          />
+          {error && <p className={styles.error}>{error}</p>}
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : 'Complete Registration'}
+          </button>
+        </form>
+      </div>
+    </div>
   );
-};  
+};
 
     const checkPasswordStrength = (password: string): boolean => {
     const hasMinLength = password.length >= 10;
@@ -253,36 +269,62 @@ export const Login = () => {
   } finally {
     setIsLoading(false);
   }
-};
-    
+};   
+   
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let email = window.localStorage.getItem('emailForSignIn');
       if (!email) {
-      email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
+        email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
       }
       if (email) {
         setIsLoading(true);
         signInWithEmailLink(auth, email, window.location.href)
           .then(async (result) => {
-             const additionalInfo = getAdditionalUserInfo(result);
+            console.log('Email link sign in result:', result);
+            const additionalInfo = getAdditionalUserInfo(result);
+            console.log('Additional info:', additionalInfo);
         
-            if (additionalInfo?.isNewUser) {
+            if (additionalInfo?.isNewUser || !result.user.displayName) {
+              console.log('Setting new user states');
               setEmailLinkUser(result.user);
               setNeedsProfile(true);
+              setIsLoading(false);
+              return;
             } else {
-            // Add user data to R2
-            await addUserDataAction({
-              userUid: result.user.uid,
+          // Get API key      
+          const apiKey = await getUserApiKey();
+                
+          // Add to KV database
+          const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Custom-Auth-Key': apiKey
+            },
+            body: JSON.stringify({
               email: result.user.email,
-              firstName: additionalInfo.profile?.given_name || '',
-              lastName: additionalInfo.profile?.family_name || ''                          
-            });
-            setUser(result.user);
+              firstName: result.user.displayName?.split(' ')[0] || '',
+              lastName: result.user.displayName?.split(' ')[1] || '',
+              permitted: false
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to create user data');
           }
-            window.localStorage.removeItem('emailForSignIn');            
+          
+          setUser(result.user);
+        }
+        window.localStorage.removeItem('emailForSignIn');            
+      })
+          .catch((error) => {
+            console.error('Email link error:', error);
+            setError(error.message);
           })
-          .catch((error) => setError(error.message))
-          .finally(() => setIsLoading(false));
+          .finally(() => {
+            window.localStorage.removeItem('emailForSignIn');
+            setIsLoading(false);
+          });
       }
     }
 
@@ -312,72 +354,53 @@ export const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  setError('');
   setIsLoading(true);
+  setError('');
 
-  const formData = new FormData(formRef.current!);
+  const formData = new FormData(e.currentTarget as HTMLFormElement);
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const confirmPassword = formData.get('confirmPassword') as string;
+  const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
 
   try {
-    if (isLogin) {
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        if (!userCredential.user.emailVerified) {
-          await handleSignOut();
-          setError('Please verify your email before logging in');
-          return;
-        }
-        setUser(userCredential.user);
-      } catch (err) {
-        const { message } = handleAuthError(err);
-        setError(message);
-        return;
-      }
-    } else {
-      // Registration validation
-      if (password !== confirmPassword) {
-        setError(ERROR_MESSAGES.PASSWORDS_MISMATCH);
-        return;
-      }
-      
-      if (!checkPasswordStrength(password)) {
-        setError(ERROR_MESSAGES.WEAK_PASSWORD);
-        return;
-      }
-
-      const firstName = formData.get('firstName') as string;
-      const lastName = formData.get('lastName') as string;
-
-      if (!firstName || !lastName) {
-        setError('First and last name are required');
-        return;
-      }
-
-      try {
-        const createCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(createCredential.user, {
-          displayName: `${firstName} ${lastName}`
-        });
-
-        // Add user data to R2
-      await addUserDataAction({
-        userUid: createCredential.user.uid,
-        email: createCredential.user.email,
-        firstName,
-        lastName        
+    if (!isLogin) {
+      // Registration
+      const createCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(createCredential.user, {
+        displayName: `${firstName} ${lastName}`
       });
 
-        await sendEmailVerification(createCredential.user);
-        await handleSignOut();
-        setError('Registration successful! Please verify your email before logging in.');
-        setIsLogin(true);
-      } catch (err) {
-        const { message } = handleAuthError(err);
-        setError(message);
-        return;
+      // Get API key      
+      const apiKey = await getUserApiKey();
+
+      // Add to KV database
+      const userData = createUserData(
+        createCredential.user.uid,
+        createCredential.user.email,
+        firstName,
+        lastName
+      );
+
+      const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create user data');
       }
+
+      await sendEmailVerification(createCredential.user);
+      setError('Please check your email to verify your account');
+      handleSignOut();
+    } else {
+      // Login
+      await signInWithEmailAndPassword(auth, email, password);
     }
   } catch (err) {
     const { message } = handleAuthError(err);
@@ -389,30 +412,76 @@ export const Login = () => {
 
   const EmailLinkForm = () => {
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get('email') as string;
-      handleEmailLink(email);
-    }} className={styles.form}>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        autoComplete="email"
-        className={styles.input}
-        required
-        disabled={isLoading}
-      />
-      {error && <p className={styles.error}>{error}</p>}
-      <button 
-        type="submit" 
-        className={styles.button}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Sending...' : 'Send Login Link'}
-      </button>
-    </form>
+    <>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get('email') as string;
+        const firstName = formData.get('firstName') as string;
+        const lastName = formData.get('lastName') as string;
+        
+        // Store name data for registration flow
+        if (!isLogin) {
+          window.localStorage.setItem('firstName', firstName);
+          window.localStorage.setItem('lastName', lastName);
+        }
+        
+        handleEmailLink(email);
+      }} className={styles.form}>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          autoComplete="email"
+          className={styles.input}
+          required
+          disabled={isLoading}
+        />
+        
+        {!isLogin && (
+          <>
+            <input
+              type="text"
+              name="firstName"
+              required
+              placeholder="First Name (required)"
+              className={styles.input}
+              disabled={isLoading}
+              autoComplete="given-name"
+            />
+            <input
+              type="text"
+              name="lastName"
+              required
+              placeholder="Last Name (required)"
+              className={styles.input}
+              disabled={isLoading}
+              autoComplete="family-name"
+            />
+          </>
+        )}
+        
+        {error && <p className={styles.error}>{error}</p>}
+        <button 
+          type="submit" 
+          className={styles.button}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Sending...' : 'Send Login Link'}
+        </button>
+      </form>
+      
+      <p className={styles.toggle}>
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <button 
+          onClick={() => setIsLogin(!isLogin)}
+          className={styles.toggleButton}
+          disabled={isLoading}
+        >
+          {isLogin ? 'Register' : 'Login'}
+        </button>
+      </p>
+    </>
   );
 };
 

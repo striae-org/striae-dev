@@ -9,14 +9,19 @@ import {
   useRouteError,
   Link
 } from "@remix-run/react";
+import { 
+  ThemeProvider,
+  themeStyles 
+} from '~/components/theme-provider/theme-provider';
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
 import "./tailwind.css";
-import styles from '~/styles/error.module.css';
+import styles from '~/styles/root.module.css';
 import { auth } from "./services/firebase";
 import { AuthContext } from "./contexts/auth.context";
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import './reset.module.css';
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -37,20 +42,26 @@ export const links: LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const theme = 'light';
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />        
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000" />
+        <meta name="color-scheme" content={theme === 'light' ? 'dark' : 'light'} />
+        <style dangerouslySetInnerHTML={{ __html: themeStyles }} />        
         <Meta />
         <Links />
       </head>
       <body className="flex flex-col min-h-screen w-screen max-w-full overflow-x-hidden">
+        <ThemeProvider theme={theme} className="">
         <MobileWarning />
         <main className="flex-grow w-full">
           {children}
         </main>
         <Footer />
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -90,14 +101,16 @@ export function ErrorBoundary() {
         <head>
           <title>{`${error.status} ${error.statusText}`}</title>          
         </head>
-        <body className="flex flex-col min-h-screen">          
+        <body className="flex flex-col min-h-screen">
+          <ThemeProvider theme="light" className="">          
           <main className="flex-grow">
             <div className={styles.errorContainer}>
-              <h1 className={styles.errorTitle}>{error.status}</h1>
+              <div className={styles.errorTitle}>{error.status}</div>
               <p className={styles.errorMessage}>{error.statusText}</p>
               <Link to="/" className={styles.errorLink}>Return Home</Link>
             </div>
-          </main>          
+          </main>
+          </ThemeProvider>          
         </body>
       </html>
     );
@@ -108,14 +121,16 @@ export function ErrorBoundary() {
       <head>
         <title>Oops! Something went wrong</title>       
       </head>
-      <body className="flex flex-col min-h-screen">        
+      <body className="flex flex-col min-h-screen">
+        <ThemeProvider theme="light" className="">        
         <main className="flex-grow">
           <div className={styles.errorContainer}>
-            <h1 className={styles.errorTitle}>500</h1>
+            <div className={styles.errorTitle}>500</div>
             <p className={styles.errorMessage}>Something went wrong. Please try again later.</p>
             <Link to="/" className={styles.errorLink}>Return Home</Link>
           </div>
-        </main>        
+        </main>
+        </ThemeProvider>        
       </body>
     </html>
   );

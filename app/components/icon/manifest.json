@@ -1,0 +1,98 @@
+{
+  "send": {
+    "width": 24,
+    "height": 24
+  },
+  "arrow-right": {
+    "width": 24,
+    "height": 24
+  },
+  "chevron-right": {
+    "width": 24,
+    "height": 24
+  },
+  "github": {
+    "width": 24,
+    "height": 24
+  },
+  "menu": {
+    "width": 24,
+    "height": 24
+  },
+  "figma": {
+    "width": 24,
+    "height": 24
+  },
+  "copy": {
+    "width": 24,
+    "height": 24
+  },
+  "error": {
+    "width": 24,
+    "height": 24
+  },
+  "arrow-left": {
+    "width": 24,
+    "height": 24
+  },
+  "check": {
+    "width": 24,
+    "height": 24
+  },
+  "link": {
+    "width": 24,
+    "height": 24
+  },
+  "close": {
+    "width": 24,
+    "height": 24
+  },
+  "pause": {
+    "width": 24,
+    "height": 24
+  },
+  "play": {
+    "width": 24,
+    "height": 24
+  },
+  "bluesky": {
+    "width": 24,
+    "height": 24
+  },
+  "linkedin": {
+    "width": 24,
+    "height": 24
+  },
+  "soundcloud": {
+    "width": 24,
+    "height": 24
+  },
+  "number": {
+    "width": 24,
+    "height": 24
+  },
+  "class": {
+    "width": 24,
+    "height": 24
+  },
+  "notes": {
+    "width": 24,
+    "height": 24
+  },
+  "print": {
+    "width": 24,
+    "height": 24
+  },
+  "id": {
+    "width": 24,
+    "height": 24
+  },
+  "index": {
+    "width": 24,
+    "height": 24
+  },
+  "tictactoe": {
+    "width": 24,
+    "height": 24
+  }
+}

@@ -8,6 +8,8 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
+import { getUserApiKey } from '~/utils/auth';
+import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
 
@@ -15,6 +17,8 @@ interface ManageProfileProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const USER_WORKER_URL = paths.user_worker_url;
 
 export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const { user } = useContext(AuthContext);  
@@ -53,9 +57,31 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         }
       }
 
+       // Update Firebase profile
       await updateProfile(user, {
         displayName
       });
+
+      // Update KV store
+      const apiKey = await getUserApiKey();
+      const [firstName, lastName] = displayName.split(' ');
+      
+      const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify({
+          email,
+          firstName: firstName || '',
+          lastName: lastName || '',
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile in database');
+      }
 
       setSuccess(ERROR_MESSAGES.PROFILE_UPDATED);
     } catch (err) {

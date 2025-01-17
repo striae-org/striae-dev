@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 import { baseMeta } from '~/utils/meta';
-import styles from '~/styles/error.module.css';
+import styles from '~/styles/root.module.css';
 
 export const meta = () => {
   return baseMeta({
@@ -12,7 +12,7 @@ export const meta = () => {
 export default function NotFound() {
   return (
     <div className={styles.errorContainer}>
-      <h1 className={styles.errorTitle}>404</h1>
+      <div className={styles.errorTitle}>404</div>
       <p className={styles.errorMessage}>Page not found</p>
       <Link to="/" className={styles.errorLink}>Return Home</Link>
     </div>

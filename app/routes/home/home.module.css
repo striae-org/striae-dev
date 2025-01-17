@@ -1,0 +1,97 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spaceXL);
+  padding: var(--spaceM);
+  text-align: center;
+  max-width: var(--maxWidthL);
+  margin: 0 var(--spaceOuter);
+}
+
+.logo {
+  width: 300px;
+  height: 300px;
+  background-image: url('/logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.title {
+  font-size: var(--fontSizeH2);
+  font-weight: var(--fontWeightMedium);
+  color: var(--background);
+  max-width: 1000px;
+  line-height: var(--lineHeightTitle);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: var(--spaceM);
+  margin-top: var(--spaceL);
+}
+
+.actionButton,
+.betaButton {
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  text-decoration: none;
+  font-weight: var(--fontWeightMedium);
+  font-size: var(--fontSizeBodyM);
+  transition: all var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.actionButton {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.actionButton:hover {
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
+}
+
+.betaButton {
+  background-color: var(--accent);
+  color: var(--white);
+}
+
+.betaButton:hover {
+  background-color: color-mix(in lab, var(--accent) 85%, var(--black));
+}
+
+@media (max-width: 696px) {
+  .container {
+    padding: 0 var(--spaceM);
+  }
+
+  .title {
+    font-size: var(--fontSizeH3);
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .actionButton,
+  .betaButton {
+    width: 100%;
+    text-align: center;
+  }
+}
