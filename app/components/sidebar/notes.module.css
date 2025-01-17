@@ -120,17 +120,6 @@ textarea:focus {
   margin-bottom: 2rem;
 }
 
-.colorLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.colorInput {
-  height: 40px;
-  padding: 0.25rem;
-}
-
 .radioGroup {
   display: flex;
   gap: 1.5rem;
@@ -145,6 +134,8 @@ textarea:focus {
   gap: 0.5rem;
   color: #495057;
   font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
 }
 
 .radioGroup input[type="radio"],

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './colors.module.css';
 
 interface ColorSelectorProps {
@@ -19,21 +20,46 @@ const commonColors = [
 ];
 
 export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => {
+  const [showColorWheel, setShowColorWheel] = useState(false);
+
   return (
     <div className={styles.colorSelector}>
-      <span className={styles.colorLabel}>Select index color</span>
-      <div className={styles.colorGrid}>
-        {commonColors.map((color) => (
-          <button
-            key={color}
-            className={`${styles.colorSwatch} ${color === selectedColor ? styles.selected : ''}`}
-            style={{ backgroundColor: color }}
-            onClick={() => onColorSelect(color)}
-            aria-label={`Select ${color} color`}
-            title={color}
-          />
-        ))}
+      <div className={styles.colorHeader}>
+        <span className={styles.colorLabel}>Select index color</span>
+        <button 
+          onClick={() => setShowColorWheel(!showColorWheel)}
+          className={styles.toggleButton}
+        >
+          {showColorWheel ? 'Show Presets' : 'Show Color Wheel'}
+        </button>
       </div>
+      
+      {showColorWheel ? (
+        <>
+          <label htmlFor="colorWheelInput">Color:</label>
+          <input
+            id="colorWheelInput"
+            type="color"
+            value={selectedColor}
+            onChange={(e) => onColorSelect(e.target.value)}
+            className={styles.colorWheel}
+            title="Choose a color"
+          />
+        </>
+      ) : (
+        <div className={styles.colorGrid}>
+          {commonColors.map((color) => (
+            <button
+              key={color}
+              className={`${styles.colorSwatch} ${color === selectedColor ? styles.selected : ''}`}
+              style={{ backgroundColor: color }}
+              onClick={() => onColorSelect(color)}
+              aria-label={`Select ${color} color`}
+              title={color}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
