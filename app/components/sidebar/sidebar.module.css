@@ -368,10 +368,10 @@
 
 .sidebarToggle {
   margin-bottom: 1rem;
-  padding: 0 1rem;
+  padding: 1rem 1rem;
 }
 
-.toggleButton {
+.sidebarToggle button {
   width: 100%;
   padding: 0.75rem;
   background-color: var(--primary);
@@ -383,11 +383,11 @@
   transition: all 0.2s;
 }
 
-.toggleButton:hover:not(:disabled) {
+.sidebarToggle button:hover:not(:disabled) {
   background-color: color-mix(in lab, var(--primary) 85%, var(--black));
 }
 
-.toggleButton:disabled {
+.sidebarToggle button:disabled {
   background-color: var(--backgroundLight);
   color: var(--textLight);
   cursor: not-allowed;

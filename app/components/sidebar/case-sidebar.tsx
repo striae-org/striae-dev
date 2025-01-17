@@ -350,13 +350,14 @@ return (
         </ul>
       )}
     </div>
+    <div className={`${styles.sidebarToggle} mb-4`}>
     <button
           onClick={onNotesClick}
-          disabled={!imageLoaded}
-          className={styles.toggleButton}
+          disabled={!imageLoaded}          
         >
           Image Notes
         </button>
+        </div>
           {currentCase && (
         <div className={`${styles.caseRename} mb-4`}>
           <input
