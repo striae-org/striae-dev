@@ -4,6 +4,7 @@ import styles from './sidebar.module.css';
 import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './case-sidebar';
+import { NotesSidebar } from './notes-sidebar';
 
 interface FileData {
   id: string;
@@ -14,11 +15,18 @@ interface FileData {
 interface SidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
-  onCaseChange: (caseNumber: string) => void;  // Add this prop
+  onCaseChange: (caseNumber: string) => void;
+  imageLoaded?: boolean;
+  currentCase?: string;
 }
 
-export const Sidebar = ({ user, onImageSelect, onCaseChange }: SidebarProps) => {
+export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, currentCase }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  const handleReturn = () => {
+    setShowNotes(false);
+  };
 
   return (
     <div className={styles.sidebar}>
@@ -37,15 +45,34 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange }: SidebarProps) => 
         </div>
       </div>
 
+      <div className={styles.sidebarToggle}>
+        <button
+          onClick={() => setShowNotes(true)}
+          disabled={!imageLoaded}
+          className={styles.toggleButton}
+        >
+          Image Notes
+        </button>
+      </div>
+
       <ManageProfile 
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
 
-      <CaseSidebar 
-        user={user} 
-        onImageSelect={onImageSelect}
-        onCaseChange={onCaseChange} />
+      {showNotes ? (
+        <NotesSidebar 
+          currentCase={currentCase || ''}
+          onReturn={handleReturn}
+        />
+      ) : (
+        <CaseSidebar 
+          user={user} 
+          onImageSelect={onImageSelect}
+          onCaseChange={onCaseChange}
+        />
+      )}
+      
     </div>
   );
 };
