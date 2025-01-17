@@ -4,10 +4,13 @@
 }
 
 .caseSection h4 {
+  font-size: 1.3rem;
+  font-weight: 600;  /* Increased weight to match case-sidebar */
   color: #495057;
   margin-bottom: 1rem;
-  font-size: 1rem;
 }
+
+
 
 .caseInput {
   display: flex;
