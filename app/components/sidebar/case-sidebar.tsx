@@ -364,7 +364,7 @@ return (
             value={newCaseName}
             onChange={(e) => setNewCaseName(e.target.value)}
             placeholder="New Case Number"
-            className={styles.renameInput}
+            className={styles.caseInput}
           />
           <button
             onClick={handleRenameCase}
