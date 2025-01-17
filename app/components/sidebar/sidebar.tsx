@@ -68,13 +68,11 @@ export const Sidebar = ({
           </button>
           <SignOut />
         </div>
-      </div>      
-
+      </div>  
       <ManageProfile 
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
-
       {showNotes ? (
         <NotesSidebar 
           currentCase={currentCase}
