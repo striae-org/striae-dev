@@ -1,0 +1,15 @@
+.toolbar {
+  display: flex;
+  gap: var(--spaceS);
+  padding: var(--spaceM);
+  background: var(--background);
+  border-radius: var(--radiusL);
+  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    width: calc(100% - var(--spaceXL));
+    justify-content: space-around;
+  }
+}

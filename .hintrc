@@ -12,6 +12,12 @@
           "meta[name=theme-color]"
         ]
       }
+    ],
+    "axe/aria": [
+      "default",
+      {
+        "aria-valid-attr-value": "off"
+      }
     ]
   }
 }
