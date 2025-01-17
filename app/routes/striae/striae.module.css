@@ -14,3 +14,15 @@
   min-width: 0; /* Prevent flex items from overflowing */
   height: 100vh;
 }
+
+.canvasArea {
+  position: relative;
+  flex: 1;
+}
+
+.toolbarWrapper {
+  position: absolute;
+  top: var(--spaceL);
+  left: var(--spaceL);
+  z-index: var(--zIndex2);
+}
