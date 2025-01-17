@@ -23,13 +23,13 @@ export const Striae = ({ user }: StriaePage) => {
   const [error, setError] = useState<string>();
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Case management states
+  // Case management states - All managed here
   const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
   const [caseNumber, setCaseNumber] = useState('');
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
+  const [showNotes, setShowNotes] = useState(false);
 
-  
 
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
@@ -80,6 +80,7 @@ export const Striae = ({ user }: StriaePage) => {
         onImageSelect={handleImageSelect}
         onCaseChange={handleCaseChange}
         currentCase={currentCase}
+        setCurrentCase={setCurrentCase}
         imageLoaded={imageLoaded}
         setImageLoaded={setImageLoaded}
         files={files}
@@ -90,6 +91,8 @@ export const Striae = ({ user }: StriaePage) => {
         setError={setError}
         successAction={successAction}
         setSuccessAction={setSuccessAction}
+        showNotes={showNotes}
+        setShowNotes={setShowNotes}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>

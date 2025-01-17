@@ -17,8 +17,9 @@ interface SidebarProps {
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
   currentCase: string;
+  setCurrentCase: (caseNumber: string) => void;
   files: FileData[];
-  setFiles: (files: FileData[]) => void;
+  setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
   imageLoaded: boolean;
   setImageLoaded: (loaded: boolean) => void;
   caseNumber: string;
@@ -27,6 +28,8 @@ interface SidebarProps {
   setError: (error: string) => void;
   successAction: 'loaded' | 'created' | 'deleted' | null;
   setSuccessAction: (action: 'loaded' | 'created' | 'deleted' | null) => void;
+  showNotes: boolean;
+  setShowNotes: (show: boolean) => void;
 }
 
 export const Sidebar = ({ 
@@ -34,6 +37,7 @@ export const Sidebar = ({
   onImageSelect, 
   onCaseChange,
   currentCase,
+  setCurrentCase,
   imageLoaded,
   setImageLoaded,
   files,
@@ -43,14 +47,11 @@ export const Sidebar = ({
   error,
   setError,
   successAction,
-  setSuccessAction
+  setSuccessAction,
+  showNotes,
+  setShowNotes
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
-
-  const handleReturn = () => {
-    setShowNotes(false);
-  };
 
   return (
     <div className={styles.sidebar}>
@@ -77,7 +78,7 @@ export const Sidebar = ({
       {showNotes ? (
         <NotesSidebar 
           currentCase={currentCase}
-          onReturn={handleReturn}
+          onReturn={() => setShowNotes(false)}
         />
       ) : (
         <CaseSidebar 
@@ -85,6 +86,7 @@ export const Sidebar = ({
           onImageSelect={onImageSelect}
           onCaseChange={onCaseChange}
           currentCase={currentCase}
+          setCurrentCase={setCurrentCase}
           imageLoaded={imageLoaded}
           setImageLoaded={setImageLoaded}
           files={files}

@@ -19,19 +19,22 @@ interface CaseSidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
-  imageLoaded?: boolean;
+  imageLoaded: boolean;
   setImageLoaded: (loaded: boolean) => void;
-  onNotesClick?: () => void;
+  onNotesClick: () => void;
   files: FileData[];
-  setFiles: (files: FileData[]) => void;
+  setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
   caseNumber: string;
-  currentCase?: string;
   setCaseNumber: (caseNumber: string) => void;
+  currentCase: string | null;
+  setCurrentCase: (caseNumber: string) => void;
   error: string;
   setError: (error: string) => void;
-  successAction: 'loaded' | 'created' | 'deleted' | null;
+  successAction: string | null;
   setSuccessAction: (action: 'loaded' | 'created' | 'deleted' | null) => void;
 }
+
+
 
 interface FileData {
   id: string;
@@ -47,26 +50,29 @@ export const CaseSidebar = ({
   onCaseChange,
   imageLoaded,
   setImageLoaded,
-  onNotesClick 
+  onNotesClick,
+  files,
+  setFiles,
+  caseNumber,
+  setCaseNumber,
+  currentCase,
+  setCurrentCase,
+  error,
+  setError,
+  successAction,
+  setSuccessAction,
 }: CaseSidebarProps) => {
-  // Case management states
-    const [caseNumber, setCaseNumber] = useState<string>('');
-    const [currentCase, setCurrentCase] = useState<string>('');
-    const [isDeletingCase, setIsDeletingCase] = useState(false);
-    const [newCaseName, setNewCaseName] = useState('');
-    const [isRenaming, setIsRenaming] = useState(false);  
-  
-    // UI states
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [error, setError] = useState<string>('');
-    const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
+  // Keep only UI-specific local state
+  const [isDeletingCase, setIsDeletingCase] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [fileError, setFileError] = useState('');
+  const [newCaseName, setNewCaseName] = useState('');
 
-    // File management state
-    const [files, setFiles] = useState<FileData[]>([]);
-    const [isUploadingFile, setIsUploadingFile] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState<number>(0);
-    const [fileError, setFileError] = useState<string>('');
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Image File Types
@@ -96,7 +102,7 @@ export const CaseSidebar = ({
     } else {
       setFiles([]);
     }
-  }, [user, currentCase]);
+  }, [user, currentCase, setFiles]);
   
   const handleCase = async () => {
     setIsLoading(true);
@@ -278,7 +284,7 @@ return (
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelectCase={setCaseNumber}
-        currentCase={currentCase}
+        currentCase={currentCase || ''}
         user={user}
       />
         <div className={styles.filesSection}>
