@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
 import { useState, useEffect, useRef } from 'react';
-import styles from './sidebar.module.css';
+import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
 import {
   validateCaseNumber,

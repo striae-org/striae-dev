@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from './sidebar.module.css';
+import styles from './notes.module.css';
 
 interface NotesSidebarProps {
   currentCase: string;
@@ -44,161 +44,189 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
 
   return (
     <div className={styles.notesSidebar}>
-      <h4>Comparison Notes</h4>
+      <div className={styles.sectionHeader}>
+        <h4>Comparison Notes</h4>
+      </div>
       
-      <div className={styles.caseNumbers}>
-        <div className={styles.caseInput}>
-          <label htmlFor="leftCase">Left Side Case #</label>
-          <input
-            id="leftCase"
-            type="text"
-            value={leftCase}
-            onChange={(e) => setLeftCase(e.target.value)}
-            disabled={useCurrentCaseLeft}
-          />
-        </div>
+      <div className={styles.section}>
+        <h5 className={styles.sectionTitle}>Case Information</h5>
+        <div className={styles.caseNumbers}>
+          {/* Left side inputs */}
+          <div className={styles.inputGroup}>
+            <div className={styles.caseInput}>
+              <label htmlFor="leftCase">Left Side Case #</label>
+              <input
+                id="leftCase"
+                type="text"
+                value={leftCase}
+                onChange={(e) => setLeftCase(e.target.value)}
+                disabled={useCurrentCaseLeft}
+                className={styles.textInput}
+              />
+            </div>
+            <div className={styles.caseInput}>
+              <label htmlFor="leftItem">Left Side Item #</label>
+              <input
+                id="leftItem"
+                type="text"
+                value={leftItem}
+                onChange={(e) => setLeftItem(e.target.value)}
+                className={styles.textInput}
+              />
+            </div>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={useCurrentCaseLeft}
+                onChange={(e) => setUseCurrentCaseLeft(e.target.checked)}
+                className={styles.checkbox}
+              />
+              <span>Use current case number for left side</span>
+            </label>
+          </div>
 
-        <div className={styles.caseInput}>
-          <label htmlFor="leftItem">Left Side Item #</label>
-          <input
-            id="leftItem"
-            type="text"
-            value={leftItem}
-            onChange={(e) => setLeftItem(e.target.value)}
-          />
+          {/* Right side inputs */}
+          <div className={styles.inputGroup}>
+            <div className={styles.caseInput}>
+              <label htmlFor="rightCase">Right Side Case #</label>
+              <input
+                id="rightCase"
+                type="text"
+                value={rightCase}
+                onChange={(e) => setRightCase(e.target.value)}
+                disabled={useCurrentCaseRight}
+                className={styles.textInput}
+              />
+            </div>
+            <div className={styles.caseInput}>
+              <label htmlFor="rightItem">Right Side Item #</label>
+              <input
+                id="rightItem"
+                type="text"
+                value={rightItem}
+                onChange={(e) => setRightItem(e.target.value)}
+                className={styles.textInput}
+              />
+            </div>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={useCurrentCaseRight}
+                onChange={(e) => setUseCurrentCaseRight(e.target.checked)}
+                className={styles.checkbox}
+              />
+              <span>Use current case number for right side</span>
+            </label>
+          </div>
         </div>
-
-        <label className={styles.checkbox}>
-          <input
-            type="checkbox"
-            checked={useCurrentCaseLeft}
-            onChange={(e) => setUseCurrentCaseLeft(e.target.checked)}
-          />
-          Use current case number for left side
-        </label>
-        
-        <div className={styles.caseInput}>
-          <label htmlFor="rightCase">Right Side Case #</label>
-          <input
-            id="rightCase"
-            type="text"
-            value={rightCase}
-            onChange={(e) => setRightCase(e.target.value)}
-            disabled={useCurrentCaseRight}
-          />
-        </div>
-
-        <div className={styles.caseInput}>
-          <label htmlFor="rightItem">Right Side Item #</label>
-          <input
-            id="rightItem"
-            type="text"
-            value={rightItem}
-            onChange={(e) => setRightItem(e.target.value)}
-          />
-        </div>
-
-         <label className={styles.checkbox}>
-          <input
-            type="checkbox"
-            checked={useCurrentCaseRight}
-            onChange={(e) => setUseCurrentCaseRight(e.target.checked)}
-          />
-          Use current case number for right side
-        </label>
       </div>
 
-      <div className={styles.classCharacteristics}>
-        <label htmlFor="classType">Class Characteristics</label>
-        <select
-          id="classType"
-          value={classType}
-          onChange={(e) => setClassType(e.target.value as ClassType)}
-        >
-          <option value="Bullet">Bullet</option>
-          <option value="Cartridge Case">Cartridge Case</option>
-          <option value="Other">Other</option>
-        </select>
+      <div className={styles.section}>
+        <h5 className={styles.sectionTitle}>Class Characteristics</h5>
+        <div className={styles.classCharacteristics}>
+          <select
+            id="classType"
+            aria-label="Class Type"
+            value={classType}
+            onChange={(e) => setClassType(e.target.value as ClassType)}
+            className={styles.select}
+          >
+            <option value="Bullet">Bullet</option>
+            <option value="Cartridge Case">Cartridge Case</option>
+            <option value="Other">Other</option>
+          </select>
 
-        {classType === 'Other' && (
-          <input
-            type="text"
-            value={customClass}
-            onChange={(e) => setCustomClass(e.target.value)}
-            placeholder="Specify class characteristic"
-          />
-        )}
-
-        <textarea
-          value={classNote}
-          onChange={(e) => setClassNote(e.target.value)}
-          placeholder="Enter class characteristic details..."
-        />
-      </div>
-
-      <div className={styles.indexing}>
-        <label htmlFor="indexTypeGroup">Index Type</label>
-        <div id="indexTypeGroup" className={styles.radioGroup} role="radiogroup">
-          <label id="number-label">
+          {classType === 'Other' && (
             <input
-              type="radio"
-              checked={indexType === 'number'}
-              onChange={() => setIndexType('number')}
-              title="Number index type"
-              aria-labelledby="number-label"
+              type="text"
+              value={customClass}
+              onChange={(e) => setCustomClass(e.target.value)}
+              placeholder="Specify class characteristic"
+              className={styles.textInput}
             />
-            Number
-          </label>
-          <label id="color-label">
-            <input
-              type="radio"
-              checked={indexType === 'color'}
-              onChange={() => setIndexType('color')}
-              title="Color index type"
-              aria-labelledby="color-label"
-            />
-            Color
-          </label>
+          )}
+
+          <textarea
+            value={classNote}
+            onChange={(e) => setClassNote(e.target.value)}
+            placeholder="Enter class characteristic details..."
+            className={styles.textarea}
+          />
         </div>
-
-        {indexType === 'number' ? (
-          <input
-            type="text"
-            value={indexNumber}
-            onChange={(e) => setIndexNumber(e.target.value)}
-            placeholder="Enter index number"
-          />
-        ) : (
-          <input
-            type="color"
-            value={indexColor}
-            onChange={(e) => setIndexColor(e.target.value)}
-            title="Choose index color"
-          />
-        )}
       </div>
 
-      <div className={styles.support}>
-        <label htmlFor="supportLevel">Support For</label>
-        <select
-          id="supportLevel"
-          value={supportLevel}
-          onChange={(e) => setSupportLevel(e.target.value as SupportLevel)}
-        >
-          <option value="ID">Identification</option>
-          <option value="Exclusion">Exclusion</option>
-          <option value="Inconclusive">Inconclusive</option>
-        </select>
+      <div className={styles.section}>
+        <h5 className={styles.sectionTitle}>Index Type</h5>
+        <div className={styles.indexing}>
+          <div className={styles.radioGroup}>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                checked={indexType === 'number'}
+                onChange={() => setIndexType('number')}
+              />
+              <span>Number</span>
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                checked={indexType === 'color'}
+                onChange={() => setIndexType('color')}
+              />
+              <span>Color</span>
+            </label>
+          </div>
+
+          {indexType === 'number' ? (
+            <input
+              type="text"
+              value={indexNumber}
+              onChange={(e) => setIndexNumber(e.target.value)}
+              placeholder="Enter index number"
+              className={styles.textInput}
+            />
+          ) : (
+            <label className={styles.colorLabel}>
+              <span>Select index color</span>
+              <input
+                type="color"
+                value={indexColor}
+                onChange={(e) => setIndexColor(e.target.value)}
+                className={styles.colorInput}
+                title="Color picker for index"
+                aria-label="Select index color"
+              />
+            </label>
+          )}
+        </div>
       </div>
 
-      <div className={styles.confirmation}>
-        <label>
+      <div className={styles.section}>
+        <h5 className={styles.sectionTitle}>Support Level</h5>
+        <div className={styles.support}>
+          <select
+            id="supportLevel"
+            aria-label="Support Level"
+            value={supportLevel}
+            onChange={(e) => setSupportLevel(e.target.value as SupportLevel)}
+            className={styles.select}
+          >
+            <option value="ID">Identification</option>
+            <option value="Exclusion">Exclusion</option>
+            <option value="Inconclusive">Inconclusive</option>
+          </select>
+        </div>
+      </div>
+
+      <div className={`${styles.section} ${styles.confirmation}`}>
+        <label className={styles.checkboxLabel}>
           <input
             type="checkbox"
             checked={includeConfirmation}
             onChange={(e) => setIncludeConfirmation(e.target.checked)}
+            className={styles.checkbox}
           />
-          Include Confirmation Field
+          <span>Include Confirmation Field</span>
         </label>
       </div>
 
