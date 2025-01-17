@@ -16,31 +16,40 @@ interface SidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
-  currentCase?: string;
+  currentCase: string;
+  files: FileData[];
+  setFiles: (files: FileData[]) => void;
   imageLoaded: boolean;
   setImageLoaded: (loaded: boolean) => void;
+  caseNumber: string;
+  setCaseNumber: (caseNumber: string) => void;
+  error: string;
+  setError: (error: string) => void;
+  successAction: 'loaded' | 'created' | 'deleted' | null;
+  setSuccessAction: (action: 'loaded' | 'created' | 'deleted' | null) => void;
 }
 
 export const Sidebar = ({ 
   user, 
   onImageSelect, 
-  onCaseChange, 
-  currentCase = '', 
+  onCaseChange,
+  currentCase,
   imageLoaded,
-  setImageLoaded
+  setImageLoaded,
+  files,
+  setFiles,
+  caseNumber,
+  setCaseNumber,
+  error,
+  setError,
+  successAction,
+  setSuccessAction
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
-  
-  // Preserve case management state
-  const [files, setFiles] = useState<FileData[]>([]);
-  const [caseNumber, setCaseNumber] = useState('');
-  const [error, setError] = useState('');
-  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
 
   const handleReturn = () => {
     setShowNotes(false);
-    // Don't reset other state
   };
 
   return (

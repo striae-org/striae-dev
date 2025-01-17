@@ -18,10 +18,18 @@ interface FileData {
 }
 
 export const Striae = ({ user }: StriaePage) => {
+  // Image and error states
   const [selectedImage, setSelectedImage] = useState<string>();
   const [error, setError] = useState<string>();
-  const [currentCase, setCurrentCase] = useState<string>();
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Case management states
+  const [currentCase, setCurrentCase] = useState<string>('');
+  const [files, setFiles] = useState<FileData[]>([]);
+  const [caseNumber, setCaseNumber] = useState('');
+  const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
+
+  
 
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
@@ -67,20 +75,28 @@ export const Striae = ({ user }: StriaePage) => {
 
   return (
     <div className={styles.appContainer}>
-      <Sidebar 
+     <Sidebar 
         user={user} 
         onImageSelect={handleImageSelect}
         onCaseChange={handleCaseChange}
         currentCase={currentCase}
         imageLoaded={imageLoaded}
         setImageLoaded={setImageLoaded}
+        files={files}
+        setFiles={setFiles}
+        caseNumber={caseNumber}
+        setCaseNumber={setCaseNumber}
+        error={error ?? ''}
+        setError={setError}
+        successAction={successAction}
+        setSuccessAction={setSuccessAction}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
           <div className={styles.toolbarWrapper}>
             <Toolbar />
           </div>
-          <Canvas imageUrl={selectedImage} error={error} />
+          <Canvas imageUrl={selectedImage} error={error ?? ''} />
         </div>
         <Annotations />
       </main>
