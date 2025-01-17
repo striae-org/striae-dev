@@ -16,11 +16,19 @@ interface SidebarProps {
   user: User;
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
-  imageLoaded?: boolean;
   currentCase?: string;
+  imageLoaded: boolean;
+  setImageLoaded: (loaded: boolean) => void;
 }
 
-export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, currentCase }: SidebarProps) => {
+export const Sidebar = ({ 
+  user, 
+  onImageSelect, 
+  onCaseChange, 
+  currentCase = '', 
+  imageLoaded,
+  setImageLoaded
+}: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
 
@@ -61,6 +69,7 @@ export const Sidebar = ({ user, onImageSelect, onCaseChange, imageLoaded, curren
           onImageSelect={onImageSelect}
           onCaseChange={onCaseChange}
           imageLoaded={imageLoaded}
+          setImageLoaded={setImageLoaded}
           onNotesClick={() => setShowNotes(true)}
         />
       )}

@@ -20,6 +20,7 @@ interface CaseSidebarProps {
   onImageSelect: (file: FileData) => void;
   onCaseChange: (caseNumber: string) => void;
   imageLoaded?: boolean;
+  setImageLoaded: (loaded: boolean) => void;
   onNotesClick?: () => void;
 }
 
@@ -34,8 +35,9 @@ const SUCCESS_MESSAGE_TIMEOUT = 3000;
 export const CaseSidebar = ({ 
   user, 
   onImageSelect, 
-  onCaseChange, 
+  onCaseChange,
   imageLoaded,
+  setImageLoaded,
   onNotesClick 
 }: CaseSidebarProps) => {
   // Case management states
@@ -224,6 +226,11 @@ export const CaseSidebar = ({
   }
 };
 
+const handleImageSelect = (file: FileData) => {
+    onImageSelect(file);
+    setImageLoaded(true);
+  };
+
 return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
@@ -307,8 +314,8 @@ return (
               className={styles.fileItem}>
                 <button
                   className={styles.fileButton}
-                  onClick={() => onImageSelect(file)}
-                  onKeyDown={(e) => e.key === 'Enter' && onImageSelect(file)}
+                  onClick={() => handleImageSelect(file)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
                 >
                 <span className={styles.fileName}>{file.originalFilename}</span>
               </button>              
