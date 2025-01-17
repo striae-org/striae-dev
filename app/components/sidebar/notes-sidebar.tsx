@@ -204,7 +204,7 @@ export const NotesSidebar = ({ currentCase, onReturn }: NotesSidebarProps) => {
             <option value="Exclusion">Exclusion</option>
             <option value="Inconclusive">Inconclusive</option>
           </select>
-          <label className={styles.checkboxLabel}>
+          <label className={`${styles.checkboxLabel} mb-4`}>
           <input
             type="checkbox"
             checked={includeConfirmation}
