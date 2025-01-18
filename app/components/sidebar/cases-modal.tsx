@@ -19,6 +19,19 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
   const CASES_PER_PAGE = 10;
 
   useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
       setError('');
