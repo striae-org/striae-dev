@@ -7,13 +7,15 @@ interface ButtonProps {
   isActive?: boolean;
   onClick?: () => void;
   ariaLabel: string;
+  title?: string;
 }
 
 export const Button = ({ 
   iconId, 
   isActive = false, 
   onClick,
-  ariaLabel 
+  ariaLabel,
+  title 
 }: ButtonProps) => {
   return (
     <button
@@ -21,6 +23,7 @@ export const Button = ({
       onClick={onClick}
       aria-label={ariaLabel}
       aria-pressed={isActive}
+      title={title || ariaLabel}
     >
       <Icon
         size={30}        

@@ -265,17 +265,17 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
             onChange={(e) => setClassNote(e.target.value)}
             placeholder="Enter class characteristic details..."
             className={styles.textarea}
-          />
-          <label className={`${styles.checkboxLabel} mb-4`}>
+          />          
+        </div>
+        <label className={`${styles.checkboxLabel} mb-4`}>
           <input
             type="checkbox"
             checked={hasSubclass}
             onChange={(e) => setHasSubclass(e.target.checked)}
             className={styles.checkbox}
           />
-          <span>Potential Subclass?</span>
+          <span>Potential subclass?</span>
         </label>
-        </div>
       </div>
 
       <div className={styles.section}>
@@ -337,7 +337,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
             onChange={(e) => setIncludeConfirmation(e.target.checked)}
             className={styles.checkbox}
           />
-          <span>Include Confirmation Field</span>
+          <span>Include confirmation field</span>
         </label>
         </div>
         <button 

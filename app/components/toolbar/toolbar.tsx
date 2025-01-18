@@ -45,7 +45,7 @@ export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
             iconId={isVisible ? 'eye-off' : 'eye'}
             isActive={false}
             onClick={() => handleToolClick('visibility')}
-            ariaLabel={isVisible ? "Hide toolbar" : "Show toolbar"}
+            ariaLabel={isVisible ? "Hide toolbar" : "Show toolbar"}            
           />
         </div>
       <div className={styles.toolbarContent} role="toolbar" aria-label="Annotation tools">         
@@ -53,37 +53,37 @@ export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
         iconId="number"
         isActive={activeTools.has('number')}
         onClick={() => handleToolClick('number')}
-        ariaLabel="Numbering tool"
+        ariaLabel="Case & Item Numbers"
       />
       <Button
         iconId="class"
         isActive={activeTools.has('class')}
         onClick={() => handleToolClick('class')}
-        ariaLabel="Classification tool"
+        ariaLabel="Class Characteristics"
       />
       <Button
         iconId="index"
         isActive={activeTools.has('index')}
         onClick={() => handleToolClick('index')}
-        ariaLabel="Index tool"
+        ariaLabel="Index Marks"
       />
       <Button
         iconId="id"
         isActive={activeTools.has('id')}
         onClick={() => handleToolClick('id')}
-        ariaLabel="ID tool"
+        ariaLabel="Support Level"
       />
       <Button
         iconId="notes"
         isActive={activeTools.has('notes')}
         onClick={() => handleToolClick('notes')}
-        ariaLabel="Notes tool"
+        ariaLabel="Additional Notes"
       />
       <Button
         iconId="print"
         isActive={false}
         onClick={() => handleToolClick('print')}
-        ariaLabel="Print tool"
+        ariaLabel="Save/Print to PDF"
       />
         </div>
       </div>
