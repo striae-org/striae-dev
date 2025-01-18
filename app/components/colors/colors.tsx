@@ -9,7 +9,7 @@ interface ColorSelectorProps {
 const commonColors = [
   '#ff0000', // red
   '#ff8000', // orange
-  '#ffff00', // yellow
+  '#ffde21', // yellow
   '#00ff00', // green
   '#00ffff', // cyan
   '#0000ff', // blue

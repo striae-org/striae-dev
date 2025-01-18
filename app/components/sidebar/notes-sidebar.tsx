@@ -237,13 +237,11 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               />
             </div>            
           </div>
-        </div>
-        <div className={styles.colorSection}>          
+        </div>                  
           <ColorSelector            
             selectedColor={caseFontColor}
             onColorSelect={setCaseFontColor}
-          />
-        </div>
+          />        
       </div>
 
       <div className={styles.section}>
@@ -317,13 +315,11 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               onChange={(e) => setIndexNumber(e.target.value)}
               placeholder="Enter index number"              
             />
-          ) : (
-            <div className={styles.colorSection}>
+          ) : (            
             <ColorSelector
               selectedColor={indexColor}
               onColorSelect={setIndexColor}
-            />
-            </div>
+            />            
           )}
         </div>
       </div>
