@@ -111,37 +111,57 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
-  const imagesApiToken = await getImageApiKey();
-  await fetch(`${IMAGE_URL}/${fileId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${imagesApiToken}`
+  try {
+    // Delete image file
+    const imagesApiToken = await getImageApiKey();
+    const imageResponse = await fetch(`${IMAGE_URL}/${fileId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${imagesApiToken}`
+      }
+    });
+
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to delete image: ${imageResponse.statusText}`);
     }
-  });
 
-  const apiKey = await getDataApiKey();
-  
-  // Get full case data
-  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    headers: { 'X-Custom-Auth-Key': apiKey }
-  });
-  const existingData = await response.json() as CaseData;
+    // Try to delete notes file - ignore 404
+    const apiKey = await getDataApiKey();
+    const notesResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`, {
+      method: 'DELETE',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
 
-  // Create updated data preserving existing fields
+    // Only throw if error is not 404 (notes file not found)
+    if (!notesResponse.ok && notesResponse.status !== 404) {
+      throw new Error(`Failed to delete notes: ${notesResponse.statusText}`);
+    }
 
-  const updatedData: CaseData = {
-    ...existingData,
-    files: (existingData.files || []).filter((f: FileData) => f.id !== fileId)
-  };
+    // Update case data.json
+    const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      headers: { 'X-Custom-Auth-Key': apiKey }
+    });
 
-  await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    method: 'PUT', 
-    headers: {
-      'X-Custom-Auth-Key': apiKey,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedData)
-  });
+    const existingData = await caseResponse.json() as CaseData;
+    const updatedData: CaseData = {
+      ...existingData,
+      files: (existingData.files || []).filter((f: FileData) => f.id !== fileId)
+    };
+
+    await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      method: 'PUT',
+      headers: {
+        'X-Custom-Auth-Key': apiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    });
+  } catch (error) {
+    console.error('Error in deleteFile:', error);
+    throw error;
+  }
 };
 
 /**
