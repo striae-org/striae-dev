@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './notes.module.css';
 
 interface NotesModalProps {
@@ -11,7 +11,20 @@ interface NotesModalProps {
 export const NotesModal = ({ isOpen, onClose, notes, onSave }: NotesModalProps) => {
   const [tempNotes, setTempNotes] = useState(notes);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+  
+      if (isOpen) {
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+      }
+    }, [isOpen, onClose]);
+
+  if (!isOpen) return null;  
 
   const handleSave = () => {
     onSave(tempNotes);

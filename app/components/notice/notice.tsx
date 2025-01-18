@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styles from './notice.module.css';
 
 interface NoticeContent {
@@ -13,6 +14,20 @@ interface NoticeProps {
 }
 
 export function Notice({ isOpen, onClose, notice }: NoticeProps) {
+
+  useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+  
+      if (isOpen) {
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+      }
+    }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
