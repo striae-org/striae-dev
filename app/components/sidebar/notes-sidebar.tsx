@@ -238,8 +238,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
             </div>            
           </div>
         </div>
-        <div className={styles.colorSection}>
-          <label htmlFor="fontColor">Font Color</label>
+        <div className={styles.colorSection}>          
           <ColorSelector            
             selectedColor={caseFontColor}
             onColorSelect={setCaseFontColor}
@@ -319,10 +318,12 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               placeholder="Enter index number"              
             />
           ) : (
+            <div className={styles.colorSection}>
             <ColorSelector
               selectedColor={indexColor}
               onColorSelect={setIndexColor}
             />
+            </div>
           )}
         </div>
       </div>
