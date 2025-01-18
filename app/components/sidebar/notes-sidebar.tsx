@@ -237,7 +237,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               />
             </div>            
           </div>
-        </div>                  
+        </div>
+         <label htmlFor="colorSelect">Font</label>                  
           <ColorSelector            
             selectedColor={caseFontColor}
             onColorSelect={setCaseFontColor}
