@@ -268,6 +268,22 @@ textarea:focus {
   cursor: pointer;
 }
 
+.cancelButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #bd2130;
+}
+
 .saveButton {
   width: 100%;
   padding: 0.75rem;
