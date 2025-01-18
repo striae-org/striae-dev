@@ -20,6 +20,7 @@ interface NotesData {
   classType: ClassType;
   customClass?: string;
   classNote: string;
+  hasSubclass?: boolean;
   indexType: IndexType;
   indexNumber?: string;
   indexColor?: string;
@@ -50,9 +51,10 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
   const [classType, setClassType] = useState<ClassType>('Bullet');
   const [customClass, setCustomClass] = useState('');
   const [classNote, setClassNote] = useState('');
+  const [hasSubclass, setHasSubclass] = useState(false);
 
   // Index state
-  const [indexType, setIndexType] = useState<IndexType>('number');
+  const [indexType, setIndexType] = useState<IndexType>('color');
   const [indexNumber, setIndexNumber] = useState('');
   const [indexColor, setIndexColor] = useState('#000000');
 
@@ -83,6 +85,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
           setClassType(existingNotes.classType);
           setCustomClass(existingNotes.customClass || '');
           setClassNote(existingNotes.classNote);
+          setHasSubclass(existingNotes.hasSubclass ?? false);
           setIndexType(existingNotes.indexType);
           setIndexNumber(existingNotes.indexNumber || '');
           setIndexColor(existingNotes.indexColor || '#000000');
@@ -129,6 +132,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       classType: classType,
       customClass: customClass,  // Save even if empty
       classNote: classNote || '',
+      hasSubclass: hasSubclass,
       
       // Index Information
       indexType: indexType,
@@ -262,6 +266,15 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
             placeholder="Enter class characteristic details..."
             className={styles.textarea}
           />
+          <label className={`${styles.checkboxLabel} mb-4`}>
+          <input
+            type="checkbox"
+            checked={hasSubclass}
+            onChange={(e) => setHasSubclass(e.target.checked)}
+            className={styles.checkbox}
+          />
+          <span>Potential Subclass?</span>
+        </label>
         </div>
       </div>
 
@@ -272,18 +285,18 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
             <label className={styles.radioLabel}>
               <input
                 type="radio"
-                checked={indexType === 'number'}
-                onChange={() => setIndexType('number')}
-              />
-              <span>Number</span>
-            </label>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
                 checked={indexType === 'color'}
                 onChange={() => setIndexType('color')}
               />
               <span>Color</span>
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                checked={indexType === 'number'}
+                onChange={() => setIndexType('number')}
+              />
+              <span>Number</span>
             </label>
           </div>
 

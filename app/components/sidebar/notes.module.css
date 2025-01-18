@@ -262,8 +262,8 @@ textarea:focus {
 
 .cancelButton {
   padding: 0.5rem 1rem;
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--error);
+  color: var(--text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -272,7 +272,7 @@ textarea:focus {
 .saveButton {
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--primary);
+  background-color: var(--accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -283,7 +283,7 @@ textarea:focus {
 }
 
 .saveButton:hover {
-  background-color: color-mix(in lab, var(--primary) 95%, transparent);
+  background-color: color-mix(in lab, var(--accent) 95%, transparent);
   transform: translateY(-1px);
 }
 
@@ -293,7 +293,7 @@ textarea:focus {
 }
 
 .successMessage {
-  color: #198754;
+  color: var(--success);
   background-color: #d1e7dd;
   border: 1px solid #badbcc;
   border-radius: 4px;

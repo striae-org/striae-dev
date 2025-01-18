@@ -12,6 +12,7 @@ interface NotesData {
   classType: 'Bullet' | 'Cartridge Case' | 'Other';
   customClass?: string;
   classNote: string;
+  hasSubclass?: boolean;
   indexType: 'number' | 'color';
   indexNumber?: string;
   indexColor?: string;
