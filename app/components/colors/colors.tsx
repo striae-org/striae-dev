@@ -35,10 +35,8 @@ export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorPro
       </div>
       
       {showColorWheel ? (
-        <>
-          <label htmlFor="colorWheelInput">Color</label>
-          <input
-            id="colorWheelInput"
+        <>          
+          <input            
             type="color"
             value={selectedColor}
             onChange={(e) => onColorSelect(e.target.value)}
