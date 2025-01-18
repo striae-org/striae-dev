@@ -85,7 +85,7 @@ export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
         onClick={() => handleToolClick('print')}
         ariaLabel="Print tool"
       />
-    </div>
+        </div>
       </div>
     </div>
   );
