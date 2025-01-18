@@ -204,5 +204,6 @@
   .authToggleButton, 
   .emailLinkButton {
     width: 100%;
+    font-size: var(--fontSizeBodyL);
   }
 }
