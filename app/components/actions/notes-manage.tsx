@@ -9,6 +9,7 @@ interface NotesData {
   rightCase: string;
   leftItem: string;
   rightItem: string;
+  caseFontColor: string;
   classType: 'Bullet' | 'Cartridge Case' | 'Other';
   customClass?: string;
   classNote: string;

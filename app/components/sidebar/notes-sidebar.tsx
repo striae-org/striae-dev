@@ -17,6 +17,7 @@ interface NotesData {
   rightCase: string;
   leftItem: string;
   rightItem: string;
+  caseFontColor: string;
   classType: ClassType;
   customClass?: string;
   classNote: string;
@@ -46,6 +47,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
   const [rightItem, setRightItem] = useState('');
   const [useCurrentCaseLeft, setUseCurrentCaseLeft] = useState(false);
   const [useCurrentCaseRight, setUseCurrentCaseRight] = useState(false);
+  const [caseFontColor, setCaseFontColor] = useState('#FFDE21');
 
   // Class characteristics state
   const [classType, setClassType] = useState<ClassType>('Bullet');
@@ -82,6 +84,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
           setRightCase(existingNotes.rightCase);
           setLeftItem(existingNotes.leftItem);
           setRightItem(existingNotes.rightItem);
+          setCaseFontColor(existingNotes.caseFontColor || '#FFDE21');
           setClassType(existingNotes.classType);
           setCustomClass(existingNotes.customClass || '');
           setClassNote(existingNotes.classNote);
@@ -127,6 +130,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       rightCase: rightCase || '',
       leftItem: leftItem || '',
       rightItem: rightItem || '',
+      caseFontColor: caseFontColor || '#FFDE21',
       
       // Class Characteristics
       classType: classType,
@@ -233,6 +237,13 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
               />
             </div>            
           </div>
+        </div>
+        <div className={styles.colorSection}>
+          <label htmlFor="fontColor">Font Color</label>
+          <ColorSelector            
+            selectedColor={caseFontColor}
+            onColorSelect={setCaseFontColor}
+          />
         </div>
       </div>
 
