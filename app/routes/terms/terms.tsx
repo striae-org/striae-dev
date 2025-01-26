@@ -41,7 +41,7 @@ export const Terms = () => {
 <p><strong>Country</strong> refers to: California, United States</p>
 </li>
 <li>
-<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AllyForensics, 2031 Crenshaw St, San Diego, CA 92105.</p>
+<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AllyForensics, <Link to="https://www.allyforensics.com">https://www.allyforensics.com</Link>.</p>
 </li>
 <li>
 <p><strong>Data</strong> refers to content such as text, images, or other information that can be posted, uploaded, linked to or otherwise made available by You, regardless of the form of that content.</p>
