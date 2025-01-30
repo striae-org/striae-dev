@@ -26,6 +26,7 @@ export default function Home() {
           <div className={styles.logo} />
           <div className={styles.title}>
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
+            <br />
             <p><em>Development currently on hold. Please check back in Q3 2025. Thank you.</em></p>
           </div>
           <div className={styles.buttonGroup}>
