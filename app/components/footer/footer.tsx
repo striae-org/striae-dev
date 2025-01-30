@@ -17,12 +17,12 @@ export default function Footer() {
           <Link to="/security" className={styles.link}>
             Security Policy
           </Link>
-          <Link to="/support" className={styles.link}>
+          {/* <Link to="/support" className={styles.link}>
             Need Help?
           </Link>
           <Link to="/bugs" className={styles.link}>
             Submit a Bug Report
-          </Link>
+          </Link> */}
         </nav>
         <p className={styles.copyright}>
           Striae © {year} AllyForensics. All rights reserved.
