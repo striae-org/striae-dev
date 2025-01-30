@@ -116,13 +116,13 @@ Beta Feedback Agreement: ${betaFeedback}`,
 
 export const BetaSignup = () => {
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
-  const [hasReadNotice, setHasReadNotice] = useState(false);
+  //const [hasReadNotice, setHasReadNotice] = useState(false);
   const actionData = useActionData<ActionData>();
   const { state } = useNavigation();
   const sending = state === 'submitting';
 
   const handleNoticeClose = () => {
-    setHasReadNotice(true);
+    //setHasReadNotice(true);
     setIsNoticeOpen(false);
   };
 
@@ -204,15 +204,18 @@ export const BetaSignup = () => {
           />
           <button 
           type="submit"                     
-          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
-          disabled={sending || !hasReadNotice}
-          title={!hasReadNotice ? 'Please read the notice first' : undefined}
-          >
-          {!hasReadNotice 
+          //className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
+          className={`${styles.button} ${styles.buttonDisabled}`}
+          //disabled={sending || !hasReadNotice}
+          disabled
+          //title={!hasReadNotice ? 'Please read the notice first' : undefined}
+          title={'Development currently on hold'}
+          >Development currently on hold
+          {/* {!hasReadNotice 
             ? 'Please read the notice first'
             : sending 
               ? 'Submitting...' 
-              : 'Request Beta Access'}              
+              : 'Request Beta Access'} */}
         </button>
       </Form>
         {actionData?.success && (

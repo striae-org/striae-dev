@@ -25,7 +25,8 @@ export default function Home() {
         <div className={styles.content}>
           <div className={styles.logo} />
           <div className={styles.title}>
-            Striae: A Firearms Examiner&apos;s Comparison Companion
+            <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
+            <p><em>Development currently on hold. Please check back in Q3 2025. Thank you.</em></p>
           </div>
           <div className={styles.buttonGroup}>
             <Link to="/auth" className={styles.actionButton}>
