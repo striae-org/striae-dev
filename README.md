@@ -1,47 +1,25 @@
-# Welcome to Remix + Cloudflare!
+## Striae Development Indefinitely Suspended
 
-- 📖 [Remix docs](https://remix.run/docs)
-- 📖 [Remix Cloudflare docs](https://remix.run/guides/vite#cloudflare)
+Some of you know that at the end of 2024, I’d been working on a personal project close to my heart — **Striae**, a *Firearms Examiner’s Comparison Companion*.
 
-## Development
+The goal was simple but powerful: give firearms examiners a secure, organized way to **upload bullet and cartridge case comparison images**, link them to specific cases, and make **notations directly tied to each image**.
 
-Run the dev server:
+**Core Features I built:**
+- User login & account management
+- Case management for organized workflows
+- Upload images tied to cases
+- Make and store notations linked to each specific image
 
-```sh
-npm run dev
-```
+**Security Measures baked in from day one:**
+- 🔐 Firebase Authentication for login and admin management
+- 🔐 Encryption in transit and at rest
+- 🔐 Data segregation/isolation
+- 🔐 Controlled access & monitoring
 
-To run Wrangler:
+Unfortunately, a few significant life upheavals forced me to pause development before reaching the **printing tools and live display functions** I had envisioned.
 
-```sh
-npm run build
-npm run start
-```
+Rather than let it fade away in a private, closed folder, I’ve **opened the code archive to the public**. Every project that I had built in the previous few years has been founded on the principle of contributing to the public good. My hope is that someone with the skills and interest might pick up where I left off — improve it, adapt it, and maybe even take *Striae* further than I imagined. If that sounds like you (or you know someone who'd be interested), the code is now available for anyone to view and build upon.
 
-## Typegen
+<https://github.com/StephenJLu/striae>
 
-Generate types for your Cloudflare bindings in `wrangler.toml`:
-
-```sh
-npm run typegen
-```
-
-You will need to rerun typegen whenever you make changes to `wrangler.toml`.
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then, deploy your app to Cloudflare Pages:
-
-```sh
-npm run deploy
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+This isn’t a goodbye to the idea — just me passing the torch on.
