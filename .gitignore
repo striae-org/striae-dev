@@ -10,6 +10,3 @@ node_modules
 .firebase
 firebase-debug.log
 *.txt
-config.json
-firebase.ts
-
