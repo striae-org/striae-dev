@@ -22,4 +22,6 @@ Rather than let it fade away in a private, closed folder, I’ve **opened the c
 
 <https://github.com/StephenJLu/striae>
 
+[Test Run Video](https://youtu.be/G4S2-jpke68)
+
 This isn’t a goodbye to the idea — just me passing the torch on.
