@@ -11,7 +11,7 @@ const createResponse = (data, status = 200) => new Response(
 );
 
 const hasValidHeader = (request, env) => 
-  request.headers.get("X-Custom-Auth-Key") === env.FWJIO_WFOLIWLF_WFOUIH;
+  request.headers.get("X-Custom-Auth-Key") === env.R2_KEY_SECRET;
 
 export default {
   async fetch(request, env) {       

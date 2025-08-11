@@ -2,5 +2,5 @@
 // by running `wrangler types`
 
 interface Env {
-	WDEFOIJ_EFOIJ: string;
+	SL_API_KEY: string;
 }

@@ -65,7 +65,7 @@ export async function action({ request, context }: { request: Request, context: 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${context.cloudflare.env.WDEFOIJ_EFOIJ}`,
+        'Authorization': `Bearer ${context.cloudflare.env.SL_API_KEY}`,
       },
       body: JSON.stringify({
         "from": {

@@ -1,9 +1,9 @@
 /**
  * @typedef {Object} Env
- * @property {string} FWJIO_WFOLIWLF_WFOUIH
- * @property {string} WDEFOIJ_EFOIJ
- * @property {string} JOCVKJWEW
- * @property {string} EFJIOJVMEW
+ * @property {string} R2_KEY_SECRET
+ * @property {string} SL_API_KEY
+ * @property {string} CFT_PUBLIC_KEY
+ * @property {string} CFT_SECRET_KEY
  */
 
 const corsHeaders = {
