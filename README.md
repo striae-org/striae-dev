@@ -27,3 +27,7 @@ Rather than let it fade away in a private, closed folder, I’ve **opened the c
 [Test Run Video](https://youtu.be/G4S2-jpke68)
 
 This isn’t a goodbye to the idea — just me passing the torch on.
+
+Stephen J. Lu
+
+*Updated August 13, 2025*
