@@ -269,7 +269,7 @@ You agree that the original English text shall prevail in the case of a dispute.
   <li><p><strong>Transport Layer Security</strong></p>
   <p>All Data transfers are encrypted using TLS, ensuring protection from interception or tampering while in transit.</p></li>
   <li><p><strong>Signed URLs</strong></p>
-  <p>Temporary signed URLs provide secure access to Your images and files. These URLs expire after a set time, ensuring that Your Data cannot be accessed indefinitely or without Your authorization.</p></li>
+  <p>Using HMAC-SHA-256, temporary signed URLs provide authenticated, tamper-evident, time-limited access to your images and files.</p></li>
   <li><p><strong>Logging and Monitoring</strong></p>
   <p>Access requests and Data transfers are logged in detail, allowing Us to audit activities and identify any unauthorized access attempts.</p></li>
   <li><p><strong>Cross-Origin Resource Sharing (CORS) Support</strong></p>
