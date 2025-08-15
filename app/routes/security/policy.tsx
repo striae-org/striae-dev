@@ -22,6 +22,7 @@ export const Policy = () => {
         <section>
           <h2>Reporting Security Issues</h2>
           <p>We take the security of Striae seriously. If you believe you have found a security vulnerability, please report it to us responsibly.</p>
+          <p />
           <p>Please email security findings to: <Link to="mailto:info@striae.org">info@striae.org</Link></p>
         </section>
 
