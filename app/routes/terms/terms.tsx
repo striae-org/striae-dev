@@ -304,9 +304,6 @@ You agree that the original English text shall prevail in the case of a dispute.
 <li>
 <p>By email: info@striae.org</p>
 </li>
-<li>
-<p>By phone number: (520) 244-8862</p>
-</li>
 </ul>
         </section>
       </div>      

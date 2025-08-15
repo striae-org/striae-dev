@@ -385,9 +385,6 @@ export const Privacy = () => {
 <li>
 <p>By email: info@striae.org</p>
 </li>
-<li>
-<p>By phone number: (520) 244-8862</p>
-</li>
 </ul>
 <p>Only You, or a person registered with the California Secretary of State that You authorize to act on Your behalf, may make a verifiable request related to Your personal information.</p>
 <p>Your request to Us must:</p>
