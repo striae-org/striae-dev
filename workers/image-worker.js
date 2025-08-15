@@ -19,8 +19,8 @@ const hasValidToken = (request, env) => {
   const authHeader = request.headers.get("Authorization");
   const expectedToken = `Bearer ${env.API_TOKEN}`;
   console.log('Auth check:', {
-    received: authHeader,
-    expected: expectedToken
+    received: authHeader ? '[REDACTED]' : 'None',
+    match: authHeader === expectedToken
   });
   return authHeader === expectedToken;
 };
