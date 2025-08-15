@@ -38,7 +38,7 @@ export const Terms = () => {
 <p><strong>Account</strong> means a unique account created for You to access Our Service or parts of Our Service.</p>
 </li>
 <li>
-<p><strong>Country</strong> refers to: California, United States</p>
+<p><strong>Country</strong> refers to: United States</p>
 </li>
 <li>
 <p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Striae, <Link to="https://www.striae.org">https://www.striae.org</Link>.</p>
@@ -305,7 +305,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>By email: info@striae.org</p>
 </li>
 <li>
-<p>By phone number: (619) 798-6062</p>
+<p>By phone number: (520) 244-8862</p>
 </li>
 </ul>
         </section>

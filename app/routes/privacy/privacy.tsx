@@ -52,7 +52,7 @@ export const Privacy = () => {
 <p><strong>Consumer</strong>, for the purpose of the CCPA/CPRA, means a natural person who is a California resident. A resident, as defined in the law, includes (1) every individual who is in the USA for other than a temporary or transitory purpose, and (2) every individual who is domiciled in the USA who is outside the USA for a temporary or transitory purpose.</p>
 </li>
 <li>
-<p><strong>Country</strong> refers to: California,  United States</p>
+<p><strong>Country</strong> refers to: United States</p>
 </li>
 <li>
 <p><strong>Device</strong> means any device that can access the Service such as a computer, a cellphone or a digital tablet.</p>
@@ -386,7 +386,7 @@ export const Privacy = () => {
 <p>By email: info@striae.org</p>
 </li>
 <li>
-<p>By phone number: (619) 798-6062</p>
+<p>By phone number: (520) 244-8862</p>
 </li>
 </ul>
 <p>Only You, or a person registered with the California Secretary of State that You authorize to act on Your behalf, may make a verifiable request related to Your personal information.</p>
@@ -460,7 +460,7 @@ export const Privacy = () => {
 <p>By email: info@striae.org</p>
 </li>
 <li>
-<p>By phone number: (619) 798-6062</p>
+<p>By phone number: (520) 244-8862</p>
 </li>
 </ul>
         </section>
