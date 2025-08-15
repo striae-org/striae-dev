@@ -1,12 +1,11 @@
 node_modules
 /app/config
-/workers
 /.cache
 /build
+
 .env
 .dev.vars
 .dns
-
 .wrangler
 .firebase
 firebase-debug.log
