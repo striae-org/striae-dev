@@ -166,7 +166,7 @@ export const License = () => {
       of your accepting any such warranty or additional liability.</li>
       </ol>
   <div className={styles.copyright}>
-    <p>Copyright © 2025 AllyForensics</p>
+    <p>Copyright © 2025 Stephen J. Lu</p>
     <p>Licensed under the Apache License, Version 2.0 (the "License");</p>
     <p>You may obtain a copy of the License at</p>
     <p><a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">

@@ -25,7 +25,7 @@ export default function Footer() {
           </Link> */}
         </nav>
         <p className={styles.copyright}>
-          Striae © {year} AllyForensics. All rights reserved.
+          Striae © {year} Stephen J. Lu. All rights reserved.
         </p>
       </div>
     </footer>    

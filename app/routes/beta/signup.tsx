@@ -70,12 +70,12 @@ export async function action({ request, context }: { request: Request, context: 
       body: JSON.stringify({
         "from": {
           "name": "Striae Beta Signup",
-          "email": "no-reply@allyforensics.com"
+          "email": "no-reply@striae.org"
         },
         "to": [
           {
-            "name": "AllyForensics",
-            "email": "info@allyforensics.com"
+            "name": "Striae",
+            "email": "info@striae.org"
           }
         ],
         "subject": "New Beta Signup Request",
@@ -97,7 +97,7 @@ Beta Feedback Agreement: ${betaFeedback}`,
           "beta-signup"          
         ],
         "Headers": {
-          "X-Mailer": "allyforensics.com"          
+          "X-Mailer": "striae.org"          
         }
       }),
     });
@@ -185,7 +185,7 @@ export const BetaSignup = () => {
               required
               disabled={sending}
             />
-            <span>I agree to receive emails from allyforensics.com</span>
+            <span>I agree to receive emails from striae.org</span>
           </label>
 
           <label className={styles.toggle}>

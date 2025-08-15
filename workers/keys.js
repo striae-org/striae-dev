@@ -7,7 +7,7 @@
  */
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://striae.allyforensics.com',
+  'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'text/plain'

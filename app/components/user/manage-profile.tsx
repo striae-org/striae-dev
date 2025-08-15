@@ -171,8 +171,8 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               </div>
               <p className={styles.deleteNotice}>
                 To delete your account, please contact{' '}
-                <a href="mailto:info@allyforensics.com" className={styles.deleteLink}>
-                  info@allyforensics.com
+                <a href="mailto:info@striae.org" className={styles.deleteLink}>
+                  info@striae.org
                 </a>
               </p>
             </form>

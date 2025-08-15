@@ -41,7 +41,7 @@ export const Terms = () => {
 <p><strong>Country</strong> refers to: California, United States</p>
 </li>
 <li>
-<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AllyForensics, <Link to="https://www.allyforensics.com">https://www.allyforensics.com</Link>.</p>
+<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Striae, <Link to="https://www.striae.org">https://www.striae.org</Link>.</p>
 </li>
 <li>
 <p><strong>Data</strong> refers to content such as text, images, or other information that can be posted, uploaded, linked to or otherwise made available by You, regardless of the form of that content.</p>
@@ -127,7 +127,7 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <h2>Copyright Policy</h2>
 <h3>Intellectual Property Infringement</h3>
 <p>We respect the intellectual property rights of others. It is Our policy to respond to any claim that Data posted on the Service infringes a copyright or other intellectual property infringement of any person.</p>
-<p>If You are a copyright owner, or authorized on behalf of one, and You believe that the copyrighted work has been copied in a way that constitutes copyright infringement that is taking place through the Service, You must submit Your notice in writing to the attention of Our copyright agent via email at info@allyforensics.com and include in Your notice a detailed description of the alleged infringement.</p>
+<p>If You are a copyright owner, or authorized on behalf of one, and You believe that the copyrighted work has been copied in a way that constitutes copyright infringement that is taking place through the Service, You must submit Your notice in writing to the attention of Our copyright agent via email at info@striae.org and include in Your notice a detailed description of the alleged infringement.</p>
 <p>You may be held accountable for damages (including costs and attorneys' fees) for misrepresenting that any Data is infringing Your copyright.</p>
 <h3>DMCA Notice and DMCA Procedure for Copyright Infringement Claims</h3>
 <p>You may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by providing Our Copyright Agent with the following information in writing (see 17 U.S.C 512(c)(3) for further detail):</p>
@@ -139,7 +139,7 @@ You will not receive a refund for the fees You already paid for Your current Sub
 <li>A statement by You that You have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law.</li>
 <li>A statement by You, made under penalty of perjury, that the above information in Your notice is accurate and that You are the copyright owner or authorized to act on the copyright owner's behalf.</li>
 </ul>
-<p>You can contact Our copyright agent via email at info@allyforensics.com.
+<p>You can contact Our copyright agent via email at info@striae.org.
 Upon receipt of a notification, the Company will take whatever action, in its sole discretion, it deems appropriate, including removal of the challenged content from the Service.</p>          
         </section>
 <section className={styles.section}>
@@ -208,7 +208,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         </section>
         <section className={styles.section}>
           <h2 id="storage">Data Storage Addendum</h2>
-<p>At AllyForensics, We take Your privacy and Data security seriously. We understand the sensitive nature of the Data that You may store with Us. This Data Storage Addendum outlines how We handle and store Your Data within the app.</p>
+<p>At Striae, We take Your privacy and Data security seriously. We understand the sensitive nature of the Data that You may store with Us. This Data Storage Addendum outlines how We handle and store Your Data within the app.</p>
 <ul>
   <li>
 <p><strong>Authentication and Password Security</strong></p>
@@ -280,7 +280,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 </li>
 <li>
 <p><strong>Access to Data</strong></p>
-<p>Your Data is strictly accessible only by You, the user, and by AllyForensics as necessary. AllyForensics may access Your Data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to Your Data.</p>
+<p>Your Data is strictly accessible only by You, the user, and by Striae as necessary. Striae may access Your Data only for troubleshooting, maintenance, or support purposes, and only to the extent required to resolve issues or provide assistance. No unauthorized third party has access to Your Data.</p>
 </li>
 <li>
 <p><strong>No Sharing of Sensitive Information</strong></p>
@@ -302,7 +302,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>If You have any questions about these Terms and Conditions, You can contact Us:</p>
 <ul>
 <li>
-<p>By email: info@allyforensics.com</p>
+<p>By email: info@striae.org</p>
 </li>
 <li>
 <p>By phone number: (619) 798-6062</p>

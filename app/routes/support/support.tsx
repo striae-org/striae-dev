@@ -71,12 +71,12 @@ export async function action({ request, context }: { request: Request, context: 
       body: JSON.stringify({
         "from": {
           "name": "Striae Support Ticket",
-          "email": "no-reply@allyforensics.com"
+          "email": "no-reply@striae.org"
         },
         "to": [
           {
-            "name": "AllyForensics",
-            "email": "info@allyforensics.com"
+            "name": "Striae",
+            "email": "info@striae.org"
           }
         ],
         "subject": "New Striae Support Ticket",
@@ -100,7 +100,7 @@ export async function action({ request, context }: { request: Request, context: 
           "bug-report"          
         ],
         "Headers": {
-          "X-Mailer": "allyforensics.com"          
+          "X-Mailer": "striae.org"          
         }
       }),
     });

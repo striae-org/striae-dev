@@ -48,7 +48,7 @@ interface UserData {
 const USER_WORKER_URL = paths.user_worker_url;  
 
 const actionCodeSettings = {
-  url: 'https://striae.allyforensics.com', // Update with your domain in production
+  url: 'https://www.striae.org', // Update with your domain in production
   handleCodeInApp: true,
 };
 

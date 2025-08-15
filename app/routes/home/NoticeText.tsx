@@ -49,7 +49,7 @@ const NoticeText = () => {
             <strong>Control Over Your Data:</strong> Sharing data with other Striae users is entirely optional (to be developed in future releases). Deleting your account ensures all associated data is permanently removed from our systems.
         </li>        
       </ul>
-      <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@allyforensics.com" target="_blank" rel="noopener noreferrer">info@allyforensics.com</Link>.</p>
+      <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</Link>.</p>
       <p>
         Striae is currently in active development, and we are conducting alpha testing to refine its functionality and ensure it meets the needs of forensic firearms examiners. Beta testing is expected to launch near the end of Q1 or early Q2 2025.
       </p>

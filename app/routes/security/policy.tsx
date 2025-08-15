@@ -22,7 +22,7 @@ export const Policy = () => {
         <section>
           <h2>Reporting Security Issues</h2>
           <p>We take the security of Striae seriously. If you believe you have found a security vulnerability, please report it to us responsibly.</p>
-          <p>Please email security findings to: <Link to="mailto:info@allyforensics.com">info@allyforensics.com</Link></p>
+          <p>Please email security findings to: <Link to="mailto:info@striae.org">info@striae.org</Link></p>
         </section>
 
         <section>
@@ -38,7 +38,7 @@ export const Policy = () => {
           <h2>Scope</h2>
           <p>This policy applies to all Striae properties including:</p>
           <ul>
-            <li>https://striae.allyforensics.com</li>
+            <li>https://www.striae.org</li>
             <li>All Striae subdomains</li>
             <li>Striae web application</li>
           </ul>
