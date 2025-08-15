@@ -22,6 +22,8 @@ Unfortunately, a few significant life upheavals forced me to pause development b
 
 Rather than let it fade away in a private, closed folder, I’ve **opened the code archive to the public**. Every project that I had built in the previous few years has been founded on the principle of contributing to the public good. My hope is that someone with the skills and interest might pick up where I left off — improve it, adapt it, and maybe even take *Striae* further than I imagined. If that sounds like you (or you know someone who'd be interested), the code is now available for anyone to view and build upon. If circumstances allow, I may resume development in the future and take this to the finish line.
 
+[Application URL](https://www.striae.org)
+
 [GitHub Archive](https://github.com/StephenJLu/striae)
 
 [Striae Documentation](https://docs.stephenjlu.com/)
