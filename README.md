@@ -20,7 +20,7 @@ The goal was simple but powerful: give firearms examiners a secure, organized wa
 
 Unfortunately, a few significant life upheavals forced me to pause development before reaching the **printing tools and live display functions** I had envisioned.
 
-Rather than let it fade away in a private, closed folder, I’ve **opened the code archive to the public**. Every project that I had built in the previous few years has been founded on the principle of contributing to the public good. My hope is that someone with the skills and interest might pick up where I left off — improve it, adapt it, and maybe even take *Striae* further than I imagined. If that sounds like you (or you know someone who'd be interested), the code is now available for anyone to view and build upon. In addition, I may resume development in the future and take this to the finish line.
+Rather than let it fade away in a private, closed folder, I’ve **opened the code archive to the public**. Every project that I had built in the previous few years has been founded on the principle of contributing to the public good. My hope is that someone with the skills and interest might pick up where I left off — improve it, adapt it, and maybe even take *Striae* further than I imagined. If that sounds like you (or you know someone who'd be interested), the code is now available for anyone to view and build upon. If circumstances allow, I may resume development in the future and take this to the finish line.
 
 [GitHub Archive](https://github.com/StephenJLu/striae)
 
