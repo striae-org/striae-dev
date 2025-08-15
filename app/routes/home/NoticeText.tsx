@@ -24,9 +24,9 @@ const NoticeText = () => {
       </ul>
       <p><strong>Security Features of Striae:</strong></p>
       <p>
-        Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. Striae is designed with security as a top priority, and we plan to apply for <Link to="https://cloudsecurityalliance.org/star" target="_blank" rel="noopener noreferrer">CSA STAR registration</Link> to ensure that our security practices meet the highest industry standards.
+        Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. From day one, Striae was designed with data security as a top priority.
         <p>
-            In preparation for compliance, we have implemented the following security features in Striae:
+            We have implemented the following security features in Striae:
         </p>
       </p>
       <ul>
