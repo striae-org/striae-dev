@@ -76,7 +76,7 @@ async function handleImageDelete(request, env) {
  * Handle Signed URL generation
  */
 
-const KEY = '9JhGmtnWuO2o2lGoiq3ObXmK5u8N78U0';
+const KEY = 'HMAC_KEY';
 const EXPIRATION = 60 * 60; // 1 hour
 
 const bufferToHex = buffer =>
