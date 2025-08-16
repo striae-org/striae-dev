@@ -2,11 +2,12 @@ import config from '~/config/config.json';
 
 interface AppConfig {
   name: string;
+  author: string;
   title: string;
   url: string;  
 }
 
-const { name, title, url } = config as AppConfig;
+const { name, author, title, url } = config as AppConfig;
 const defaultOgImage = `${url}/social-image.png`;
 
 
@@ -27,7 +28,7 @@ export function baseMeta({
   return [
     { title: titleText },
     { name: 'description', content: description },
-    { name: 'author', content: title },
+    { name: 'author', content: author },
     { property: 'og:image', content: ogImage },
     { property: 'og:image:alt', content: 'Banner for the site' },
     { property: 'og:image:width', content: '1020' },
