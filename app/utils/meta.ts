@@ -7,7 +7,7 @@ interface AppConfig {
   url: string;  
 }
 
-const { name, author, title, url } = config as AppConfig;
+const { name, author, url } = config as AppConfig;
 const defaultOgImage = `${url}/social-image.png`;
 
 
@@ -42,7 +42,7 @@ export function baseMeta({
     { property: 'twitter:description', content: description },
     { property: 'twitter:title', content: titleText },
     { property: 'twitter:site', content: url },
-    { property: 'twitter:creator', content: title },
+    { property: 'twitter:creator', content: author },
     { property: 'twitter:image', content: ogImage },
   ];
 }
