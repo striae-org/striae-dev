@@ -1,10 +1,15 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/cloudflare";
 
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error("Session secret variable is required");
+}
+
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: "striae_session",
     secure: true,
-    secrets: ["your-secret"],
+    secrets: [sessionSecret],
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24,
