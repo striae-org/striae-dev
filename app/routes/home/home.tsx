@@ -29,15 +29,13 @@ export default function Home() {
             <br />
             <p><em>Development currently on hold. Please check for updates <Link to="https://github.com/StephenJLu/striae?tab=readme-ov-file#striae-development-indefinitely-suspended">here</Link>. Thank you.</em></p>
           </div>
-          <div className={styles.buttonGroup}>
-            {/*
+          <div className={styles.buttonGroup}>            
             <Link to="/auth" className={styles.actionButton}>
-              Sign In / Register
+              Sign In
             </Link>
-            <Link to="/beta" className={styles.betaButton}>
-              Learn About the Beta
-            </Link>
-              */}
+            <Link to="/access" className={styles.accessButton}>
+              Request Access
+            </Link>              
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>

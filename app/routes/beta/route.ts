@@ -1,1 +1,0 @@
-export { BetaSignup as default, meta, action } from './signup'

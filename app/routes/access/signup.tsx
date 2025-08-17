@@ -17,32 +17,44 @@ interface ActionData {
     success?: boolean;
     errors?: {
       firstName?: string;
+      lastName?: string;
       email?: string;
+      company?: string;
     };
 }
 
 export const meta = () => {
   return baseMeta({
-    title: 'Signup for Striae Beta',
+    title: 'Signup for Striae Access',
     description:
-      'Complete the form to request access to the Striae beta program.',
+      'Complete the form to request early access to Striae.',
   });
 };
 
 export async function action({ request, context }: { request: Request, context: any }) {
   const formData = await request.formData();
   const firstName = formData.get('firstName') as string;
+  const lastName = formData.get('lastName') as string;
   const email = formData.get('email') as string;
+  const company = formData.get('company') as string;
   const emailConsent = formData.get('emailConsent') === 'on';
-  const betaFeedback = formData.get('betaFeedback') === 'on';
-  const errors: { firstName?: string; email?: string } = {};
+  const Feedback = formData.get('Feedback') === 'on';
+  const errors: { firstName?: string; lastName?: string; email?: string; company?: string; } = {};
 
   if (!firstName || firstName.length > MAX_NAME_LENGTH) {
-    errors.firstName = 'Please enter a valid name';
+    errors.firstName = 'Please enter your first name';
+  }
+
+  if (!lastName || lastName.length > MAX_NAME_LENGTH) {
+    errors.lastName = 'Please enter your last name';
   }
 
   if (!email || !EMAIL_PATTERN.test(email) || email.length > MAX_EMAIL_LENGTH) {
-    errors.email = 'Please enter a valid email address';
+    errors.email = 'Please enter a valid work email address';
+  }
+
+  if (!company || company.length > MAX_NAME_LENGTH) {
+    errors.company = 'Please enter your lab/company name';
   }
 
   if (Object.keys(errors).length > 0) {
@@ -50,7 +62,6 @@ export async function action({ request, context }: { request: Request, context: 
   }
 
   try {
-        
     const token = formData.get('cf-turnstile-response') as string;
     const verificationResult = await verifyTurnstileToken(token);
     
@@ -69,7 +80,7 @@ export async function action({ request, context }: { request: Request, context: 
       },
       body: JSON.stringify({
         "from": {
-          "name": "Striae Beta Signup",
+          "name": "Striae Access Signup",
           "email": "no-reply@striae.org"
         },
         "to": [
@@ -78,26 +89,30 @@ export async function action({ request, context }: { request: Request, context: 
             "email": "info@striae.org"
           }
         ],
-        "subject": "New Beta Signup Request",
+        "subject": "New Striae Access Request",
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
-          <h2>New Beta Signup Request</h2>
+          <h2>New Striae Access Request</h2>
           <p><strong>Name:</strong> ${firstName}</p>
+          <p><strong>Last Name:</strong> ${lastName}</p>
           <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Lab/Company Name:</strong> ${company}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
-          <p><strong>Beta Feedback Agreement:</strong> ${betaFeedback}</p>
+          <p><strong>Early Access Agreement:</strong> ${Feedback}</p>
         </body></html>`,
-        "PlainContent": `New Beta Signup Request:
+        "PlainContent": `New Striae Access Request:
 
-Name: ${firstName}
-Email: ${email}
-Email Consent: ${emailConsent}
-Beta Feedback Agreement: ${betaFeedback}`,
+        Name: ${firstName}
+        Last Name: ${lastName}
+        Email: ${email}
+        Lab/Company Name: ${company}
+        Email Consent: ${emailConsent}
+        Early Access Agreement: ${Feedback}`,
         "Tags": [
-          "beta-signup"          
+          "access-signup"
         ],
         "Headers": {
-          "X-Mailer": "striae.org"          
+          "X-Mailer": "striae.org"
         }
       }),
     });
@@ -114,15 +129,15 @@ Beta Feedback Agreement: ${betaFeedback}`,
 }
 
 
-export const BetaSignup = () => {
+export const Signup = () => {
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
-  //const [hasReadNotice, setHasReadNotice] = useState(false);
+  const [hasReadNotice, setHasReadNotice] = useState(false);
   const actionData = useActionData<ActionData>();
   const { state } = useNavigation();
   const sending = state === 'submitting';
 
   const handleNoticeClose = () => {
-    //setHasReadNotice(true);
+    setHasReadNotice(true);
     setIsNoticeOpen(false);
   };
 
@@ -138,7 +153,7 @@ export const BetaSignup = () => {
   <div className={styles.logo} />
 </Link>      
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Join Striae Beta</h1>
+        <h1 className={styles.title}>Request Striae Access</h1>
          <button 
           type="button"
           onClick={() => setIsNoticeOpen(true)}
@@ -164,7 +179,18 @@ export const BetaSignup = () => {
           {actionData?.errors?.firstName && (
             <p className={styles.error}>{actionData.errors.firstName}</p>
           )}
-          
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            autoComplete="family-name"
+            className={styles.input}
+            required
+            disabled={sending}
+          />
+          {actionData?.errors?.lastName && (
+            <p className={styles.error}>{actionData.errors.lastName}</p>
+          )}
           <input
             type="email"
             name="email"
@@ -176,8 +202,19 @@ export const BetaSignup = () => {
           />
           {actionData?.errors?.email && (
             <p className={styles.error}>{actionData.errors.email}</p>
+          )}          
+          <input
+            type="text"
+            name="company"
+            placeholder="Laboratory/Company Name"
+            autoComplete="organization"
+            className={styles.input}
+            required
+            disabled={sending}
+          />
+          {actionData?.errors?.company && (
+            <p className={styles.error}>{actionData.errors.company}</p>
           )}
-          
           <label className={styles.toggle}>
             <input
               type="checkbox"
@@ -191,11 +228,11 @@ export const BetaSignup = () => {
           <label className={styles.toggle}>
             <input
               type="checkbox"
-              name="betaFeedback"
+              name="Feedback"
               required
               disabled={sending}
             />
-            <span>I have read the notice and agree to provide feedback during beta testing in exchange for free access upon release</span>
+            <span>I have read the notice and understand some functionality may be missing and/or bugs may be currently unresolved</span>
           </label>
 
           <Turnstile
@@ -204,24 +241,21 @@ export const BetaSignup = () => {
           />
           <button 
           type="submit"                     
-          //className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}
-          className={`${styles.button} ${styles.buttonDisabled}`}
-          //disabled={sending || !hasReadNotice}
-          disabled
-          //title={!hasReadNotice ? 'Please read the notice first' : undefined}
-          title={'Development currently on hold'}
-          >Development currently on hold
-          {/* {!hasReadNotice 
+          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}          
+          disabled={sending || !hasReadNotice}          
+          title={!hasReadNotice ? 'Please read the notice first' : undefined}
+        >
+          {!hasReadNotice 
             ? 'Please read the notice first'
             : sending 
               ? 'Submitting...' 
-              : 'Request Beta Access'} */}
+              : 'Request Access'}
         </button>
       </Form>
         {actionData?.success && (
           <div className={styles.success}>
             <p><h2>Thank you for signing up!</h2></p>
-            <p>We&apos;ll be in touch Q2 2025</p>
+            <p>We&apos;ll be in touch soon</p>
           </div>
         )}
       </div>
