@@ -36,11 +36,9 @@ export async function action({ request, context }: { request: Request, context: 
   const category = formData.get('category') as string;
   const description = formData.get('description') as string;
   const steps = formData.get('steps') as string;
-  const expected = formData.get('expected') as string; 
+  const expected = formData.get('expected') as string;
+  const errors: { name?: string; email?: string; category?: string; description?: string; } = {};
 
-  // Validation
-  const errors: ActionData['errors'] = {};
-  
   if (!name || name.length > MAX_NAME_LENGTH) {
     errors.name = 'Please enter a valid name';
   }
@@ -53,6 +51,10 @@ export async function action({ request, context }: { request: Request, context: 
   if (!description || description.length < 10) {
     errors.description = 'Please provide a detailed description';
   }
+
+  if (Object.keys(errors).length > 0) {
+      return json<ActionData>({ errors }, { status: 400 });
+    }
 
   try {    
 

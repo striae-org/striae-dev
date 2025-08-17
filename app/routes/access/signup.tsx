@@ -38,7 +38,7 @@ export async function action({ request, context }: { request: Request, context: 
   const email = formData.get('email') as string;
   const company = formData.get('company') as string;
   const emailConsent = formData.get('emailConsent') === 'on';
-  const Feedback = formData.get('Feedback') === 'on';
+  const feedback = formData.get('feedback') === 'on';
   const errors: { firstName?: string; lastName?: string; email?: string; company?: string; } = {};
 
   if (!firstName || firstName.length > MAX_NAME_LENGTH) {
@@ -98,7 +98,7 @@ export async function action({ request, context }: { request: Request, context: 
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Lab/Company Name:</strong> ${company}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
-          <p><strong>Early Access Agreement:</strong> ${Feedback}</p>
+          <p><strong>Early Access Agreement:</strong> ${feedback}</p>
         </body></html>`,
         "PlainContent": `New Striae Access Request:
 
@@ -107,7 +107,7 @@ export async function action({ request, context }: { request: Request, context: 
         Email: ${email}
         Lab/Company Name: ${company}
         Email Consent: ${emailConsent}
-        Early Access Agreement: ${Feedback}`,
+        Early Access Agreement: ${feedback}`,
         "Tags": [
           "access-signup"
         ],
@@ -224,7 +224,7 @@ export const Signup = () => {
           <label className={styles.toggle}>
             <input
               type="checkbox"
-              name="Feedback"
+              name="feedback"
               required
               disabled={sending}
             />

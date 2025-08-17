@@ -37,9 +37,8 @@ export async function action({ request, context }: { request: Request, context: 
   const steps = formData.get('steps') as string;
   const expected = formData.get('expected') as string;
   const actual = formData.get('actual') as string;
+  const errors: { name?: string; email?: string; description?: string; steps?: string; expected?: string; actual?: string; } = {};
 
-  // Validation
-  const errors: ActionData['errors'] = {};
   
   if (!name || name.length > MAX_NAME_LENGTH) {
     errors.name = 'Please enter a valid name';
@@ -59,6 +58,10 @@ export async function action({ request, context }: { request: Request, context: 
   if (!actual || actual.length < 10) {
     errors.actual = 'Please provide the actual behavior';
   }
+
+  if (Object.keys(errors).length > 0) {
+      return json<ActionData>({ errors }, { status: 400 });
+    }
 
   try {    
 
