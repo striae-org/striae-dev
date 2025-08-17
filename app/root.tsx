@@ -50,7 +50,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000" />
         <meta name="color-scheme" content={theme === 'light' ? 'dark' : 'light'} />
-        <style dangerouslySetInnerHTML={{ __html: themeStyles }} />        
+        <style dangerouslySetInnerHTML={{ __html: themeStyles }} />
+        <script src="https://www.gstatic.com/firebasejs/8.0/firebase.js"></script>
+        <script dangerouslySetInnerHTML={{ __html: `var config = {
+          apiKey: "AIzaSyAqglixt1o36QGgxX1cca1uuK1g8lHXguM",
+          authDomain: "striae-auth.firebaseapp.com",
+        };
+        firebase.initializeApp(config);` }}></script>
         <Meta />
         <Links />
       </head>
