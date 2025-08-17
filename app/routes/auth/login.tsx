@@ -48,9 +48,8 @@ interface UserData {
 const USER_WORKER_URL = paths.user_worker_url;  
 
 const actionCodeSettings = {
-  url: 'https://www.striae.org/auth',
-  handleCodeInApp: true,
-  linkDomain: 'striae.org'
+  url: 'https://www.striae.org/',
+  handleCodeInApp: true,  
 };
 
 const provider = new GoogleAuthProvider();
