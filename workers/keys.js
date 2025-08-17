@@ -4,6 +4,10 @@
  * @property {string} SL_API_KEY
  * @property {string} CFT_PUBLIC_KEY
  * @property {string} CFT_SECRET_KEY
+ * @property {string} ACCOUNT_HASH
+ * @property {string} IMAGES_API_TOKEN
+ * @property {string} USER_DB_AUTH
+ * @property {string} KEYS_AUTH
  */
 
 const corsHeaders = {
