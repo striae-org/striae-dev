@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
-    "deploy": "npm run build && wrangler pages deploy --branch production",
-    "dev-deploy": "npm run build && wrangler pages deploy --branch preview",
+    "deploy": "npm run build && wrangler pages deploy",
     "dev": "remix vite:dev",
     "emulators": "firebase emulators:start --only auth",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
