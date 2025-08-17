@@ -172,8 +172,7 @@ export const Signup = () => {
             name="firstName"
             placeholder="First Name"
             autoComplete="given-name"
-            className={styles.input}
-            required
+            className={styles.input}            
             disabled={sending}
           />
           {actionData?.errors?.firstName && (
@@ -184,8 +183,7 @@ export const Signup = () => {
             name="lastName"
             placeholder="Last Name"
             autoComplete="family-name"
-            className={styles.input}
-            required
+            className={styles.input}            
             disabled={sending}
           />
           {actionData?.errors?.lastName && (
@@ -196,8 +194,7 @@ export const Signup = () => {
             name="email"
             placeholder="Email Address"
             autoComplete="email"
-            className={styles.input}
-            required
+            className={styles.input}            
             disabled={sending}
           />
           {actionData?.errors?.email && (
@@ -208,8 +205,7 @@ export const Signup = () => {
             name="company"
             placeholder="Laboratory/Company Name"
             autoComplete="organization"
-            className={styles.input}
-            required
+            className={styles.input}            
             disabled={sending}
           />
           {actionData?.errors?.company && (
