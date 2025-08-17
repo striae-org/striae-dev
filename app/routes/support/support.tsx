@@ -14,6 +14,7 @@ interface ActionData {
     errors?: {
       name?: string;
       email?: string;
+      category?: string;
       description?: string;
       steps?: string;
       expected?: string;      
@@ -45,6 +46,9 @@ export async function action({ request, context }: { request: Request, context: 
   }
   if (!email || !EMAIL_PATTERN.test(email)) {
     errors.email = 'Please enter a valid email address';
+  }
+  if (!category || category.length < 3) {
+    errors.category = 'Please provide a valid category';
   }
   if (!description || description.length < 10) {
     errors.description = 'Please provide a detailed description';
@@ -137,56 +141,57 @@ export const Support = () => {
             name="name"
             placeholder="Your Name"
             autoComplete="name"
-            className={styles.input}
-            required
+            className={styles.input}            
           />
-          
+          {actionData?.errors?.name && (
+            <p className={styles.error}>{actionData.errors.name}</p>
+          )}
           <input
             type="email"
             name="email"
             placeholder="Your Email"
             autoComplete="email"
-            className={styles.input}
-            required
+            className={styles.input}            
           />
-          
+          {actionData?.errors?.email && (
+            <p className={styles.error}>{actionData.errors.email}</p>
+          )}
          <select 
             name="category"
             className={styles.input}
-            aria-label="Issue Category"
-            required
+            aria-label="Issue Category"            
           >
             <option value="">Select Issue Category</option>
             <option value="technical">Technical Issue</option>
             <option value="account">Account Issue</option>
             <option value="feature">Feature Request</option>
             <option value="other">Other</option>
-          </select>
-          
+          </select>          
+          {actionData?.errors?.category && (
+            <p className={styles.error}>{actionData.errors.category}</p>
+          )}
           <textarea
             name="description"
             placeholder="Describe what you need help with or a feature request"
-            className={styles.textarea}
-            required
+            className={styles.textarea}            
           />
-          
+          {actionData?.errors?.description && (
+            <p className={styles.error}>{actionData.errors.description}</p>
+          )}
           <textarea
             name="steps"
             placeholder="What have you tried so far? (Optional)"
             className={styles.textarea}
-          />
-          
+          />          
           <textarea
             name="expected"
             placeholder="What are you trying to accomplish? (Optional)"
             className={styles.textarea}
           />
-
           <Turnstile
             className={styles.turnstile}
             theme="light"
-          />
-          
+          />          
           <button 
             type="submit" 
             className={styles.button}
@@ -194,8 +199,7 @@ export const Support = () => {
           >
             {sending ? 'Submitting...' : 'Submit Support Ticket'}
           </button>
-        </Form>
-        
+        </Form>        
         {actionData?.success && (
           <div className={styles.success}>
             <p>Thank you for contacting support!</p>

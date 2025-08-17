@@ -50,6 +50,15 @@ export async function action({ request, context }: { request: Request, context: 
   if (!description || description.length < 10) {
     errors.description = 'Please provide a detailed description';
   }
+  if (!steps || steps.length < 10) {
+    errors.steps = 'Please provide detailed steps to reproduce the issue';
+  }
+  if (!expected || expected.length < 10) {
+    errors.expected = 'Please provide the expected behavior';
+  }
+  if (!actual || actual.length < 10) {
+    errors.actual = 'Please provide the actual behavior';
+  }
 
   try {    
 
@@ -138,47 +147,53 @@ export const Bugs = () => {
             name="name"
             placeholder="Your Name"
             autoComplete="name"
-            className={styles.input}
-            required
+            className={styles.input}            
           />
-          
+          {actionData?.errors?.name && (
+            <p className={styles.error}>{actionData.errors.name}</p>
+          )}          
           <input
             type="email"
             name="email"
             placeholder="Your Email"
             autoComplete="email"
-            className={styles.input}
-            required
-          />
-          
+            className={styles.input}          
+          />          
+          {actionData?.errors?.email && (
+            <p className={styles.error}>{actionData.errors.email}</p>
+          )}
           <textarea
             name="description"
             placeholder="Describe the bug in detail"
-            className={styles.textarea}
-            required
+            className={styles.textarea}            
           />
-          
+          {actionData?.errors?.description && (
+            <p className={styles.error}>{actionData.errors.description}</p>
+          )}
           <textarea
             name="steps"
             placeholder="Steps to reproduce the bug"
-            className={styles.textarea}
-            required
+            className={styles.textarea}            
           />
-          
+          {actionData?.errors?.steps && (
+            <p className={styles.error}>{actionData.errors.steps}</p>
+          )}
           <textarea
             name="expected"
             placeholder="What did you expect to happen?"
-            className={styles.textarea}
-            required
+            className={styles.textarea}            
           />
-          
+          {actionData?.errors?.expected && (
+            <p className={styles.error}>{actionData.errors.expected}</p>
+          )}
           <textarea
             name="actual"
             placeholder="What actually happened?"
-            className={styles.textarea}
-            required
+            className={styles.textarea}            
           />
-
+          {actionData?.errors?.actual && (
+            <p className={styles.error}>{actionData.errors.actual}</p>
+          )}
           <Turnstile
             className={styles.turnstile}
             theme="light"
