@@ -30,7 +30,7 @@ export default function Home() {
             <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae?tab=readme-ov-file#striae-development-indefinitely-suspended">here</Link>. Thank you.</em></p>
           </div>
           <div className={styles.buttonGroup}>            
-            <Link to="/auth" className={styles.actionButton}>
+            <Link to="https://www.striae.org/auth" className={styles.actionButton}>
               Sign In
             </Link>
             <Link to="/access" className={styles.accessButton}>
