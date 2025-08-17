@@ -50,6 +50,7 @@ const USER_WORKER_URL = paths.user_worker_url;
 const actionCodeSettings = {
   url: 'https://www.striae.org', // Update with your domain in production
   handleCodeInApp: true,
+  linkDomain: 'striae.org'
 };
 
 const provider = new GoogleAuthProvider();
