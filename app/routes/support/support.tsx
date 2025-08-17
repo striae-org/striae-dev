@@ -159,13 +159,13 @@ export const Support = () => {
             <option value="">Select Issue Category</option>
             <option value="technical">Technical Issue</option>
             <option value="account">Account Issue</option>
-            <option value="billing">Billing Issue</option>
+            <option value="feature">Feature Request</option>
             <option value="other">Other</option>
           </select>
           
           <textarea
             name="description"
-            placeholder="Describe what you need help with"
+            placeholder="Describe what you need help with or a feature request"
             className={styles.textarea}
             required
           />
