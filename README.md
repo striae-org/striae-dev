@@ -21,6 +21,7 @@
 - Firebase Authentication methods
 - Case manangement
 - File upload & management
+- Notes creation & management
 
 ---
 
