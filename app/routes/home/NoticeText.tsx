@@ -7,7 +7,7 @@ const NoticeText = () => {
       <p>
         We are excited to announce Striae, an innovative web app designed to assist firearms examiners in creating detailed annotations for your comparison images. Striae aims to streamline the processes of labeling, note-taking, and printing, making the review process a little bit easier.
       </p>
-      <p><strong>Features of Striae:</strong></p>
+      <p><strong>Features of Striae</strong></p>
       <ul>
         <li>
             <strong>Annotation Tools:</strong> Simplify the process of marking and labeling comparison images with ease. Add case and item number labels, labels for class characteristics, a potential subclass warning/indicator, an indexing color/number indicator, support indicator for ID, inconclusive, or exclusion, and more.
@@ -22,7 +22,7 @@ const NoticeText = () => {
             <strong>Convert to PDF to Save or Print: </strong> Generate professional-quality PDF outputs for documentation and reporting.
         </li>
       </ul>
-      <p><strong>Security Features of Striae:</strong></p>
+      <p><strong>Security Features of Striae</strong></p>
       <p>
         Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. From day one, Striae was designed with data security as a top priority.
         <p>
@@ -51,10 +51,16 @@ const NoticeText = () => {
       </ul>
       <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</Link>.</p>
       <p>
-        <strong>Development of Striae is currently on hold until further notice.</strong>
+        <strong>Open Source Commitment</strong>
       </p>
       <p>
-        If you’re interested in participating in the beta testing phase or want to stay updated on Striae’s progress, please let us know. Your feedback will be invaluable as we continue to develop and perfect this tool.
+        Striae is an open-source project, supporting transparency, collaboration, and continuous improvement from the firearms examiner community. The entire codebase is available on GitHub at <Link to="https://github.com/StephenJLu/striae">github.com/StephenJLu/striae</Link>. We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination.
+      </p>
+      <p>
+        By making Striae open source, we aim to foster community involvement, maintain accountability for security and privacy, and ensure that users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
+      </p>
+      <p>
+        If you’re interested in participating in the <Link to="/access">Early Access Program</Link> or want to stay updated on Striae’s progress, please let us know. Your feedback will be invaluable as we continue to develop and perfect this tool.
         </p>
       <p>
         Thank you for your support, and we look forward to bringing Striae to your comparison toolkit in the future!
