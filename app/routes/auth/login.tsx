@@ -528,7 +528,7 @@ if (additionalInfo?.isNewUser) {
         ) : (
           <>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
-            <a href="/beta"><h5 className={styles.subtitle}>Sign up for Beta Access</h5></a>
+            <a href="/access"><h5 className={styles.subtitle}>Request Early Access</h5></a>
 
             <div className={styles.authToggle}>
               <button 
