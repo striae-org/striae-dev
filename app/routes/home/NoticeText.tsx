@@ -24,7 +24,7 @@ const NoticeText = () => {
       </ul>
       <p><strong>Security Features of Striae</strong></p>
       <p>
-        Coming from a forensics background ourselves, we understand the necessity of strong security measures in order to protect your data and files. From day one, Striae was designed with data security as a top priority.
+        Coming from a forensics background ourselves, we understand the necessity for strong security measures in order to protect your data and files. From day one, Striae was designed with data security as a top priority.
         <p>
             We have implemented the following security features in Striae:
         </p>
