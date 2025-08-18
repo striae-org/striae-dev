@@ -25,7 +25,7 @@
 
 ---
 
-## [2025-08-15]
+## [2025-08-10]
 ### Striae Development Indefinitely Suspended
 
 Some of you know that at the end of 2024, I’d been working on a personal project close to my heart — Striae, a Firearms Examiner’s Comparison Companion.
