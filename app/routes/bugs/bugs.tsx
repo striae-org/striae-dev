@@ -142,8 +142,11 @@ export const Bugs = () => {
       </Link>      
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Report a Bug</h1>
-        <p className={styles.subtitle}>Help us improve Striae by reporting issues you encounter</p>
-        
+        <p className={styles.subtitle}>Help us improve Striae by reporting issues you encounter
+          <br />
+          To avoid redundancy, please check the <Link to="https://github.com/StephenJLu/striae/issues" target="_blank" rel="noopener noreferrer">current list of issues</Link> first
+        </p>
+
         <Form method="post" className={styles.form}>
           <input
             type="text"
