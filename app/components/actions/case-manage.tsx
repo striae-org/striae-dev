@@ -222,6 +222,35 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     body: JSON.stringify(newCaseData)
   });
 
+  // Transfer notes JSON files for each image
+  if (oldCaseData.files && oldCaseData.files.length > 0) {
+    for (const file of oldCaseData.files) {
+      try {
+        // Try to get the notes file for this image
+        const notesResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/${file.id}/data.json`, {
+          headers: { 'X-Custom-Auth-Key': dataApiKey }
+        });
+
+        if (notesResponse.ok) {
+          const notesData = await notesResponse.json();
+          
+          // Copy notes to new case location
+          await fetch(`${DATA_WORKER_URL}/${user.uid}/${newCaseNumber}/${file.id}/data.json`, {
+            method: 'PUT',
+            headers: {
+              'X-Custom-Auth-Key': dataApiKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notesData)
+          });
+        }
+      } catch (error) {
+        console.warn(`Failed to transfer notes for file ${file.id}:`, error);
+        // Continue with other files even if one fails
+      }
+    }
+  }
+
   // Add new case to KV store
   const rootCaseData: Omit<CaseData, 'files'> = {
     createdAt: newCaseData.createdAt,
@@ -260,6 +289,22 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     method: 'DELETE',
     headers: { 'X-Custom-Auth-Key': dataApiKey }
   });
+
+  // Clean up old notes JSON files
+  if (oldCaseData.files && oldCaseData.files.length > 0) {
+    for (const file of oldCaseData.files) {
+      try {
+        // Delete old notes file if it exists
+        await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/${file.id}/data.json`, {
+          method: 'DELETE',
+          headers: { 'X-Custom-Auth-Key': dataApiKey }
+        });
+      } catch (error) {
+        console.warn(`Failed to delete old notes for file ${file.id}:`, error);
+        // Continue with cleanup even if one fails
+      }
+    }
+  }
 };
 
  export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
