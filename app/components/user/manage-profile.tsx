@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { 
   updateProfile, 
   updateEmail,   
@@ -30,6 +30,23 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {    
     e.preventDefault();
@@ -99,11 +116,26 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   }
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
+    <div 
+      className={styles.modalOverlay} 
+      onClick={onClose}
+      role="presentation"
+    >
+      <div 
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
             <header className={styles.modalHeader}>
-              <h1>Manage Profile</h1>
-              <button onClick={onClose} className={styles.closeButton}>&times;</button>
+              <h1 id="modal-title">Manage Profile</h1>
+              <button 
+                onClick={onClose} 
+                className={styles.closeButton}
+                aria-label="Close modal"
+              >
+                &times;
+              </button>
             </header>
 
             <form onSubmit={handleUpdateProfile} className={styles.form}>
