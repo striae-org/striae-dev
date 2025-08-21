@@ -5,22 +5,22 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
 }
 
 .modal {
-  background: var(--colorSurface);
+  background: #ffffff;
   border-radius: 12px;
   padding: 2rem;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--colorBorder);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid #e0e0e0;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .header h3 {
-  color: var(--colorTextPrimary);
+  color: #1a1a1a;
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
@@ -53,9 +53,10 @@
 }
 
 .content p {
-  color: var(--colorTextSecondary);
+  color: #4a4a4a;
   margin: 0 0 1rem 0;
   line-height: 1.5;
+  font-size: 1rem;
 }
 
 .countdown {
@@ -88,40 +89,60 @@
 }
 
 .extendButton {
-  background: var(--colorPrimary);
+  background: #007bff;
   color: white;
 }
 
 .extendButton:hover {
-  background: var(--colorPrimaryHover);
+  background: #0056b3;
   transform: translateY(-1px);
 }
 
 .signOutButton {
   background: transparent;
-  color: var(--colorTextSecondary);
-  border: 1px solid var(--colorBorder);
+  color: #6c757d;
+  border: 1px solid #dee2e6;
 }
 
 .signOutButton:hover {
-  background: var(--colorSurfaceHover);
-  color: var(--colorTextPrimary);
+  background: #f8f9fa;
+  color: #495057;
+  border-color: #adb5bd;
 }
 
 .extendButton:focus,
 .signOutButton:focus {
-  outline: 2px solid var(--colorPrimary);
+  outline: 2px solid #007bff;
   outline-offset: 2px;
 }
 
 /* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {
   .overlay {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
   }
   
   .modal {
-    background: var(--colorSurfaceDark);
-    border-color: var(--colorBorderDark);
+    background: #2d2d2d;
+    border-color: #404040;
+  }
+  
+  .header h3 {
+    color: #ffffff;
+  }
+  
+  .content p {
+    color: #cccccc;
+  }
+  
+  .signOutButton {
+    color: #adb5bd;
+    border-color: #6c757d;
+  }
+  
+  .signOutButton:hover {
+    background: #404040;
+    color: #ffffff;
+    border-color: #adb5bd;
   }
 }
