@@ -339,6 +339,7 @@ return (
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
                     handleFileDelete(file.id);
+                    setImageLoaded(false);
                   }
                 }}
                 className={styles.deleteButton}
