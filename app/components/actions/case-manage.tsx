@@ -269,8 +269,41 @@ export const renameCase = async (
     throw new Error('Failed to add new case');
   }
 
-  // Clean up the old case completely
-  await deleteCase(user, oldCaseNumber);
+  // Delete old case from KV
+  const deleteResponse = await fetch(`${USER_WORKER_URL}/${user.uid}/cases`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Custom-Auth-Key': userApiKey
+    },
+    body: JSON.stringify({ casesToDelete: [oldCaseNumber] })
+  });
+
+  if (!deleteResponse.ok) {
+    throw new Error('Failed to delete old case');
+  }
+
+  // Delete old case from data worker
+  await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/data.json`, {
+    method: 'DELETE',
+    headers: { 'X-Custom-Auth-Key': dataApiKey }
+  });
+
+  // Clean up old notes JSON files
+  if (oldCaseData.files && oldCaseData.files.length > 0) {
+    for (const file of oldCaseData.files) {
+      try {
+        // Delete old notes file if it exists
+        await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/${file.id}/data.json`, {
+          method: 'DELETE',
+          headers: { 'X-Custom-Auth-Key': dataApiKey }
+        });
+      } catch (error) {
+        console.warn(`Failed to delete old notes for file ${file.id}:`, error);
+        // Continue with cleanup even if one fails
+      }
+    }
+  }
 };
 
 export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
