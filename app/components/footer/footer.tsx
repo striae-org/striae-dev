@@ -25,7 +25,9 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          Striae © {year}. Licensed under <Link to="https://github.com/StephenJLu/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Apache 2.0</Link>. All rights reserved.
+          Striae © {year}. All rights reserved.
+          <br />
+           <Link to="https://github.com/StephenJLu/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Open-source software, licensed under Apache 2.0</Link>
         </p>
       </div>
     </footer>    
