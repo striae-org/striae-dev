@@ -27,7 +27,7 @@ export default function Home() {
           <div className={styles.title}>
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
             <br />
-            <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae?tab=readme-ov-file#striae-development-indefinitely-suspended">here</Link>. Thank you.</em></p>
+            <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae">here</Link>. Thank you.</em></p>
           </div>
           <div className={styles.buttonGroup}>            
             <Link to="https://www.striae.org/auth" target="_blank" rel="noopener noreferrer" className={styles.actionButton}>
