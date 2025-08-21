@@ -80,6 +80,13 @@
   box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
 }
 
+.helpText {
+  font-size: var(--fontSizeBodyXS);
+  color: var(--textLight);
+  margin-top: var(--spaceXS);
+  line-height: 1.4;
+}
+
 .buttonGroup {
   display: flex;
   gap: var(--spaceS);

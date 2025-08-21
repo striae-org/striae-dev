@@ -25,7 +25,7 @@ export const ERROR_MESSAGES = {
   GOOGLE_ERROR: 'Error signing in with Google',
   
   // General
-  GENERAL_ERROR: 'New registrations are currently disabled',
+  GENERAL_ERROR: 'Something went wrong. Please contact support.',
   NO_USER: 'No user found',
   VERIFICATION_SENT: 'Verification email sent! Check your inbox',
   PROFILE_UPDATED: 'Profile updated successfully'
