@@ -11,6 +11,7 @@ export const ERROR_MESSAGES = {
   ACTION_RESTRICTED: 'Operation not allowed',
   PASSWORDS_MISMATCH: 'Passwords do not match',
   WEAK_PASSWORD: 'Password does not meet strength requirements',
+  REQUIRES_RECENT_LOGIN: 'Please sign in again to change your email',
   
   // Reset/Verify Errors
   RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
@@ -63,6 +64,8 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
         return { message: ERROR_MESSAGES.INVALID_EMAIL, data: errorData };
       case 'auth/weak-password':
         return { message: ERROR_MESSAGES.WEAK_PASSWORD, data: errorData };
+      case 'auth/requires-recent-login':
+        return { message: ERROR_MESSAGES.REQUIRES_RECENT_LOGIN, data: errorData };
       
       // Google Auth Specific Errors
       case 'auth/popup-closed-by-user':

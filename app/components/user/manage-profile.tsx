@@ -63,12 +63,18 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
 
       if (email !== user.email && password) {
         try {
+          // Step 1: Reauthenticate the user
           const credential = EmailAuthProvider.credential(user.email!, password);
           await reauthenticateWithCredential(user, credential);
+          
+          // Step 2: Update email (this changes the user's email immediately)
           await updateEmail(user, email);
+          
+          // Step 3: Send verification email to the new address
           await sendEmailVerification(user);
+          
           setVerificationSent(true);
-          setSuccess(ERROR_MESSAGES.VERIFICATION_SENT);
+          setSuccess('Email updated! Please check your new email address for verification.');
           return;
         } catch (err) {
           const { message } = handleAuthError(err);
