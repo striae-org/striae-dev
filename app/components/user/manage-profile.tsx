@@ -1,10 +1,9 @@
 import { useState, useContext, useEffect } from 'react';
 import { 
   updateProfile, 
-  updateEmail,   
+  verifyBeforeUpdateEmail,   
   reauthenticateWithCredential, 
-  EmailAuthProvider,
-  sendEmailVerification  
+  EmailAuthProvider,    
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
@@ -68,13 +67,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           await reauthenticateWithCredential(user, credential);
           
           // Step 2: Update email (this changes the user's email immediately)
-          await updateEmail(user, email);
-          
-          // Step 3: Send verification email to the new address
-          await sendEmailVerification(user);
+          await verifyBeforeUpdateEmail(user, email);
           
           setVerificationSent(true);
-          setSuccess('Email updated! Please check your new email address for verification.');
+          setSuccess('A verification email has been sent to your new address. Please check your inbox to complete the email update!');
           return;
         } catch (err) {
           const { message } = handleAuthError(err);
