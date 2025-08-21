@@ -71,6 +71,7 @@ export const CaseSidebar = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [fileError, setFileError] = useState('');
   const [newCaseName, setNewCaseName] = useState('');
+  const [showCaseActions, setShowCaseActions] = useState(false);
 
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -359,32 +360,44 @@ return (
         </button>
         </div>
           {currentCase && (
-        <div className={`${styles.caseRename} mb-4`}>
-          <input
-            type="text"
-            value={newCaseName}
-            onChange={(e) => setNewCaseName(e.target.value)}
-            placeholder="New Case Number"            
-          />
+        <div className={styles.caseActionsSection}>
           <button
-            onClick={handleRenameCase}
-            disabled={isRenaming || !newCaseName}            
+            onClick={() => setShowCaseActions(!showCaseActions)}
+            className={styles.caseActionsToggle}
           >
-            {isRenaming ? 'Renaming...' : 'Rename Case'}
+            {showCaseActions ? 'Hide' : 'Rename/Delete Case'}
           </button>
+          
+          {showCaseActions && (
+            <div className={styles.caseActionsContent}>
+              <div className={`${styles.caseRename} mb-4`}>
+                <input
+                  type="text"
+                  value={newCaseName}
+                  onChange={(e) => setNewCaseName(e.target.value)}
+                  placeholder="New Case Number"            
+                />
+                <button
+                  onClick={handleRenameCase}
+                  disabled={isRenaming || !newCaseName}            
+                >
+                  {isRenaming ? 'Renaming...' : 'Rename Case'}
+                </button>
+              </div>
+              
+              <div className={styles.deleteCaseSection}>
+                <button
+                  onClick={handleDeleteCase}
+                  disabled={isDeletingCase}
+                  className={styles.deleteWarningButton}
+                >
+                  {isDeletingCase ? 'Deleting...' : 'Delete Case'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
-        {currentCase && (
-          <div className={styles.deleteCaseSection}>
-            <button
-              onClick={handleDeleteCase}
-              disabled={isDeletingCase}
-              className={styles.deleteWarningButton}
-            >
-              {isDeletingCase ? 'Deleting...' : 'Delete Case'}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
