@@ -175,8 +175,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
   }
 };
       
-
-  export const renameCase = async (
+export const renameCase = async (
   user: User, 
   oldCaseNumber: string, 
   newCaseNumber: string
@@ -307,7 +306,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
   }
 };
 
- export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
+export const deleteCase = async (user: User, caseNumber: string): Promise<void> => {
   if (!validateCaseNumber(caseNumber)) {
     throw new Error('Invalid case number');
   }
