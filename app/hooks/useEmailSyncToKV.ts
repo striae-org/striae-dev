@@ -6,15 +6,11 @@ import paths from '~/config/config.json';
 
 const USER_WORKER_URL = paths.user_worker_url;
 
-/**
- * Hook that monitors auth state changes and syncs email updates to KV store
- */
 export const useEmailSyncToKV = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.emailVerified) {
-        try {
-          // Get current user data from KV store
+        try {          
           const apiKey = await getUserApiKey();
           const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
             method: 'GET',
@@ -25,12 +21,10 @@ export const useEmailSyncToKV = () => {
 
           if (response.ok) {
             const userData = await response.json() as { email: string; [key: string]: unknown };
-            
-            // Check if email in KV store is different from Firebase Auth
+                        
             if (userData.email !== user.email) {
               console.log('Email mismatch detected, updating KV store...');
               
-              // Update KV store with new email
               const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
                 method: 'PATCH',
                 headers: {
