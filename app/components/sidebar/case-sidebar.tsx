@@ -338,7 +338,8 @@ return (
               <button
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-                    handleFileDelete(file.id);
+                    handleFileDelete(file.id);                    
+                    onImageSelect({ id: '', originalFilename: '', uploadedAt: '' });
                     setImageLoaded(false);
                   }
                 }}
