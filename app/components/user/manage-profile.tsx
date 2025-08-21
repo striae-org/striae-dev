@@ -121,11 +121,13 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
       onClick={onClose}
       role="presentation"
     >
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div 
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
+        onClick={(e) => e.stopPropagation()}
       >
             <header className={styles.modalHeader}>
               <h1 id="modal-title">Manage Profile</h1>
