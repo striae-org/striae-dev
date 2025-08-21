@@ -78,7 +78,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           return;
         }
       }
-
        // Update Firebase profile
       await updateProfile(user, {
         displayName
