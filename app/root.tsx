@@ -15,10 +15,13 @@ import {
 } from '~/components/theme-provider/theme-provider';
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
+import { InactivityWarning } from '~/components/user/inactivity-warning';
 import "./tailwind.css";
 import styles from '~/styles/root.module.css';
 import { auth } from "./services/firebase";
 import { useEmailSyncToKV } from '~/hooks/useEmailSyncToKV';
+import { useInactivityTimeout } from '~/hooks/useInactivityTimeout';
+import { INACTIVITY_CONFIG } from '~/config/inactivity';
 import { AuthContext } from '~/contexts/auth.context';
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
@@ -71,18 +74,53 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [showInactivityWarning, setShowInactivityWarning] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
   
   useEmailSyncToKV();
+
+  const { extendSession } = useInactivityTimeout({
+    timeoutMinutes: INACTIVITY_CONFIG.TIMEOUT_MINUTES,
+    warningMinutes: INACTIVITY_CONFIG.WARNING_MINUTES,
+    enabled: !!user,
+    onWarning: () => {
+      setRemainingSeconds(INACTIVITY_CONFIG.WARNING_MINUTES * 60);
+      setShowInactivityWarning(true);
+    },
+    onTimeout: () => {
+      setShowInactivityWarning(false);      
+    }
+  });
 
   useEffect(() => {
     return auth.onAuthStateChanged((user) => {
       setUser(user);
+      // Hide warning when user signs out
+      if (!user) {
+        setShowInactivityWarning(false);
+      }
     });
   }, []);
+
+  const handleExtendSession = () => {
+    setShowInactivityWarning(false);
+    extendSession();
+  };
+
+  const handleSignOutNow = () => {
+    setShowInactivityWarning(false);
+    auth.signOut();
+  };
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       {children}
+      <InactivityWarning
+        isOpen={showInactivityWarning}
+        remainingSeconds={remainingSeconds}
+        onExtendSession={handleExtendSession}
+        onSignOut={handleSignOutNow}
+      />
     </AuthContext.Provider>
   );
 }
