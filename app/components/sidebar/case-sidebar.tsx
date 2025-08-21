@@ -185,7 +185,9 @@ export const CaseSidebar = ({
     setFileError('');
     try {
       await deleteFile(user, currentCase, fileId);
-      setFiles(prev => prev.filter(f => f.id !== fileId));      
+      setFiles(prev => prev.filter(f => f.id !== fileId));
+      onImageSelect({ id: '', originalFilename: '', uploadedAt: '' });
+      setImageLoaded(false);      
     } catch (err) {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
@@ -338,9 +340,7 @@ return (
               <button
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-                    handleFileDelete(file.id);                    
-                    onImageSelect({ id: '', originalFilename: '', uploadedAt: '' });
-                    setImageLoaded(false);
+                    handleFileDelete(file.id);                                        
                   }
                 }}
                 className={styles.deleteButton}
