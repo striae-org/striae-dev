@@ -27,6 +27,8 @@ export const InactivityWarning = ({
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
+          // Trigger sign out when countdown reaches 0
+          onSignOut();
           return 0;
         }
         return prev - 1;
@@ -34,7 +36,7 @@ export const InactivityWarning = ({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen]);
+  }, [isOpen, onSignOut]);
 
   if (!isOpen) return null;
 

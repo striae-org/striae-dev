@@ -94,8 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     return auth.onAuthStateChanged((user) => {
-      setUser(user);
-      // Hide warning when user signs out
+      setUser(user);      
       if (!user) {
         setShowInactivityWarning(false);
       }
