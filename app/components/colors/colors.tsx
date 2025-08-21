@@ -21,7 +21,7 @@ const commonColors: ColorOption[] = [
   { value: '#8000ff', label: 'Purple' },
   { value: '#ff00ff', label: 'Magenta' },
   { value: '#000000', label: 'Black' },
-  { value: '#808080', label: 'Gray' }
+  { value: '#ffffff', label: 'White' }
 ];
 
 export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => {
