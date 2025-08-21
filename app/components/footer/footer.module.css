@@ -37,6 +37,7 @@
 .copyright {
   color: var(--textLight);
   font-size: var(--fontSizeBodyXS);
+  text-align: center;
 }
 
 @media (max-width: 768px) {
