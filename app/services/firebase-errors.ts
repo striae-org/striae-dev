@@ -8,7 +8,7 @@ export const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: 'Invalid credentials',
   USER_NOT_FOUND: 'No account found with this email',
   EMAIL_IN_USE: 'An account with this email already exists',
-  REGISTRATION_DISABLED: 'New registrations are currently disabled',
+  ACTION_RESTRICTED: 'Operation not allowed',
   PASSWORDS_MISMATCH: 'Passwords do not match',
   WEAK_PASSWORD: 'Password does not meet strength requirements',
   
@@ -75,7 +75,7 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
       // Operation Errors
       case 'auth/operation-not-allowed':
       case 'auth/admin-restricted-operation':
-        return { message: ERROR_MESSAGES.REGISTRATION_DISABLED, data: errorData };
+        return { message: ERROR_MESSAGES.ACTION_RESTRICTED, data: errorData };
       
       default:
         console.error('Firebase Auth Error:', errorData);
