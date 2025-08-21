@@ -53,8 +53,7 @@ export const Striae = ({ user }: StriaePage) => {
   }, []); // Empty dependency array means this runs only on mount/unmount
 
 
-  const handleImageSelect = async (file: FileData) => {
-  // Handle special clear case
+  const handleImageSelect = async (file: FileData) => {  
   if (file?.id === 'clear') {
     setSelectedImage('/clear.jpg');
     setImageId(undefined);
