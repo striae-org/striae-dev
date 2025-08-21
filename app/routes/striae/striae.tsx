@@ -54,6 +54,15 @@ export const Striae = ({ user }: StriaePage) => {
 
 
   const handleImageSelect = async (file: FileData) => {
+  // Handle special clear case
+  if (file?.id === 'clear') {
+    setSelectedImage('/clear.jpg');
+    setImageId(undefined);
+    setImageLoaded(false);
+    setError(undefined);
+    return;
+  }
+
   if (!file?.id) {
     setError('Invalid file selected');
     return;
