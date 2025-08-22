@@ -383,7 +383,7 @@
 .caseActionsToggle {
   width: 100%;
   padding: 0.75rem;
-  background-color: #0d6efd;
+  background-color: rgba(139, 69, 19, 0.8); /* Dark red with transparency */
   color: white;
   border: none;
   border-radius: 6px;
@@ -394,7 +394,7 @@
 }
 
 .caseActionsToggle:hover {
-  background-color: #0b5ed7;
+  background-color: rgba(139, 69, 19, 0.9); /* Slightly less transparent on hover */
   transform: translateY(-1px);
 }
 
