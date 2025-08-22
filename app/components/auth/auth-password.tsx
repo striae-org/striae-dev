@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import config from '~/config/config.json';
 import styles from './auth-password.module.css';
 
 interface AuthPasswordProps {
@@ -24,8 +23,9 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
     setIsLoading(true);
     setError('');
 
-    // Check password against config
-    if (password === config.auth_access_password) {
+    const auth_password = process.env.AUTH_PASSWORD;
+    
+    if (password === auth_password) {
       sessionStorage.setItem('auth-access-granted', 'true');
       onAccessGranted();
     } else {
