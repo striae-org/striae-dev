@@ -25,7 +25,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
     setError('');
 
     // Check password against config
-    if (password === config.auth_access_password) {
+    if (password === config.eVmc3jkhfFqFuW5Gt3MVH) {
       sessionStorage.setItem('auth-access-granted', 'true');
       onAccessGranted();
     } else {
