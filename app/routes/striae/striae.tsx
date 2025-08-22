@@ -30,6 +30,7 @@ interface AnnotationData {
   indexNumber?: string;
   indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  hasSubclass?: boolean;
 }
 
 export const Striae = ({ user }: StriaePage) => {
@@ -119,7 +120,8 @@ export const Striae = ({ user }: StriaePage) => {
             indexType: notes.indexType || 'number',
             indexNumber: notes.indexNumber,
             indexColor: notes.indexColor,
-            supportLevel: notes.supportLevel || 'Inconclusive'
+            supportLevel: notes.supportLevel || 'Inconclusive',
+            hasSubclass: notes.hasSubclass
           });
         } else {
           setAnnotationData(null);

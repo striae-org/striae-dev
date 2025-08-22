@@ -14,6 +14,7 @@ interface AnnotationData {
   indexNumber?: string;
   indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  hasSubclass?: boolean;
 }
 
 interface CanvasProps {
@@ -31,6 +32,7 @@ type ImageLoadError = {
 export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
+  const [isFlashing, setIsFlashing] = useState(false);
 
   useEffect(() => {
     if (!imageUrl) {
@@ -74,6 +76,25 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
       setIsLoading(false);
     };
   }, [imageUrl]);
+
+  // Flashing effect for subclass warning
+  useEffect(() => {
+    if (!annotationData?.hasSubclass) {
+      setIsFlashing(false);
+      return;
+    }
+
+    const flashInterval = setInterval(() => {
+      setIsFlashing(true);
+      setTimeout(() => setIsFlashing(false), 200); // Flash on for 200ms
+      setTimeout(() => {
+        setIsFlashing(true);
+        setTimeout(() => setIsFlashing(false), 200); // Second flash after 300ms
+      }, 300);
+    }, 60000); // Repeat every minute
+
+    return () => clearInterval(flashInterval);
+  }, [annotationData?.hasSubclass]);
 
   const getErrorMessage = () => {
     if (error) return error;
@@ -172,6 +193,15 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             }}
           >
             {annotationData.supportLevel === 'ID' ? 'Identification' : annotationData.supportLevel}
+          </div>
+        </div>
+      )}
+      
+      {/* Subclass Warning - Bottom Right of Canvas */}
+      {annotationData?.hasSubclass && (
+        <div className={`${styles.subclassWarning} ${isFlashing ? styles.flashing : ''}`}>
+          <div className={styles.subclassText}>
+            POTENTIAL SUBCLASS
           </div>
         </div>
       )}
