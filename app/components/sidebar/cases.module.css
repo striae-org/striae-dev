@@ -135,6 +135,34 @@
   margin: 1rem 0;
 }
 
+.fileList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+  max-height: calc(5 * 3.5rem); /* Approximately 5 items at ~3.5rem each */
+  overflow-y: auto;
+}
+
+.fileList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.fileList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.fileList::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.fileList::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
 .fileItem {
   display: flex;
   align-items: center;
