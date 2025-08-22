@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
-import { json, type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { auth } from '~/services/firebase';
 import {
     applyActionCode,           
@@ -29,24 +28,6 @@ export const meta = () => {
     description: 'Login to your Striae account to access your projects and data',
   });
 };
-
-export async function action({ request, context }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const intent = formData.get('intent');
-  
-  if (intent === 'verify-password') {
-    const password = formData.get('password') as string;
-    const authPassword = context.cloudflare.env.AUTH_PASSWORD;
-    
-    if (password === authPassword) {
-      return json({ success: true });
-    } else {
-      return json({ success: false, error: 'Incorrect access password. Please contact support if you need access.' });
-    }
-  }
-  
-  return json({ success: false, error: 'Invalid request' });
-}
 
 interface UserData {
   uid: string;
