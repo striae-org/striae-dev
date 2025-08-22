@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from '@remix-run/react';
+import { Link, useFetcher } from '@remix-run/react';
 import styles from './auth-password.module.css';
 
 interface AuthPasswordProps {
@@ -9,7 +9,7 @@ interface AuthPasswordProps {
 export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const fetcher = useFetcher();
 
   // Check if access is already granted
   useEffect(() => {
@@ -18,23 +18,32 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
     }
   }, [onAccessGranted]);
 
+  // Handle server response
+  useEffect(() => {
+    if (fetcher.data && typeof fetcher.data === 'object') {
+      const data = fetcher.data as { success?: boolean; error?: string };
+      if (data.success) {
+        sessionStorage.setItem('auth-access-granted', 'true');
+        onAccessGranted();
+      } else if (data.error) {
+        setError(data.error);
+        setPassword('');
+      }
+    }
+  }, [fetcher.data, onAccessGranted]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
-
-    const auth_password = process.env.AUTH_PASSWORD;
     
-    if (password === auth_password) {
-      sessionStorage.setItem('auth-access-granted', 'true');
-      onAccessGranted();
-    } else {
-      setError('Incorrect access password. Please contact support if you need access.');
-      setPassword('');
-    }
+    const formData = new FormData();
+    formData.append('intent', 'verify-password');
+    formData.append('password', password);
     
-    setIsLoading(false);
+    fetcher.submit(formData, { method: 'post' });
   };
+
+  const isLoading = fetcher.state === 'submitting';
 
   return (
     <div className={styles.container}>

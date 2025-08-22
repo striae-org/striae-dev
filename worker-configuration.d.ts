@@ -3,4 +3,5 @@
 
 interface Env {
 	SL_API_KEY: string;
+	AUTH_PASSWORD: string;
 }
