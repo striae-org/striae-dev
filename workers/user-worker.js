@@ -33,7 +33,7 @@ async function handleGetUser(env, userUid) {
 
 async function handleAddUser(request, env, userUid) {
   try {
-    const { email, firstName, lastName, permitted = false } = await request.json();
+    const { email, firstName, lastName, company, permitted = false } = await request.json();
     
     // Check for existing user
     const value = await env.USER_DB.get(userUid);
@@ -47,6 +47,7 @@ async function handleAddUser(request, env, userUid) {
         email: email || existing.email,
         firstName: firstName || existing.firstName,
         lastName: lastName || existing.lastName,
+        company: company || existing.company,
         permitted: permitted !== undefined ? permitted : existing.permitted,
         updatedAt: new Date().toISOString()
       };
@@ -57,6 +58,7 @@ async function handleAddUser(request, env, userUid) {
         email,
         firstName,
         lastName,
+        company,
         permitted,
         cases: [],
         createdAt: new Date().toISOString()

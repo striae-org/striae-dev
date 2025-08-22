@@ -23,6 +23,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const { user } = useContext(AuthContext);  
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [company, setCompany] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,6 +33,31 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
 
   // Check if user has Google provider
   const hasGoogleProvider = user?.providerData.some(provider => provider.providerId === 'google.com');
+
+  // Load user data from KV store when modal opens
+  useEffect(() => {
+    if (isOpen && user) {
+      const loadUserData = async () => {
+        try {
+          const apiKey = await getUserApiKey();
+          const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+            headers: {
+              'X-Custom-Auth-Key': apiKey
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json() as { company?: string };
+            setCompany(userData.company || '');
+          }
+        } catch (err) {
+          console.error('Failed to load user data:', err);
+        }
+      };
+      
+      loadUserData();
+    }
+  }, [isOpen, user]);
 
   // Handle escape key to close modal
   useEffect(() => {
@@ -97,6 +123,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           email,
           firstName: firstName || '',
           lastName: lastName || '',
+          // Note: company field intentionally omitted - admin only
         })
       });
 
@@ -156,6 +183,22 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               className={styles.input}
               required
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="company">Lab/Company Name</label>
+            <input
+              id="company"
+              type="text"
+              value={company}
+              className={styles.input}
+              disabled
+              readOnly
+              style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
+            />
+            <p className={styles.helpText}>
+              Company name can only be changed by an administrator. Contact support if changes are needed.
+            </p>
           </div>
 
           <div className={styles.formGroup}>

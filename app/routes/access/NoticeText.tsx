@@ -1,18 +1,20 @@
 export default function NoticeText() {
   return (
     <>
-      <h2>Striae Early Access Program</h2>
+      <h2>Striae Registration</h2>
 
-<p>We&apos;re excited to welcome you to the Striae Early Access Program! By joining, you&apos;ll be among the first to explore new features and updates while helping us shape Striae into the most useful tool possible for firearms examiners.</p>
+<p>We&apos;re excited to welcome you to Striae! By joining, you&apos;ll be among the first to explore new features and updates while helping us shape Striae into the most useful tool possible for firearms examiners.</p>
 
-<p>Access to Striae is completely free for all participants who are currently employed at a forensic laboratory. To sign up, you&apos;ll need to use your work email address to verify eligibility. Don&apos;t worry — once you&apos;re signed up, you can change your login email anytime.</p>
+<p>Access to Striae is completely free for all participants who are currently employed at a forensic laboratory. To sign up, you&apos;ll need to use your work email address to verify eligibility. Once you&apos;re registered, you can change your login email anytime.</p>
+
+<p>Please note that Striae is intended for professional use only. Personal email addresses are not permitted for this initial registration. Striae reserves the right to disable accounts that do not comply with this policy.</p>
 
 <p>Since Striae is still in active development, you may notice some rough edges along the way. Your feedback will help us refine and improve the experience for everyone in the community.</p>
 
 <h2>Important Details</h2>
 <ul>
   <li><strong>Free Forever:</strong> All features are available at no cost to users employed by a forensic laboratory.</li>
-  <li><strong>Work Email Required:</strong> A valid work email is needed to sign up. After registration, you can update your login email if you prefer.</li>
+  <li><strong>Work Email Required:</strong> A valid work email is needed to register. After registration, you can update your login email if you prefer.</li>
   <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better.</li>
 </ul>
 
@@ -23,7 +25,7 @@ export default function NoticeText() {
   <li>Missing functionality, some minor bugs or quirks, since the app is still being developed and polished</li>
 </ul>
 
-<p>By joining the Early Access Program, you&apos;re helping to build the future of Striae. We can&apos;t wait to hear your insights and see how you use it in your work!</p>
+<p>By registering, you&apos;re helping to build the future of Striae. We can&apos;t wait to hear your insights and see how you use it in your work!</p>
 </>
   );
 }
