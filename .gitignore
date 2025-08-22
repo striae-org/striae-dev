@@ -1,5 +1,6 @@
 node_modules
 /archive
+/app/routes/access
 /app/config
 /.cache
 /build
