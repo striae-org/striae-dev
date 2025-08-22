@@ -86,7 +86,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
           setLeftItem(existingNotes.leftItem);
           setRightItem(existingNotes.rightItem);
           setCaseFontColor(existingNotes.caseFontColor || '#FFDE21');
-          setClassType(existingNotes.classType);
+          setClassType(existingNotes.classType || 'Bullet');
           setCustomClass(existingNotes.customClass || '');
           setClassNote(existingNotes.classNote);
           setHasSubclass(existingNotes.hasSubclass ?? false);

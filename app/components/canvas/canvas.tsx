@@ -84,7 +84,7 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl && imageUrl !== '/clear.jpg' ? (
-        <>
+        <div className={styles.imageContainer}>
           {/* Class Characteristics - Above Image */}
           {activeAnnotations?.has('class') && annotationData && (
             <div className={styles.classCharacteristics}>
@@ -95,7 +95,6 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             </div>
           )}
           
-          <div className={styles.imageContainer}>
           <img 
             src={imageUrl}
             alt="Case evidence"
@@ -132,7 +131,6 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             </div>
           )}
         </div>
-        </>
       ) : (
         <p className={styles.placeholder}>
           Upload or select an image to get started

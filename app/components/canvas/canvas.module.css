@@ -90,11 +90,12 @@
 
 /* Class Characteristics Display */
 .classCharacteristics {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-  width: 100%;
+  position: absolute;
+  top: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  pointer-events: none;
 }
 
 .classText {
