@@ -1,7 +1,7 @@
 import paths from '~/config/config.json';
 
 const KEYS_URL = paths.keys_url;
-const KEYS_AUTH = paths.keys_auth;
+const KEYS_AUTH = paths.TWuar70C2mdT8V4D9gUwGC0DC;
 
 export async function getUserApiKey(): Promise<string> {
   const keyResponse = await fetch(`${KEYS_URL}/USER_DB_AUTH`, {
