@@ -93,7 +93,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
           setIndexType(existingNotes.indexType);
           setIndexNumber(existingNotes.indexNumber || '');
           setIndexColor(existingNotes.indexColor || '#000000');
-          setSupportLevel(existingNotes.supportLevel);
+          setSupportLevel(existingNotes.supportLevel || 'ID');
           setIncludeConfirmation(existingNotes.includeConfirmation);
           setAdditionalNotes(existingNotes.additionalNotes);
         }
@@ -116,6 +116,13 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       setRightCase(currentCase);
     }
   }, [useCurrentCaseLeft, useCurrentCaseRight, currentCase]);
+
+  // Automatically set includeConfirmation to true when Identification is selected
+  useEffect(() => {
+    if (supportLevel === 'ID') {
+      setIncludeConfirmation(true);
+    }
+  }, [supportLevel]);
 
   const handleSave = async () => {
 
@@ -145,7 +152,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       indexColor: indexColor,    // Save even if empty
       
       // Support Level & Confirmation
-      supportLevel: supportLevel,
+      supportLevel: supportLevel || 'ID',
       includeConfirmation: includeConfirmation,
       
       // Additional Notes
