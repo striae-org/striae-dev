@@ -141,16 +141,16 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       caseFontColor: caseFontColor || '#FFDE21',
       
       // Class Characteristics
-      classType: classType,
-      customClass: customClass,  // Save even if empty
+      classType: classType || 'Bullet',
+      customClass: customClass,
       classNote: classNote || '',
       hasSubclass: hasSubclass,
       
       // Index Information
       indexType: indexType,
-      indexNumber: indexNumber,  // Save even if empty
-      indexColor: indexColor,    // Save even if empty
-      
+      indexNumber: indexNumber,
+      indexColor: indexColor || '#000000',
+
       // Support Level & Confirmation
       supportLevel: supportLevel || 'ID',
       includeConfirmation: includeConfirmation,
