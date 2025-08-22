@@ -42,6 +42,7 @@ export const Striae = ({ user }: StriaePage) => {
   // Annotation states
   const [activeAnnotations, setActiveAnnotations] = useState<Set<string>>(new Set());
   const [annotationData, setAnnotationData] = useState<AnnotationData | null>(null);
+  const [annotationRefreshTrigger, setAnnotationRefreshTrigger] = useState(0);
 
 
    useEffect(() => {
@@ -72,6 +73,11 @@ export const Striae = ({ user }: StriaePage) => {
   const handleVisibilityChange = (visible: boolean) => {
     // For now, we'll just handle this if needed later
     console.log('Toolbar visibility changed:', visible);
+  };
+
+  // Function to refresh annotation data (called when notes are saved)
+  const refreshAnnotationData = () => {
+    setAnnotationRefreshTrigger(prev => prev + 1);
   };
 
   useEffect(() => {
@@ -111,7 +117,7 @@ export const Striae = ({ user }: StriaePage) => {
     };
 
     loadAnnotationData();
-  }, [imageId, currentCase, user]);
+  }, [imageId, currentCase, user, annotationRefreshTrigger]);
 
 
   const handleImageSelect = async (file: FileData) => {  
@@ -168,6 +174,7 @@ export const Striae = ({ user }: StriaePage) => {
         setSuccessAction={setSuccessAction}
         showNotes={showNotes}
         setShowNotes={setShowNotes}
+        onAnnotationRefresh={refreshAnnotationData}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>

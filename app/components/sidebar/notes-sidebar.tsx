@@ -10,6 +10,7 @@ interface NotesSidebarProps {
   onReturn: () => void;
   user: User;
   imageId: string;
+  onAnnotationRefresh?: () => void;
 }
 
 interface NotesData {
@@ -35,7 +36,7 @@ type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
-export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSidebarProps) => {
+export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh }: NotesSidebarProps) => {
   // Loading/Saving Notes States
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
@@ -157,6 +158,11 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       await saveNotes(user, currentCase, imageId, notesData);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+      
+      // Refresh annotation data after saving notes
+      if (onAnnotationRefresh) {
+        onAnnotationRefresh();
+      }
     } catch (error) {
       console.error('Failed to save notes:', error);
     }

@@ -31,6 +31,7 @@ interface SidebarProps {
   setSuccessAction: (action: 'loaded' | 'created' | 'deleted' | null) => void;
   showNotes: boolean;
   setShowNotes: (show: boolean) => void;
+  onAnnotationRefresh?: () => void;
 }
 
 export const Sidebar = ({ 
@@ -51,7 +52,8 @@ export const Sidebar = ({
   successAction,
   setSuccessAction,
   showNotes,
-  setShowNotes
+  setShowNotes,
+  onAnnotationRefresh
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -81,6 +83,7 @@ export const Sidebar = ({
           onReturn={() => setShowNotes(false)}
           user={user}
           imageId={imageId || ''}
+          onAnnotationRefresh={onAnnotationRefresh}
         />
       ) : (
         <CaseSidebar 
