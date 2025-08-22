@@ -53,6 +53,9 @@ const actionCodeSettings = {
 };
 
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({
+  prompt: 'login'
+});
 
 const createUserData = (
   uid: string,
