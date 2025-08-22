@@ -10,6 +10,7 @@ interface NotesSidebarProps {
   onReturn: () => void;
   user: User;
   imageId: string;
+  onAnnotationRefresh?: () => void;
 }
 
 interface NotesData {
@@ -35,7 +36,7 @@ type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
-export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSidebarProps) => {
+export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh }: NotesSidebarProps) => {
   // Loading/Saving Notes States
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
@@ -85,14 +86,14 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
           setLeftItem(existingNotes.leftItem);
           setRightItem(existingNotes.rightItem);
           setCaseFontColor(existingNotes.caseFontColor || '#FFDE21');
-          setClassType(existingNotes.classType);
+          setClassType(existingNotes.classType || 'Bullet');
           setCustomClass(existingNotes.customClass || '');
           setClassNote(existingNotes.classNote);
           setHasSubclass(existingNotes.hasSubclass ?? false);
           setIndexType(existingNotes.indexType);
           setIndexNumber(existingNotes.indexNumber || '');
           setIndexColor(existingNotes.indexColor || '#000000');
-          setSupportLevel(existingNotes.supportLevel);
+          setSupportLevel(existingNotes.supportLevel || 'ID');
           setIncludeConfirmation(existingNotes.includeConfirmation);
           setAdditionalNotes(existingNotes.additionalNotes);
         }
@@ -116,6 +117,13 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
     }
   }, [useCurrentCaseLeft, useCurrentCaseRight, currentCase]);
 
+  // Automatically set includeConfirmation to true when Identification is selected
+  useEffect(() => {
+    if (supportLevel === 'ID') {
+      setIncludeConfirmation(true);
+    }
+  }, [supportLevel]);
+
   const handleSave = async () => {
 
     if (!imageId) {
@@ -133,18 +141,18 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       caseFontColor: caseFontColor || '#FFDE21',
       
       // Class Characteristics
-      classType: classType,
-      customClass: customClass,  // Save even if empty
+      classType: classType || 'Bullet',
+      customClass: customClass,
       classNote: classNote || '',
       hasSubclass: hasSubclass,
       
       // Index Information
       indexType: indexType,
-      indexNumber: indexNumber,  // Save even if empty
-      indexColor: indexColor,    // Save even if empty
-      
+      indexNumber: indexNumber,
+      indexColor: indexColor || '#000000',
+
       // Support Level & Confirmation
-      supportLevel: supportLevel,
+      supportLevel: supportLevel || 'ID',
       includeConfirmation: includeConfirmation,
       
       // Additional Notes
@@ -157,6 +165,11 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId }: NotesSide
       await saveNotes(user, currentCase, imageId, notesData);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+      
+      // Refresh annotation data after saving notes
+      if (onAnnotationRefresh) {
+        onAnnotationRefresh();
+      }
     } catch (error) {
       console.error('Failed to save notes:', error);
     }

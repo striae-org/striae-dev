@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from '~/components/sidebar/sidebar';
 import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
-import { Annotations } from '~/components/annotations/annotations';
 import { getImageUrl } from '~/components/actions/image-manage';
+import { getNotes } from '~/components/actions/notes-manage';
 import styles from './striae.module.css';
 
 interface StriaePage {
@@ -15,6 +15,23 @@ interface FileData {
   id: string;
   originalFilename: string;
   uploadedAt: string;
+}
+
+interface AnnotationData {
+  leftCase: string;
+  rightCase: string;
+  leftItem: string;
+  rightItem: string;
+  caseFontColor: string;
+  classType: 'Bullet' | 'Cartridge Case' | 'Other';
+  customClass?: string;
+  classNote: string;
+  indexType: 'number' | 'color';
+  indexNumber?: string;
+  indexColor?: string;
+  supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  hasSubclass?: boolean;
+  additionalNotes: string;
 }
 
 export const Striae = ({ user }: StriaePage) => {
@@ -31,6 +48,11 @@ export const Striae = ({ user }: StriaePage) => {
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
   const [showNotes, setShowNotes] = useState(false);
 
+  // Annotation states
+  const [activeAnnotations, setActiveAnnotations] = useState<Set<string>>(new Set());
+  const [annotationData, setAnnotationData] = useState<AnnotationData | null>(null);
+  const [annotationRefreshTrigger, setAnnotationRefreshTrigger] = useState(0);
+
 
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
@@ -43,6 +65,30 @@ export const Striae = ({ user }: StriaePage) => {
     setCurrentCase(caseNumber);
   };
 
+  // Handler for toolbar annotation selection
+  const handleToolSelect = (toolId: string, active: boolean) => {
+    setActiveAnnotations(prev => {
+      const next = new Set(prev);
+      if (active) {
+        next.add(toolId);
+      } else {
+        next.delete(toolId);
+      }
+      return next;
+    });
+  };
+
+  // Handler for toolbar visibility
+  const handleVisibilityChange = (visible: boolean) => {
+    // For now, we'll just handle this if needed later
+    console.log('Toolbar visibility changed:', visible);
+  };
+
+  // Function to refresh annotation data (called when notes are saved)
+  const refreshAnnotationData = () => {
+    setAnnotationRefreshTrigger(prev => prev + 1);
+  };
+
   useEffect(() => {
     // Cleanup function to clear image when component unmounts
     return () => {
@@ -51,6 +97,45 @@ export const Striae = ({ user }: StriaePage) => {
       setImageLoaded(false);
     };
   }, []); // Empty dependency array means this runs only on mount/unmount
+
+  // Load annotation data when imageId changes
+  useEffect(() => {
+    const loadAnnotationData = async () => {
+      if (!imageId || !currentCase) {
+        setAnnotationData(null);
+        return;
+      }
+
+      try {
+        const notes = await getNotes(user, currentCase, imageId);
+        if (notes) {
+          setAnnotationData({
+            leftCase: notes.leftCase || '',
+            rightCase: notes.rightCase || '',
+            leftItem: notes.leftItem || '',
+            rightItem: notes.rightItem || '',
+            caseFontColor: notes.caseFontColor || '#FFDE21',
+            classType: notes.classType || 'Other',
+            customClass: notes.customClass,
+            classNote: notes.classNote || '',
+            indexType: notes.indexType || 'number',
+            indexNumber: notes.indexNumber,
+            indexColor: notes.indexColor,
+            supportLevel: notes.supportLevel || 'Inconclusive',
+            hasSubclass: notes.hasSubclass,
+            additionalNotes: notes.additionalNotes || ''
+          });
+        } else {
+          setAnnotationData(null);
+        }
+      } catch (error) {
+        console.error('Failed to load annotation data:', error);
+        setAnnotationData(null);
+      }
+    };
+
+    loadAnnotationData();
+  }, [imageId, currentCase, user, annotationRefreshTrigger]);
 
 
   const handleImageSelect = async (file: FileData) => {  
@@ -107,15 +192,23 @@ export const Striae = ({ user }: StriaePage) => {
         setSuccessAction={setSuccessAction}
         showNotes={showNotes}
         setShowNotes={setShowNotes}
+        onAnnotationRefresh={refreshAnnotationData}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
           <div className={styles.toolbarWrapper}>
-            <Toolbar />
+            <Toolbar 
+              onToolSelect={handleToolSelect}
+              onVisibilityChange={handleVisibilityChange}
+            />
           </div>
-          <Canvas imageUrl={selectedImage} error={error ?? ''} />
+          <Canvas 
+            imageUrl={selectedImage} 
+            error={error ?? ''}
+            activeAnnotations={activeAnnotations}
+            annotationData={annotationData}
+          />
         </div>
-        <Annotations />
       </main>
     </div>
   );

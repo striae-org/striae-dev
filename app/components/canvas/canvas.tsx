@@ -1,9 +1,28 @@
 import { useEffect, useState } from 'react';
 import styles from './canvas.module.css';
 
+interface AnnotationData {
+  leftCase: string;
+  rightCase: string;
+  leftItem: string;
+  rightItem: string;
+  caseFontColor: string;
+  classType: 'Bullet' | 'Cartridge Case' | 'Other';
+  customClass?: string;
+  classNote: string;
+  indexType: 'number' | 'color';
+  indexNumber?: string;
+  indexColor?: string;
+  supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  hasSubclass?: boolean;
+  additionalNotes: string;
+}
+
 interface CanvasProps {
   imageUrl?: string;
   error?: string;
+  activeAnnotations?: Set<string>;
+  annotationData?: AnnotationData | null;
 }
 
 type ImageLoadError = {
@@ -11,9 +30,10 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, error }: CanvasProps) => {
+export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
+  const [isFlashing, setIsFlashing] = useState(false);
 
   useEffect(() => {
     if (!imageUrl) {
@@ -58,6 +78,25 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
     };
   }, [imageUrl]);
 
+  // Flashing effect for subclass warning
+  useEffect(() => {
+    if (!annotationData?.hasSubclass) {
+      setIsFlashing(false);
+      return;
+    }
+
+    const flashInterval = setInterval(() => {
+      setIsFlashing(true);
+      setTimeout(() => setIsFlashing(false), 200); // Flash on for 200ms
+      setTimeout(() => {
+        setIsFlashing(true);
+        setTimeout(() => setIsFlashing(false), 200); // Second flash after 300ms
+      }, 300);
+    }, 60000); // Repeat every minute
+
+    return () => clearInterval(flashInterval);
+  }, [annotationData?.hasSubclass]);
+
   const getErrorMessage = () => {
     if (error) return error;
     if (loadError) return loadError.message;
@@ -71,19 +110,112 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl && imageUrl !== '/clear.jpg' ? (
-        <img 
-          src={imageUrl}
-          alt="Case evidence"
-          className={styles.image}
-          onError={() => setLoadError({
-            type: 'network',
-            message: 'Failed to load image from network'
-          })}
-        />
+        <div className={styles.imageAndNotesContainer}>
+          <div className={styles.imageContainer}>
+            {/* Class Characteristics - Above Image */}
+            {activeAnnotations?.has('class') && annotationData && (
+              <div className={styles.classCharacteristics}>
+                <div className={styles.classText}>
+                  {annotationData.customClass || annotationData.classType}
+                  {annotationData.classNote && ` (${annotationData.classNote})`}
+                </div>
+              </div>
+            )}
+            
+            <img 
+            src={imageUrl}
+            alt="Case evidence"
+            className={styles.image}
+            style={{
+              border: activeAnnotations?.has('index') && annotationData?.indexType === 'color' && annotationData?.indexColor
+                ? `6px solid ${annotationData.indexColor}`
+                : undefined
+            }}
+            onError={() => setLoadError({
+              type: 'network',
+              message: 'Failed to load image from network'
+            })}
+          />
+          {/* Annotations Overlay */}
+          {activeAnnotations?.has('number') && annotationData && (
+            <div className={styles.annotationsOverlay}>
+              {/* Left side case and item numbers */}
+              <div 
+                className={styles.leftAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  {annotationData.leftCase}
+                  {annotationData.leftItem && ` ${annotationData.leftItem}`}
+                </div>
+              </div>
+              
+              {/* Right side case and item numbers */}
+              <div 
+                className={styles.rightAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  {annotationData.rightCase}
+                  {annotationData.rightItem && ` ${annotationData.rightItem}`}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Index Number Overlay */}
+          {activeAnnotations?.has('index') && annotationData?.indexType === 'number' && annotationData?.indexNumber && (
+            <div className={styles.annotationsOverlay}>
+              <div 
+                className={styles.indexAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  Index: {annotationData.indexNumber}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Additional Notes - Below Image */}
+        {activeAnnotations?.has('notes') && annotationData?.additionalNotes && (
+          <div className={styles.additionalNotesContainer}>
+            <div className={styles.additionalNotesBox}>
+              {annotationData.additionalNotes}
+            </div>
+          </div>
+        )}
+        </div>
       ) : (
         <p className={styles.placeholder}>
           Upload or select an image to get started
         </p>
+      )}
+      
+      {/* Support Level - Bottom Left of Canvas */}
+      {activeAnnotations?.has('id') && annotationData && (
+        <div className={styles.supportLevelAnnotation}>
+          <div 
+            className={styles.supportLevelText}
+            style={{ 
+              color: annotationData.supportLevel === 'ID' ? '#28a745' : 
+                     annotationData.supportLevel === 'Exclusion' ? '#dc3545' : 
+                     '#ffc107' 
+            }}
+          >
+            {annotationData.supportLevel === 'ID' ? 'Identification' : annotationData.supportLevel}
+          </div>
+        </div>
+      )}
+      
+      {/* Subclass Warning - Bottom Right of Canvas */}
+      {annotationData?.hasSubclass && (
+        <div className={`${styles.subclassWarning} ${isFlashing ? styles.flashing : ''}`}>
+          <div className={styles.subclassText}>
+            POTENTIAL SUBCLASS
+          </div>
+        </div>
       )}
     </div>    
   );

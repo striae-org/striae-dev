@@ -1,1 +1,0 @@
-export { License as default, meta } from './license'

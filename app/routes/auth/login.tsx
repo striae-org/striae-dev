@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
-import { getAdditionalUserInfo } from '~/components/actions/additionalUserInfo';
 import {
     applyActionCode,           
     signInWithEmailAndPassword, 
@@ -13,8 +12,6 @@ import {
     sendEmailVerification,
     User,
     updateProfile,
-    GoogleAuthProvider,    
-    signInWithPopup,        
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
@@ -36,6 +33,7 @@ interface UserData {
   email: string | null;
   firstName: string;
   lastName: string;
+  company: string;
   permitted: boolean;
   cases: Array<{
     caseNumber: string;
@@ -52,21 +50,18 @@ const actionCodeSettings = {
   handleCodeInApp: true,  
 };
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
-  prompt: 'login'
-});
-
 const createUserData = (
   uid: string,
   email: string | null,
   firstName: string,
-  lastName: string
+  lastName: string,
+  company: string
 ): UserData => ({
   uid,
   email,
   firstName,
   lastName,
+  company,
   permitted: false,
   cases: [],
   createdAt: new Date().toISOString(),
@@ -86,55 +81,6 @@ export const Login = () => {
   const [needsProfile, setNeedsProfile] = useState(false);
   const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
 
-  
-
-  const handleGoogleSignIn = async () => {
-  setIsLoading(true);
-  setError('');
-  
-  
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const additionalInfo = getAdditionalUserInfo(result);
-    
-    if (!result.user.emailVerified) {
-      await handleSignOut();
-      setError('Please verify your email before logging in');
-      return;
-    }
-    
-if (additionalInfo?.isNewUser) {
-  const apiKey = await getUserApiKey();
-  const userData = createUserData(
-    result.user.uid,
-    result.user.email,
-    additionalInfo.profile?.given_name || '',
-    additionalInfo.profile?.family_name || ''
-  );
-
-  const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': apiKey
-    },
-    body: JSON.stringify(userData)
-  });
-
-  if (!response.ok) {
-        throw new Error('Failed to create user data');
-      }
-    }
-
-    setUser(result.user);
-  } catch (err) {
-    const { message } = handleAuthError(err);
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
   const NameCollectionForm = () => {
   return (
     <div className={styles.container}>
@@ -151,6 +97,7 @@ if (additionalInfo?.isNewUser) {
           const formData = new FormData(e.currentTarget);
           const firstName = formData.get('firstName') as string;
           const lastName = formData.get('lastName') as string;
+          const company = formData.get('company') as string || window.localStorage.getItem('company') || '';
 
           try {
             if (emailLinkUser) {
@@ -165,7 +112,8 @@ if (additionalInfo?.isNewUser) {
                 emailLinkUser.uid,
                 emailLinkUser.email,
                 firstName,
-                lastName
+                lastName,
+                company
               );
 
               // Add to KV database
@@ -184,6 +132,11 @@ if (additionalInfo?.isNewUser) {
 
               setUser(emailLinkUser);
               setNeedsProfile(false);
+              
+              // Clean up localStorage
+              window.localStorage.removeItem('firstName');
+              window.localStorage.removeItem('lastName');
+              window.localStorage.removeItem('company');
             }
           } catch (err) {
             const { message } = handleAuthError(err);
@@ -209,6 +162,16 @@ if (additionalInfo?.isNewUser) {
             className={styles.input}
             disabled={isLoading}
             autoComplete="family-name"
+          />
+          <input
+            type="text"
+            name="company"
+            required
+            placeholder="Lab/Company Name (required)"
+            className={styles.input}
+            disabled={isLoading}
+            autoComplete="organization"
+            defaultValue={window.localStorage.getItem('company') || ''}
           />
           {error && <p className={styles.error}>{error}</p>}
           <button
@@ -284,10 +247,8 @@ if (additionalInfo?.isNewUser) {
         signInWithEmailLink(auth, email, window.location.href)
           .then(async (result) => {
             console.log('Email link sign in result:', result);
-            const additionalInfo = getAdditionalUserInfo(result);
-            console.log('Additional info:', additionalInfo);
         
-            if (additionalInfo?.isNewUser || !result.user.displayName) {
+            if (!result.user.displayName) {
               console.log('Setting new user states');
               setEmailLinkUser(result.user);
               setNeedsProfile(true);
@@ -365,6 +326,7 @@ if (additionalInfo?.isNewUser) {
   const password = formData.get('password') as string;
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
+  const company = formData.get('company') as string;
 
   try {
     if (!isLogin) {
@@ -382,7 +344,8 @@ if (additionalInfo?.isNewUser) {
         createCredential.user.uid,
         createCredential.user.email,
         firstName,
-        lastName
+        lastName,
+        company || '' // Use company from form, fallback to empty string
       );
 
       const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
@@ -422,11 +385,13 @@ if (additionalInfo?.isNewUser) {
         const email = formData.get('email') as string;
         const firstName = formData.get('firstName') as string;
         const lastName = formData.get('lastName') as string;
+        const company = formData.get('company') as string;
         
         // Store name data for registration flow
         if (!isLogin) {
           window.localStorage.setItem('firstName', firstName);
           window.localStorage.setItem('lastName', lastName);
+          window.localStorage.setItem('company', company);
         }
         
         handleEmailLink(email);
@@ -460,6 +425,15 @@ if (additionalInfo?.isNewUser) {
               className={styles.input}
               disabled={isLoading}
               autoComplete="family-name"
+            />
+            <input
+              type="text"
+              name="company"
+              required
+              placeholder="Lab/Company Name (required)"
+              className={styles.input}
+              disabled={isLoading}
+              autoComplete="organization"
             />
           </>
         )}
@@ -531,8 +505,6 @@ if (additionalInfo?.isNewUser) {
         ) : (
           <>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
-            <a href="/access"><h5 className={styles.subtitle}>Request Early Access</h5></a>
-
             <div className={styles.authToggle}>
               <button 
                 onClick={() => setAuthMethod('password')}
@@ -548,14 +520,6 @@ if (additionalInfo?.isNewUser) {
                 Get a Code Instead
               </button>
             </div>
-            <button 
-              type="button"
-              onClick={handleGoogleSignIn}
-              className={styles.googleButton}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing in...' : 'Sign in with Google'}
-            </button>
             
             {authMethod === 'password' ? (
               <>
@@ -606,6 +570,15 @@ if (additionalInfo?.isNewUser) {
                       required
                       placeholder="Last Name (required)"
                       autoComplete="family-name"
+                      className={styles.input}
+                      disabled={isLoading}
+                    />
+                    <input
+                      type="text"
+                      name="company"
+                      required
+                      placeholder="Lab/Company Name (required)"
+                      autoComplete="organization"
                       className={styles.input}
                       disabled={isLoading}
                     />                      

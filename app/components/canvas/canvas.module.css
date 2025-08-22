@@ -11,6 +11,15 @@
   overflow: hidden;
 }
 
+.imageContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .toolbarWrapper {
   position: absolute;
   left: var(--spaceL);
@@ -36,4 +45,213 @@
   padding: 1rem;
   border-radius: 4px;
   text-align: center;
+}
+
+/* Annotations Overlay */
+.annotationsOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.leftAnnotation,
+.rightAnnotation {
+  position: absolute;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leftAnnotation {
+  top: 1rem;
+  left: 1rem;
+}
+
+.rightAnnotation {
+  top: 1rem;
+  right: 1rem;
+}
+
+.indexAnnotation {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.caseText {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* Class Characteristics Display */
+.classCharacteristics {
+  position: absolute;
+  top: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  pointer-events: none;
+}
+
+.classText {
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+/* Support Level Display */
+.supportLevelAnnotation {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.supportLevelText {
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+/* Subclass Warning Display */
+.subclassWarning {
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.subclassText {
+  padding: 0.75rem 1.5rem;
+  background: rgba(220, 53, 69, 0.9);
+  color: #ffffff;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+.flashing .subclassText {
+  background: rgba(255, 0, 0, 0.95);
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.6);
+  transform: scale(1.05);
+  transition: all 0.1s ease-in-out;
+}
+
+/* Image and Notes Container */
+.imageAndNotesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Additional Notes Display */
+.additionalNotesContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.additionalNotesBox {
+  background: #ffffff;
+  color: #000000;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Responsive class characteristics for smaller screens */
+@media (max-width: 768px) {
+  .classText {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .supportLevelText {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .subclassText {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .additionalNotesBox {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    max-width: calc(100% - 2rem);
+  }
+}
+
+/* Responsive annotations for smaller screens */
+@media (max-width: 768px) {
+  .leftAnnotation,
+  .rightAnnotation,
+  .indexAnnotation {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .caseText {
+    font-size: 0.9rem;
+  }
 }

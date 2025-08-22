@@ -6,7 +6,7 @@ import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
 import { verifyTurnstileToken } from '~/utils/turnstile';
 import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
-import { json } from '@remix-run/cloudflare';
+import { json, redirect } from '@remix-run/cloudflare';
 import styles from './signup.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -25,9 +25,9 @@ interface ActionData {
 
 export const meta = () => {
   return baseMeta({
-    title: 'Signup for Striae Access',
+    title: 'Sign up for Striae Access',
     description:
-      'Complete the form to request early access to Striae.',
+      'Complete the form to register Striae access.',
   });
 };
 
@@ -80,7 +80,7 @@ export async function action({ request, context }: { request: Request, context: 
       },
       body: JSON.stringify({
         "from": {
-          "name": "Striae Access Signup",
+          "name": "Striae Access Registration",
           "email": "no-reply@striae.org"
         },
         "to": [
@@ -89,7 +89,7 @@ export async function action({ request, context }: { request: Request, context: 
             "email": "info@striae.org"
           }
         ],
-        "subject": "New Striae Access Request",
+        "subject": "New Striae Registration",
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>New Striae Access Request</h2>
@@ -98,16 +98,16 @@ export async function action({ request, context }: { request: Request, context: 
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Lab/Company Name:</strong> ${company}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
-          <p><strong>Early Access Agreement:</strong> ${feedback}</p>
+          <p><strong>Registration Agreement:</strong> ${feedback}</p>
         </body></html>`,
-        "PlainContent": `New Striae Access Request:
+        "PlainContent": `New Striae Registration:
 
         Name: ${firstName}
         Last Name: ${lastName}
         Email: ${email}
         Lab/Company Name: ${company}
         Email Consent: ${emailConsent}
-        Early Access Agreement: ${feedback}`,
+        Registration Agreement: ${feedback}`,
         "Tags": [
           "access-signup"
         ],
@@ -121,7 +121,7 @@ export async function action({ request, context }: { request: Request, context: 
       throw new Error('Failed to send email');
     }
 
-    return json({ success: true }, { status: 200 });
+    return redirect('/auth');
   } catch (error) {
     console.error('Error:', error);
     return json({ errors: { email: 'Failed to submit. Please try again.' } }, { status: 500 });
@@ -142,7 +142,7 @@ export const Signup = () => {
   };
 
   const signupNotice = {
-    title: 'Before You Request Access',
+    title: 'Before You Register',
     content: <NoticeText />,
     buttonText: 'I Have Read and Understand'
   };
@@ -153,13 +153,13 @@ export const Signup = () => {
   <div className={styles.logo} />
 </Link>      
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Request Striae Access</h1>
+        <h1 className={styles.title}>Register for Striae Access</h1>
          <button 
           type="button"
           onClick={() => setIsNoticeOpen(true)}
           className={styles.noticeButton}
         >
-          Read before requesting an invite
+          Read before registering
         </button>
         <Notice 
         isOpen={isNoticeOpen} 
@@ -206,7 +206,7 @@ export const Signup = () => {
             placeholder="Laboratory/Company Name"
             autoComplete="organization"
             className={styles.input}            
-            disabled={sending}
+            disabled={sending}            
           />
           {actionData?.errors?.company && (
             <p className={styles.error}>{actionData.errors.company}</p>
@@ -228,7 +228,7 @@ export const Signup = () => {
               required
               disabled={sending}
             />
-            <span>I have read the notice and understand some functionality may be missing and/or bugs may be currently unresolved</span>
+            <span>I have read the notice and understand some functionality may be missing and/or bugs may be currently unresolved. Additionally, I understand that my account may be disabled if I do not comply with the registration requirements.</span>
           </label>
 
           <Turnstile
@@ -245,15 +245,9 @@ export const Signup = () => {
             ? 'Please read the notice first'
             : sending 
               ? 'Submitting...' 
-              : 'Request Access'}
+              : 'Register Now'}
         </button>
       </Form>
-        {actionData?.success && (
-          <div className={styles.success}>
-            <p><h2>Thank you for signing up!</h2></p>
-            <p>We&apos;ll be in touch soon</p>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -29,12 +29,9 @@ export default function Home() {
             <br />
             <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae">here</Link>. Thank you.</em></p>
           </div>
-          <div className={styles.buttonGroup}>            
-            <Link to="https://www.striae.org/auth" target="_blank" rel="noopener noreferrer" className={styles.actionButton}>
-              Sign In
-            </Link>
+          <div className={styles.buttonGroup}>                        
             <Link to="/access" className={styles.accessButton}>
-              Request Access
+              Register Now
             </Link>              
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
