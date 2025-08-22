@@ -21,7 +21,10 @@ export const InactivityWarning = ({
   }, [remainingSeconds]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setCountdown(0);
+      return;
+    }
 
     const interval = setInterval(() => {
       setCountdown(prev => {
