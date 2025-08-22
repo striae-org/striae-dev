@@ -7,6 +7,9 @@ interface AnnotationData {
   leftItem: string;
   rightItem: string;
   caseFontColor: string;
+  classType: 'Bullet' | 'Cartridge Case' | 'Other';
+  customClass?: string;
+  classNote: string;
 }
 
 interface CanvasProps {
@@ -81,7 +84,18 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl && imageUrl !== '/clear.jpg' ? (
-        <div className={styles.imageContainer}>
+        <>
+          {/* Class Characteristics - Above Image */}
+          {activeAnnotations?.has('class') && annotationData && (
+            <div className={styles.classCharacteristics}>
+              <div className={styles.classText}>
+                {annotationData.customClass || annotationData.classType}
+                {annotationData.classNote && ` (${annotationData.classNote})`}
+              </div>
+            </div>
+          )}
+          
+          <div className={styles.imageContainer}>
           <img 
             src={imageUrl}
             alt="Case evidence"
@@ -118,6 +132,7 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             </div>
           )}
         </div>
+        </>
       ) : (
         <p className={styles.placeholder}>
           Upload or select an image to get started

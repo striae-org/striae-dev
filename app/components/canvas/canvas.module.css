@@ -88,6 +88,40 @@
   letter-spacing: 0.5px;
 }
 
+/* Class Characteristics Display */
+.classCharacteristics {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.classText {
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+/* Responsive class characteristics for smaller screens */
+@media (max-width: 768px) {
+  .classText {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
 /* Responsive annotations for smaller screens */
 @media (max-width: 768px) {
   .leftAnnotation,

@@ -23,6 +23,9 @@ interface AnnotationData {
   leftItem: string;
   rightItem: string;
   caseFontColor: string;
+  classType: 'Bullet' | 'Cartridge Case' | 'Other';
+  customClass?: string;
+  classNote: string;
 }
 
 export const Striae = ({ user }: StriaePage) => {
@@ -105,7 +108,10 @@ export const Striae = ({ user }: StriaePage) => {
             rightCase: notes.rightCase || '',
             leftItem: notes.leftItem || '',
             rightItem: notes.rightItem || '',
-            caseFontColor: notes.caseFontColor || '#FFDE21'
+            caseFontColor: notes.caseFontColor || '#FFDE21',
+            classType: notes.classType || 'Other',
+            customClass: notes.customClass,
+            classNote: notes.classNote || ''
           });
         } else {
           setAnnotationData(null);
