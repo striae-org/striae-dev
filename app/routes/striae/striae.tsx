@@ -29,6 +29,7 @@ interface AnnotationData {
   indexType: 'number' | 'color';
   indexNumber?: string;
   indexColor?: string;
+  supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
 }
 
 export const Striae = ({ user }: StriaePage) => {
@@ -117,7 +118,8 @@ export const Striae = ({ user }: StriaePage) => {
             classNote: notes.classNote || '',
             indexType: notes.indexType || 'number',
             indexNumber: notes.indexNumber,
-            indexColor: notes.indexColor
+            indexColor: notes.indexColor,
+            supportLevel: notes.supportLevel || 'Inconclusive'
           });
         } else {
           setAnnotationData(null);

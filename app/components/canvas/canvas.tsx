@@ -13,6 +13,7 @@ interface AnnotationData {
   indexType: 'number' | 'color';
   indexNumber?: string;
   indexColor?: string;
+  supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
 }
 
 interface CanvasProps {
@@ -104,7 +105,7 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             className={styles.image}
             style={{
               border: activeAnnotations?.has('index') && annotationData?.indexType === 'color' && annotationData?.indexColor
-                ? `4px solid ${annotationData.indexColor}`
+                ? `6px solid ${annotationData.indexColor}`
                 : undefined
             }}
             onError={() => setLoadError({
@@ -147,7 +148,7 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
                 style={{ color: annotationData.caseFontColor }}
               >
                 <div className={styles.caseText}>
-                  {annotationData.indexNumber}
+                  Index: {annotationData.indexNumber}
                 </div>
               </div>
             </div>
@@ -157,6 +158,22 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
         <p className={styles.placeholder}>
           Upload or select an image to get started
         </p>
+      )}
+      
+      {/* Support Level - Bottom Left of Canvas */}
+      {activeAnnotations?.has('id') && annotationData && (
+        <div className={styles.supportLevelAnnotation}>
+          <div 
+            className={styles.supportLevelText}
+            style={{ 
+              color: annotationData.supportLevel === 'ID' ? '#28a745' : 
+                     annotationData.supportLevel === 'Exclusion' ? '#dc3545' : 
+                     '#ffc107' 
+            }}
+          >
+            {annotationData.supportLevel === 'ID' ? 'Identification' : annotationData.supportLevel}
+          </div>
+        </div>
       )}
     </div>    
   );
