@@ -29,7 +29,10 @@ export default function Home() {
             <br />
             <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae">here</Link>. Thank you.</em></p>
           </div>
-          <div className={styles.buttonGroup}>                        
+          <div className={styles.buttonGroup}>
+            <Link to="/auth" className={styles.actionButton}>
+              Sign In
+            </Link>                        
             <Link to="/access" className={styles.accessButton}>
               Register Now
             </Link>              
