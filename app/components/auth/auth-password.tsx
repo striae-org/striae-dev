@@ -1,0 +1,84 @@
+import { useState, useEffect } from 'react';
+import { Link } from '@remix-run/react';
+import config from '~/config/config.json';
+import styles from './auth-password.module.css';
+
+interface AuthPasswordProps {
+  onAccessGranted: () => void;
+}
+
+export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Check if access is already granted
+  useEffect(() => {
+    if (sessionStorage.getItem('auth-access-granted') === 'true') {
+      onAccessGranted();
+    }
+  }, [onAccessGranted]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    // Check password against config
+    if (password === config.auth_access_password) {
+      sessionStorage.setItem('auth-access-granted', 'true');
+      onAccessGranted();
+    } else {
+      setError('Incorrect access password. Please contact support if you need access.');
+      setPassword('');
+    }
+    
+    setIsLoading(false);
+  };
+
+  return (
+    <div className={styles.container}>
+      <Link to="/" className={styles.logoLink}>
+        <div className={styles.logo} />
+      </Link>
+      <div className={styles.formWrapper}>
+        <h1 className={styles.title}>Authentication Access</h1>
+        <p className={styles.description}>
+          Please enter the access password provided to you during registration.
+        </p>
+        
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter access password"
+            className={styles.input}
+            required
+            disabled={isLoading}
+            autoComplete="off"
+          />
+          
+          {error && <p className={styles.error}>{error}</p>}
+          
+          <button 
+            type="submit" 
+            className={styles.button}
+            disabled={isLoading || !password}
+          >
+            {isLoading ? 'Verifying...' : 'Access Authentication'}
+          </button>
+        </form>
+        
+        <div className={styles.helpSection}>
+          <p className={styles.helpText}>
+            Need access? Complete the registration form first.
+          </p>
+          <Link to="/access/signup" className={styles.signupLink}>
+            Register for Access
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};

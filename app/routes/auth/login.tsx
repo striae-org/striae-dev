@@ -15,6 +15,7 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
+import { AuthPassword } from '~/components/auth/auth-password';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
@@ -80,6 +81,17 @@ export const Login = () => {
   const [isResetting, setIsResetting] = useState(false);
   const [needsProfile, setNeedsProfile] = useState(false);
   const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
+  const [hasAuthAccess, setHasAuthAccess] = useState(false);
+
+  // Check for existing auth access on mount
+  useEffect(() => {
+    const accessGranted = sessionStorage.getItem('auth-access-granted') === 'true';
+    setHasAuthAccess(accessGranted);
+  }, []);
+
+  const handleAccessGranted = () => {
+    setHasAuthAccess(true);
+  };
 
   const NameCollectionForm = () => {
   return (
@@ -475,29 +487,33 @@ export const Login = () => {
 
   return (
     <>
-      {user ? (
-        user.emailVerified ? (
-          <Striae user={user} />
-        ) : (
-          <div className={styles.verificationPrompt}>
-            <h2>Email Verification Required</h2>
-            <p>Please check your email and verify your account before continuing.</p>
-            <button 
-              onClick={handleSignOut}
-              className={styles.button}
-            >
-              Sign Out
-            </button>
-          </div>
-        )
-      ) : needsProfile ? (
-        <NameCollectionForm />
-      ) : isResetting ? (
-        <PasswordReset onBack={() => setIsResetting(false)}/>
+      {!hasAuthAccess ? (
+        <AuthPassword onAccessGranted={handleAccessGranted} />
       ) : (
-        <div className={styles.container}>
-          <Link to="/" className={styles.logoLink}>
-            <div className={styles.logo} />
+        <>
+          {user ? (
+            user.emailVerified ? (
+              <Striae user={user} />
+            ) : (
+              <div className={styles.verificationPrompt}>
+                <h2>Email Verification Required</h2>
+                <p>Please check your email and verify your account before continuing.</p>
+                <button 
+                  onClick={handleSignOut}
+                  className={styles.button}
+                >
+                  Sign Out
+                </button>
+              </div>
+            )
+          ) : needsProfile ? (
+            <NameCollectionForm />
+          ) : isResetting ? (
+            <PasswordReset onBack={() => setIsResetting(false)}/>
+          ) : (
+            <div className={styles.container}>
+              <Link to="/" className={styles.logoLink}>
+                <div className={styles.logo} />
           </Link>
           <div className={styles.formWrapper}>
         {isResetting ? (
@@ -628,6 +644,8 @@ export const Login = () => {
         )}
      </div>
         </div>
+          )}
+        </>
       )}
     </>
   );
