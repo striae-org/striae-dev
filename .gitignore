@@ -2,6 +2,8 @@ node_modules
 /archive
 /app/routes/access
 /app/config
+/app/components/auth
+/app/utils/auth.ts
 /.cache
 /build
 
