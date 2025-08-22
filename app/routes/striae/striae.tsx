@@ -31,6 +31,9 @@ export const Striae = ({ user }: StriaePage) => {
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
   const [showNotes, setShowNotes] = useState(false);
 
+  // Annotation states
+  const [activeAnnotations, setActiveAnnotations] = useState<Set<string>>(new Set());
+
 
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
@@ -41,6 +44,25 @@ export const Striae = ({ user }: StriaePage) => {
 
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
+  };
+
+  // Handler for toolbar annotation selection
+  const handleToolSelect = (toolId: string, active: boolean) => {
+    setActiveAnnotations(prev => {
+      const next = new Set(prev);
+      if (active) {
+        next.add(toolId);
+      } else {
+        next.delete(toolId);
+      }
+      return next;
+    });
+  };
+
+  // Handler for toolbar visibility
+  const handleVisibilityChange = (visible: boolean) => {
+    // For now, we'll just handle this if needed later
+    console.log('Toolbar visibility changed:', visible);
   };
 
   useEffect(() => {
@@ -111,11 +133,19 @@ export const Striae = ({ user }: StriaePage) => {
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
           <div className={styles.toolbarWrapper}>
-            <Toolbar />
+            <Toolbar 
+              onToolSelect={handleToolSelect}
+              onVisibilityChange={handleVisibilityChange}
+            />
           </div>
           <Canvas imageUrl={selectedImage} error={error ?? ''} />
         </div>
-        <Annotations />
+        <Annotations 
+          activeAnnotations={activeAnnotations}
+          currentCase={currentCase}
+          imageId={imageId}
+          user={user}
+        />
       </main>
     </div>
   );

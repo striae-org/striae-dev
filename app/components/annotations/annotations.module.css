@@ -1,0 +1,175 @@
+/* Annotations Display Styles */
+.annotationsContainer {
+  padding: 1.5rem;
+  background: #ffffff;
+  border-left: 1px solid #e0e0e0;
+  min-width: 300px;
+  max-width: 400px;
+  height: 100vh;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.annotationSection {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.annotationTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Case Numbers Display */
+.caseNumbersDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.caseNumberPair {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.caseNumberItem {
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.caseNumberItem strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.caseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.caseNumber {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.itemNumber {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.noData {
+  text-align: center;
+  padding: 1.5rem;
+  color: #6c757d;
+  font-style: italic;
+  background: white;
+  border-radius: 6px;
+  border: 2px dashed #dee2e6;
+}
+
+/* Placeholder for future annotations */
+.placeholder {
+  text-align: center;
+  padding: 1.5rem;
+  color: #adb5bd;
+  font-style: italic;
+  background: white;
+  border-radius: 6px;
+  border: 2px dashed #dee2e6;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .annotationsContainer {
+    min-width: 250px;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 992px) {
+  .annotationsContainer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1000;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .annotationsContainer.visible {
+    transform: translateX(0);
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .annotationsContainer {
+    background: #2d2d2d;
+    border-left-color: #404040;
+    color: #ffffff;
+  }
+  
+  .annotationSection {
+    background: #3a3a3a;
+    border-color: #555555;
+  }
+  
+  .annotationTitle {
+    color: #ffffff;
+    border-bottom-color: #555555;
+  }
+  
+  .caseNumberItem {
+    background: #404040;
+    border-color: #555555;
+  }
+  
+  .caseNumberItem strong {
+    color: #cccccc;
+  }
+  
+  .caseNumber {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .itemNumber {
+    color: #adb5bd;
+  }
+  
+  .noData,
+  .placeholder {
+    background: #404040;
+    border-color: #555555;
+    color: #adb5bd;
+  }
+}
