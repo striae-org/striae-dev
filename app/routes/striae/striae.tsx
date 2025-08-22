@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from '~/components/sidebar/sidebar';
 import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
-import { Annotations } from '~/components/annotations/annotations';
 import { getImageUrl } from '~/components/actions/image-manage';
+import { getNotes } from '~/components/actions/notes-manage';
 import styles from './striae.module.css';
 
 interface StriaePage {
@@ -15,6 +15,14 @@ interface FileData {
   id: string;
   originalFilename: string;
   uploadedAt: string;
+}
+
+interface AnnotationData {
+  leftCase: string;
+  rightCase: string;
+  leftItem: string;
+  rightItem: string;
+  caseFontColor: string;
 }
 
 export const Striae = ({ user }: StriaePage) => {
@@ -33,6 +41,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Annotation states
   const [activeAnnotations, setActiveAnnotations] = useState<Set<string>>(new Set());
+  const [annotationData, setAnnotationData] = useState<AnnotationData | null>(null);
 
 
    useEffect(() => {
@@ -73,6 +82,36 @@ export const Striae = ({ user }: StriaePage) => {
       setImageLoaded(false);
     };
   }, []); // Empty dependency array means this runs only on mount/unmount
+
+  // Load annotation data when imageId changes
+  useEffect(() => {
+    const loadAnnotationData = async () => {
+      if (!imageId || !currentCase) {
+        setAnnotationData(null);
+        return;
+      }
+
+      try {
+        const notes = await getNotes(user, currentCase, imageId);
+        if (notes) {
+          setAnnotationData({
+            leftCase: notes.leftCase || '',
+            rightCase: notes.rightCase || '',
+            leftItem: notes.leftItem || '',
+            rightItem: notes.rightItem || '',
+            caseFontColor: notes.caseFontColor || '#FFDE21'
+          });
+        } else {
+          setAnnotationData(null);
+        }
+      } catch (error) {
+        console.error('Failed to load annotation data:', error);
+        setAnnotationData(null);
+      }
+    };
+
+    loadAnnotationData();
+  }, [imageId, currentCase, user]);
 
 
   const handleImageSelect = async (file: FileData) => {  
@@ -138,14 +177,13 @@ export const Striae = ({ user }: StriaePage) => {
               onVisibilityChange={handleVisibilityChange}
             />
           </div>
-          <Canvas imageUrl={selectedImage} error={error ?? ''} />
+          <Canvas 
+            imageUrl={selectedImage} 
+            error={error ?? ''}
+            activeAnnotations={activeAnnotations}
+            annotationData={annotationData}
+          />
         </div>
-        <Annotations 
-          activeAnnotations={activeAnnotations}
-          currentCase={currentCase}
-          imageId={imageId}
-          user={user}
-        />
       </main>
     </div>
   );

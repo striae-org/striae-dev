@@ -11,6 +11,15 @@
   overflow: hidden;
 }
 
+.imageContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .toolbarWrapper {
   position: absolute;
   left: var(--spaceL);
@@ -36,4 +45,57 @@
   padding: 1rem;
   border-radius: 4px;
   text-align: center;
+}
+
+/* Annotations Overlay */
+.annotationsOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.leftAnnotation,
+.rightAnnotation {
+  position: absolute;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leftAnnotation {
+  top: 1rem;
+  left: 1rem;
+}
+
+.rightAnnotation {
+  top: 1rem;
+  right: 1rem;
+}
+
+.caseText {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive annotations for smaller screens */
+@media (max-width: 768px) {
+  .leftAnnotation,
+  .rightAnnotation {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .caseText {
+    font-size: 0.9rem;
+  }
 }

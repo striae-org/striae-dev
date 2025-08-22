@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import styles from './canvas.module.css';
 
+interface AnnotationData {
+  leftCase: string;
+  rightCase: string;
+  leftItem: string;
+  rightItem: string;
+  caseFontColor: string;
+}
+
 interface CanvasProps {
   imageUrl?: string;
   error?: string;
+  activeAnnotations?: Set<string>;
+  annotationData?: AnnotationData | null;
 }
 
 type ImageLoadError = {
@@ -11,7 +21,7 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, error }: CanvasProps) => {
+export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
 
@@ -71,15 +81,43 @@ export const Canvas = ({ imageUrl, error }: CanvasProps) => {
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl && imageUrl !== '/clear.jpg' ? (
-        <img 
-          src={imageUrl}
-          alt="Case evidence"
-          className={styles.image}
-          onError={() => setLoadError({
-            type: 'network',
-            message: 'Failed to load image from network'
-          })}
-        />
+        <div className={styles.imageContainer}>
+          <img 
+            src={imageUrl}
+            alt="Case evidence"
+            className={styles.image}
+            onError={() => setLoadError({
+              type: 'network',
+              message: 'Failed to load image from network'
+            })}
+          />
+          {/* Annotations Overlay */}
+          {activeAnnotations?.has('number') && annotationData && (
+            <div className={styles.annotationsOverlay}>
+              {/* Left side case and item numbers */}
+              <div 
+                className={styles.leftAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  {annotationData.leftCase}
+                  {annotationData.leftItem && ` ${annotationData.leftItem}`}
+                </div>
+              </div>
+              
+              {/* Right side case and item numbers */}
+              <div 
+                className={styles.rightAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  {annotationData.rightCase}
+                  {annotationData.rightItem && ` ${annotationData.rightItem}`}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <p className={styles.placeholder}>
           Upload or select an image to get started
