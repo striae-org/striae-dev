@@ -15,6 +15,7 @@ interface AnnotationData {
   indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
   hasSubclass?: boolean;
+  additionalNotes: string;
 }
 
 interface CanvasProps {
@@ -109,18 +110,19 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
       ) : isLoading ? (
         <p className={styles.loading}>Loading image...</p>
       ) : imageUrl && imageUrl !== '/clear.jpg' ? (
-        <div className={styles.imageContainer}>
-          {/* Class Characteristics - Above Image */}
-          {activeAnnotations?.has('class') && annotationData && (
-            <div className={styles.classCharacteristics}>
-              <div className={styles.classText}>
-                {annotationData.customClass || annotationData.classType}
-                {annotationData.classNote && ` (${annotationData.classNote})`}
+        <div className={styles.imageAndNotesContainer}>
+          <div className={styles.imageContainer}>
+            {/* Class Characteristics - Above Image */}
+            {activeAnnotations?.has('class') && annotationData && (
+              <div className={styles.classCharacteristics}>
+                <div className={styles.classText}>
+                  {annotationData.customClass || annotationData.classType}
+                  {annotationData.classNote && ` (${annotationData.classNote})`}
+                </div>
               </div>
-            </div>
-          )}
-          
-          <img 
+            )}
+            
+            <img 
             src={imageUrl}
             alt="Case evidence"
             className={styles.image}
@@ -174,6 +176,16 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
               </div>
             </div>
           )}
+        </div>
+        
+        {/* Additional Notes - Below Image */}
+        {activeAnnotations?.has('notes') && annotationData?.additionalNotes && (
+          <div className={styles.additionalNotesContainer}>
+            <div className={styles.additionalNotesBox}>
+              {annotationData.additionalNotes}
+            </div>
+          </div>
+        )}
         </div>
       ) : (
         <p className={styles.placeholder}>

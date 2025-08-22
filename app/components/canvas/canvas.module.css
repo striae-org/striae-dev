@@ -156,7 +156,7 @@
 .subclassWarning {
   position: absolute;
   bottom: 1rem;
-  right: 1rem;
+  right: 2rem;
   z-index: 20;
   pointer-events: none;
 }
@@ -185,6 +185,40 @@
   transition: all 0.1s ease-in-out;
 }
 
+/* Image and Notes Container */
+.imageAndNotesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Additional Notes Display */
+.additionalNotesContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.additionalNotesBox {
+  background: #ffffff;
+  color: #000000;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
 /* Responsive class characteristics for smaller screens */
 @media (max-width: 768px) {
   .classText {
@@ -200,6 +234,12 @@
   .subclassText {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
+  }
+  
+  .additionalNotesBox {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    max-width: calc(100% - 2rem);
   }
 }
 
