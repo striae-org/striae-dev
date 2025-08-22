@@ -42,7 +42,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
         <div className={styles.logo} />
       </Link>
       <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Authentication Access</h1>
+        <h1 className={styles.title}>Striae Access</h1>
         <p className={styles.description}>
           Please enter the access password provided to you during registration.
         </p>
@@ -66,7 +66,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
             className={styles.button}
             disabled={isLoading || !password}
           >
-            {isLoading ? 'Verifying...' : 'Access Authentication'}
+            {isLoading ? 'Verifying...' : 'Access Striae'}
           </button>
         </form>
         
@@ -74,8 +74,8 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
           <p className={styles.helpText}>
             Need access? Complete the registration form first.
           </p>
-          <Link to="/access/signup" className={styles.signupLink}>
-            Register for Access
+          <Link to="/access" className={styles.signupLink}>
+            Register your account
           </Link>
         </div>
       </div>

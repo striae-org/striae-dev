@@ -87,6 +87,10 @@ export async function action({ request, context }: { request: Request, context: 
           {
             "name": "Striae",
             "email": "info@striae.org"
+          },
+          {
+            "name": `${firstName} ${lastName}`,
+            "email": email
           }
         ],
         "subject": "New Striae Registration",
@@ -99,6 +103,7 @@ export async function action({ request, context }: { request: Request, context: 
           <p><strong>Lab/Company Name:</strong> ${company}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
           <p><strong>Registration Agreement:</strong> ${feedback}</p>
+          <p><strong>Access Password:</strong> VyTcw%8FC9N8UU2TBgZ9jnmqb</p>
         </body></html>`,
         "PlainContent": `New Striae Registration:
 
@@ -107,7 +112,8 @@ export async function action({ request, context }: { request: Request, context: 
         Email: ${email}
         Lab/Company Name: ${company}
         Email Consent: ${emailConsent}
-        Registration Agreement: ${feedback}`,
+        Registration Agreement: ${feedback}
+        Access Password: VyTcw%8FC9N8UU2TBgZ9jnmqb`,
         "Tags": [
           "access-signup"
         ],
