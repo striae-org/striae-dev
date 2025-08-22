@@ -10,6 +10,9 @@ interface AnnotationData {
   classType: 'Bullet' | 'Cartridge Case' | 'Other';
   customClass?: string;
   classNote: string;
+  indexType: 'number' | 'color';
+  indexNumber?: string;
+  indexColor?: string;
 }
 
 interface CanvasProps {
@@ -99,6 +102,11 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             src={imageUrl}
             alt="Case evidence"
             className={styles.image}
+            style={{
+              border: activeAnnotations?.has('index') && annotationData?.indexType === 'color' && annotationData?.indexColor
+                ? `4px solid ${annotationData.indexColor}`
+                : undefined
+            }}
             onError={() => setLoadError({
               type: 'network',
               message: 'Failed to load image from network'
@@ -126,6 +134,20 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
                 <div className={styles.caseText}>
                   {annotationData.rightCase}
                   {annotationData.rightItem && ` ${annotationData.rightItem}`}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Index Number Overlay */}
+          {activeAnnotations?.has('index') && annotationData?.indexType === 'number' && annotationData?.indexNumber && (
+            <div className={styles.annotationsOverlay}>
+              <div 
+                className={styles.indexAnnotation}
+                style={{ color: annotationData.caseFontColor }}
+              >
+                <div className={styles.caseText}>
+                  {annotationData.indexNumber}
                 </div>
               </div>
             </div>

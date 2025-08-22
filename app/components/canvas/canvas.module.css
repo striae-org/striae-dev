@@ -79,6 +79,18 @@
   right: 1rem;
 }
 
+.indexAnnotation {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .caseText {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 1.1rem;
@@ -126,7 +138,8 @@
 /* Responsive annotations for smaller screens */
 @media (max-width: 768px) {
   .leftAnnotation,
-  .rightAnnotation {
+  .rightAnnotation,
+  .indexAnnotation {
     padding: 0.5rem 0.75rem;
   }
   
