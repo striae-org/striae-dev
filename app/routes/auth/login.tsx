@@ -52,17 +52,7 @@ const actionCodeSettings = {
   handleCodeInApp: true,  
 };
 
-const createGoogleProvider = (forceReauth: 'none' | 'select_account' | 'login' = 'login') => {
-  const provider = new GoogleAuthProvider();
-  
-  if (forceReauth !== 'none') {
-    provider.setCustomParameters({
-      prompt: forceReauth
-    });
-  }
-  
-  return provider;
-};
+const provider = new GoogleAuthProvider();
 
 const createUserData = (
   uid: string,
@@ -100,8 +90,7 @@ export const Login = () => {
   setError('');
   
   
-  try {    
-    const provider = createGoogleProvider('login');
+  try {
     const result = await signInWithPopup(auth, provider);
     const additionalInfo = getAdditionalUserInfo(result);
     
