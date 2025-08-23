@@ -6,8 +6,8 @@ node_modules
 /.cache
 /build
 
-.env
-.dev.vars
+.env*
+.dev.vars*
 .dns
 .wrangler
 .firebase
