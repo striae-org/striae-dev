@@ -8,6 +8,7 @@
  * @property {string} IMAGES_API_TOKEN
  * @property {string} USER_DB_AUTH
  * @property {string} KEYS_AUTH
+ * @property {string} AUTH_PASSWORD
  */
 
 const corsHeaders = {
