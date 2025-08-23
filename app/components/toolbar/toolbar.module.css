@@ -25,6 +25,7 @@
 
 .hidden {
   height: calc(40px + (var(--spaceM) * 2));
+  opacity: 0.3;
 }
 
 .hidden .toolbarContent {
