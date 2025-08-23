@@ -28,6 +28,8 @@ export default function Footer() {
           Striae © {year}. All rights reserved.
           <br />
            <Link to="https://github.com/StephenJLu/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Open-source software, licensed under Apache 2.0</Link>
+          <br />
+            <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
       </div>
     </footer>    

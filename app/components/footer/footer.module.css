@@ -30,7 +30,19 @@
   transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
 
+.linkSmall {
+  color: var(--textLight);
+  text-decoration: none;
+  text-align: center;
+  font-size: 0.75rem;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
 .link:hover {
+  color: var(--text);
+}
+
+.linkSmall:hover {
   color: var(--text);
 }
 
