@@ -27,6 +27,24 @@
   z-index: var(--zIndex2);
 }
 
+/* Filename Display */
+.filenameDisplay {
+  position: absolute;
+  left: 12rem; /* Position to the right of where toolbar typically is */
+  top: 1rem;
+  z-index: 15;
+  color: #e0e0e0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  pointer-events: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100vw - 14rem);
+}
+
 .image {
   max-width: 100%;
   max-height: 80vh;
@@ -253,5 +271,11 @@
   
   .caseText {
     font-size: 0.9rem;
+  }
+  
+  .filenameDisplay {
+    left: 8rem; /* Adjust for smaller screens */
+    font-size: 0.8rem;
+    max-width: calc(100vw - 10rem);
   }
 }

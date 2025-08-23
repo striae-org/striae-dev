@@ -20,6 +20,7 @@ interface AnnotationData {
 
 interface CanvasProps {
   imageUrl?: string;
+  filename?: string;
   error?: string;
   activeAnnotations?: Set<string>;
   annotationData?: AnnotationData | null;
@@ -30,7 +31,7 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: CanvasProps) => {
+export const Canvas = ({ imageUrl, filename, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
@@ -110,6 +111,13 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
 
   return (    
     <div className={styles.canvasContainer}>
+      {/* Filename Display - Upper Left */}
+      {filename && (
+        <div className={styles.filenameDisplay}>
+          {filename}
+        </div>
+      )}
+      
       {(loadError || error) ? (
         <p className={styles.error}>{getErrorMessage()}</p>
       ) : isLoading ? (

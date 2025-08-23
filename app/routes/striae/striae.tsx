@@ -37,6 +37,7 @@ interface AnnotationData {
 export const Striae = ({ user }: StriaePage) => {
   // Image and error states
   const [selectedImage, setSelectedImage] = useState<string>();
+  const [selectedFilename, setSelectedFilename] = useState<string>();
   const [imageId, setImageId] = useState<string>();
   const [error, setError] = useState<string>();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -93,6 +94,7 @@ export const Striae = ({ user }: StriaePage) => {
     // Cleanup function to clear image when component unmounts
     return () => {
       setSelectedImage(undefined);
+      setSelectedFilename(undefined);
       setError(undefined);
       setImageLoaded(false);
     };
@@ -141,6 +143,7 @@ export const Striae = ({ user }: StriaePage) => {
   const handleImageSelect = async (file: FileData) => {  
   if (file?.id === 'clear') {
     setSelectedImage('/clear.jpg');
+    setSelectedFilename(undefined);
     setImageId(undefined);
     setImageLoaded(false);
     setError(undefined);
@@ -155,12 +158,14 @@ export const Striae = ({ user }: StriaePage) => {
   try {
       setError(undefined);
       setSelectedImage(undefined);
+      setSelectedFilename(undefined);
       setImageLoaded(false);
     
     const signedUrl = await getImageUrl(file);
     if (!signedUrl) throw new Error('No URL returned');
 
     setSelectedImage(signedUrl);
+      setSelectedFilename(file.originalFilename);
       setImageId(file.id); 
       setImageLoaded(true);
 
@@ -168,6 +173,7 @@ export const Striae = ({ user }: StriaePage) => {
     setError('Failed to load image. Please try again.');
     console.error('Image selection error:', err);
     setSelectedImage(undefined);
+    setSelectedFilename(undefined);
   }
 };
 
@@ -204,6 +210,7 @@ export const Striae = ({ user }: StriaePage) => {
           </div>
           <Canvas 
             imageUrl={selectedImage} 
+            filename={selectedFilename}
             error={error ?? ''}
             activeAnnotations={activeAnnotations}
             annotationData={annotationData}
