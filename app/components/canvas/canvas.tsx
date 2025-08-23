@@ -103,6 +103,11 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
     return 'An error occurred';
   };
 
+  // Helper function to check if color is black
+  const isBlackColor = (color: string) => {
+    return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
+  };
+
   return (    
     <div className={styles.canvasContainer}>
       {(loadError || error) ? (
@@ -144,12 +149,8 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
                 className={styles.leftAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor,
-                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
-                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px 8px' : undefined,
-                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px' : undefined
+                  backgroundColor: isBlackColor(annotationData.caseFontColor)
+                    ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
                 <div className={styles.caseText}>
@@ -163,12 +164,8 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
                 className={styles.rightAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor,
-                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
-                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px 8px' : undefined,
-                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px' : undefined
+                  backgroundColor: isBlackColor(annotationData.caseFontColor)
+                    ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
                 <div className={styles.caseText}>
@@ -186,12 +183,8 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
                 className={styles.indexAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor,
-                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
-                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px 8px' : undefined,
-                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
-                    ? '4px' : undefined
+                  backgroundColor: isBlackColor(annotationData.caseFontColor)
+                    ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
                 <div className={styles.caseText}>
