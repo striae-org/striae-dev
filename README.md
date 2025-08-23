@@ -1,4 +1,4 @@
-# 🔫 Striae - Firearms Examiner's Comparison Companion
+# 🔫 Striae - A Firearms Examiner's Comparison Companion
 
 ## 🌐 Application URL
 **[Live App: https://www.striae.org](https://www.striae.org)**
