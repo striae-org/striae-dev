@@ -1,48 +1,93 @@
-# Application URL
-[https://www.striae.org](https://www.striae.org)
+# 🔫 Striae - Firearms Examiner's Comparison Companion
 
-# Documentation
-[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
+## 🌐 Application URL
+**[Live App: https://www.striae.org](https://www.striae.org)**
 
-# Contact
-[Striae Support](https://www.striae.org/support)
+## 📚 Documentation
+**[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)**
 
-# Changelog
+## 💬 Contact & Support
+**[Striae Support](https://www.striae.org/support)**
 
-## [2025-08-17]
-### Added
+---
+
+## 📋 Changelog
+
+### [2025-08-23] - Latest Release
+
+#### ✨ Feature Additions
+
+- Annotations display completed!
+
+#### 🔒 Security Enhancements
+
+- **Security** - Replaced Cloudflare Zero Trust with registration password gateway
+- **Security** - Removed Google-linked sign-in
+- **Security** - Corrected Manage Profile to verify new email addresses before updating from old email address
+- **Security** - Added an inactivity timer to automatically sign user out after certain period of inactivity
+
+#### 🐛 Bug Fixes
+
+- **Function Bug** - Renaming cases bug: Saved notes did not transfer over to the new case number correctly. This operation was fixed.
+- **Function Bug** - Clear canvas on image delete: Clear the canvas of any images when a single file is deleted.
+
+#### 🎨 Interface Improvements
+
+- **Interface** - Added a "Rename/Delete Case" button to hide critical functions behind an extra gateway
+
+#### 🔧 Minor Updates
+
+- Multiple wording and interface adjustments
+
+---
+
+### [2025-08-17] - Earlier Release
+
+#### ✅ Added
+
 - Cloudflare Zero Access Gateway integration for enhanced security and streamlined authentication.
 - Minor description/wording updates throughout the app for clarity.
 - Various code corrections and minor bug fixes for reliability.
-### Planned
-- Annnotations display on the canvas
+
+#### 🚧 Planned
+
+- Annotations display on the canvas
 - Conversion to Adobe PDF
-### Stable
+
+#### ✅ Stable Features
+
 - Firebase Authentication methods
-- Case manangement
+- Case management
 - File upload & management
 - Notes creation & management
 
 ---
 
-## [2025-08-10]
-### Striae Development Indefinitely Suspended
+### [2025-08-10] - Development Update
+
+#### ⚠️ Development Status
+
+**Striae Development Indefinitely Suspended**
 
 Some of you know that at the end of 2024, I’d been working on a personal project close to my heart — Striae, a Firearms Examiner’s Comparison Companion.
 
 The goal was simple but powerful: give firearms examiners a secure, organized way to upload bullet and cartridge case comparison images, link them to specific cases, and make notations directly tied to each image.
 
-#### Core Features I built
+#### ✅ Core Features Built
+
 - User login & account management
 - Case management for organized workflows
 - Upload images tied to cases
 - Make and store notations linked to each specific image
 
-#### Security Measures baked in from day one
+#### 🔒 Security Measures Implemented
+
 - 🔐 Firebase Authentication for login and admin management
 - 🔐 Encryption in transit and at rest
 - 🔐 Data segregation/isolation
 - 🔐 Controlled access & monitoring
+
+#### 🔮 Future Outlook
 
 Unfortunately, a few significant life upheavals forced me to pause development before reaching the printing tools and live display functions I had envisioned.
 
