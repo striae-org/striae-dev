@@ -5,6 +5,8 @@ import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
 import { getImageUrl } from '~/components/actions/image-manage';
 import { getNotes } from '~/components/actions/notes-manage';
+import { getUserApiKey } from '~/utils/auth';
+import paths from '~/config/config.json';
 import styles from './striae.module.css';
 
 interface StriaePage {
@@ -42,6 +44,9 @@ export const Striae = ({ user }: StriaePage) => {
   const [error, setError] = useState<string>();
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // User states
+  const [userCompany, setUserCompany] = useState<string>('');
+
   // Case management states - All managed here
   const [currentCase, setCurrentCase] = useState<string>('');
   const [files, setFiles] = useState<FileData[]>([]);
@@ -61,6 +66,31 @@ export const Striae = ({ user }: StriaePage) => {
     setError(undefined);
     setImageLoaded(false);
   }, [currentCase]);
+
+  // Fetch user company data when component mounts
+  useEffect(() => {
+    const fetchUserCompany = async () => {
+      try {
+        const apiKey = await getUserApiKey();
+        const response = await fetch(`${paths.user_worker_url}/${user.uid}`, {
+          headers: {
+            'X-Custom-Auth-Key': apiKey
+          }
+        });
+        
+        if (response.ok) {
+          const userData = await response.json() as { company?: string };
+          setUserCompany(userData.company || '');
+        }
+      } catch (err) {
+        console.error('Failed to load user company:', err);
+      }
+    };
+    
+    if (user?.uid) {
+      fetchUserCompany();
+    }
+  }, [user?.uid]);
 
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
@@ -204,6 +234,7 @@ export const Striae = ({ user }: StriaePage) => {
           <Canvas 
             imageUrl={selectedImage} 
             filename={selectedFilename}
+            company={userCompany}
             error={error ?? ''}
             activeAnnotations={activeAnnotations}
             annotationData={annotationData}

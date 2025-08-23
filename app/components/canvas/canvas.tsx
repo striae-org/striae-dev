@@ -21,6 +21,7 @@ interface AnnotationData {
 interface CanvasProps {
   imageUrl?: string;
   filename?: string;
+  company?: string;
   error?: string;
   activeAnnotations?: Set<string>;
   annotationData?: AnnotationData | null;
@@ -31,7 +32,7 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, filename, error, activeAnnotations, annotationData }: CanvasProps) => {
+export const Canvas = ({ imageUrl, filename, company, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
@@ -115,6 +116,13 @@ export const Canvas = ({ imageUrl, filename, error, activeAnnotations, annotatio
       {filename && (
         <div className={styles.filenameDisplay}>
           File: {filename}
+        </div>
+      )}
+      
+      {/* Company Display - Upper Right */}
+      {company && (
+        <div className={styles.companyDisplay}>
+          {company}
         </div>
       )}
       
