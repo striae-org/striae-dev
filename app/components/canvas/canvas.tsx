@@ -114,7 +114,7 @@ export const Canvas = ({ imageUrl, filename, error, activeAnnotations, annotatio
       {/* Filename Display - Upper Left */}
       {filename && (
         <div className={styles.filenameDisplay}>
-          {filename}
+          File: {filename}
         </div>
       )}
       

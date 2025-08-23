@@ -77,13 +77,7 @@ export const Striae = ({ user }: StriaePage) => {
       }
       return next;
     });
-  };
-
-  // Handler for toolbar visibility
-  const handleVisibilityChange = (visible: boolean) => {
-    // For now, we'll just handle this if needed later
-    console.log('Toolbar visibility changed:', visible);
-  };
+  };  
 
   // Function to refresh annotation data (called when notes are saved)
   const refreshAnnotationData = () => {
@@ -204,8 +198,7 @@ export const Striae = ({ user }: StriaePage) => {
         <div className={styles.canvasArea}>
           <div className={styles.toolbarWrapper}>
             <Toolbar 
-              onToolSelect={handleToolSelect}
-              onVisibilityChange={handleVisibilityChange}
+              onToolSelect={handleToolSelect}              
             />
           </div>
           <Canvas 
