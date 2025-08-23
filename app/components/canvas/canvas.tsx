@@ -83,7 +83,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
 
   // Flashing effect for subclass warning
   useEffect(() => {
-    if (!annotationData?.hasSubclass) {
+    if (!activeAnnotations?.has('class') || !annotationData?.hasSubclass) {
       setIsFlashing(false);
       return;
     }
@@ -98,7 +98,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
     }, 60000); // Repeat every minute
 
     return () => clearInterval(flashInterval);
-  }, [annotationData?.hasSubclass]);
+  }, [activeAnnotations, annotationData?.hasSubclass]);
 
   const getErrorMessage = () => {
     if (error) return error;
@@ -249,7 +249,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
       )}
       
       {/* Subclass Warning - Bottom Right of Canvas */}
-      {annotationData?.hasSubclass && (
+      {activeAnnotations?.has('class') && annotationData?.hasSubclass && (
         <div className={`${styles.subclassWarning} ${isFlashing ? styles.flashing : ''}`}>
           <div className={styles.subclassText}>
             POTENTIAL SUBCLASS
