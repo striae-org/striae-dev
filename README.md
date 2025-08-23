@@ -21,19 +21,19 @@
 
 #### 🔒 Security Enhancements
 
-- **Security** - Replaced Cloudflare Zero Trust with registration password gateway
-- **Security** - Removed Google-linked sign-in
-- **Security** - Corrected Manage Profile to verify new email addresses before updating from old email address
-- **Security** - Added an inactivity timer to automatically sign user out after certain period of inactivity
+- Replaced Cloudflare Zero Trust with registration password gateway
+- Removed Google-linked sign-in
+- Corrected Manage Profile to verify new email addresses before updating from old email address
+- Added an inactivity timer to automatically sign user out after certain period of inactivity
 
 #### 🐛 Bug Fixes
 
-- **Function Bug** - Renaming cases bug: Saved notes did not transfer over to the new case number correctly. This operation was fixed.
-- **Function Bug** - Clear canvas on image delete: Clear the canvas of any images when a single file is deleted.
+- Renaming cases bug: Saved notes did not transfer over to the new case number correctly. This operation was fixed.
+- Clear canvas on image delete: Clear the canvas of any images when a single file is deleted.
 
 #### 🎨 Interface Improvements
 
-- **Interface** - Added a "Rename/Delete Case" button to hide critical functions behind an extra gateway
+- Added a "Rename/Delete Case" button to hide critical functions behind an extra gateway
 
 #### 🔧 Minor Updates
 
