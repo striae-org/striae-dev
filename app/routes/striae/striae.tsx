@@ -46,6 +46,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   // User states
   const [userCompany, setUserCompany] = useState<string>('');
+  const [userFirstName, setUserFirstName] = useState<string>('');
 
   // Case management states - All managed here
   const [currentCase, setCurrentCase] = useState<string>('');
@@ -79,8 +80,9 @@ export const Striae = ({ user }: StriaePage) => {
         });
         
         if (response.ok) {
-          const userData = await response.json() as { company?: string };
+          const userData = await response.json() as { company?: string; firstName?: string };
           setUserCompany(userData.company || '');
+          setUserFirstName(userData.firstName || '');
         }
       } catch (err) {
         console.error('Failed to load user company:', err);
@@ -235,6 +237,7 @@ export const Striae = ({ user }: StriaePage) => {
             imageUrl={selectedImage} 
             filename={selectedFilename}
             company={userCompany}
+            firstName={userFirstName}
             error={error ?? ''}
             activeAnnotations={activeAnnotations}
             annotationData={annotationData}

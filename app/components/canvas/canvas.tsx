@@ -22,6 +22,7 @@ interface CanvasProps {
   imageUrl?: string;
   filename?: string;
   company?: string;
+  firstName?: string;
   error?: string;
   activeAnnotations?: Set<string>;
   annotationData?: AnnotationData | null;
@@ -32,7 +33,7 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, filename, company, error, activeAnnotations, annotationData }: CanvasProps) => {
+export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAnnotations, annotationData }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
@@ -221,9 +222,14 @@ export const Canvas = ({ imageUrl, filename, company, error, activeAnnotations, 
         )}
         </div>
       ) : (
-        <p className={styles.placeholder}>
-          Upload or select an image to get started
-        </p>
+        <p 
+          className={styles.placeholder}
+          dangerouslySetInnerHTML={{
+            __html: firstName 
+              ? `Hello, ${firstName}<br>Upload or select an image to get started.`
+              : 'Upload or select an image to get started'
+          }}
+        />
       )}
       
       {/* Support Level - Bottom Left of Canvas */}
