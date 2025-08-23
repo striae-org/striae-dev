@@ -226,7 +226,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
           className={styles.placeholder}
           dangerouslySetInnerHTML={{
             __html: firstName 
-              ? `Hello, ${firstName}<br>Upload or select an image to get started.`
+              ? `Hello, ${firstName}<br>Upload or select an image to get started`
               : 'Upload or select an image to get started'
           }}
         />
