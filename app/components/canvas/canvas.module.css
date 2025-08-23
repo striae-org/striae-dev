@@ -48,7 +48,7 @@
 /* Company Display */
 .companyDisplay {
   position: absolute;
-  right: 1rem;
+  right: 3rem;
   top: 1rem;
   z-index: 15;
   color: #e0e0e0;
