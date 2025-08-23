@@ -31,9 +31,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [showResetForm, setShowResetForm] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
 
-  // Check if user has Google provider
-  const hasGoogleProvider = user?.providerData.some(provider => provider.providerId === 'google.com');
-
   // Load user data from KV store when modal opens
   useEffect(() => {
     if (isOpen && user) {
@@ -211,16 +208,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               onChange={(e) => setEmail(e.target.value)}
               className={styles.input}
               required
-              disabled={hasGoogleProvider}
             />
-            {hasGoogleProvider && (
-              <p className={styles.helpText}>
-                Email changes are not allowed for Google-linked accounts. Please manage your email through your Google account.
-              </p>
-            )}
           </div>
 
-          {email !== user?.email && !hasGoogleProvider && (
+          {email !== user?.email && (
             <div className={styles.formGroup}>
               <label htmlFor="password">Current Password (required for email change)</label>
               <input
