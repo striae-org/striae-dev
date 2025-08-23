@@ -142,7 +142,15 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
               {/* Left side case and item numbers */}
               <div 
                 className={styles.leftAnnotation}
-                style={{ color: annotationData.caseFontColor }}
+                style={{ 
+                  color: annotationData.caseFontColor,
+                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px 8px' : undefined,
+                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px' : undefined
+                }}
               >
                 <div className={styles.caseText}>
                   {annotationData.leftCase}
@@ -153,7 +161,15 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
               {/* Right side case and item numbers */}
               <div 
                 className={styles.rightAnnotation}
-                style={{ color: annotationData.caseFontColor }}
+                style={{ 
+                  color: annotationData.caseFontColor,
+                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px 8px' : undefined,
+                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px' : undefined
+                }}
               >
                 <div className={styles.caseText}>
                   {annotationData.rightCase}
@@ -168,7 +184,15 @@ export const Canvas = ({ imageUrl, error, activeAnnotations, annotationData }: C
             <div className={styles.annotationsOverlay}>
               <div 
                 className={styles.indexAnnotation}
-                style={{ color: annotationData.caseFontColor }}
+                style={{ 
+                  color: annotationData.caseFontColor,
+                  backgroundColor: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+                  padding: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px 8px' : undefined,
+                  borderRadius: annotationData.caseFontColor.toLowerCase() === '#000000' || annotationData.caseFontColor.toLowerCase() === 'black' 
+                    ? '4px' : undefined
+                }}
               >
                 <div className={styles.caseText}>
                   Index: {annotationData.indexNumber}
