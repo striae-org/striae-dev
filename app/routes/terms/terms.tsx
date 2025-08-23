@@ -288,7 +288,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 </li>
 <li>
 <p><strong>User Data Sharing</strong></p>
-<p>Sharing Data with other Striae users is entirely optional. You have complete discretion over what to share, with whom, and under what circumstances. In addition, existing users will not be displayed. In order to share Data, You'll need to enter their email address and You won't be notified if the recipient is actually a user.</p>
+<p>You can send PDF reports of your Data directly to any email address through the app. This sharing feature is entirely optional and gives You complete discretion over what to share, with whom, and under what circumstances. Recipients do not need to be Striae users to receive PDF reports via email.</p>
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>

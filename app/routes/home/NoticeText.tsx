@@ -46,7 +46,7 @@ const NoticeText = () => {
             <strong>Transparency and Accountability:</strong> We maintain an open security policy, which encourages reporting of vulnerabilities and issues. We are committed to addressing any security concerns promptly and transparently. Striae does not share sensitive data with third parties, nor is any data stored with Striae subject to scraping, analysis, or processing for any purpose other than the intended use of the app. 
         </li>
         <li>
-            <strong>Control Over Your Data:</strong> Sharing data with other Striae users is entirely optional (to be developed in future releases). Deleting your account ensures all associated data is permanently removed from our systems.
+            <strong>Control Over Your Data:</strong> Send PDF reports directly to any email address through the app. Deleting your account ensures all associated data is permanently removed from our systems.
         </li>        
       </ul>
       <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</Link>.</p>
@@ -60,10 +60,10 @@ const NoticeText = () => {
         By making Striae open source, we aim to foster community involvement, maintain accountability for security and privacy, and ensure that users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
       </p>
       <p>
-        If you’re interested in participating in the <Link to="/access">Early Access Program</Link> or want to stay updated on Striae’s progress, please let us know. Your feedback will be invaluable as we continue to develop and perfect this tool.
+        If you’re interested in getting early access to Striae, you can <Link to="/access">register for an account</Link> today. Your feedback will be invaluable as we continue to develop and perfect this tool.
         </p>
       <p>
-        Thank you for your support, and we look forward to bringing Striae to your comparison toolkit in the future!
+        Thank you for your support, and we look forward to bringing Striae to your comparison toolkit!
         </p>
     </div>
   );
