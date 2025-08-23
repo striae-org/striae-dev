@@ -2,7 +2,6 @@ node_modules
 
 /archive
 /app/config
-/app/components/auth
 
 /.cache
 /build
