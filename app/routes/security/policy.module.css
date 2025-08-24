@@ -15,16 +15,18 @@
   background-repeat: no-repeat;
   background-position: center;
   z-index: var(--zIndex2);
+  transition: transform var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .logoLink {
-  display: block;
-  cursor: pointer;
-  transition: opacity var(--durationS) var(--bezierFastoutSlowin);
+  position: absolute;
+  top: var(--spaceL);
+  left: var(--spaceL);
+  text-decoration: none;
 }
 
-.logoLink:hover {
-  opacity: 0.8;
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .content {
