@@ -20,7 +20,7 @@ export const Terms = () => {
         <h1>Terms and Conditions</h1>
         <p className={styles.lastUpdated}>Last updated: August 24, 2025</p>
         <p>Please read these terms and conditions carefully before using Our Service.</p>
-        <p><Link to="/striae-tc-plain.pdf" download="Striae-Terms-Conditions-Summary.pdf">Download Summary PDF</Link></p>
+        <p><a href="/striae-tc-plain.pdf" download="Striae-Terms-Conditions-Summary.pdf">Download Summary PDF</a></p>
         <section className={styles.section}>
           <h2>Interpretation and Definitions</h2>
 <h3>Interpretation</h3>
