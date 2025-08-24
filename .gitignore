@@ -1,15 +1,16 @@
 node_modules
 
-/archive
-/app/config
+archive/
+app/config
 
 /.cache
 /build
 
-.env*
-.dev.vars*
+*.env
+*.dev.vars
 .dns
 .wrangler
 .firebase
 firebase-debug.log
 *.txt
+*.toml
