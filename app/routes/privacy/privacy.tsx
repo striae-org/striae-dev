@@ -18,7 +18,8 @@ export const Privacy = () => {
 </Link>
       <div className={styles.content}>
         <h1>Privacy Policy</h1>
-        <p className={styles.lastUpdated}>Last updated: August 15, 2025</p>
+        <p className={styles.lastUpdated}>Last updated: August 24, 2025</p>
+        <p><Link to="/striae-pp-plain.pdf" download="Striae-Privacy-Policy-Summary.pdf">Download Summary PDF</Link></p>
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
 <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
         
@@ -91,6 +92,9 @@ export const Privacy = () => {
 <p>First name and last name</p>
 </li>
 <li>
+<p>Employer</p>
+</li>
+<li>
 <p>Usage Data</p>
 </li>
 </ul>
@@ -129,7 +133,7 @@ export const Privacy = () => {
 </ul>
 <p>We may share Your personal information in the following situations:</p>
 <ul>
-<li><strong>With Service Providers:</strong> We may share Your personal information with Service Providers to monitor and analyze the use of Our Service, for payment processing,  to contact You.</li>
+<li><strong>With Service Providers:</strong> We may share Your personal information with Service Providers to provide technical operation of the Application, monitor and analyze the use of Our Service, to contact You.</li>
 <li><strong>For business transfers:</strong> We may share or transfer Your personal information in connection with, or during negotiations of, any merger, sale of Company assets, financing, or acquisition of all or a portion of Our business to another company.</li>
 <li><strong>With Affiliates:</strong> We may share Your information with Our affiliates, in which case We will require those affiliates to honor this Privacy Policy. Affiliates include Our parent company and any other subsidiaries, joint venture partners or other companies that We control or that are under common control with Us.</li>
 <li><strong>With business partners:</strong> We may share Your information with Our business partners to offer You certain products, services or promotions.</li>
@@ -170,7 +174,7 @@ export const Privacy = () => {
           <p>The Service Providers We use may have access to Your Personal Data. These third-party vendors collect, store, use, process and transfer information about Your activity on Our Service in accordance with their Privacy Policies.</p>
 
           <h3>Analytics</h3>
-          <p>We may use third-party Service providers to monitor and analyze the use of Our Service.</p>
+          <p>We may use minimal third-party services for diagnostics and security monitoring only (e.g., Firebase Analytics/Authentication). These are not used for targeted advertising, personalization, or sale of information.</p>
 <ul>
 <li>
 <p><strong>Firebase</strong></p>
@@ -181,25 +185,19 @@ export const Privacy = () => {
 </li>
 </ul>
 <h3>Email Marketing</h3>
-<p>We may use Your Personal Data to contact You with newsletters, marketing or promotional materials and other information that may be of interest to You. You may opt-out of receiving any, or all, of these communications from Us by following the unsubscribe link or instructions provided in any email We send or by contacting Us.</p>
-<p>We may use Email Marketing Service Providers to manage and send emails to You.</p>
+<p>We may use Email Marketing Service Providers to manage and send emails to You about the Service, Your Account, or other important updates and notices.</p>
 <ul>
 <li>
 <p><strong>SendLayer</strong></p>
 <p>Their Privacy Policy can be viewed at <Link to="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</Link></p>
 </li>
-</ul>
-<h3>Payments</h3>
-<p>We may provide paid products and/or services within the Service. In that case, We may use third-party services for payment processing (e.g. payment processors).</p>
-<p>We will not store or collect Your payment card details. That information is provided directly to Our third-party payment processors whose use of Your personal information is governed by their Privacy Policy. These payment processors adhere to the standards set by PCI-DSS as managed by the PCI Security Standards Council, which is a joint effort of brands like Visa, Mastercard, American Express and Discover. PCI-DSS requirements help ensure the secure handling of payment information.</p>
-<ul>
-<li>
-<p><strong>Stripe</strong></p>
-<p>Their Privacy Policy can be viewed at <Link to="https://stripe.com/Us/privacy" rel="noopener noreferrer" target="_blank">https://stripe.com/Us/privacy</Link></p>
-</li>
-</ul>
+</ul>                
+<h3>Sensitive Data</h3>
+<p>Striae does not collect, process, or disclose sensitive forensic case data for external use. All Data remains encrypted and under user control.</p>
+<h3>Children's Privacy</h3>
+<p>The Service is only available to individuals 18 years and older who are employed at a forensic laboratory or related company. We do not knowingly collect data from minors.</p>
         </section>
-        <section className={styles.section}>
+        <section className={styles.section}>          
           <h2>CCPA/CPRA Privacy Notice</h2>
 <p>This privacy notice section for California residents supplements the information contained in Our Privacy Policy and it applies solely to all visitors, users, and others who reside in the State of California.</p>
 <h3>Categories of Personal Information Collected</h3>
@@ -224,7 +222,7 @@ export const Privacy = () => {
 <li>
 <p><strong>Category D: Commercial information.</strong></p>
 <p>Examples: Records and history of products or services purchased or considered.</p>
-<p>Collected: Yes.</p>
+<p>Collected: No.</p>
 </li>
 <li>
 <p><strong>Category E: Biometric information.</strong></p>
@@ -239,7 +237,7 @@ export const Privacy = () => {
 <li>
 <p><strong>Category G: Geolocation data.</strong></p>
 <p>Examples: Approximate physical location.</p>
-<p>Collected: No.</p>
+<p>Collected: Yes.</p>
 </li>
 <li>
 <p><strong>Category H: Sensory data.</strong></p>
@@ -249,7 +247,7 @@ export const Privacy = () => {
 <li>
 <p><strong>Category I: Professional or employment-related information.</strong></p>
 <p>Examples: Current or past job history or performance evaluations.</p>
-<p>Collected: No.</p>
+<p>Collected: Yes.</p>
 </li>
 <li>
 <p><strong>Category J: Non-public education information (per the Family Educational Rights and Privacy Act (20 U.S.C. Section 1232g, 34 C.F.R. Part 99)).</strong></p>
@@ -296,10 +294,14 @@ export const Privacy = () => {
 <li>As described to You when collecting Your personal information or as otherwise set forth in the CCPA/CPRA.</li>
 <li>For internal administrative and auditing purposes.</li>
 <li>To detect security incidents and protect against malicious, deceptive, fraudulent or illegal activity, including, when necessary, to prosecute those responsible for such activities.</li>
+<li>Only minimal Identifiers (email, name, employment verification) and Internet Activity (usage logs for support/security) may be collected.</li>
+<li>Categories such as commercial information, payment details, or social/media identifiers do not apply.</li>
 <li>Other one-time uses.</li>
 </ul>
 <p>Please note that the examples provided above are illustrative and not intended to be exhaustive. For more details on how We use this information, please refer to the &quot;Use of Your Personal Data&quot; section.</p>
 <p>If We decide to collect additional categories of personal information or use the personal information We collected for materially different, unrelated, or incompatible purposes We will update this Privacy Policy.</p>
+<h3>No Sale of Personal Information</h3>
+<p>Striae does not sell or share Personal Information as defined by CCPA/CPRA, including for interest-based advertising.</p>
 <h3>Disclosure of Personal Information</h3>
 <p>We may use or disclose and may have used or disclosed in the last twelve (12) months the following categories of personal information for business or commercial purposes:</p>
 <ul>
