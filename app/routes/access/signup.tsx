@@ -31,6 +31,7 @@ const PERSONAL_EMAIL_DOMAINS = [
   'tutanota.com',
   'yandex.com',
   'mail.com',
+  'ymail.com',
   'gmx.com',
   'fastmail.com'
 ];
