@@ -156,12 +156,22 @@ export const CaseSidebar = ({
     // Validate file type
     if (!allowedTypes.includes(file.type)) {
       setFileError('Only PNG, GIF, JPEG, WEBP, or SVG files are allowed');
+      setIsUploadingFile(false);
+      setUploadProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      // Clear error after 3 seconds
+      setTimeout(() => setFileError(''), 3000);
       return;
     }
 
     // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
       setFileError('File size must be less than 10 MB');
+      setIsUploadingFile(false);
+      setUploadProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      // Clear error after 3 seconds
+      setTimeout(() => setFileError(''), 3000);
       return;
     }
 
@@ -173,6 +183,8 @@ export const CaseSidebar = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   } catch (err) {
     setFileError(err instanceof Error ? err.message : 'Upload failed');
+    // Clear error after 3 seconds
+    setTimeout(() => setFileError(''), 3000);
   } finally {
     setIsUploadingFile(false);
     setUploadProgress(0);
