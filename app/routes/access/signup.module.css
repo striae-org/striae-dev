@@ -27,8 +27,8 @@
   transition: opacity var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.logoLink:hover {
-  opacity: 0.8;
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .formWrapper {
