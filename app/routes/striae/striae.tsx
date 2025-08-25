@@ -66,8 +66,7 @@ export const Striae = ({ user }: StriaePage) => {
     setSelectedImage('/clear.jpg');
     setSelectedFilename(undefined);
     setImageId(undefined);
-    setAnnotationData(null);
-    setActiveAnnotations(new Set());
+    setAnnotationData(null);    
     setError(undefined);
     setImageLoaded(false);
   }, [currentCase]);
@@ -102,8 +101,7 @@ export const Striae = ({ user }: StriaePage) => {
     setCurrentCase(caseNumber);
     setAnnotationData(null);
     setSelectedFilename(undefined);
-    setImageId(undefined);
-    setActiveAnnotations(new Set());
+    setImageId(undefined);    
   };
 
   // Handler for toolbar annotation selection
