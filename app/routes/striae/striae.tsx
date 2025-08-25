@@ -64,6 +64,10 @@ export const Striae = ({ user }: StriaePage) => {
    useEffect(() => {
     // Set clear.jpg when case changes or is cleared
     setSelectedImage('/clear.jpg');
+    setSelectedFilename(undefined);
+    setImageId(undefined);
+    setAnnotationData(null);
+    setActiveAnnotations(new Set());
     setError(undefined);
     setImageLoaded(false);
   }, [currentCase]);
@@ -97,6 +101,9 @@ export const Striae = ({ user }: StriaePage) => {
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
     setAnnotationData(null);
+    setSelectedFilename(undefined);
+    setImageId(undefined);
+    setActiveAnnotations(new Set());
   };
 
   // Handler for toolbar annotation selection
