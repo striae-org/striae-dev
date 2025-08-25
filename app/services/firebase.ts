@@ -3,10 +3,12 @@ import {
     getAuth,
     //connectAuthEmulator,    
  } from 'firebase/auth';
+ import { getAnalytics } from 'firebase/analytics';
 import firebaseConfig from '~/config/firebase';
 
 export const app = initializeApp(firebaseConfig, "Striae");
 export const auth = getAuth(app);
+export const analytics = getAnalytics(app);
 
 console.log(`Welcome to ${app.name}`); // "Welcome to Striae"
 
