@@ -124,6 +124,7 @@ export const Striae = ({ user }: StriaePage) => {
       setSelectedFilename(undefined);
       setError(undefined);
       setImageLoaded(false);
+      setAnnotationData(null);
     };
   }, []); // Empty dependency array means this runs only on mount/unmount
 
