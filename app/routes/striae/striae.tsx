@@ -172,6 +172,7 @@ export const Striae = ({ user }: StriaePage) => {
     setSelectedFilename(undefined);
     setImageId(undefined);
     setImageLoaded(false);
+    setAnnotationData(null);
     setError(undefined);
     return;
   }
