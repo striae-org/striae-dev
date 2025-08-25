@@ -96,6 +96,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
+    setAnnotationData(null);
   };
 
   // Handler for toolbar annotation selection
