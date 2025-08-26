@@ -376,11 +376,33 @@ export default {
 
         await browser.close();
 
+        // Generate filename based on annotation data
+        let filename = 'striae-report';
+        if (data.annotationData) {
+          const { leftCase, leftItem, rightCase, rightItem } = data.annotationData;
+          
+          if (leftCase || leftItem || rightCase || rightItem) {
+            const leftPart = [leftCase, leftItem].filter(Boolean).join(' ');
+            const rightPart = [rightCase, rightItem].filter(Boolean).join(' ');
+            
+            if (leftPart && rightPart) {
+              filename = `striae-report-${leftPart}-${rightPart}`;
+            } else if (leftPart) {
+              filename = `striae-report-${leftPart}`;
+            } else if (rightPart) {
+              filename = `striae-report-${rightPart}`;
+            }
+          }
+        }
+        
+        // Sanitize filename by removing invalid characters
+        filename = filename.replace(/[<>:"/\\|?*]/g, '-');
+
         return new Response(pdf, {
           headers: {
             ...corsHeaders,
             "content-type": "application/pdf",
-            "content-disposition": `attachment; filename="striae-report-${Date.now()}.pdf"`
+            "content-disposition": `attachment; filename="${filename}.pdf"`
           },
         });
       } catch (error) {
