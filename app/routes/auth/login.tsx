@@ -267,30 +267,37 @@ export const Login = () => {
               setIsLoading(false);
               return;
             } else {
-          // Get API key      
-          const apiKey = await getUserApiKey();
+              // User already has a displayName, create user data in KV store
+              const apiKey = await getUserApiKey();
+              
+              const firstName = result.user.displayName?.split(' ')[0] || '';
+              const lastName = result.user.displayName?.split(' ')[1] || '';
+              const company = ''; // Default empty company for existing users
+              
+              const userData = createUserData(
+                result.user.uid,
+                result.user.email,
+                firstName,
+                lastName,
+                company
+              );
                 
-          // Add to KV database
-          const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Custom-Auth-Key': apiKey
-            },
-            body: JSON.stringify({
-              email: result.user.email,
-              firstName: result.user.displayName?.split(' ')[0] || '',
-              lastName: result.user.displayName?.split(' ')[1] || '',
-              permitted: false
-            })
-          });
+              // Add to KV database
+              const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Custom-Auth-Key': apiKey
+                },
+                body: JSON.stringify(userData)
+              });
 
-          if (!response.ok) {
-            throw new Error('Failed to create user data');
-          }
-          
-          setUser(result.user);
-        }
+              if (!response.ok) {
+                throw new Error('Failed to create user data');
+              }
+              
+              setUser(result.user);
+            }
         window.localStorage.removeItem('emailForSignIn');            
       })
           .catch((error) => {
