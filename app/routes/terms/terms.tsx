@@ -264,8 +264,8 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>Striae does not collect or share sensitive information, such as images, case numbers, item numbers, or any other personally identifiable information with third parties. Additionally, Your Data is not subject to analysis, scraping, or processing by third-party analytics tools, AI systems, or any other automated processes outside the scope of the app’s intended use. The integrity and confidentiality of Your Data are paramount to Us.</p>
 </li>
 <li>
-<p><strong>User Data Sharing</strong></p>
-<p>You can send PDF reports of your Data directly to any email address through the app. This sharing feature is entirely optional and gives You complete discretion over what to share, with whom, and under what circumstances. Recipients do not need to be Striae users to receive PDF reports via email.</p>
+  <p><strong>Data Control</strong></p>
+  <p>Striae will never edit or modify Your Data without Your explicit input. The only edits made to Your Data will be for the purpose of resizing and compression for optimal display, storage, and performance. When You delete Data it is permanently removed from our systems.</p>
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>

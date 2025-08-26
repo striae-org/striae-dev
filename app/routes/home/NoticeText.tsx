@@ -46,7 +46,7 @@ const NoticeText = () => {
             <strong>Transparency and Accountability:</strong> We maintain an open security policy, which encourages reporting of vulnerabilities and issues. We are committed to addressing any security concerns promptly and transparently. Striae does not share sensitive data with third parties, nor is any data stored with Striae subject to scraping, analysis, or processing for any purpose other than the intended use of the app. 
         </li>
         <li>
-            <strong>Control Over Your Data:</strong> Send PDF reports directly to any email address through the app. Deleting your account ensures all associated data is permanently removed from our systems.
+            <strong>Control Over Your Data:</strong> Striae will never edit or modify your data. The only edit made to your data will be resizing and compression for optimal display, storage, and performance. When you delete your data, it is permanently removed from our systems.
         </li>        
       </ul>
       <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</Link>.</p>
