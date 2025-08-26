@@ -22,3 +22,5 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 https://striae.pages.dev/*
   X-Robots-Tag: noindex
+https://dev.striae.org/*
+  X-Robots-Tag: noindex
