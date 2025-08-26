@@ -71,10 +71,12 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .passwordField .input {
   padding-right: var(--space2XL);
+  width: 100%;
 }
 
 .passwordToggle {
@@ -91,6 +93,8 @@
   justify-content: center;
   transition: background-color var(--durationS) var(--bezierFastoutSlowin);
   z-index: 1;
+  height: auto;
+  min-width: 24px;
 }
 
 .passwordToggle:hover {
