@@ -6,15 +6,27 @@ type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibil
 
 interface ToolbarProps {
   onToolSelect?: (toolId: ToolId, active: boolean) => void;
+  onGeneratePDF?: () => void;
+  canGeneratePDF?: boolean;
   onVisibilityChange?: (visible: boolean) => void;
+  isGeneratingPDF?: boolean;
 }
 
-export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
+export const Toolbar = ({ 
+  onToolSelect, 
+  onVisibilityChange, 
+  onGeneratePDF, 
+  canGeneratePDF, 
+  isGeneratingPDF = false
+}: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
 
   const handleToolClick = (toolId: ToolId) => {
     if (toolId === 'print') {
+      if (onGeneratePDF && canGeneratePDF) {
+        onGeneratePDF();
+      }
       onToolSelect?.('print', true);
       return;
     }
@@ -34,7 +46,7 @@ export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
       }
       onToolSelect?.(toolId, next.has(toolId));
       return next;
-    });
+    });    
   };
 
   return (
@@ -83,7 +95,9 @@ export const Toolbar = ({ onToolSelect, onVisibilityChange }: ToolbarProps) => {
         iconId="print"
         isActive={false}
         onClick={() => handleToolClick('print')}
-        ariaLabel="Save/Print to PDF"
+        ariaLabel={isGeneratingPDF ? "Generating PDF..." : "Save/Print to PDF"}
+        disabled={!canGeneratePDF || isGeneratingPDF}
+        showSpinner={isGeneratingPDF}
       />
         </div>
       </div>

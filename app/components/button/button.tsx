@@ -8,6 +8,8 @@ interface ButtonProps {
   onClick?: () => void;
   ariaLabel: string;
   title?: string;
+  disabled?: boolean;
+  showSpinner?: boolean;
 }
 
 export const Button = ({ 
@@ -15,21 +17,28 @@ export const Button = ({
   isActive = false, 
   onClick,
   ariaLabel,
-  title 
+  title,
+  disabled = false,
+  showSpinner = false
 }: ButtonProps) => {
   return (
     <button
-      className={classes(styles.button, isActive && styles.active)}
-      onClick={onClick}
+      className={classes(styles.button, isActive && styles.active, disabled && styles.disabled)}
+      onClick={disabled ? undefined : onClick}
       aria-label={ariaLabel}
       aria-pressed={isActive}
       title={title || ariaLabel}
+      disabled={disabled}
     >
-      <Icon
-        size={30}        
-        icon={iconId} 
-        className={styles.icon}
-      />
+      {showSpinner ? (
+        <div className={styles.spinner}></div>
+      ) : (
+        <Icon
+          size={30}        
+          icon={iconId} 
+          className={styles.icon}
+        />
+      )}
     </button>
   );
 };
