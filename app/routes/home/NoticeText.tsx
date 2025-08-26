@@ -58,12 +58,9 @@ const NoticeText = () => {
       </p>
       <p>
         By making Striae open source, we aim to foster community involvement, maintain accountability for security and privacy, and ensure that users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
-      </p>
+      </p>      
       <p>
-        If you’re interested in getting early access to Striae, you can <Link to="/access">register for an account</Link> today. Your feedback will be invaluable as we continue to develop and perfect this tool.
-        </p>
-      <p>
-        Thank you for your support, and we look forward to bringing Striae to your comparison toolkit!
+        Thank you for your support, and we hope Striae is a valuable addition to your comparison toolkit!
         </p>
     </div>
   );

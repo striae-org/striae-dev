@@ -26,8 +26,6 @@ export default function Home() {
           <div className={styles.logo} />
           <div className={styles.title}>
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
-            <br />
-            <p><em>Currently in development. Please check for updates <Link to="https://github.com/StephenJLu/striae">here</Link>. Thank you.</em></p>
           </div>
           <div className={styles.buttonGroup}>
             <Link to="/auth" className={styles.actionButton}>
