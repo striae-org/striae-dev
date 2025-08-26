@@ -155,7 +155,7 @@ export const Striae = ({ user }: StriaePage) => {
         notesUpdatedFormatted // Pass formatted notes updated date
       };
 
-      const response = await fetch('https://pdf.striae.org/', {
+      const response = await fetch(paths.pdf_worker_url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
