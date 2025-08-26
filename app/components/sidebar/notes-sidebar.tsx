@@ -318,7 +318,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 checked={indexType === 'number'}
                 onChange={() => setIndexType('number')}
               />
-              <span>Number</span>
+              <span>Number/Letter</span>
             </label>
           </div>
 
