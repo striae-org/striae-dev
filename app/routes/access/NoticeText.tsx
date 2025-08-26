@@ -9,7 +9,7 @@ export default function NoticeText() {
 
 <p>Please note that Striae is intended for professional use only. Personal email addresses are not permitted for this initial registration. Striae reserves the right to disable accounts that do not comply with this policy.</p>
 
-<p>Since Striae is still in active development, you may notice some rough edges along the way. Your feedback will help us refine and improve the experience for everyone in the community.</p>
+<p>Since Striae is in active development, you may notice some rough edges along the way. Your feedback will help us refine and improve the experience for everyone in the community.</p>
 
 <h2>Important Details</h2>
 <ul>
@@ -18,14 +18,7 @@ export default function NoticeText() {
   <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better.</li>
 </ul>
 
-<h2>What You Can Expect</h2>
-<ul>
-  <li>Early access to new features and improvements as they roll out</li>
-  <li>Opportunities to share feedback that directly influences development</li>
-  <li>Missing functionality, some minor bugs or quirks, since the app is still being developed and polished</li>
-</ul>
-
-<p>By registering, you&apos;re helping to build the future of Striae. We can&apos;t wait to hear your insights and see how you use it in your work!</p>
+<p>By registering, you&apos;re helping to build the future of Striae and digital annotation tools for forensic firearms examination. We can&apos;t wait to hear your insights and how you use it in your work!</p>
 </>
   );
 }
