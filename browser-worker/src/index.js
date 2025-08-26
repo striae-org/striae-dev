@@ -330,7 +330,7 @@ const generateDocument = (data) => {
       </div>
       ` : '<div></div>'}
 
-      ${annotationData && annotationsSet?.has('additionalNotes') && annotationData.additionalNotes ? `
+      ${annotationData && annotationsSet?.has('notes') && annotationData.additionalNotes && annotationData.additionalNotes.trim() ? `
       <div class="additional-notes-section">${annotationData.additionalNotes.trim()}</div>
       ` : '<div></div>'}
     </div>
