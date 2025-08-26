@@ -13,7 +13,7 @@
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.striae.org',
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'text/plain'
 };
@@ -35,23 +35,58 @@ export default {
     }
 
     const url = new URL(request.url);
-    const keyName = url.pathname.replace('/', '');
+    const path = url.pathname.replace('/', '');
     
-    if (!keyName) {
-      return new Response('Key name required', { 
-        status: 400,
-        headers: corsHeaders 
+    // Handle password verification
+    if (request.method === 'POST' && path === 'verify-auth-password') {
+      try {
+        const { password } = await request.json();
+        
+        if (!password) {
+          return new Response(JSON.stringify({ valid: false }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        
+        const isValid = password === env.AUTH_PASSWORD;
+        
+        return new Response(JSON.stringify({ valid: isValid }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ valid: false }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    // Handle regular key retrieval
+    if (request.method === 'GET') {
+      const keyName = path;
+      
+      if (!keyName) {
+        return new Response('Key name required', { 
+          status: 400,
+          headers: corsHeaders 
+        });
+      }
+
+      if (!(keyName in env)) {
+        return new Response('Key not found', { 
+          status: 404,
+          headers: corsHeaders 
+        });
+      }
+
+      return new Response(env[keyName], {
+        headers: corsHeaders
       });
     }
 
-    if (!(keyName in env)) {
-      return new Response('Key not found', { 
-        status: 404,
-        headers: corsHeaders 
-      });
-    }
-
-    return new Response(env[keyName], {
+    return new Response('Method not allowed', {
+      status: 405,
       headers: corsHeaders
     });
   }

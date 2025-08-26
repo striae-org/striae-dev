@@ -3,7 +3,7 @@ import paths from '~/config/config.json';
 const KEYS_URL = paths.keys_url;
 const KEYS_AUTH = paths.keys_auth;
 
-type KeyType = 'USER_DB_AUTH' | 'R2_KEY_SECRET' | 'IMAGES_API_TOKEN' | 'ACCOUNT_HASH' | 'AUTH_PASSWORD';
+type KeyType = 'USER_DB_AUTH' | 'R2_KEY_SECRET' | 'IMAGES_API_TOKEN' | 'ACCOUNT_HASH';
 
 async function getApiKey(keyType: KeyType): Promise<string> {
   const keyResponse = await fetch(`${KEYS_URL}/${keyType}`, {
@@ -33,6 +33,25 @@ export async function getAccountHash(): Promise<string> {
   return getApiKey('ACCOUNT_HASH');
 }
 
-export async function getAuthPassword(): Promise<string> {
-  return getApiKey('AUTH_PASSWORD');
+export async function verifyAuthPassword(password: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${KEYS_URL}/verify-auth-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': KEYS_AUTH
+      },
+      body: JSON.stringify({ password })
+    });
+    
+    if (!response.ok) {
+      return false;
+    }
+    
+    const result = await response.json() as { valid: boolean };
+    return result.valid;
+  } catch (error) {
+    console.error('Error verifying auth password:', error);
+    return false;
+  }
 }
