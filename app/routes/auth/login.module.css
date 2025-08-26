@@ -42,13 +42,6 @@
   font-size: var(--fontSizeH4);
 }
 
-.subtitle {
-  text-align: center;
-  color: var(--accent);
-  margin-bottom: var(--spaceXL);
-  font-size: var(--fontSizeBodyM);
-}
-
 .form {
   display: flex;
   flex-direction: column;
@@ -72,6 +65,41 @@
 .input:disabled {
   background-color: color-mix(in lab, var(--background) 95%, transparent);
   cursor: not-allowed;
+}
+
+.passwordField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordField .input {
+  padding-right: var(--space2XL);
+}
+
+.passwordToggle {
+  position: absolute;
+  right: var(--spaceM);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: var(--spaceXS);
+  border-radius: var(--spaceXS);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
+  z-index: 1;
+}
+
+.passwordToggle:hover {
+  background-color: color-mix(in lab, var(--text) 10%, transparent);
+}
+
+.passwordToggle:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .button {
@@ -135,58 +163,6 @@
   white-space: pre-line;
 }
 
-.authToggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spaceL);
-  margin: var(--spaceXL) 0;
-  width: 100%;
-}
-
-.authToggleButton, 
-.emailLinkButton {
-  padding: var(--spaceM) var(--spaceL);
-  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
-  border-radius: var(--spaceXS);
-  background: transparent;
-  cursor: pointer;
-  font-size: var(--fontSizeBodyM);
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.active {
-  background: color-mix(in lab, var(--background) 95%, transparent);
-  border-color: color-mix(in lab, var(--text) 30%, transparent);
-}
-
-.divider {
-  color: var(--textLight);
-  font-size: var(--fontSizeBodyXS);
-}
-
-.googleButton {
-  width: 100%;
-  padding: var(--spaceM) var(--spaceL);
-  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
-  border-radius: var(--spaceXS);
-  background-color: var(--backgroundLight);
-  color: var(--textBody);
-  font-size: var(--fontSizeBodyM);
-  cursor: pointer;
-  margin: var(--spaceL) 0;
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.googleButton:hover:not(:disabled) {
-  background-color: color-mix(in lab, var(--background) 95%, transparent);
-}
-
-.googleButton:disabled {
-  background-color: color-mix(in lab, var(--background) 98%, transparent);
-  cursor: not-allowed;
-}
-
 @media (max-width: 768px) {
   .logo {
     display: none;
@@ -194,15 +170,5 @@
 
   .formWrapper {
     padding: var(--spaceL);
-  }
-
-  .authToggle {
-    flex-direction: column;
-    gap: var(--spaceM);    
-  }
-
-  .authToggleButton, 
-  .emailLinkButton {
-    width: 100%;    
   }
 }

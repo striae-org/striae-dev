@@ -1,20 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@remix-run/react';
+import { useState, useEffect } from 'react';
+import { Link } from '@remix-run/react';
 import { auth } from '~/services/firebase';
 import {
-    applyActionCode,           
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword,
     onAuthStateChanged,
-    sendSignInLinkToEmail,
-    signInWithEmailLink,
-    isSignInWithEmailLink,    
     sendEmailVerification,
     User,
     updateProfile,
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
-import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
+import { handleAuthError } from '~/services/firebase-errors';
 import { AuthPassword } from '~/components/auth/auth-password';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
@@ -44,12 +40,7 @@ interface UserData {
   updatedAt: string;
 }
 
-const USER_WORKER_URL = paths.user_worker_url;  
-
-const actionCodeSettings = {
-  url: 'https://www.striae.org/auth',
-  handleCodeInApp: true,  
-};
+const USER_WORKER_URL = paths.user_worker_url;
 
 const createUserData = (
   uid: string,
@@ -69,19 +60,16 @@ const createUserData = (
   updatedAt: new Date().toISOString()
 });
 
-export const Login = () => {    
-  const navigate = useNavigate();
-  const formRef = useRef<HTMLFormElement>(null);
+export const Login = () => {
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [passwordStrength, setPasswordStrength] = useState('');  
-  const [authMethod, setAuthMethod] = useState<'password' | 'emailLink'>('password');
+  const [passwordStrength, setPasswordStrength] = useState('');
   const [isResetting, setIsResetting] = useState(false);
-  const [needsProfile, setNeedsProfile] = useState(false);
-  const [emailLinkUser, setEmailLinkUser] = useState<User | null>(null);
   const [hasAuthAccess, setHasAuthAccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Check for existing auth access on mount
   useEffect(() => {
@@ -93,113 +81,7 @@ export const Login = () => {
     setHasAuthAccess(true);
   };
 
-  const NameCollectionForm = () => {
-  return (
-    <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
-        <div className={styles.logo} />
-      </Link>
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Complete Your Profile</h1>
-        <form onSubmit={async (e) => {
-          e.preventDefault();
-          setIsLoading(true);
-          setError('');
-          
-          const formData = new FormData(e.currentTarget);
-          const firstName = formData.get('firstName') as string;
-          const lastName = formData.get('lastName') as string;
-          const company = formData.get('company') as string || window.localStorage.getItem('company') || '';
-
-          try {
-            if (emailLinkUser) {
-              // Update Firebase profile
-              await updateProfile(emailLinkUser, {
-                displayName: `${firstName} ${lastName}`
-              });
-
-              // Get API key and create user data
-              const apiKey = await getUserApiKey();
-              const userData = createUserData(
-                emailLinkUser.uid,
-                emailLinkUser.email,
-                firstName,
-                lastName,
-                company
-              );
-
-              // Add to KV database
-              const response = await fetch(`${USER_WORKER_URL}/${emailLinkUser.uid}`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Custom-Auth-Key': apiKey
-                },
-                body: JSON.stringify(userData)
-              });
-
-              if (!response.ok) {
-                throw new Error('Failed to create user data');
-              }
-
-              setUser(emailLinkUser);
-              setNeedsProfile(false);
-              
-              // Clean up localStorage
-              window.localStorage.removeItem('firstName');
-              window.localStorage.removeItem('lastName');
-              window.localStorage.removeItem('company');
-            }
-          } catch (err) {
-            const { message } = handleAuthError(err);
-            setError(message);
-          } finally {
-            setIsLoading(false);
-          }
-        }} className={styles.form}>
-          <input
-            type="text"
-            name="firstName"
-            required
-            placeholder="First Name (required)"
-            className={styles.input}
-            disabled={isLoading}
-            autoComplete="given-name"
-          />
-          <input
-            type="text"
-            name="lastName"
-            required
-            placeholder="Last Name (required)"
-            className={styles.input}
-            disabled={isLoading}
-            autoComplete="family-name"
-          />
-          <input
-            type="text"
-            name="company"
-            required
-            placeholder="Lab/Company Name (required)"
-            className={styles.input}
-            disabled={isLoading}
-            autoComplete="organization"
-            defaultValue={window.localStorage.getItem('company') || ''}
-          />
-          {error && <p className={styles.error}>{error}</p>}
-          <button
-            type="submit"
-            className={styles.button}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Saving...' : 'Complete Registration'}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-    const checkPasswordStrength = (password: string): boolean => {
+  const checkPasswordStrength = (password: string): boolean => {
     const hasMinLength = password.length >= 10;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
@@ -232,102 +114,10 @@ export const Login = () => {
       setUser(null);
     }
   });
-  
 
-    const handleVerifyEmail = async (actionCode: string, continueUrl?: string) => {
-  try {
-    await applyActionCode(auth, actionCode);
-    setError('Email verified successfully!');
-    if (continueUrl) {
-      navigate(continueUrl);
-    }
-  } catch (err) {
-    const { message } = handleAuthError(err);
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};   
-   
-    if (isSignInWithEmailLink(auth, window.location.href)) {
-      let email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-        email = window.prompt(ERROR_MESSAGES.EMAIL_REQUIRED);
-      }
-      if (email) {
-        setIsLoading(true);
-        signInWithEmailLink(auth, email, window.location.href)
-          .then(async (result) => {
-            console.log('Email link sign in result:', result);
-        
-            if (!result.user.displayName) {
-              console.log('Setting new user states');
-              setEmailLinkUser(result.user);
-              setNeedsProfile(true);
-              setIsLoading(false);
-              return;
-            } else {
-          // Get API key      
-          const apiKey = await getUserApiKey();
-                
-          // Add to KV database
-          const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Custom-Auth-Key': apiKey
-            },
-            body: JSON.stringify({
-              email: result.user.email,
-              firstName: result.user.displayName?.split(' ')[0] || '',
-              lastName: result.user.displayName?.split(' ')[1] || '',
-              permitted: false
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to create user data');
-          }
-          
-          setUser(result.user);
-        }
-        window.localStorage.removeItem('emailForSignIn');            
-      })
-          .catch((error) => {
-            console.error('Email link error:', error);
-            setError(error.message);
-          })
-          .finally(() => {
-            window.localStorage.removeItem('emailForSignIn');
-            setIsLoading(false);
-          });
-      }
-    }
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode');
-  const actionCode = urlParams.get('oobCode');
-  const continueUrl = urlParams.get('continueUrl');
-
-  if (mode === 'verifyEmail' && actionCode) {
-    handleVerifyEmail(actionCode, continueUrl || undefined);
-  }
    return () => unsubscribe();
-}, [navigate]);
+}, []);
   
-  const handleEmailLink = async (email: string) => {
-  try {
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-    window.localStorage.setItem('emailForSignIn', email);
-    setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
-  } catch (err) {
-    const { message } = handleAuthError(err);
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   setIsLoading(true);
@@ -336,12 +126,26 @@ export const Login = () => {
   const formData = new FormData(e.currentTarget as HTMLFormElement);
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
   const firstName = formData.get('firstName') as string;
   const lastName = formData.get('lastName') as string;
   const company = formData.get('company') as string;
 
   try {
     if (!isLogin) {
+      // Registration validation
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!checkPasswordStrength(password)) {
+        setError('Password does not meet requirements');
+        setIsLoading(false);
+        return;
+      }
+
       // Registration
       const createCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(createCredential.user, {
@@ -388,92 +192,6 @@ export const Login = () => {
   }
 };
 
-  const EmailLinkForm = () => {
-  return (
-    <>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const email = formData.get('email') as string;
-        const firstName = formData.get('firstName') as string;
-        const lastName = formData.get('lastName') as string;
-        const company = formData.get('company') as string;
-        
-        // Store name data for registration flow
-        if (!isLogin) {
-          window.localStorage.setItem('firstName', firstName);
-          window.localStorage.setItem('lastName', lastName);
-          window.localStorage.setItem('company', company);
-        }
-        
-        handleEmailLink(email);
-      }} className={styles.form}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          autoComplete="email"
-          className={styles.input}
-          required
-          disabled={isLoading}
-        />
-        
-        {!isLogin && (
-          <>
-            <input
-              type="text"
-              name="firstName"
-              required
-              placeholder="First Name (required)"
-              className={styles.input}
-              disabled={isLoading}
-              autoComplete="given-name"
-            />
-            <input
-              type="text"
-              name="lastName"
-              required
-              placeholder="Last Name (required)"
-              className={styles.input}
-              disabled={isLoading}
-              autoComplete="family-name"
-            />
-            <input
-              type="text"
-              name="company"
-              required
-              placeholder="Lab/Company Name (required)"
-              className={styles.input}
-              disabled={isLoading}
-              autoComplete="organization"
-            />
-          </>
-        )}
-        
-        {error && <p className={styles.error}>{error}</p>}
-        <button 
-          type="submit" 
-          className={styles.button}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Sending...' : 'Send Login Link'}
-        </button>
-      </form>
-      
-      <p className={styles.toggle}>
-        {isLogin ? "Don't have an account? " : "Already have an account? "}
-        <button 
-          onClick={() => setIsLogin(!isLogin)}
-          className={styles.toggleButton}
-          disabled={isLoading}
-        >
-          {isLogin ? 'Register' : 'Login'}
-        </button>
-      </p>
-    </>
-  );
-};
-
   // Add proper sign out handling
   const handleSignOut = async () => {
     try {
@@ -506,40 +224,17 @@ export const Login = () => {
                 </button>
               </div>
             )
-          ) : needsProfile ? (
-            <NameCollectionForm />
           ) : isResetting ? (
             <PasswordReset onBack={() => setIsResetting(false)}/>
           ) : (
             <div className={styles.container}>
               <Link to="/" className={styles.logoLink}>
                 <div className={styles.logo} />
-          </Link>
-          <div className={styles.formWrapper}>
-        {isResetting ? (
-          <PasswordReset onBack={() => setIsResetting(false)}/>
-        ) : (
-          <>
-            <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
-            <div className={styles.authToggle}>
-              <button 
-                onClick={() => setAuthMethod('password')}
-                className={`${styles.authToggleButton} ${authMethod === 'password' ? styles.active : ''}`}
-              >
-                Sign in with Password
-              </button>
-              <span className={styles.divider}>or</span>
-              <button 
-                onClick={() => setAuthMethod('emailLink')}
-                className={`${styles.emailLinkButton} ${authMethod === 'emailLink' ? styles.active : ''}`}
-              >
-                Get a Code Instead
-              </button>
-            </div>
-            
-            {authMethod === 'password' ? (
-              <>
-                <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
+              </Link>
+              <div className={styles.formWrapper}>
+                <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
+                
+                <form onSubmit={handleSubmit} className={styles.form}>
                   <input
                     type="email"
                     name="email"
@@ -549,55 +244,75 @@ export const Login = () => {
                     required
                     disabled={isLoading}
                   />
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    autoComplete={isLogin ? "current-password" : "new-password"}
-                    className={styles.input}
-                    required
-                    disabled={isLoading}
-                    onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
-                  />
+                  <div className={styles.passwordField}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Password"
+                      autoComplete={isLogin ? "current-password" : "new-password"}
+                      className={styles.input}
+                      required
+                      disabled={isLoading}
+                      onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? "👁️" : "👁️‍🗨️"}
+                    </button>
+                  </div>
                   
                   {!isLogin && (
                     <>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Confirm Password"
-                        autoComplete="new-password"
-                        className={styles.input}
+                      <div className={styles.passwordField}>
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          placeholder="Confirm Password"
+                          autoComplete="new-password"
+                          className={styles.input}
+                          required
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          className={styles.passwordToggle}
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                        >
+                          {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        name="firstName"
                         required
+                        placeholder="First Name (required)"
+                        autoComplete="given-name"
+                        className={styles.input}
                         disabled={isLoading}
                       />
-                    <input
-                      type="text"
-                      name="firstName"
-                      required
-                      placeholder="First Name (required)"
-                      autoComplete="given-name"
-                      className={styles.input}
-                      disabled={isLoading}
-                    />
-                    <input
-                      type="text"
-                      name="lastName"
-                      required
-                      placeholder="Last Name (required)"
-                      autoComplete="family-name"
-                      className={styles.input}
-                      disabled={isLoading}
-                    />
-                    <input
-                      type="text"
-                      name="company"
-                      required
-                      placeholder="Lab/Company Name (required)"
-                      autoComplete="organization"
-                      className={styles.input}
-                      disabled={isLoading}
-                    />                      
+                      <input
+                        type="text"
+                        name="lastName"
+                        required
+                        placeholder="Last Name (required)"
+                        autoComplete="family-name"
+                        className={styles.input}
+                        disabled={isLoading}
+                      />
+                      <input
+                        type="text"
+                        name="company"
+                        required
+                        placeholder="Lab/Company Name (required)"
+                        autoComplete="organization"
+                        className={styles.input}
+                        disabled={isLoading}
+                      />                      
                       {passwordStrength && (
                         <div className={styles.passwordStrength}>
                           <pre>{passwordStrength}</pre>
@@ -612,7 +327,7 @@ export const Login = () => {
                       onClick={() => setIsResetting(true)}
                       className={styles.resetLink}
                     >
-                    Forgot Password?
+                      Forgot Password?
                     </button>
                   )}
                   
@@ -626,24 +341,25 @@ export const Login = () => {
                     {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
                   </button>
                 </form>
+                
                 <p className={styles.toggle}>
                   {isLogin ? "Don't have an account? " : "Already have an account? "}
                   <button 
-                    onClick={() => setIsLogin(!isLogin)}
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setShowPassword(false);
+                      setShowConfirmPassword(false);
+                      setPasswordStrength('');
+                      setError('');
+                    }}
                     className={styles.toggleButton}
                     disabled={isLoading}
                   >
                     {isLogin ? 'Register' : 'Login'}
                   </button>
                 </p>
-              </>
-            ) : (
-              <EmailLinkForm />
-            )}
-          </>
-        )}
-     </div>
-        </div>
+              </div>
+            </div>
           )}
         </>
       )}
