@@ -6,7 +6,6 @@
 
 @layer base {
   :root {
-    color-scheme: light;
     --mobileNavOffset: calc(var(--spaceOuter) * 2 + var(--space2XL));
   }
 

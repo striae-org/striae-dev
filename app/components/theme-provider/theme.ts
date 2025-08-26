@@ -117,8 +117,8 @@ const dark = {
   text: 'var(--white)',
   textTitle: 'var(--text)',
   linkColor: 'var(--accent)',
-  textBody: 'color-mix(in lab, var(--text) 80%, transparent)',
-  textLight: 'color-mix(in lab, var(--text) 60%, transparent)',
+  textBody: 'rgba(255, 255, 255, 0.8)', // Fallback for Firefox
+  textLight: 'rgba(255, 255, 255, 0.6)', // Fallback for Firefox
 };
 
 const light = {
@@ -130,10 +130,10 @@ const light = {
   error: 'oklch(63.17% 0.259 25.41)',
   errorLight: 'oklch(90% 0.259 25.41)',
   text: 'var(--black)',  
-  textTitle: 'color-mix(in lab, var(--text) 90%, transparent)',
+  textTitle: 'rgba(0, 0, 0, 0.9)', // Fallback for Firefox
   linkColor: 'var(--accent)',
-  textBody: 'color-mix(in lab, var(--text) 75%, transparent)',
-  textLight: 'color-mix(in lab, var(--text) 55%, transparent)',
+  textBody: 'rgba(0, 0, 0, 0.75)', // Fallback for Firefox
+  textLight: 'rgba(0, 0, 0, 0.55)', // Fallback for Firefox
 };
 
 export const tokens = {
