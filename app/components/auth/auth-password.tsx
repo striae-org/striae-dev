@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import { getAuthPassword } from '~/utils/auth';
+import { verifyAuthPassword } from '~/utils/auth';
 import styles from './auth-password.module.css';
 
 interface AuthPasswordProps {
@@ -24,9 +24,9 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
     setError('');    
 
     try {      
-      const correctPassword = await getAuthPassword();      
+      const isValidPassword = await verifyAuthPassword(password);      
       
-      if (password === correctPassword) {
+      if (isValidPassword) {
         sessionStorage.setItem('auth-access-granted', 'true');
         onAccessGranted();
       } else {
@@ -35,7 +35,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
       }
     } catch (error) {
       setError('Unable to verify password. Please try again later.');
-      console.error('Error fetching auth password:', error);
+      console.error('Error verifying auth password:', error);
     }
     
     setIsLoading(false);
