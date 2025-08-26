@@ -308,35 +308,10 @@ export const Login = () => {
                 
                 setUser(result.user);
               } else {
-                // No profile data - this is a new user who used login email link
-                // Check if user exists in KV store
-                try {
-                  const apiKey = await getUserApiKey();
-                  const checkResponse = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
-                    method: 'GET',
-                    headers: {
-                      'X-Custom-Auth-Key': apiKey
-                    }
-                  });
-                  
-                  if (checkResponse.ok) {
-                    // User exists in KV store, just set them as logged in
-                    console.log('User exists in KV store');
-                    setUser(result.user);
-                  } else if (checkResponse.status === 404) {
-                    // User doesn't exist in KV store, need profile setup
-                    console.log('New user needs profile setup');
-                    setEmailLinkUser(result.user);
-                    setNeedsProfile(true);
-                  } else {
-                    throw new Error('Failed to check user existence');
-                  }
-                } catch (error) {
-                  console.error('Error checking user existence:', error);
-                  // Fallback to profile setup
-                  setEmailLinkUser(result.user);
-                  setNeedsProfile(true);
-                }
+                // No profile data, need to collect it
+                console.log('No stored profile data, needs profile setup');
+                setEmailLinkUser(result.user);
+                setNeedsProfile(true);
               }
               
               setIsLoading(false);
