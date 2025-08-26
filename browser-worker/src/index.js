@@ -329,8 +329,8 @@ const generateDocument = (data) => {
         <div class="confirmation-line"></div>
       </div>
       ` : '<div></div>'}
-      
-      ${annotationData && annotationData.additionalNotes ? `
+
+      ${annotationData && annotationsSet?.has('additionalNotes') && annotationData.additionalNotes ? `
       <div class="additional-notes-section">${annotationData.additionalNotes.trim()}</div>
       ` : '<div></div>'}
     </div>
