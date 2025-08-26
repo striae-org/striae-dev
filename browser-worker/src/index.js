@@ -378,6 +378,8 @@ export default {
 
         // Generate filename based on annotation data
         let filename = 'striae-report';
+        
+        // Try to create filename from case/item annotations
         if (data.annotationData) {
           const { leftCase, leftItem, rightCase, rightItem } = data.annotationData;
           
@@ -393,6 +395,18 @@ export default {
               filename = `striae-report-${rightPart}`;
             }
           }
+        }
+        
+        // Fallback to case number if no case/item data
+        if (filename === 'striae-report' && data.caseNumber) {
+          filename = `striae-report-${data.caseNumber}`;
+        }
+        
+        // Final fallback to date if nothing else available
+        if (filename === 'striae-report') {
+          const now = new Date();
+          const dateStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}${now.getFullYear()}`;
+          filename = `striae-report-${dateStr}`;
         }
         
         // Sanitize filename by removing invalid characters
