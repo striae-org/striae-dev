@@ -129,7 +129,11 @@ export const Striae = ({ user }: StriaePage) => {
   // Generate PDF function
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
-    setShowToast(false); // Hide any existing toast
+    
+    // Show generating toast immediately
+    setToastType('success');
+    setToastMessage('Generating PDF report... This may take up to a minute.');
+    setShowToast(true);
     
     try {
       // Format current date in user's timezone
