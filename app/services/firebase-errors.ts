@@ -1,5 +1,4 @@
 import { FirebaseError } from 'firebase/app';
-import { GoogleAuthProvider, AuthCredential } from 'firebase/auth';
 
 export const ERROR_MESSAGES = {
   // Auth Errors
@@ -15,39 +14,23 @@ export const ERROR_MESSAGES = {
   
   // Reset/Verify Errors
   RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
-  RESET_EMAIL_FAILED: 'Failed to send reset email',
-  LOGIN_LINK_SENT: 'Check your email for the login link!',
-  EMAIL_REQUIRED: 'Please provide your email for confirmation',
-  
-  // Google Auth Errors
-  GOOGLE_SIGNIN_CANCELLED: 'Google sign-in was cancelled',
-  GOOGLE_POPUP_BLOCKED: 'Pop-up was blocked by browser',
-  GOOGLE_ACCOUNT_EXISTS: 'Account already exists with different provider',
-  GOOGLE_ERROR: 'Error signing in with Google',
   
   // General
   GENERAL_ERROR: 'Something went wrong. Please contact support.',
   NO_USER: 'No user found',
-  VERIFICATION_SENT: 'Verification email sent! Check your inbox',
   PROFILE_UPDATED: 'Profile updated successfully'
 };
 
 interface AuthErrorData {
   code: string;
   message: string;
-  email?: string;
-  credential?: AuthCredential | null;
 }
 
 export const handleAuthError = (err: unknown): { message: string; data?: AuthErrorData } => {
   if (err instanceof FirebaseError) {
-    const email = typeof err.customData?.email === 'string' ? err.customData.email : undefined;
-    const credential = GoogleAuthProvider.credentialFromError(err);
     const errorData: AuthErrorData = {
       code: err.code,
-      message: err.message,
-      email,
-      credential
+      message: err.message
     };
     
     switch (err.code) {
@@ -66,14 +49,6 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
         return { message: ERROR_MESSAGES.WEAK_PASSWORD, data: errorData };
       case 'auth/requires-recent-login':
         return { message: ERROR_MESSAGES.REQUIRES_RECENT_LOGIN, data: errorData };
-      
-      // Google Auth Specific Errors
-      case 'auth/popup-closed-by-user':
-        return { message: ERROR_MESSAGES.GOOGLE_SIGNIN_CANCELLED, data: errorData };
-      case 'auth/popup-blocked':
-        return { message: ERROR_MESSAGES.GOOGLE_POPUP_BLOCKED, data: errorData };
-      case 'auth/account-exists-with-different-credential':
-        return { message: ERROR_MESSAGES.GOOGLE_ACCOUNT_EXISTS, data: errorData };
       
       // Operation Errors
       case 'auth/operation-not-allowed':
