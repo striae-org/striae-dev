@@ -261,9 +261,59 @@ export const Login = () => {
             console.log('Email link sign in result:', result);
         
             if (!result.user.displayName) {
-              console.log('Setting new user states');
-              setEmailLinkUser(result.user);
-              setNeedsProfile(true);
+              console.log('New user without displayName - checking for stored profile data');
+              
+              // Check if we have stored profile information from registration
+              const storedFirstName = window.localStorage.getItem('firstName');
+              const storedLastName = window.localStorage.getItem('lastName');
+              const storedCompany = window.localStorage.getItem('company');
+              
+              if (storedFirstName && storedLastName) {
+                // We have profile data, create user immediately
+                console.log('Found stored profile data, creating user');
+                
+                // Update Firebase profile
+                await updateProfile(result.user, {
+                  displayName: `${storedFirstName} ${storedLastName}`
+                });
+
+                // Get API key and create user data
+                const apiKey = await getUserApiKey();
+                const userData = createUserData(
+                  result.user.uid,
+                  result.user.email,
+                  storedFirstName,
+                  storedLastName,
+                  storedCompany || ''
+                );
+
+                // Add to KV database
+                const response = await fetch(`${USER_WORKER_URL}/${result.user.uid}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-Custom-Auth-Key': apiKey
+                  },
+                  body: JSON.stringify(userData)
+                });
+
+                if (!response.ok) {
+                  throw new Error('Failed to create user data');
+                }
+
+                // Clean up localStorage
+                window.localStorage.removeItem('firstName');
+                window.localStorage.removeItem('lastName');
+                window.localStorage.removeItem('company');
+                
+                setUser(result.user);
+              } else {
+                // No profile data, need to collect it
+                console.log('No stored profile data, needs profile setup');
+                setEmailLinkUser(result.user);
+                setNeedsProfile(true);
+              }
+              
               setIsLoading(false);
               return;
             } else {
@@ -322,10 +372,16 @@ export const Login = () => {
    return () => unsubscribe();
 }, [navigate]);
   
-  const handleEmailLink = async (email: string) => {
+  const handleEmailLink = async (email: string, firstName?: string, lastName?: string, company?: string) => {
   try {
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
     window.localStorage.setItem('emailForSignIn', email);
+    
+    // Store profile info for new user registration
+    if (firstName) window.localStorage.setItem('firstName', firstName);
+    if (lastName) window.localStorage.setItem('lastName', lastName);
+    if (company) window.localStorage.setItem('company', company);
+    
     setError(ERROR_MESSAGES.LOGIN_LINK_SENT);
   } catch (err) {
     const { message } = handleAuthError(err);
@@ -411,9 +467,10 @@ export const Login = () => {
           window.localStorage.setItem('firstName', firstName);
           window.localStorage.setItem('lastName', lastName);
           window.localStorage.setItem('company', company);
+          handleEmailLink(email, firstName, lastName, company);
+        } else {
+          handleEmailLink(email);
         }
-        
-        handleEmailLink(email);
       }} className={styles.form}>
         <input
           type="email"
