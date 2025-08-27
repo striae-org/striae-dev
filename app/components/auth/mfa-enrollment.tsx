@@ -167,12 +167,12 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
         <div className={styles.content}>
           {!codeSent ? (
             <div className={styles.phoneStep}>
-              <h3>Step 1: Enter Your Phone Number (10 digits only)</h3>
+              <h3>Step 1: Enter Your Phone Number</h3>
               <input
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="5551234567"
+                placeholder="Mobile Phone"
                 className={styles.input}
                 disabled={isLoading}
               />
