@@ -265,7 +265,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 </li>
 <li>
   <p><strong>Data Control</strong></p>
-  <p>Striae will never edit or modify Your Data without Your explicit input. The only edits made to Your Data will be for the purpose of resizing and compression for optimal display, storage, and performance. When You delete Data it is permanently removed from our systems.</p>
+  <p>Striae will never edit or modify the contents of Your Data without Your explicit input. The only edits made to Your Data will be for the purpose of resizing and compression for optimal display, storage, and performance. When You delete Data it is permanently removed from our systems.</p>
 </li>
 <li>
 <p><strong>Account Deletion</strong></p>
