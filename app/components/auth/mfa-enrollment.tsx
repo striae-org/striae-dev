@@ -172,7 +172,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                 type="tel"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Mobile Phone"
+                placeholder="5551234567"
                 className={styles.input}
                 disabled={isLoading}
               />
