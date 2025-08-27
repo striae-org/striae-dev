@@ -173,15 +173,37 @@ export const Striae = ({ user }: StriaePage) => {
         const a = document.createElement('a');
         a.href = url;
         
-        // Get filename from Content-Disposition header, fallback to default
-        const contentDisposition = response.headers.get('content-disposition');
-        let filename = 'striae-report.pdf';
-        if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-          if (filenameMatch) {
-            filename = filenameMatch[1];
+        // Generate filename based on annotation data
+        let filename = 'striae-report';
+        
+        if (annotationData) {
+          const { leftCase, leftItem, rightCase, rightItem } = annotationData;
+          
+          // Build left and right parts
+          const leftPart = [leftCase, leftItem].filter(Boolean).join('-');
+          const rightPart = [rightCase, rightItem].filter(Boolean).join(' ');
+          
+          if (leftPart && rightPart) {
+            filename = `striae-report-${leftPart}--${rightPart}`;
+          } else if (leftPart) {
+            filename = `striae-report-${leftPart}`;
+          } else if (rightPart) {
+            filename = `striae-report-${rightPart}`;
           }
         }
+        
+        // Fallback to case number if no annotation data
+        if (filename === 'striae-report' && currentCase) {
+          filename = `striae-report-${currentCase}`;
+        }
+        
+        // Final fallback to timestamp
+        if (filename === 'striae-report') {
+          filename = `striae-report-${Date.now()}`;
+        }
+        
+        // Sanitize filename and ensure .pdf extension
+        filename = filename.replace(/[<>:"/\\|?*]/g, '-') + '.pdf';
         
         a.download = filename;
         document.body.appendChild(a);
