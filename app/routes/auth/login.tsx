@@ -111,7 +111,7 @@ export const Login = () => {
   };  
 
    useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
    if (user) {
       if (!user.emailVerified) {
         handleSignOut();
