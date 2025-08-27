@@ -9,8 +9,6 @@ export default function NoticeText() {
 
 <p>Please note that Striae is intended for professional use only. Personal email addresses are not permitted for this initial registration. Striae reserves the right to disable accounts that do not comply with this policy.</p>
 
-<p>Since Striae is in active development, you may notice some rough edges along the way. Your feedback will help us refine and improve the experience for everyone in the community.</p>
-
 <h2>Important Details</h2>
 <ul>
   <li><strong>Free Forever:</strong> All features are available at no cost to users employed by a forensic laboratory.</li>
