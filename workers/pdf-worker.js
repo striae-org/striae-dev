@@ -376,47 +376,10 @@ export default {
 
         await browser.close();
 
-        // Generate filename based on annotation data
-        let filename = 'striae-report';
-        
-        // Try to create filename from case/item annotations
-        if (data.annotationData) {
-          const { leftCase, leftItem, rightCase, rightItem } = data.annotationData;
-          
-          if (leftCase || leftItem || rightCase || rightItem) {
-            const leftPart = [leftCase, leftItem].filter(Boolean).join(' ');
-            const rightPart = [rightCase, rightItem].filter(Boolean).join(' ');
-            
-            if (leftPart && rightPart) {
-              filename = `striae-report-${leftPart}-${rightPart}`;
-            } else if (leftPart) {
-              filename = `striae-report-${leftPart}`;
-            } else if (rightPart) {
-              filename = `striae-report-${rightPart}`;
-            }
-          }
-        }
-        
-        // Fallback to case number if no case/item data
-        if (filename === 'striae-report' && data.caseNumber) {
-          filename = `striae-report-${data.caseNumber}`;
-        }
-        
-        // Final fallback to date if nothing else available
-        if (filename === 'striae-report') {
-          const now = new Date();
-          const dateStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}${now.getFullYear()}`;
-          filename = `striae-report-${dateStr}`;
-        }
-        
-        // Sanitize filename by removing invalid characters
-        filename = filename.replace(/[<>:"/\\|?*]/g, '-');
-
         return new Response(pdf, {
           headers: {
             ...corsHeaders,
-            "content-type": "application/pdf",
-            "content-disposition": `attachment; filename="${filename}.pdf"`
+            "content-type": "application/pdf"
           },
         });
       } catch (error) {
