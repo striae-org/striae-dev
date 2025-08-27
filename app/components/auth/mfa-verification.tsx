@@ -3,10 +3,10 @@ import {
   PhoneAuthProvider, 
   PhoneMultiFactorGenerator, 
   RecaptchaVerifier,
-  getAuth,
   MultiFactorResolver,
   UserCredential
 } from 'firebase/auth';
+import { auth } from '~/services/firebase';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -23,10 +23,16 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
     // Initialize reCAPTCHA verifier
-    const auth = getAuth();
     const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
       size: 'invisible',
       callback: () => {
@@ -38,14 +44,13 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
     return () => {
       verifier.clear();
     };
-  }, []);
+  }, [isClient]);
 
   const sendVerificationCode = async () => {
     if (!recaptchaVerifier) return;
 
     setLoading(true);
     try {
-      const auth = getAuth();
       const phoneAuthProvider = new PhoneAuthProvider(auth);
       
       const phoneInfoOptions = {
@@ -87,6 +92,10 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
 
   const selectedHint = resolver.hints[selectedHintIndex];
   const maskedPhoneNumber = selectedHint?.displayName || 'your phone';
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className={styles.container}>

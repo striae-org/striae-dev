@@ -76,11 +76,17 @@ export const Login = () => {
   const [hasAuthAccess, setHasAuthAccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   
   // MFA state
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
   const [showMfaVerification, setShowMfaVerification] = useState(false);
   const [showMfaEnrollment, setShowMfaEnrollment] = useState(false);
+
+  // Check if we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Check for existing auth access on mount
   useEffect(() => {
@@ -482,7 +488,7 @@ export const Login = () => {
         </>
       )}
       
-      {showMfaVerification && mfaResolver && (
+      {isClient && showMfaVerification && mfaResolver && (
         <MFAVerification 
           resolver={mfaResolver}
           onSuccess={handleMfaSuccess}
@@ -491,7 +497,7 @@ export const Login = () => {
         />
       )}
       
-      {showMfaEnrollment && user && (
+      {isClient && showMfaEnrollment && user && (
         <MFAEnrollment 
           user={user}
           onSuccess={handleMfaEnrollmentSuccess}

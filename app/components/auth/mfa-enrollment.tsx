@@ -33,8 +33,15 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
   const [verificationId, setVerificationId] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
     // Initialize reCAPTCHA verifier
     const verifier = new RecaptchaVerifier(auth, 'recaptcha-container-enrollment', {
       size: 'invisible',
@@ -50,7 +57,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
     return () => {
       verifier.clear();
     };
-  }, [onError]);
+  }, [onError, isClient]);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -139,6 +146,10 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       onSkip();
     }
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className={styles.overlay}>
