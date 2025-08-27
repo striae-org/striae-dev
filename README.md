@@ -13,7 +13,90 @@
 
 ## 📋 Changelog
 
-### [2025-08-23] - Latest Release
+## [2025-08-26] - *Pre-Beta Release*
+
+## 🔐 Authentication & Security Enhancements
+
+### Multi-Factor Authentication (MFA)
+
+- ✅ **Complete MFA system** with phone-based verification
+
+### Login System Improvements
+
+- ✅ **Simplified login process (email & password only)** with better error handling
+
+---
+
+## 🎨 UI/UX Improvements
+
+### Visual Enhancements
+
+- ✅ **Firefox compatibility** - Fixed text color issues
+- ✅ **Consistent branding** - Logo links across all landing pages
+- ✅ **Professional icons** - Replaced emoji in password fields with custom SVG icons
+- ✅ **Improved form interactions** and visual feedback
+
+---
+
+## 📄 PDF Generation & Reporting
+
+### New PDF Functionality
+
+- ✅ **Complete PDF generation system**
+- ✅ **Dynamic filename generation** for reports
+- ✅ **Toast notifications** for PDF generation status
+- ✅ **Enhanced button components** for PDF actions and status
+
+---
+
+## 📋 Content & Legal Updates
+
+### Documentation
+
+- ✅ **Simplified Terms & Conditions and Privacy Policy Sheets**
+- ✅ **Compliance updates** for data control terms
+
+---
+
+## 🐛 Bug Fixes & Optimizations
+
+### Canvas & Annotation System
+
+- ✅ **Memory management** - Cleanup on component unmount
+- ✅ **State management** - Clear displays on case/image changes
+- ✅ **Improved interaction handling**
+
+### General Improvements
+
+- ✅ **Index labeling** to include numbers OR letters
+- ✅ **Notes display** fixes
+- ✅ **Form enhancements**
+- ✅ **Link corrections** across application
+
+---
+
+## 📊 Development Statistics
+
+- **94 commits** in 4 days
+- **7 major feature areas** enhanced
+- **3 new components** created
+- **1 new worker module** implemented
+
+---
+
+## 🎯 Key Highlights
+
+| Feature | Impact | Status |
+|---------|--------|--------|
+| **MFA Implementation** | 🔒 Major security enhancement | ✅ Complete |
+| **PDF Generation** | 📄 New core functionality | ✅ Complete |
+| **UI Modernization** | 🎨 Better user experience | ✅ Complete |
+| **Worker Infrastructure** | ⚡ Performance & scalability | ✅ Complete |
+| **Code Quality** | 🛡️ SSR compatibility & error handling | ✅ Complete |
+
+---
+
+## [2025-08-23]
 
 #### ✨ Feature Additions
 
@@ -41,7 +124,7 @@
 
 ---
 
-### [2025-08-17] - Earlier Release
+## [2025-08-17]
 
 #### ✅ Added
 
@@ -63,7 +146,7 @@
 
 ---
 
-### [2025-08-10] - Development Update
+## [2025-08-10] - Development Update
 
 #### ⚠️ Development Status
 
