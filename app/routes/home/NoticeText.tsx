@@ -31,7 +31,7 @@ const NoticeText = () => {
       </p>
       <ul>
         <li>
-            <strong>Authentication and Password Security:</strong> Striae relies on Firebase Authentication, a secure platform by Google, to manage user authentication. Features of Firebase include hashed passwords, secure token generation, and multi-factor authentication options (MFA to be implemented after beta release).
+            <strong>Authentication and Password Security:</strong> Striae relies on Firebase Authentication, a secure platform by Google, to manage user authentication. Features of Firebase include hashed passwords, secure token generation, and multi-factor authentication options.
         </li>
         <li>
             <strong>Data Storage:</strong> Your data is encrypted and protected against unauthorized access. Measures include data segregation, AES-256 encryption, and no plaintext storage of sensitive information.

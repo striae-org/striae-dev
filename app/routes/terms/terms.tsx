@@ -195,7 +195,7 @@ You agree that the original English text shall prevail in the case of a dispute.
   <p>Firebase secures passwords and authentication details using industry-standard hashing algorithms. This ensures that Your credentials are stored in a secure, unreadable format.</p></li>
   <li><p><strong>Advanced Threat Detection</strong></p>
   <p>Firebase employs machine learning models to detect and mitigate suspicious activity, such as brute-force attacks or unauthorized login attempts.</p></li>
-  <li><p><strong>Multi-Factor Authentication (Future)</strong></p>
+  <li><p><strong>Multi-Factor Authentication</strong></p>
   <p>Firebase supports multi-factor authentication (MFA), providing an additional layer of security for Your account.</p></li>  
 </ul>
 </li>
