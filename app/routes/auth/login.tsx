@@ -8,10 +8,16 @@ import {
     sendEmailVerification,
     User,
     updateProfile,
+    getMultiFactorResolver,
+    MultiFactorResolver,
+    MultiFactorError,
+    multiFactor
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { handleAuthError } from '~/services/firebase-errors';
 import { AuthPassword } from '~/components/auth/auth-password';
+import { MFAVerification } from '~/components/auth/mfa-verification';
+import { MFAEnrollment } from '~/components/auth/mfa-enrollment';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
@@ -70,6 +76,11 @@ export const Login = () => {
   const [hasAuthAccess, setHasAuthAccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // MFA state
+  const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
+  const [showMfaVerification, setShowMfaVerification] = useState(false);
+  const [showMfaEnrollment, setShowMfaEnrollment] = useState(false);
 
   // Check for existing auth access on mount
   useEffect(() => {
@@ -100,18 +111,30 @@ export const Login = () => {
   };  
 
    useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
    if (user) {
       if (!user.emailVerified) {
         handleSignOut();
         setError('Please verify your email before logging in');
         return;
       }      
+      
+      // Check if user has MFA enrolled
+      const mfaFactors = multiFactor(user).enrolledFactors;
+      if (mfaFactors.length === 0) {
+        // User has no MFA factors enrolled - require enrollment
+        setShowMfaEnrollment(true);
+        setUser(user); // Still set user so enrollment component can use it
+        return;
+      }
+      
       console.log("Logged in user:", user.email);
-      setUser(user);      
+      setUser(user);
+      setShowMfaEnrollment(false);      
     } else {
       console.log("No user logged in");
       setUser(null);
+      setShowMfaEnrollment(false);
     }
   });
 
@@ -182,7 +205,25 @@ export const Login = () => {
       handleSignOut();
     } else {
       // Login
-      await signInWithEmailAndPassword(auth, email, password);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (loginError: unknown) {
+        // Check if it's a Firebase Auth error with MFA requirement
+        if (
+          loginError && 
+          typeof loginError === 'object' && 
+          'code' in loginError && 
+          loginError.code === 'auth/multi-factor-auth-required'
+        ) {
+          // Handle MFA requirement
+          const resolver = getMultiFactorResolver(auth, loginError as MultiFactorError);
+          setMfaResolver(resolver);
+          setShowMfaVerification(true);
+          setIsLoading(false);
+          return;
+        }
+        throw loginError; // Re-throw non-MFA errors
+      }
     }
   } catch (err) {
     const { message } = handleAuthError(err);
@@ -198,9 +239,40 @@ export const Login = () => {
       await auth.signOut();      
       setUser(null);
       setIsLoading(false);
+      setShowMfaEnrollment(false);
+      setShowMfaVerification(false);
+      setMfaResolver(null);
     } catch (err) {
       console.error('Sign out error:', err);
     }
+  };
+
+  // MFA handlers
+  const handleMfaSuccess = () => {
+    setShowMfaVerification(false);
+    setMfaResolver(null);
+    // The auth state listener will handle the rest
+  };
+
+  const handleMfaError = (errorMessage: string) => {
+    setError(errorMessage);
+  };
+
+  const handleMfaCancel = () => {
+    setShowMfaVerification(false);
+    setMfaResolver(null);
+    setError('Authentication cancelled');
+  };
+
+  // MFA enrollment handlers
+  const handleMfaEnrollmentSuccess = () => {
+    setShowMfaEnrollment(false);
+    setError('');
+    // The auth state listener will re-evaluate the user's MFA status
+  };
+
+  const handleMfaEnrollmentError = (errorMessage: string) => {
+    setError(errorMessage);
   };  
 
   return (
@@ -362,6 +434,24 @@ export const Login = () => {
             </div>
           )}
         </>
+      )}
+      
+      {showMfaVerification && mfaResolver && (
+        <MFAVerification 
+          resolver={mfaResolver}
+          onSuccess={handleMfaSuccess}
+          onError={handleMfaError}
+          onCancel={handleMfaCancel}
+        />
+      )}
+      
+      {showMfaEnrollment && user && (
+        <MFAEnrollment 
+          user={user}
+          onSuccess={handleMfaEnrollmentSuccess}
+          onError={handleMfaEnrollmentError}
+          mandatory={true}
+        />
       )}
     </>
   );

@@ -15,6 +15,12 @@ export const ERROR_MESSAGES = {
   // Reset/Verify Errors
   RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
   
+  // MFA Errors
+  MFA_REQUIRED: 'Multi-factor authentication required',
+  MFA_INVALID_CODE: 'Invalid verification code',
+  MFA_CODE_EXPIRED: 'Verification code expired',
+  MFA_TOO_MANY_REQUESTS: 'Too many requests. Please try again later',
+  
   // General
   GENERAL_ERROR: 'Something went wrong. Please contact support.',
   NO_USER: 'No user found',
@@ -49,6 +55,16 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
         return { message: ERROR_MESSAGES.WEAK_PASSWORD, data: errorData };
       case 'auth/requires-recent-login':
         return { message: ERROR_MESSAGES.REQUIRES_RECENT_LOGIN, data: errorData };
+      
+      // MFA Errors
+      case 'auth/multi-factor-auth-required':
+        return { message: ERROR_MESSAGES.MFA_REQUIRED, data: errorData };
+      case 'auth/invalid-verification-code':
+        return { message: ERROR_MESSAGES.MFA_INVALID_CODE, data: errorData };
+      case 'auth/code-expired':
+        return { message: ERROR_MESSAGES.MFA_CODE_EXPIRED, data: errorData };
+      case 'auth/too-many-requests':
+        return { message: ERROR_MESSAGES.MFA_TOO_MANY_REQUESTS, data: errorData };
       
       // Operation Errors
       case 'auth/operation-not-allowed':
