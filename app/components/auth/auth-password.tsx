@@ -30,7 +30,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
         sessionStorage.setItem('auth-access-granted', 'true');
         onAccessGranted();
       } else {
-        setError('Incorrect access password. Please contact support if you need access.');
+        setError('Incorrect access password. Please re-register if you need access.');
         setPassword('');
       }
     } catch (error) {
@@ -49,7 +49,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Striae Access</h1>
         <p className={styles.description}>
-          Please enter the access password provided to you during registration. If you have lost the access password, you may re-register.
+          Please enter the access password provided to you during registration. If you have lost the access password or it has become invalid, you may re-register.
         </p>
         
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -80,7 +80,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
             Need access?
           </p>
           <Link to="/access" className={styles.signupLink}>
-            Register your account
+            Account Registration/Renewal
           </Link>
         </div>
       </div>

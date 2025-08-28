@@ -13,6 +13,7 @@ export default function NoticeText() {
 <ul>
   <li><strong>Free Forever:</strong> All features are available at no cost to users employed by a forensic laboratory.</li>
   <li><strong>Work Email Required:</strong> A valid work email is needed to register. After registration, you can update your login email if you prefer.</li>
+  <li><strong>Semi-annual Renewal Required:</strong> The access password is rotated on a semi-annual basis. In order to access Striae, you will need to submit this form again to receive the new password. Your login will remain the same, and you will not lose any of your saved data.</li>
   <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better.</li>
 </ul>
 
