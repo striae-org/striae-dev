@@ -256,18 +256,6 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
           </div>
         </div>
       )}
-
-      {/* Footer Overlay - appears on bottom hover */}
-      <div className={styles.footerTrigger}></div>
-      <div className={styles.footerOverlay}>
-        <div className={styles.footerContent}>
-          <a href="/privacy" className={styles.footerLink}>Privacy Policy</a>
-          <a href="/terms" className={styles.footerLink}>Terms of Service</a>
-          <a href="/security" className={styles.footerLink}>Security</a>
-          <a href="/support" className={styles.footerLink}>Support</a>
-          <span>© 2025 Striae</span>
-        </div>
-      </div>
     </div>    
   );
 };
