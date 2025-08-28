@@ -166,7 +166,7 @@
 /* Support Level Display */
 .supportLevelAnnotation {
   position: absolute;
-  bottom: 1rem;
+  bottom: 3rem; /* Moved up from 1rem to 3rem */
   left: 1rem;
   z-index: 20;
   pointer-events: none;
