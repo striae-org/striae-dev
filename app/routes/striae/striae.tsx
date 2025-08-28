@@ -181,7 +181,7 @@ export const Striae = ({ user }: StriaePage) => {
           
           // Build left and right parts
           const leftPart = [leftCase, leftItem].filter(Boolean).join('-');
-          const rightPart = [rightCase, rightItem].filter(Boolean).join(' ');
+          const rightPart = [rightCase, rightItem].filter(Boolean).join('-');
           
           if (leftPart && rightPart) {
             filename = `striae-report-${leftPart}--${rightPart}`;
