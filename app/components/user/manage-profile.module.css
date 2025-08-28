@@ -13,10 +13,11 @@
   background: var(--backgroundLight);
   border-radius: var(--spaceXS);
   width: 90%;
-  max-width: var(--maxWidthS);
+  max-width: 500px; /* Set a specific max-width to prevent overflow */
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   padding-bottom: var(--spaceL);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+  overflow: hidden; /* Prevent any content from overflowing */
 }
 
 .modalHeader {
@@ -24,7 +25,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spaceL);
-  font-size: var(--fontSizeH5);
+  font-size: var(--fontSizeBodyL); /* Reduced from H5 to BodyL for smaller title */
   border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   color: var(--textTitle);
 }
@@ -48,9 +49,10 @@
   flex-direction: column;
   gap: var(--spaceL);
   width: 100%;
-  max-width: var(--maxWidthS);
-  padding: var(--spaceXL);
+  max-width: 100%; /* Prevent form from exceeding modal width */
+  padding: var(--spaceL); /* Reduced padding to prevent overflow */
   margin: 0 auto;
+  box-sizing: border-box; /* Include padding in width calculations */
 }
 
 .formGroup {
