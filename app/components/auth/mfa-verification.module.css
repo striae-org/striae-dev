@@ -46,6 +46,7 @@
   font-size: var(--fontSizeBodyM);
   background: white;
   transition: border-color var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box; /* Ensure consistent width calculation */
 }
 
 .select:focus {
@@ -72,6 +73,7 @@
   letter-spacing: 2px;
   margin-bottom: var(--spaceL);
   transition: border-color var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box; /* Ensure consistent width calculation */
 }
 
 .input:focus {
@@ -91,6 +93,7 @@
   border: none;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   margin-bottom: var(--spaceM);
+  box-sizing: border-box; /* Ensure consistent width calculation */
 }
 
 .button:hover:not(:disabled) {
@@ -118,6 +121,8 @@
   font-size: var(--fontSizeBodyS);
   color: var(--textBody);
   transition: all var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box; /* Ensure consistent width calculation */
+  width: 100%; /* Ensure full width like other buttons */
 }
 
 .secondaryButton:hover:not(:disabled) {

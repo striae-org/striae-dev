@@ -89,6 +89,7 @@ textarea:focus {
   color: #495057;
   cursor: pointer;
   user-select: none;
+  margin-bottom: 1.5rem; /* Add spacing below "Use current case number" checkboxes */
 }
 
 .checkboxLabel:hover {
@@ -275,6 +276,7 @@ textarea:focus {
   font-size: 0.9rem;
   margin-bottom: 1rem;
   resize: vertical;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
 }
 
 .modalButtons {
