@@ -249,6 +249,7 @@
   border: 1px solid #dee2e6;
   border-radius: 4px;
   font-size: 0.875rem;
+  box-sizing: border-box; /* Prevent overflow */
 }
 
 .uploadingText {
@@ -278,6 +279,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
+  box-sizing: border-box; /* Prevent overflow */
 }
 
 .caseRename input:focus {
@@ -434,6 +436,7 @@
   border: 1px solid #ced4da;
   border-radius: 4px;
   margin-bottom: 0.5rem;
+  box-sizing: border-box; /* Prevent overflow */
 }
 
 .caseActionsContent .caseRename button {
