@@ -64,12 +64,12 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
             </div>
             <div className={styles.footerModalContent}>
               <div className={styles.footerModalLinks}>
+                <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User's Guide</a>
+                <a href="/support" className={styles.footerModalLink}>Need Help?</a>
+                <a href="/bugs" className={styles.footerModalLink}>Report a Bug</a>
                 <a href="/privacy" className={styles.footerModalLink}>Privacy Policy</a>
                 <a href="/terms" className={styles.footerModalLink}>Terms of Service</a>
                 <a href="/security" className={styles.footerModalLink}>Security Policy</a>
-                <a href="/support" className={styles.footerModalLink}>Support</a>
-                <a href="/bugs" className={styles.footerModalLink}>Report a Bug</a>
-                <a href="/" className={styles.footerModalLink}>Home</a>
               </div>
               <div className={styles.footerModalCopyright}>
                 © 2025 Striae. All rights reserved.
