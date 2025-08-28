@@ -223,6 +223,7 @@ textarea:focus {
   cursor: pointer;
   transition: all 0.2s;
   margin-bottom: 1rem;
+  margin-top: 1rem; /* Add spacing above the button */
 }
 
 .notesButton:hover {
@@ -256,6 +257,7 @@ textarea:focus {
   margin-bottom: 1rem;
   font-size: 1.2rem;
   font-weight: 600;
+  color: #000000; /* Black text for readability */
 }
 
 .modalTextarea {

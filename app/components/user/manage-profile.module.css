@@ -72,6 +72,7 @@
   background: var(--backgroundLight);
   color: var(--textBody);
   transition: all var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box; /* Prevent overflow by including padding in width */
 }
 
 .input:focus {

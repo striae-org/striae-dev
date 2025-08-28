@@ -48,7 +48,7 @@
 /* Company Display */
 .companyDisplay {
   position: absolute;
-  right: 3rem;
+  right: 5rem;
   top: 1rem;
   z-index: 15;
   color: #e0e0e0;
@@ -60,7 +60,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: calc(100vw - 14rem);
+  max-width: calc(100vw - 16rem);
 }
 
 .image {
