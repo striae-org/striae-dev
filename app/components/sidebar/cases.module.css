@@ -25,6 +25,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
+  box-sizing: border-box; /* Ensure padding doesn't cause overflow */
 }
 
 .caseInput input:focus {
@@ -44,6 +45,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  margin-top: 0.5rem; /* Add spacing between button and input */
+  box-sizing: border-box;
 }
 
 .caseInput button:hover:not(:disabled) {
@@ -66,6 +69,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  margin-top: 0.5rem; /* Add spacing */
+  box-sizing: border-box;
 }
 
 .caseLoad button:hover:not(:disabled) {
@@ -88,6 +93,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  margin-top: 0.5rem; /* Add spacing */
+  box-sizing: border-box;
 }
 
 .listButton:hover {
