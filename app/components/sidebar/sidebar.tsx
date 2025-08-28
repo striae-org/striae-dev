@@ -56,6 +56,7 @@ export const Sidebar = ({
   onAnnotationRefresh
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
 
   return (
     <div className={styles.sidebar}>
@@ -104,6 +105,44 @@ export const Sidebar = ({
           setSuccessAction={setSuccessAction}
           onNotesClick={() => setShowNotes(true)}
         />
+      )}
+
+      {/* Footer Button */}
+      <button 
+        onClick={() => setIsFooterModalOpen(true)}
+        className={styles.footerButton}
+      >
+        About & Links
+      </button>
+
+      {/* Footer Modal */}
+      {isFooterModalOpen && (
+        <div className={styles.footerModalOverlay} onClick={() => setIsFooterModalOpen(false)}>
+          <div className={styles.footerModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.footerModalHeader}>
+              <h2 className={styles.footerModalTitle}>About Striae</h2>
+              <button 
+                onClick={() => setIsFooterModalOpen(false)}
+                className={styles.footerModalClose}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.footerModalContent}>
+              <div className={styles.footerModalLinks}>
+                <a href="/privacy" className={styles.footerModalLink}>Privacy Policy</a>
+                <a href="/terms" className={styles.footerModalLink}>Terms of Service</a>
+                <a href="/security" className={styles.footerModalLink}>Security Policy</a>
+                <a href="/support" className={styles.footerModalLink}>Support</a>
+                <a href="/bugs" className={styles.footerModalLink}>Report a Bug</a>
+                <a href="/" className={styles.footerModalLink}>Home</a>
+              </div>
+              <div className={styles.footerModalCopyright}>
+                © 2025 Striae. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
