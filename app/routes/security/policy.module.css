@@ -52,6 +52,12 @@
   margin-bottom: var(--space2XL);
 }
 
+.content p {
+  color: #000000; /* Ensure paragraph text is black for readability */
+  margin: var(--spaceM) 0;
+  line-height: 1.6;
+}
+
 .content ul {
   list-style-type: disc;
   padding-left: var(--spaceXL);
