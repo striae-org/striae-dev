@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import { Sidebar } from '~/components/sidebar/sidebar';
+import { SidebarContainer } from '~/components/sidebar/sidebar-container';
 import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
 import { Toast } from '~/components/toast/toast';
@@ -335,7 +336,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   return (
     <div className={styles.appContainer}>
-     <Sidebar 
+     <SidebarContainer 
         user={user} 
         onImageSelect={handleImageSelect}
         imageId={imageId}

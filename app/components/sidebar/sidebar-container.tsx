@@ -1,10 +1,7 @@
+import React, { useState } from 'react';
+import { Sidebar } from './sidebar';
 import { User } from 'firebase/auth';
-import { useState } from 'react';
 import styles from './sidebar.module.css';
-import { ManageProfile } from '../user/manage-profile';
-import { SignOut } from '../actions/signout';
-import { CaseSidebar } from './case-sidebar';
-import { NotesSidebar } from './notes-sidebar';
 
 interface FileData {
   id: string;
@@ -12,7 +9,7 @@ interface FileData {
   uploadedAt: string;
 }
 
-interface SidebarProps {
+interface SidebarContainerProps {
   user: User;
   onImageSelect: (file: FileData) => void;
   imageId?: string;
@@ -34,78 +31,23 @@ interface SidebarProps {
   onAnnotationRefresh?: () => void;
 }
 
-export const Sidebar = ({ 
-  user, 
-  onImageSelect,
-  imageId, 
-  onCaseChange,
-  currentCase,
-  setCurrentCase,
-  imageLoaded,
-  setImageLoaded,
-  files,
-  setFiles,
-  caseNumber,
-  setCaseNumber,
-  error,
-  setError,
-  successAction,
-  setSuccessAction,
-  showNotes,
-  setShowNotes,
-  onAnnotationRefresh
-}: SidebarProps) => {
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
 
   return (
-    <div className={styles.sidebar}>
-      <div className={styles.userInfo}>
-        <h3 className={styles.userTitle}>
-          {`${user.displayName?.split(' ')[0] || 'User'}'s Striae`}
-        </h3>
-        <div className={styles.userActions}>
-          <button 
-            onClick={() => setIsProfileModalOpen(true)}
-            className={styles.profileButton}
-          >
-            Manage Profile
-          </button>
-          <SignOut />
-        </div>
-      </div>  
-      <ManageProfile 
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-      />
-      {showNotes ? (
-        <NotesSidebar 
-          currentCase={currentCase}
-          onReturn={() => setShowNotes(false)}
-          user={user}
-          imageId={imageId || ''}
-          onAnnotationRefresh={onAnnotationRefresh}
-        />
-      ) : (
-        <CaseSidebar 
-          user={user} 
-          onImageSelect={onImageSelect}
-          onCaseChange={onCaseChange}
-          currentCase={currentCase}
-          setCurrentCase={setCurrentCase}
-          imageLoaded={imageLoaded}
-          setImageLoaded={setImageLoaded}
-          files={files}
-          setFiles={setFiles}
-          caseNumber={caseNumber}
-          setCaseNumber={setCaseNumber}
-          error={error}
-          setError={setError}
-          successAction={successAction}
-          setSuccessAction={setSuccessAction}
-          onNotesClick={() => setShowNotes(true)}
-        />
-      )}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Main Sidebar */}
+      <Sidebar {...props} />
+      
+      {/* Footer Section */}
+      <div className={styles.footerSection}>
+        <button 
+          onClick={() => setIsFooterModalOpen(true)}
+          className={styles.footerSectionButton}
+        >
+          About & Links
+        </button>
+      </div>
 
       {/* Footer Modal */}
       {isFooterModalOpen && (

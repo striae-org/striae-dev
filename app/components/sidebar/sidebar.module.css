@@ -1,13 +1,12 @@
 /* Layout */
 .sidebar {
-  position: relative; /* Added for footer button positioning */
+  position: relative;
   width: 300px; /* Fixed width instead of percentage */
   min-width: 250px;
-  height: 100vh;
+  height: calc(100vh - 60px); /* Make sidebar shorter to leave space for footer section */
   background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
   padding: 1.5rem;
-  padding-bottom: 5rem; /* Added space for footer button */
   overflow-y: auto;
   flex-shrink: 0; /* Prevent sidebar from shrinking */
   box-sizing: border-box; /* Ensure padding is included in width */
@@ -72,7 +71,42 @@
   z-index: 10;
 }
 
+/* Footer Section */
+.footerSection {
+  width: 300px;
+  min-width: 250px;
+  height: 60px; /* Height that was removed from sidebar */
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+.footerSectionButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .footerButton:hover {
+  background-color: #0b5ed7;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.footerSectionButton:hover {
   background-color: #0b5ed7;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
