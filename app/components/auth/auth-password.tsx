@@ -30,7 +30,7 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
         sessionStorage.setItem('auth-access-granted', 'true');
         onAccessGranted();
       } else {
-        setError('Incorrect access password. Please contact support if you need access.');
+        setError('Incorrect access password. Please re-register if you need access.');
         setPassword('');
       }
     } catch (error) {

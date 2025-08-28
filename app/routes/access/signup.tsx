@@ -111,17 +111,19 @@ export async function action({ request, context }: { request: Request, context: 
           "name": "Striae Access Registration",
           "email": "no-reply@striae.org"
         },
-        "to": [
-          {
-            "name": "Striae",
-            "email": "info@striae.org"
-          },
+        "to": [          
           {
             "name": `${firstName} ${lastName}`,
             "email": email
           }
         ],
-        "subject": "New Striae Registration",
+        "cc": [
+          {
+            "name": "Striae Admin",
+            "email": "info@striae.org"
+          }
+        ],
+        "subject": "Striae Access Registration",
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>New Striae Access Request</h2>
@@ -133,7 +135,7 @@ export async function action({ request, context }: { request: Request, context: 
           <p><strong>Registration Agreement:</strong> ${feedback}</p>
           <p><strong>Access Password:</strong> ${context.cloudflare.env.AUTH_PASSWORD}</p>
         </body></html>`,
-        "PlainContent": `New Striae Registration:
+        "PlainContent": `Striae Access Registration:
 
         Name: ${firstName}
         Last Name: ${lastName}
@@ -143,7 +145,7 @@ export async function action({ request, context }: { request: Request, context: 
         Registration Agreement: ${feedback}
         Access Password: ${context.cloudflare.env.AUTH_PASSWORD}`,
         "Tags": [
-          "access-signup"
+          "access-registration"
         ],
         "Headers": {
           "X-Mailer": "striae.org"
