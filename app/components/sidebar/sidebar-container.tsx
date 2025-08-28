@@ -45,7 +45,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
           onClick={() => setIsFooterModalOpen(true)}
           className={styles.footerSectionButton}
         >
-          About & Links
+          About & Support
         </button>
       </div>
 
