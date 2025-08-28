@@ -1,0 +1,1 @@
+export { UserAdmin as default, meta } from './user-admin'
