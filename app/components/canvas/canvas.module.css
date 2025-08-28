@@ -192,7 +192,7 @@
 .subclassWarning {
   position: absolute;
   bottom: 3rem; /* Moved up from 1rem to 3rem to match support level */
-  right: 3rem; /* Moved left from 2rem to 3rem for better clearance */
+  right: 4rem; /* Moved left from 2rem to 3rem for better clearance */
   z-index: 20;
   pointer-events: none;
 }
