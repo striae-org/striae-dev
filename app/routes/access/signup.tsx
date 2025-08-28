@@ -262,7 +262,7 @@ export const Signup = () => {
               required
               disabled={sending}
             />
-            <span>I have read the notice and understand Striae is intended for professional use only. Additionally, I understand that my account may be disabled if I do not comply with the registration requirements.</span>
+            <span>I have read the notice and understand Striae is intended for professional use only. Additionally, I understand that I may need to resubmit this form to receive a new access password on a semi-annual basis.</span>
           </label>
 
           <Turnstile
