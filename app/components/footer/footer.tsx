@@ -8,6 +8,9 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.container}>
         <nav className={styles.nav}>
+          <Link to="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
+            User&apos;s Guide
+          </Link>
           <Link to="/privacy" className={styles.link}>
             Privacy Policy
           </Link>
