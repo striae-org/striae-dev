@@ -106,13 +106,6 @@
   width: 100%;
   box-sizing: border-box; /* Ensure consistent width calculation */
 }
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  width: 100%;
-}
 
 .primaryButton:hover:not(:disabled) {
   background-color: #3367d6;
