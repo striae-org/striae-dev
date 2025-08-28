@@ -30,6 +30,12 @@
   color: var(--textTitle);
 }
 
+.modalHeader h1 {
+  font-size: var(--fontSizeBodyM); /* Smaller size for the "Manage Profile" title */
+  margin: 0;
+  font-weight: var(--fontWeightMedium);
+}
+
 .closeButton {
   background: none;
   border: none;
