@@ -160,6 +160,21 @@
   cursor: not-allowed;
 }
 
+.resetLink {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.resetLink:hover {
+  color: color-mix(in lab, var(--primary) 85%, var(--black));
+}
+
 .passwordStrength {
   font-size: var(--fontSizeBodyXS);
   color: var(--textLight);
