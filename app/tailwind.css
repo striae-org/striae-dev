@@ -2,10 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
+    /* Base tokens */
+    --black: oklch(0% 0 0);
+    --white: oklch(100% 0 0);
+    --bezierFastoutSlowin: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --durationXS: 200ms;
+    --durationS: 300ms;
+    --durationM: 400ms;
+    --durationL: 600ms;
+    --durationXL: 800ms;
+    --systemFontStack: system-ui, -apple-system, BlinkMacSystemFont, San Francisco, Roboto, Segoe UI, Ubuntu, Helvetica Neue, sans-serif;
+    --fontStack: var(--systemFontStack);
+    --monoFontStack: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --fontWeightThin: 100;
+    --fontWeightLight: 300;
+    --fontWeightRegular: 400;
+    --fontWeightMedium: 500;
+    --fontWeightBold: 700;
+    --fontWeightBlack: 900;
+    --fontSizeH0: 8.75rem;
+    --fontSizeH1: 6.25rem;
+    --fontSizeH2: 3.625rem;
+    --fontSizeH3: 2.375rem;
+    --fontSizeH4: 1.75rem;
+    --fontSizeH5: 1.5rem;
+    --fontSizeBodyXL: 1.375rem;
+    --fontSizeBodyL: 1.25rem;
+    --fontSizeBodyM: 1.125rem;
+    --fontSizeBodyS: 1rem;
+    --fontSizeBodyXS: 0.875rem;
+    --lineHeightTitle: 1.1;
+    --lineHeightBody: 1.6;
+    --maxWidthS: 540px;
+    --maxWidthM: 720px;
+    --maxWidthL: 1096px;
+    --maxWidthXL: 1680px;
+    --spaceOuter: 64px;
+    --spaceXS: 4px;
+    --spaceS: 8px;
+    --spaceM: 16px;
+    --spaceL: 24px;
+    --spaceXL: 32px;
+    --space2XL: 48px;
+    --space3XL: 64px;
+    --space4XL: 96px;
+    --space5XL: 128px;
+    --zIndex0: 0;
+    --zIndex1: 4;
+    --zIndex2: 8;
+    --zIndex3: 16;
+    --zIndex4: 32;
+    --zIndex5: 64;
+    
+    /* Theme tokens - Dark theme default */
+    --background: oklch(0% 0 0);
+    --backgroundLight: oklch(20% 0 0);
+    --primary: oklch(95% 0 0);
+    --accent: oklch(89.7% 0.14 83.6);
+    --error: oklch(65.91% 0.249 13.76);
+    --text: var(--white);
+    --textTitle: var(--text);
+    --linkColor: var(--accent);
+    --textBody: rgba(255, 255, 255, 0.8);
+    --textLight: rgba(255, 255, 255, 0.6);
+    
     --mobileNavOffset: calc(var(--spaceOuter) * 2 + var(--space2XL));
   }
 
