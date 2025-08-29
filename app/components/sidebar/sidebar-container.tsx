@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './sidebar';
 import { User } from 'firebase/auth';
 import styles from './sidebar.module.css';
@@ -36,6 +36,23 @@ interface SidebarContainerProps {
 export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
   const year = new Date().getFullYear();
+
+  // Handle escape key to close modal
+    useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && isFooterModalOpen) {
+          setIsFooterModalOpen(false);
+        }
+      };
+
+      if (isFooterModalOpen) {
+        document.addEventListener('keydown', handleEscape);
+      }
+  
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }, [isFooterModalOpen]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
