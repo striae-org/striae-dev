@@ -68,11 +68,11 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
             <div className={styles.footerModalContent}>
               <div className={styles.footerModalLinks}>
                 <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User&apos;s Guide</a>
-                <a href="/support" className={styles.footerModalLink}>Need Help?</a>
-                <a href="/bugs" className={styles.footerModalLink}>Report a Bug</a>
-                <a href="/privacy" className={styles.footerModalLink}>Privacy Policy</a>
-                <a href="/terms" className={styles.footerModalLink}>Terms of Service</a>
-                <a href="/security" className={styles.footerModalLink}>Security Policy</a>
+                <a href="/support" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Need Help?</a>
+                <a href="/bugs" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Report a Bug</a>
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Privacy Policy</a>
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Terms of Service</a>
+                <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
                 © {year} Striae. All rights reserved.
