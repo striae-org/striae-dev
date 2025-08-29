@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { User } from 'firebase/auth';
@@ -33,6 +35,7 @@ interface SidebarContainerProps {
 
 export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
+  const year = new Date().getFullYear();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -64,7 +67,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
             </div>
             <div className={styles.footerModalContent}>
               <div className={styles.footerModalLinks}>
-                <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User's Guide</a>
+                <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User&apos;s Guide</a>
                 <a href="/support" className={styles.footerModalLink}>Need Help?</a>
                 <a href="/bugs" className={styles.footerModalLink}>Report a Bug</a>
                 <a href="/privacy" className={styles.footerModalLink}>Privacy Policy</a>
@@ -72,7 +75,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <a href="/security" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
-                © 2025 Striae. All rights reserved.
+                © {year} Striae. All rights reserved.
               </div>
             </div>
           </div>
