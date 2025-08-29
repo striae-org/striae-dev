@@ -24,7 +24,7 @@
 }
 
 .hidden {
-  height: calc(40px + (var(--spaceS) * 2));
+  height: calc(40px + (var(--spaceM) * 2));
   opacity: 0.3;
 }
 
