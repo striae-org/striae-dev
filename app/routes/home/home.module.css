@@ -41,6 +41,14 @@
   line-height: var(--lineHeightTitle);
 }
 
+.subtitle {
+  font-size: var(--fontSizeH4);
+  font-weight: var(--fontWeightRegular);
+  color: var(--background);
+  max-width: 1000px;
+  line-height: var(--lineHeightTitle);
+}
+
 .buttonGroup {
   display: flex;
   gap: var(--spaceM);

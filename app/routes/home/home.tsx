@@ -25,7 +25,10 @@ export default function Home() {
         <div className={styles.content}>
           <div className={styles.logo} />
           <div className={styles.title}>
-            <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
+            <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>              
+          </div>
+          <div className={styles.subtitle}>
+            <p>Beta Launches September 1, 2025</p>              
           </div>
           <div className={styles.buttonGroup}>
             <Link to="/auth" className={styles.actionButton}>
