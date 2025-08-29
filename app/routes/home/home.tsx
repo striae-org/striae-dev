@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+//import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState } from 'react';
 import { Notice } from '~/components/notice/notice';
@@ -31,12 +31,14 @@ export default function Home() {
             <p>Beta Launches September 1, 2025</p>              
           </div>
           <div className={styles.buttonGroup}>
+            {/* Disabled until beta launch
             <Link to="/auth" className={styles.actionButton}>
               Sign In
             </Link>                        
             <Link to="/access" className={styles.accessButton}>
               Register Now
-            </Link>              
+            </Link>
+            */}
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>
