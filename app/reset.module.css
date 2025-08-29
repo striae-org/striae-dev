@@ -32,7 +32,7 @@
     /* Firefox-specific fixes */
     -moz-appearance: none;
     /* Ensure text color inheritance in Firefox */
-    color: var(--textBody, rgba(255, 255, 255, 0.8));
+    color: var(--textBody, rgba(0, 0, 0, 0.8));
   }
 
   :global(:where(button, a)) {
