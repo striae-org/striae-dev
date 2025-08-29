@@ -48,7 +48,7 @@
 /* Company Display */
 .companyDisplay {
   position: absolute;
-  right: 5rem;
+  right: 3rem;
   top: 1rem;
   z-index: 15;
   color: #e0e0e0;
@@ -166,7 +166,7 @@
 /* Support Level Display */
 .supportLevelAnnotation {
   position: absolute;
-  bottom: 3rem; /* Moved up from 1rem to 3rem */
+  bottom: 1rem;
   left: 1rem;
   z-index: 20;
   pointer-events: none;
@@ -191,8 +191,8 @@
 /* Subclass Warning Display */
 .subclassWarning {
   position: absolute;
-  bottom: 3rem; /* Moved up from 1rem to 3rem to match support level */
-  right: 4rem; /* Moved left from 2rem to 3rem for better clearance */
+  bottom: 1rem; 
+  right: 2rem; 
   z-index: 20;
   pointer-events: none;
 }
