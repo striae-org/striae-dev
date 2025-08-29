@@ -204,4 +204,13 @@
   margin-top: 1rem;
 }
 
+.footerModalCopyrightLink {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+  margin-top: 1rem;
+}
+
 

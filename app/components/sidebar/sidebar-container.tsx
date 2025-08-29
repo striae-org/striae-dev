@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState, useEffect } from 'react';
+import { Link } from '@remix-run/react';
 import { Sidebar } from './sidebar';
 import { User } from 'firebase/auth';
 import styles from './sidebar.module.css';
@@ -92,7 +93,9 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
-                © {year} Striae. All rights reserved.
+                Striae © {year}. All rights reserved.
+                <br />
+                Designed and developed by <Link to="https://stephenjlu.com" className={styles.footerModalCopyrightLink} target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
               </div>
             </div>
           </div>
