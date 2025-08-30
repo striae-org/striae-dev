@@ -78,6 +78,7 @@ export default function Home() {
                 allowFullScreen
               ></iframe>
             </div>
+            Time until official launch:
              <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
           </div>          
         </div>
