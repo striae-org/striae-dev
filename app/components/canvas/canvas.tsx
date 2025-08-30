@@ -105,8 +105,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
     if (loadError) return loadError.message;
     return 'An error occurred';
   };
-
-  // Helper function to check if color is black
+  
   const isBlackColor = (color: string) => {
     return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
   };

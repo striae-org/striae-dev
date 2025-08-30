@@ -1,4 +1,3 @@
-/* Inactivity Warning Modal Styles */
 .overlay {
   position: fixed;
   top: 0;
@@ -116,7 +115,6 @@
   outline-offset: 2px;
 }
 
-/* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {
   .overlay {
     background-color: rgba(0, 0, 0, 0.9);

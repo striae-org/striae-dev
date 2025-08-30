@@ -1,15 +1,15 @@
 /* Layout */
 .sidebar {
   position: relative;
-  width: 300px; /* Fixed width instead of percentage */
+  width: 300px;
   min-width: 250px;
-  height: calc(100vh - 60px); /* Make sidebar shorter to leave space for footer section */
+  height: calc(100vh - 60px);
   background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
   padding: 1.5rem;
   overflow-y: auto;
-  flex-shrink: 0; /* Prevent sidebar from shrinking */
-  box-sizing: border-box; /* Ensure padding is included in width */
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* User Section */
@@ -20,7 +20,7 @@
   gap: 1rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e9ecef;
-  margin-bottom: 1rem; /* Reduced from 2rem to 1rem */
+  margin-bottom: 1rem;
 }
 
 .userTitle {
@@ -56,7 +56,7 @@
   position: fixed;
   bottom: 1.5rem;
   left: 1.5rem;
-  width: calc(300px - 3rem); /* Match sidebar width minus padding */
+  width: calc(300px - 3rem);
   padding: 0.75rem 1rem;
   background-color: #0d6efd;
   color: white;
@@ -75,7 +75,7 @@
 .footerSection {
   width: 300px;
   min-width: 250px;
-  height: 60px; /* Height that was removed from sidebar */
+  height: 60px;
   background-color: #f8f9fa;
   border-right: 1px solid #dee2e6;
   border-top: 1px solid #dee2e6;
@@ -89,7 +89,7 @@
 .footerSectionButton {
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: #6c757d; /* Subtle gray-blue instead of bright blue */
+  background-color: #6c757d;
   color: white;
   border: none;
   border-radius: 6px;
@@ -107,7 +107,7 @@
 }
 
 .footerSectionButton:hover {
-  background-color: #5c636a; /* Darker gray-blue for hover */
+  background-color: #5c636a;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 

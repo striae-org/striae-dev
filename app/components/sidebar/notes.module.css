@@ -24,7 +24,6 @@ hr {
   margin-bottom: 1.5rem;
 }
 
-/* Ensure all labels have black text for readability */
 label {
   color: #000000 !important;
   font-weight: 500;
@@ -72,7 +71,7 @@ textarea:focus {
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .caseInput input:focus {
@@ -89,7 +88,7 @@ textarea:focus {
   color: #495057;
   cursor: pointer;
   user-select: none;
-  margin-bottom: 1.5rem; /* Add spacing below "Use current case number" checkboxes */
+  margin-bottom: 1.5rem;
 }
 
 .checkboxLabel:hover {
@@ -118,7 +117,7 @@ textarea:focus {
   font-size: 0.9rem;
   margin-bottom: 1rem;
   background-color: white;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .classCharacteristics select:focus,
@@ -136,7 +135,7 @@ textarea:focus {
   font-size: 0.9rem;
   min-height: 100px;
   resize: vertical;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .classCharacteristics textarea:focus {
@@ -186,7 +185,7 @@ textarea:focus {
   font-size: 0.9rem;
   margin-top: 0.5rem;
   transition: border-color 0.2s;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .indexing input[type="text"]:focus {
@@ -230,7 +229,7 @@ textarea:focus {
   cursor: pointer;
   transition: all 0.2s;
   margin-bottom: 1rem;
-  margin-top: 1rem; /* Add spacing above the button */
+  margin-top: 1rem;
 }
 
 .notesButton:hover {
@@ -264,7 +263,7 @@ textarea:focus {
   margin-bottom: 1rem;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #000000; /* Black text for readability */
+  color: #000000;
 }
 
 .modalTextarea {
@@ -276,7 +275,7 @@ textarea:focus {
   font-size: 0.9rem;
   margin-bottom: 1rem;
   resize: vertical;
-  box-sizing: border-box; /* Ensure padding is included in width calculation */
+  box-sizing: border-box;
 }
 
 .modalButtons {
@@ -312,7 +311,7 @@ textarea:focus {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 1rem; /* Add top margin for spacing */
+  margin-top: 1rem;
   margin-bottom: 1rem;
   box-sizing: border-box;
 }

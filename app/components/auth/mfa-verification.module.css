@@ -46,7 +46,7 @@
   font-size: var(--fontSizeBodyM);
   background: white;
   transition: border-color var(--durationS) var(--bezierFastoutSlowin);
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .select:focus {
@@ -73,7 +73,7 @@
   letter-spacing: 2px;
   margin-bottom: var(--spaceL);
   transition: border-color var(--durationS) var(--bezierFastoutSlowin);
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -93,7 +93,7 @@
   border: none;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   margin-bottom: var(--spaceM);
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .button:hover:not(:disabled) {
@@ -121,8 +121,8 @@
   font-size: var(--fontSizeBodyS);
   color: var(--textBody);
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  box-sizing: border-box; /* Ensure consistent width calculation */
-  width: 100%; /* Ensure full width like other buttons */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .secondaryButton:hover:not(:disabled) {

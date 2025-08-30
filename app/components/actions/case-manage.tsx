@@ -67,11 +67,7 @@ export const listCases = async (user: User): Promise<string[]> => {
   }
 };
 
-    /**
-     * Sorts case numbers in ascending order, first by numbers and then by letters.
-     */
-
-    const sortCaseNumbers = (cases: string[]): string[] => {
+const sortCaseNumbers = (cases: string[]): string[] => {
   return cases.sort((a, b) => {
     // Extract all numbers and letters
     const getComponents = (str: string) => {

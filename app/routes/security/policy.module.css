@@ -53,7 +53,7 @@
 }
 
 .content p {
-  color: #000000; /* Ensure paragraph text is black for readability */
+  color: #000000;
   margin: var(--spaceM) 0;
   line-height: 1.6;
 }

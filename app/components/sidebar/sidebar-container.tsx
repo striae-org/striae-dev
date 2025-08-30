@@ -38,8 +38,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
   const year = new Date().getFullYear();
 
-  // Handle escape key to close modal
-    useEffect(() => {
+  useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape' && isFooterModalOpen) {
           setIsFooterModalOpen(false);

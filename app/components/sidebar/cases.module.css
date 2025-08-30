@@ -5,7 +5,7 @@
 
 .caseSection h4 {
   font-size: 1.3rem;
-  font-weight: 600;  /* Increased weight to match case-sidebar */
+  font-weight: 600;
   color: #495057;
   margin-bottom: 1rem;
 }
@@ -25,7 +25,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
-  box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+  box-sizing: border-box;
 }
 
 .caseInput input:focus {
@@ -45,7 +45,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 0.5rem; /* Add spacing between button and input */
+  margin-top: 0.5rem;
   box-sizing: border-box;
 }
 
@@ -69,7 +69,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 0.5rem; /* Add spacing */
+  margin-top: 0.5rem;
   box-sizing: border-box;
 }
 
@@ -93,7 +93,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 0.5rem; /* Add spacing */
+  margin-top: 0.5rem;
   box-sizing: border-box;
 }
 
@@ -149,7 +149,7 @@
   border: 1px solid #dee2e6;
   border-radius: 6px;
   overflow: hidden;
-  max-height: calc(5 * 3.5rem); /* Approximately 5 items at ~3.5rem each */
+  max-height: calc(5 * 3.5rem);
   overflow-y: auto;
 }
 
@@ -239,7 +239,7 @@
 .fileUpload label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #000000; /* Black text for upload label */
+  color: #000000;
   margin-bottom: 0.5rem;
 }
 
@@ -249,7 +249,7 @@
   border: 1px solid #dee2e6;
   border-radius: 4px;
   font-size: 0.875rem;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .uploadingText {
@@ -279,7 +279,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .caseRename input:focus {
@@ -436,7 +436,7 @@
   border: 1px solid #ced4da;
   border-radius: 4px;
   margin-bottom: 0.5rem;
-  box-sizing: border-box; /* Prevent overflow */
+  box-sizing: border-box;
 }
 
 .caseActionsContent .caseRename button {

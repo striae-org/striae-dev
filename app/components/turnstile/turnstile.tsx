@@ -4,9 +4,6 @@ import keys from './keys.json';
 declare global {
   interface Window {
 
-  /* 
-  Possible Turnstile functions, per Cloudflare documentation
-  */ 
   turnstile: {
     render: (selector: string | HTMLElement, options: {
       sitekey: string;
@@ -31,17 +28,6 @@ interface TurnstileProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: TurnstileTheme;
 }
 
-/* 
-    A[Component Mounts] --> B[Create Script Tag]
-    B --> C[Load Turnstile API]
-    C --> D[Render Widget]
-    D --> E[Return Widget ID]
-    E --> F[Call onWidgetId]
-    A --> G[Component Unmounts]
-    G --> H[Remove Script]
-    H --> I[Remove Widget] 
-*/
-
 export const Turnstile = ({ className, onWidgetId, success, theme, ...rest }: TurnstileProps) => {
   const [widgetId, setWidgetId] = useState<string>();
   const [isMobile, setIsMobile] = useState(false);
@@ -65,7 +51,6 @@ export const Turnstile = ({ className, onWidgetId, success, theme, ...rest }: Tu
     };
   }, [onWidgetId, theme]);
 
-  /* Remove Turnstile widget after successful submission */
   useEffect(() => {
     if (success && widgetId && window.turnstile) {
       window.turnstile.reset(widgetId);
@@ -80,9 +65,7 @@ export const Turnstile = ({ className, onWidgetId, success, theme, ...rest }: Tu
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  /* Explicit render of Turnstile widget */
+  }, []); 
   
   return (
     <div

@@ -173,9 +173,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
           <button onClick={onCancel} className={styles.cancelButton}>
             Cancel
           </button>
-        </div>
-
-        {/* reCAPTCHA container */}
+        </div>        
         <div id="recaptcha-container"></div>
       </div>
     </div>
