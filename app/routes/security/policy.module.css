@@ -64,6 +64,12 @@
   margin: var(--spaceL) 0;
 }
 
+.content ol {
+  list-style-type: decimal;
+  padding-left: var(--spaceXL);
+  margin: var(--spaceS) 0;
+}
+
 .content li {
   margin: var(--spaceS) 0;
   color: var(--textBody);
