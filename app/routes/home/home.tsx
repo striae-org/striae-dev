@@ -1,4 +1,4 @@
-//import { Link } from '@remix-run/react';
+import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState, useEffect } from 'react';
 import { Notice } from '~/components/notice/notice';
@@ -22,7 +22,7 @@ export default function Home() {
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   useEffect(() => {
-      const launchDate = new Date('2025-09-01T11:00:00-07:00');
+      const launchDate = new Date('2026-01-01T11:00:00-07:00');
       const updateTimer = () => {
       const now = new Date();
       const diff = launchDate.getTime() - now.getTime();
@@ -54,21 +54,19 @@ export default function Home() {
           <div className={styles.title}>
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
           </div>
-          <div className={styles.buttonGroup}>
-            {/* Disabled until beta launch
+          <div className={styles.buttonGroup}>            
             <Link to="/auth" className={styles.actionButton}>
               Sign In
             </Link>
             <Link to="/access" className={styles.accessButton}>
               Register Now
-            </Link>
-            */}
+            </Link>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>
           </div>
           <div className={styles.subtitle}>
-            <p>Beta Launches September 1, 2025 @ 11:00 AM MST</p>
+            <p>Beta Period Ends January 1, 2026 @ 11:00 AM MST</p>
            <div className={styles.youtubeEmbed}>
               <iframe
                 width="100%"
