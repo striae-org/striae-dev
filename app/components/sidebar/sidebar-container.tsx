@@ -92,7 +92,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
-                Striae © {year}. All rights reserved.              
+                Striae v0.9.0-beta © {year}. All rights reserved.              
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>
