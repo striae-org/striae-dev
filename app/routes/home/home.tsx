@@ -54,10 +54,6 @@ export default function Home() {
           <div className={styles.title}>
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
           </div>
-          <div className={styles.subtitle}>
-            <p>Beta Launches September 1, 2025 @ 11:00 AM MST</p>
-            <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>
-          </div>
           <div className={styles.buttonGroup}>
             {/* Disabled until beta launch
             <Link to="/auth" className={styles.actionButton}>
@@ -71,6 +67,21 @@ export default function Home() {
               What is this?
             </button>
           </div>
+          <div className={styles.subtitle}>
+            <p>Beta Launches September 1, 2025 @ 11:00 AM MST</p>
+           <div className={styles.youtubeEmbed}>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/9BceT9atfBA?si=tGb-WAJp2mdGx5dA"
+                title="YouTube video player"                
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            </div>
+             <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
+          </div>          
         </div>
       </div>
       <Notice isOpen={isNoticeOpen} onClose={handleNoticeClose} notice={{ title: 'About Striae', content: <NoticeText /> }} />
