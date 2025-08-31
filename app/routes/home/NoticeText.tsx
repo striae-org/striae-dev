@@ -54,7 +54,7 @@ const NoticeText = () => {
         <strong>Open Source Commitment</strong>
       </p>
       <p>
-        Striae is an open-source project, supporting transparency, collaboration, and continuous improvement from the firearms examiner community. The entire codebase is available on <Link to="https://github.com/StephenJLu/striae">GitHub</Link>. We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination.
+        Striae is an open-source project, supporting transparency, collaboration, and continuous improvement from the firearms examiner community. The entire codebase is available on <Link to="https://github.com/StephenJLu/striae" target="_blank" rel="noopener noreferrer">GitHub</Link>. We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination.
       </p>
       <p>
         By making Striae open source, we aim to foster community involvement, maintain accountability for security and privacy, and ensure that users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
