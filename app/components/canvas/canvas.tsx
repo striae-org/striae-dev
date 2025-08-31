@@ -14,6 +14,7 @@ interface AnnotationData {
   indexNumber?: string;
   indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  includeConfirmation?: boolean;
   hasSubclass?: boolean;
   additionalNotes: string;
 }
@@ -112,10 +113,15 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
 
   return (    
     <div className={styles.canvasContainer}>
-      {/* Filename Display - Upper Left */}
+      {/* Filename & Connfirmation Field Display - Upper Left */}
       {filename && (
         <div className={styles.filenameDisplay}>
           File: {filename}
+          {annotationData?.includeConfirmation && (
+            <div className={styles.confirmationIncluded}>
+              Confirmation Field Included
+            </div>
+          )}
         </div>
       )}
       
