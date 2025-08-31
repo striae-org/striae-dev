@@ -75,6 +75,10 @@
   color: var(--textBody);
 }
 
+.content ul ul > li {
+  list-style-type: circle;
+}
+
 .content a {
   color: var(--linkColor);
   text-decoration: none;
@@ -83,6 +87,12 @@
 
 .content a:hover {
   color: color-mix(in lab, var(--accent) 85%, var(--black));
+}
+
+.content .lastUpdated {
+  font-size: 0.875rem;
+  margin-top: var(--space2XL);
+  color: darkGray;
 }
 
 .backLink {
