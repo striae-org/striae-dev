@@ -267,15 +267,15 @@ const generateDocument = (data) => {
     </div>
     
     ${imageUrl && imageUrl !== '/clear.jpg' ? `
-    ${annotationData && annotationData.indexType === 'number' && annotationData.indexNumber ? `
+    ${annotationData && annotationsSet?.has('index') && annotationData.indexType === 'number' && annotationData.indexNumber ? `
     <div class="index-section">
       Index: ${annotationData.indexNumber}
     </div>
     ` : ''}
     
     <div class="image-container">
-      <img src="${imageUrl}" alt="Comparison Image" ${annotationData && annotationData.indexType === 'color' && annotationData.indexColor ? `class="image-with-border" style="border: 5px solid ${annotationData.indexColor};"` : ''} />
-      
+      <img src="${imageUrl}" alt="Comparison Image" ${annotationData && annotationsSet?.has('index') && annotationData.indexType === 'color' && annotationData.indexColor ? `class="image-with-border" style="border: 5px solid ${annotationData.indexColor};"` : ''} />
+
       ${annotationData && annotationsSet?.has('number') ? `
       <div class="annotations-overlay">
         <div class="left-annotation">
