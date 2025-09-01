@@ -156,11 +156,11 @@ For support, bug reports, or feature requests, please visit our [GitHub reposito
 Special thanks to all contributors who made this release possible:
 
 - **Stephen J. Lu** - Lead Developer
-- **Community & Alpha Testers** - Bug reports and feedback
+- **Community & Alpha Testers (Kyle, Alex, Ron, Luis, Flory, Kirsten, Brian)** - Bug reports and feedback
 - **Security Researchers** - Vulnerability reporting
 
 ---
 
 **Release Date**: September 1, 2025  
-**Beta Period**: September 1, 2025 @ 11:00 AM MST - January 1, 2026 @ 11:00 AM MST  
+**Beta Period**: September 1, 2025 @ 11:00 AM MST - January 1, 2026 @ 11:00 AM MST
 **Version**: v0.9.0-beta
