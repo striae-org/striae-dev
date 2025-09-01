@@ -80,26 +80,7 @@ export default function Home() {
                 allowFullScreen
               ></iframe>
             </div>
-             <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>
-             <div style={{ 
-               marginTop: '2rem', 
-               display: 'flex', 
-               justifyContent: 'center', 
-               alignItems: 'center',
-               width: '100%'
-             }}>
-               <iframe 
-                 className="fundraising-widget" 
-                 width="220px" 
-                 height="484px" 
-                 title="Striae Beta ALS San Diego Fundraising Widget"
-                 data-id="1471b1" 
-                 data-url-key="striae-beta-als-san-diego" 
-                 data-src="https://www.customink.com/fundraising/widgets/striae-beta-als-san-diego" 
-                 data-utm-campaign="campaign-embed-v1"
-               ></iframe>
-               <script src="https://www.customink.com/fundraising/assets/campaign_widget/fundraising_widget.js"></script>
-             </div>            
+             <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
           </div>          
         </div>
       </div>
