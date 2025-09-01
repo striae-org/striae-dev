@@ -72,6 +72,7 @@
 
 .actionButton:hover {
   background-color: color-mix(in lab, var(--primary) 85%, var(--black));
+  text-decoration: none;
 }
 
 .accessButton {
@@ -81,6 +82,7 @@
 
 .accessButton:hover {
   background-color: color-mix(in lab, var(--accent) 85%, var(--black));
+  text-decoration: none;
 }
 
 .youtubeEmbed {
