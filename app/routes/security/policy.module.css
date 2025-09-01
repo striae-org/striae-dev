@@ -79,16 +79,6 @@
   list-style-type: circle;
 }
 
-.content a {
-  color: var(--linkColor);
-  text-decoration: none;
-  transition: color var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.content a:hover {
-  color: color-mix(in lab, var(--accent) 85%, var(--black));
-}
-
 .content .lastUpdated {
   font-size: 0.875rem;
   margin-top: var(--space2XL);
