@@ -88,16 +88,6 @@
   color: var(--textBody);
 }
 
-.section a {
-  color: var(--linkColor);
-  text-decoration: none;
-  transition: color var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.section a:hover {
-  color: color-mix(in lab, var(--accent) 85%, var(--black));
-}
-
 .lastUpdated {
   color: var(--textLight);
   font-size: var(--fontSizeBodyXS);

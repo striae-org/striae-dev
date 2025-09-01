@@ -61,7 +61,7 @@
 .caseItem {
   width: 100%;
   padding: var(--spaceM) var(--spaceL);
-  border: 1px solid #e9ecef; /* Light gray border instead of default */
+  border: 1px solid #e9ecef;
   border-radius: var(--spaceXS);
   text-align: left;
   background: var(--backgroundLight);

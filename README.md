@@ -1,7 +1,7 @@
 # 🔫 Striae - A Firearms Examiner's Comparison Companion
 
 ## 🌐 Application URL
-**[Live App: https://www.striae.org](https://www.striae.org)**
+**[Live App](https://www.striae.org)**
 
 ## 📚 Documentation
 **[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)**
@@ -12,6 +12,14 @@
 ---
 
 ## 📋 Changelog
+
+## [2025-09-01] - *Release v0.9.0-beta*
+
+- Global CSS corrections and cleanup
+- Numerous code cleanups and adjustments
+- Created a footer modal component for in-app support (main app is now a single-screen interface)
+- Refactored sidebar components to reduce redundancy and improve maintainability
+- Created user's guide documentation
 
 ## [2025-08-26] - *Pre-Beta Release*
 

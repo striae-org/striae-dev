@@ -377,8 +377,6 @@ export const Striae = ({ user }: StriaePage) => {
           />
         </div>
       </main>
-      
-      {/* Toast notification */}
       <Toast
         message={toastMessage}
         type={toastType}

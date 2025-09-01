@@ -66,7 +66,7 @@
   font-size: 1rem;
   margin-bottom: 1rem;
   transition: border-color 0.2s ease;
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -104,7 +104,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   width: 100%;
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .primaryButton:hover:not(:disabled) {
@@ -127,7 +127,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
-  box-sizing: border-box; /* Ensure consistent width calculation */
+  box-sizing: border-box;
 }
 
 .secondaryButton:hover:not(:disabled) {
@@ -175,7 +175,6 @@
   cursor: not-allowed;
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .overlay {
     padding: 0.5rem;

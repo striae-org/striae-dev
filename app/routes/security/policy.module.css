@@ -53,7 +53,7 @@
 }
 
 .content p {
-  color: #000000; /* Ensure paragraph text is black for readability */
+  color: #000000;
   margin: var(--spaceM) 0;
   line-height: 1.6;
 }
@@ -64,19 +64,25 @@
   margin: var(--spaceL) 0;
 }
 
+.content ol {
+  list-style-type: decimal;
+  padding-left: var(--spaceXL);
+  margin: var(--spaceS) 0;
+}
+
 .content li {
   margin: var(--spaceS) 0;
   color: var(--textBody);
 }
 
-.content a {
-  color: var(--linkColor);
-  text-decoration: none;
-  transition: color var(--durationS) var(--bezierFastoutSlowin);
+.content ul ul > li {
+  list-style-type: circle;
 }
 
-.content a:hover {
-  color: color-mix(in lab, var(--accent) 85%, var(--black));
+.content .lastUpdated {
+  font-size: 0.875rem;
+  margin-top: var(--space2XL);
+  color: darkGray;
 }
 
 .backLink {

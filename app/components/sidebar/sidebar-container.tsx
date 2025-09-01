@@ -38,8 +38,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
   const year = new Date().getFullYear();
 
-  // Handle escape key to close modal
-    useEffect(() => {
+  useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape' && isFooterModalOpen) {
           setIsFooterModalOpen(false);
@@ -93,7 +92,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
-                Striae © {year}. All rights reserved.              
+                Striae v0.9.0-beta © {year}. All rights reserved.              
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>

@@ -164,10 +164,6 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   }
 };
 
-/**
- * Get signed image URL from Image Delivery service
- */
-
 const DEFAULT_VARIANT = 'striae';
 interface ImageDeliveryConfig {
   accountHash: string;

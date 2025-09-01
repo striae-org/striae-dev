@@ -14,6 +14,7 @@ interface AnnotationData {
   indexNumber?: string;
   indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  includeConfirmation?: boolean;
   hasSubclass?: boolean;
   additionalNotes: string;
 }
@@ -105,18 +106,22 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
     if (loadError) return loadError.message;
     return 'An error occurred';
   };
-
-  // Helper function to check if color is black
+  
   const isBlackColor = (color: string) => {
     return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
   };
 
   return (    
     <div className={styles.canvasContainer}>
-      {/* Filename Display - Upper Left */}
+      {/* Filename & Connfirmation Field Display - Upper Left */}
       {filename && (
         <div className={styles.filenameDisplay}>
           File: {filename}
+          {annotationData?.includeConfirmation && (
+            <div className={styles.confirmationIncluded}>
+              Confirmation Field Included
+            </div>
+          )}
         </div>
       )}
       

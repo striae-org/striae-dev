@@ -22,16 +22,45 @@ export const Policy = () => {
         <section>
           <h2>Reporting Security Issues</h2>
           <p>We take the security of Striae seriously. If you believe you have found a security vulnerability, please report it to us responsibly.</p>
-          <br />
-          <p>Please email security findings to: <Link to="mailto:info@striae.org">info@striae.org</Link></p>
+          <p>You may:
+            <ol>
+              <li>Email security findings to: <Link to="mailto:info@striae.org">info@striae.org</Link></li>
+              <li>Submit a security issue on <Link to="https://github.com/StephenJLu/striae/security/advisories/new" target="_blank" rel="noopener noreferrer">GitHub</Link></li>              
+            </ol>
+            For encryption, please use our <Link to="https://keybase.io/stephenjlu/pgp_keys.asc" target="_blank" rel="noopener noreferrer">PGP key</Link>
+          </p>
         </section>
 
         <section>
-          <h2>Expectations</h2>
+          <h2>Disclosure Process</h2>
           <ul>
-            <li>We will respond to your report within 48 hours</li>
-            <li>We will keep you updated as we investigate</li>
-            <li>We will not take legal action against researchers acting in good faith</li>
+            <li>After we receive your report, we will:
+              <ul>
+                <li>Acknowledge receipt within 48 hours.</li>
+                <li>Provide updates as we investigate and remediate the issue.</li>
+                <li>Notify you when the vulnerability is resolved and, if desired, credit you for your responsible disclosure.</li>
+              </ul>
+            </li>
+            <li>Where possible, we aim to resolve valid vulnerabilities within 30 days and will keep you informed of progress.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Researcher Responsibilities</h2>
+          <ul>
+            <li>Guidelines:
+              <ul>
+                <li>Do not access, modify, or delete user data without authorization.</li>
+                <li>Avoid actions that could degrade, disrupt, or damage Striae services.</li>
+                <li>Do not use automated scanning tools that generate a significant amount of traffic or requests.</li>
+                <li>Comply with all applicable laws and regulations.</li>
+              </ul>
+            </li>
+            <li>Safe Harbor:
+              <ul>
+                <li>Activities in good faith, consistent with this policy and intended to improve Striae security, will not be subject to legal action or account restriction. If legal action is initiated by a third party, Striae will make it clear that your actions were conducted under this policy.</li>
+              </ul>
+            </li>
           </ul>
         </section>
 
@@ -41,7 +70,7 @@ export const Policy = () => {
           <ul>
             <li>https://www.striae.org</li>
             <li>All Striae subdomains</li>
-            <li>Striae web application</li>
+            <li>Striae web application (current version only)</li>
           </ul>
         </section>
 
@@ -52,6 +81,9 @@ export const Policy = () => {
             <li>Spam or social engineering</li>
             <li>Physical security attacks</li>
           </ul>
+        </section>
+        <section>
+          <div className={styles.lastUpdated}>Last updated: September 1, 2025</div>
         </section>
       </div>
     </div>

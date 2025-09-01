@@ -27,15 +27,15 @@
   z-index: var(--zIndex2);
 }
 
-/* Filename Display */
+/* Filename & Confirmation Display */
 .filenameDisplay {
   position: absolute;
-  left: 12rem; /* Position to the right of where toolbar typically is */
+  left: 12rem;
   top: 1rem;
   z-index: 15;
   color: #e0e0e0;
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
   pointer-events: none;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -43,6 +43,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: calc(100vw - 14rem);
+}
+
+.confirmationIncluded {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #FFDE21;
 }
 
 /* Company Display */
@@ -253,52 +259,4 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   max-width: 100%;
-}
-
-/* Responsive class characteristics for smaller screens */
-@media (max-width: 768px) {
-  .classText {
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
-  }
-  
-  .supportLevelText {
-    padding: 0.5rem 1rem;
-    font-size: 0.95rem;
-  }
-  
-  .subclassText {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-  
-  .additionalNotesBox {
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
-    max-width: calc(100% - 2rem);
-  }
-}
-
-/* Responsive annotations for smaller screens */
-@media (max-width: 768px) {
-  .leftAnnotation,
-  .rightAnnotation,
-  .indexAnnotation {
-    padding: 0.5rem 0.75rem;
-  }
-  
-  .caseText {
-    font-size: 0.9rem;
-  }
-  
-  .filenameDisplay {
-    left: 8rem; /* Adjust for smaller screens */
-    font-size: 0.8rem;
-    max-width: calc(100vw - 10rem);
-  }
-  
-  .companyDisplay {
-    font-size: 0.8rem;
-    max-width: calc(100vw - 2rem);
-  }
 }
