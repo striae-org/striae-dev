@@ -1,4 +1,4 @@
-//import { Link } from '@remix-run/react';
+import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState, useEffect } from 'react';
 import { Notice } from '~/components/notice/notice';
@@ -69,6 +69,8 @@ export default function Home() {
           </div>
           <div className={styles.subtitle}>
             <p>Beta Launches September 1, 2025 @ 11:00 AM MST</p>
+            <br />
+            <p><Link to="https://www.customink.com/fundraising/striae-beta-als-san-diego" target="_blank" rel="noopener noreferrer">Striae Beta Fundraiser for ALS San Diego in Honor of John Farrell</Link></p>
            <div className={styles.youtubeEmbed}>
               <iframe
                 width="100%"
