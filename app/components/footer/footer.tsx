@@ -32,6 +32,11 @@ export default function Footer() {
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
+        <div style={{ textAlign: 'center', marginTop: '16px' }}>
+          <a href="https://github.com/sponsors/StephenJLu" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+            <iframe src="https://github.com/sponsors/StephenJLu/button" title="Sponsor StephenJLu" height="32" width="114" style={{ border: 0, borderRadius: '6px', pointerEvents: 'none' }}></iframe>
+          </a>
+        </div>
       </div>
     </footer>    
   );

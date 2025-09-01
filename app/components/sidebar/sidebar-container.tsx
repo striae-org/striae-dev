@@ -97,6 +97,11 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>
               </div>
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <a href="https://github.com/sponsors/StephenJLu" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+                  <iframe src="https://github.com/sponsors/StephenJLu/button" title="Sponsor StephenJLu" height="32" width="114" style={{ border: 0, borderRadius: '6px', pointerEvents: 'none' }}></iframe>
+                </a>
+              </div>
             </div>
           </div>
         </div>
