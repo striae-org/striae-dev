@@ -67,6 +67,8 @@ export default function Home() {
           </div>
           <div className={styles.subtitle}>
             <p>Beta Period Ends January 1, 2026 @ 11:00 AM MST</p>
+            <br />
+            <p><Link to="https://www.customink.com/fundraising/striae-beta-als-san-diego" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Striae Beta Fundraiser for ALS San Diego in Honor of John Farrell</Link></p>
            <div className={styles.youtubeEmbed}>
               <iframe
                 width="100%"
