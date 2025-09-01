@@ -13,7 +13,7 @@
 
 ## 📋 Changelog
 
-## [2025-09-01] - *Release v0.9.0-beta*
+## [2025-09-01] - *[Release v0.9.0-beta](https://github.com/StephenJLu/striae/releases/tag/v0.9.0)*
 
 - Global CSS corrections and cleanup
 - Numerous code cleanups and adjustments
