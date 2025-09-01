@@ -1,4 +1,4 @@
-# Striae Release Notes - August 2025
+# Striae Release Notes - September 2025
 
 ## 🎉 Major Features & Enhancements
 
