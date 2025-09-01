@@ -9,6 +9,8 @@
 ## 💬 Contact & Support
 **[Striae Support](https://www.striae.org/support)**
 
+**[Striae on Discord](https://discord.gg/ESUPhTPwHx)**
+
 ---
 
 ## 📋 Changelog
