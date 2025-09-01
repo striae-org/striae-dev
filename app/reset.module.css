@@ -42,7 +42,15 @@
   }
 
   :global(:any-link) {
-    text-decoration: dotted;
+    text-decoration: none;
+  }
+
+  :global(:any-link:hover),
+  :global(:any-link:focus),
+  :global(:any-link:active) {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
   }
 
   :global(ul) {

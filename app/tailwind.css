@@ -25,14 +25,16 @@
   }
 
   a {
-    color: var(--accent);
-    text-decoration: dotted;
+    color: var(--primary);
+    text-decoration: none;
     transition: color var(--durationS) ease;
 
     &:hover,
     &:focus,
     &:active {
-      text-decoration: dotted;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
     }
   }
 
