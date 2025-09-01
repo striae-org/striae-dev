@@ -155,9 +155,9 @@ For support, bug reports, or feature requests, please visit our [GitHub reposito
 
 Special thanks to all contributors who made this release possible:
 
-- **StephenJLu** - Lead Developer
-- **Community** - Bug reports and feedback
-- **Security researchers** - Vulnerability reporting
+- **Stephen J. Lu** - Lead Developer
+- **Community & Alpha Testers** - Bug reports and feedback
+- **Security Researchers** - Vulnerability reporting
 
 ---
 
