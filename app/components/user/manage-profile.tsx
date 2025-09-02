@@ -8,6 +8,7 @@ import {
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
+import { Icon } from '../icon/icon';
 import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
@@ -30,6 +31,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Load user data from KV store when modal opens
   useEffect(() => {
@@ -214,15 +216,25 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           {email !== user?.email && (
             <div className={styles.formGroup}>
               <label htmlFor="password">Current Password (required for email change)</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                required={email !== user?.email}
-                autoComplete="current-password"
-                onChange={(e) => setPassword(e.target.value)}
-                className={styles.input}
-              />
+              <div className={styles.passwordField}>
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  required={email !== user?.email}
+                  autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={styles.input}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <Icon icon={showPassword ? "eye-off" : "eye"} />
+                </button>
+              </div>
             </div>
           )}
 
