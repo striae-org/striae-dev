@@ -34,7 +34,7 @@ export default function Footer() {
         </p>
         <div style={{ textAlign: 'center', marginTop: '16px' }}>
           <a href="https://opencollective.com/striae" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
-            <img src="https://opencollective.com/static/images/opencollectivelogo-footer-n.svg" alt="Support Striae on Open Collective" height="32" style={{ border: 0, borderRadius: '6px' }} />
+            <img src="/opencollectivelogo-footer-n.svg" alt="Support Striae on Open Collective" height="32" style={{ border: 0, borderRadius: '6px' }} />
           </a>
         </div>
       </div>
