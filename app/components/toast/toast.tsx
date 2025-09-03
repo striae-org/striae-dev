@@ -3,7 +3,7 @@ import styles from './toast.module.css';
 
 interface ToastProps {
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'warning';
   isVisible: boolean;
   onClose: () => void;
   duration?: number;
@@ -40,7 +40,7 @@ export const Toast = ({ message, type, isVisible, onClose, duration = 4000 }: To
       ></div>
       <div className={`${styles.toast} ${styles[type]} ${isVisible ? styles.show : ''}`}>
         <div className={styles.icon}>
-          {type === 'success' ? '✓' : '✗'}
+          {type === 'success' ? '✓' : type === 'warning' ? '!' : '✗'}
         </div>
         <span className={styles.message}>{message}</span>
         <button 
