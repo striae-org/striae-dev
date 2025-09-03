@@ -25,7 +25,7 @@ export const Policy = () => {
           <p>You may:
             <ol>
               <li>Email security findings to: <Link to="mailto:info@striae.org">info@striae.org</Link></li>
-              <li>Submit a security issue on <Link to="https://github.com/StephenJLu/striae/security/advisories/new" target="_blank" rel="noopener noreferrer">GitHub</Link></li>              
+              <li>Submit a security issue on <Link to="https://github.com/striae-org/striae/security/advisories/new" target="_blank" rel="noopener noreferrer">GitHub</Link></li>              
             </ol>
             For encryption, please use our <Link to="https://keybase.io/stephenjlu/pgp_keys.asc" target="_blank" rel="noopener noreferrer">PGP key</Link>
           </p>
