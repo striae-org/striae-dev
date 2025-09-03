@@ -96,12 +96,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>
-              </div>
-              <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                <a href="https://opencollective.com/striae" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
-                  <img src="/opencollectivelogo-footer-n.svg" alt="Support Striae on Open Collective" height="32" style={{ border: 0, borderRadius: '6px' }} />
-                </a>
-              </div>
+              </div>              
             </div>
           </div>
         </div>

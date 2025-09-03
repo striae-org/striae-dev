@@ -31,12 +31,7 @@ export default function Footer() {
           <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae v0.9.0-beta</Link> © {year}. All rights reserved.
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
-        </p>
-        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <a href="https://opencollective.com/striae" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
-            <img src="/opencollectivelogo-footer-n.svg" alt="Support Striae on Open Collective" height="32" style={{ border: 0, borderRadius: '6px' }} />
-          </a>
-        </div>
+        </p>        
       </div>
     </footer>    
   );
