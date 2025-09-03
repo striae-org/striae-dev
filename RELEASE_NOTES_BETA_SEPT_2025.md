@@ -136,7 +136,7 @@ With the beta launch on **September 1, 2025**, users can expect:
 - Secure case management and file upload features
 - Professional PDF report generation
 
-For support, bug reports, or feature requests, please visit our [GitHub repository](https://github.com/StephenJLu/striae) or contact our support team.
+For support, bug reports, or feature requests, please visit our [GitHub repository](https://github.com/striae-org/striae) or contact our support team.
 
 ---
 

@@ -28,7 +28,7 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          <Link to="https://github.com/StephenJLu/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae v0.9.0-beta</Link> © {year}. All rights reserved.
+          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae v0.9.0-beta</Link> © {year}. All rights reserved.
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
