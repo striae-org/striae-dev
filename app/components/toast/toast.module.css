@@ -71,6 +71,24 @@
   font-size: 14px;
 }
 
+.toast.warning {
+  background: var(--backgroundLight);
+  border-color: var(--error);
+  box-shadow: 0 8px 32px color-mix(in lab, var(--error) 20%, transparent);
+}
+
+.toast.warning .icon {
+  color: var(--error);
+  background: color-mix(in lab, var(--error) 15%, transparent);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
 .icon {
   font-weight: bold;
   flex-shrink: 0;
