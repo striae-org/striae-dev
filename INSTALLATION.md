@@ -99,8 +99,6 @@ npm install
 ]
 ```
 
-4. Create R2 API tokens with appropriate permissions
-
 ---
 
 ## Step 3: Environment Variables Setup
