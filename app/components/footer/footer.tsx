@@ -1,8 +1,22 @@
 import { Link } from '@remix-run/react';
+import { useEffect } from 'react';
 import styles from './footer.module.css';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+
+  // Load Patreon script
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Check if script is already loaded
+      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    }
+  }, []);
   
   return (    
     <footer className={styles.footer}>
@@ -34,7 +48,6 @@ export default function Footer() {
         </p>
         <div className={styles.patreonWidget}>
           <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
-          <script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
         </div>
       </div>
     </footer>    

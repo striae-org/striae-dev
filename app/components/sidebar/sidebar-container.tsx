@@ -54,6 +54,19 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
       };
     }, [isFooterModalOpen]);
 
+  // Load Patreon script when modal opens
+  useEffect(() => {
+    if (isFooterModalOpen && typeof window !== 'undefined') {
+      // Check if script is already loaded
+      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    }
+  }, [isFooterModalOpen]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       {/* Main Sidebar */}
@@ -99,7 +112,6 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
               </div>
               <div className={styles.patreonWidget}>
                 <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
-                <script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
               </div>              
             </div>
           </div>
