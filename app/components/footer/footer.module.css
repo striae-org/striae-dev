@@ -52,6 +52,11 @@
   text-align: center;
 }
 
+.patreonWidget {
+  margin-top: var(--spaceXS);
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .nav {
     flex-direction: column;

@@ -31,7 +31,11 @@ export default function Footer() {
           <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae v0.9.0-beta</Link> © {year}. All rights reserved.
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
-        </p>        
+        </p>
+        <div className={styles.patreonWidget}>
+          <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
+          <script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+        </div>
       </div>
     </footer>    
   );

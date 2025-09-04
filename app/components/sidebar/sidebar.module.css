@@ -210,4 +210,9 @@
   font-size: 0.7rem;  
 }
 
+.patreonWidget {
+  margin-top: var(--spaceXS);
+  text-align: center;
+}
+
 
