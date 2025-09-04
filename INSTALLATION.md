@@ -58,10 +58,13 @@ npm install
    - **Variant Name**: `striae`
    - **Settings**: Use default settings
    - **Metadata**: Strip all metadata (recommended)
-4. Go to Images → Keys and generate:
-   - **Account-level API Token** (IMAGES_API_TOKEN)
+4. Go to Images → Keys and note:
    - **HMAC Key** for signed URLs (HMAC_KEY)
-5. Note down your **Account Hash** (IMAGES_ACCOUNT_HASH) from the Images dashboard
+5. Go to Images → Overview and note:
+   - **Account ID** (ACCOUNT_ID)
+   - **Account Hash** (IMAGES_ACCOUNT_HASH)
+6. Go to Manage Account → Account API Tokens and create:
+   - **Images API Token** with read and write permissions to Cloudflare Images (IMAGES_API_TOKEN)
 
 ### 2.3 Cloudflare KV Setup
 
