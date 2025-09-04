@@ -53,11 +53,9 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
         document.removeEventListener('keydown', handleEscape);
       };
     }, [isFooterModalOpen]);
-
-  // Load Patreon script when modal opens
+  
   useEffect(() => {
-    if (isFooterModalOpen && typeof window !== 'undefined') {
-      // Check if script is already loaded
+    if (isFooterModalOpen && typeof window !== 'undefined') {      
       if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
         const script = document.createElement('script');
         script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';

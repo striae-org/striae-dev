@@ -4,11 +4,9 @@ import styles from './footer.module.css';
 
 export default function Footer() {
   const year = new Date().getFullYear();
-
-  // Load Patreon script
+  
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Check if script is already loaded
+    if (typeof window !== 'undefined') {      
       if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
         const script = document.createElement('script');
         script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
