@@ -34,7 +34,7 @@ interface ImageUploadResponse {
 export const fetchFiles = async (user: User, caseNumber: string): Promise<FileData[]> => {
   const apiKey = await getDataApiKey();
   const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    headers: { 'X-Custom-Auth-Key': apiKey }
+    headers: { 'X-User-Auth': apiKey }
   });
   const data = (await response.json()) as ApiResponse;
   return data.files || [];
@@ -75,7 +75,7 @@ export const uploadFile = async (
           // Update case data
           const apiKey = await getDataApiKey();
           const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-            headers: { 'X-Custom-Auth-Key': apiKey }
+            headers: { 'X-User-Auth': apiKey }
           });
           const existingData = await response.json() as CaseData;
 
@@ -87,7 +87,7 @@ export const uploadFile = async (
           await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
             method: 'PUT',
             headers: {
-              'X-Custom-Auth-Key': apiKey,
+              'X-User-Auth': apiKey,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(updatedData)
@@ -130,7 +130,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     const notesResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`, {
       method: 'DELETE',
       headers: {
-        'X-Custom-Auth-Key': apiKey
+        'X-User-Auth': apiKey
       }
     });
 
@@ -141,7 +141,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
 
     // Update case data.json
     const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      headers: { 'X-Custom-Auth-Key': apiKey }
+      headers: { 'X-User-Auth': apiKey }
     });
 
     const existingData = await caseResponse.json() as CaseData;
@@ -153,7 +153,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
       method: 'PUT',
       headers: {
-        'X-Custom-Auth-Key': apiKey,
+        'X-User-Auth': apiKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(updatedData)

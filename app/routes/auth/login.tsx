@@ -198,7 +198,7 @@ export const Login = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': apiKey
+          'X-User-Auth': apiKey
         },
         body: JSON.stringify(userData)
       });

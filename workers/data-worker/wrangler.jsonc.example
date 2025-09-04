@@ -18,6 +18,13 @@
     }
   ],
 
+  "services": [
+    {
+      "binding": "KEYS_WORKER",
+      "service": "striae-keys"
+    }
+  ],
+
   "routes": [
     {
       "pattern": "DATA_WORKER_CUSTOM_DOMAIN",

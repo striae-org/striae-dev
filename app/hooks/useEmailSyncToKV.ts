@@ -15,7 +15,7 @@ export const useEmailSyncToKV = () => {
           const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
             method: 'GET',
             headers: {
-              'X-Custom-Auth-Key': apiKey
+              'X-User-Auth': apiKey
             }
           });
 
@@ -29,7 +29,7 @@ export const useEmailSyncToKV = () => {
                 method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
-                  'X-Custom-Auth-Key': apiKey
+                  'X-User-Auth': apiKey
                 },
                 body: JSON.stringify({
                   email: user.email,
