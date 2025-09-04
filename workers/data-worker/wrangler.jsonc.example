@@ -1,0 +1,29 @@
+{
+  "name": "striae-data",
+  "account_id": "YOUR_ACCOUNT_ID",
+  "main": "src/data-worker.js",
+  "compatibility_date": "2023-03-14",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ], 
+  
+  "observability": { 
+	"enabled": true
+  },
+
+  "r2_buckets": [
+    {
+      "binding": "STRIAE_DATA",
+      "bucket_name": "striae-data"
+    }
+  ],
+
+  "routes": [
+    {
+      "pattern": "DATA_WORKER_CUSTOM_DOMAIN",
+      "custom_domain": true
+    }
+  ],
+
+  "placement": { "mode": "smart" }
+}

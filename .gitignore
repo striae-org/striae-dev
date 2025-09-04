@@ -14,3 +14,4 @@ app/config
 firebase-debug.log
 *.txt
 *.toml
+*.jsonc
