@@ -88,7 +88,7 @@ export const Striae = ({ user }: StriaePage) => {
         const apiKey = await getUserApiKey();
         const response = await fetch(`${paths.user_worker_url}/${user.uid}`, {
           headers: {
-            'X-Custom-Auth-Key': apiKey
+            'X-User-Auth': apiKey
           }
         });
         

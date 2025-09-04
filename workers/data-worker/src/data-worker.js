@@ -1,7 +1,7 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
+  'Access-Control-Allow-Headers': 'Content-Type, X-User-Auth',
   'Content-Type': 'application/json'
 };
 
@@ -10,8 +10,21 @@ const createResponse = (data, status = 200) => new Response(
   { status, headers: corsHeaders }
 );
 
-const hasValidHeader = (request, env) => 
-  request.headers.get("X-Custom-Auth-Key") === env.R2_KEY_SECRET;
+const hasValidAuth = async (request, env) => {
+  const userAuth = request.headers.get("X-User-Auth");
+  if (!userAuth) {
+    return false;
+  }
+  
+  try {
+    // Get the expected auth key from the keys worker
+    const expectedAuth = await env.KEYS_WORKER.getKey('R2_KEY_SECRET');
+    return userAuth === expectedAuth;
+  } catch (error) {
+    console.error('Error validating auth:', error);
+    return false;
+  }
+};
 
 export default {
   async fetch(request, env) {       
@@ -19,7 +32,7 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
     
-    if (!hasValidHeader(request, env)) {
+    if (!(await hasValidAuth(request, env))) {
       return createResponse({ error: 'Forbidden' }, 403);
     }
 
