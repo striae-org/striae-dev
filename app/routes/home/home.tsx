@@ -2,7 +2,7 @@ import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState, useEffect } from 'react';
 import { Notice } from '~/components/notice/notice';
-//import { Toast } from '~/components/toast/toast';
+import { Toast } from '~/components/toast/toast';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
 
@@ -15,13 +15,12 @@ export const meta = () => {
 
 export default function Home() {
   const [isNoticeOpen, setNoticeOpen] = useState(false);
-  //const [isToastVisible, setToastVisible] = useState(false);
+  const [isToastVisible, setToastVisible] = useState(false);
 
   const handleNoticeClose = () => {
     setNoticeOpen(false);
   };
-
-  {/* NO TOAST CURRENTLY
+ 
   const handleToastClose = () => {
     setToastVisible(false);    
     if (typeof window !== 'undefined') {
@@ -37,7 +36,7 @@ export default function Home() {
       }
     }
   }, []);
-  */}
+  
   
   const [timeLeft, setTimeLeft] = useState<string>('');
 
@@ -105,16 +104,14 @@ export default function Home() {
           </div>          
         </div>
       </div>
-      <Notice isOpen={isNoticeOpen} onClose={handleNoticeClose} notice={{ title: 'About Striae', content: <NoticeText /> }} />
-      {/*
+      <Notice isOpen={isNoticeOpen} onClose={handleNoticeClose} notice={{ title: 'About Striae', content: <NoticeText /> }} />      
       <Toast 
-        message="We are currently transferring Striae to a new domain registration. Service may be interrupted in the next few weeks. Thank you for your patience."
-        type="warning"
+        message="Striae migration has been completed, and all services are fully operational. Thank you for your patience."
+        type="success"
         isVisible={isToastVisible}
         onClose={handleToastClose}
         duration={8000}
-      />
-      */}
+      />      
     </>
   );
 }
