@@ -1,3 +1,7 @@
+/**
+ * REPLACE 'YOUR_HMAC_KEY' WITH YOUR ACTUAL HMAC KEY FOR SIGNED URLS
+ */
+
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
 /**
@@ -76,7 +80,7 @@ async function handleImageDelete(request, env) {
  * Handle Signed URL generation
  */
 
-const KEY = 'HMAC_KEY';
+const KEY = 'YOUR_HMAC_KEY';
 const EXPIRATION = 60 * 60; // 1 hour
 
 const bufferToHex = buffer =>
