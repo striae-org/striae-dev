@@ -41,11 +41,11 @@ npm install
 
 ### 2.1 Cloudflare Turnstile Setup
 
-1. Navigate to Cloudflare Dashboard → Security → Turnstile
+1. Navigate to Cloudflare Dashboard → Turnstile
 2. Create a new Turnstile site
 3. Configure the site settings:
    - **Domain**: Your domain (e.g., `striae.org`)
-   - **Mode**: Managed (recommended)
+   - **Mode**: Managed or Non-Interactive (recommended)
 4. Note down:
    - **Site Key** (CFT_PUBLIC_KEY)
    - **Secret Key** (CFT_SECRET_KEY)
@@ -68,7 +68,7 @@ npm install
 
 ### 2.3 Cloudflare KV Setup
 
-1. Navigate to Cloudflare Dashboard → Workers & Pages → KV
+1. Navigate to Cloudflare Dashboard → Storage & Databases → KV
 2. Create a new KV namespace named `user-db` (or your preferred name)
 3. Note down the KV namespace ID
 
