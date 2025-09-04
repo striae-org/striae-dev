@@ -205,7 +205,7 @@ You agree that the original English text shall prevail in the case of a dispute.
 <ul>
   <li>
     <p><strong>No Exposed Plain Text</strong></p>
-    <p>User profile information and all Data stored by Striae are encrypted and never stored in exposed plain text. Instead, all sensitive information is stored securely behind secret keys, further isolating Your Data from potential breaches.</p>
+    <p>User profile information and all Data stored by Striae are encrypted and never stored in exposed plain text. Instead, all sensitive information is stored securely behind undecipherable unique identifiers, further isolating Your Data from potential breaches.</p>
   </li>
   <li>
     <p><strong>Data Segregation/Isolation</strong></p>
