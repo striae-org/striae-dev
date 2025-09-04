@@ -1,6 +1,39 @@
 import { Link } from '@remix-run/react';
+import { useEffect } from 'react';
+import styles from '~/components/notice/notice.module.css';
 
 const NoticeText = () => {
+  // Load Patreon script
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const loadPatreonScript = () => {        
+        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
+        if (existingScript) {
+          existingScript.remove();
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.async = true;
+        
+        script.onload = () => {          
+          const win = window as typeof window & { patreon?: { initializeWidgets?: () => void } };
+          if (win.patreon && win.patreon.initializeWidgets) {
+            win.patreon.initializeWidgets();
+          }
+        };
+        
+        document.head.appendChild(script);
+      };
+
+      // Delay script loading to ensure DOM is ready
+      const timer = setTimeout(loadPatreonScript, 100);
+      
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, []);
   return (
     <div>
       <h2>Introducing Striae – A New Tool for Firearms Examiners</h2>
@@ -51,13 +84,19 @@ const NoticeText = () => {
       </ul>
       <p>If you have any questions or concerns regarding our security protocols, please refer to the <Link to="/terms#storage">Data Storage Addendum</Link> in the Terms & Conditions, or contact us at <Link to="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</Link>.</p>
       <p>
-        <strong>Open Source Commitment</strong>
+        <strong>Open Source Commitment & Supporting Striae</strong>
       </p>
       <p>
-        Striae is an open-source project, supporting transparency, collaboration, and continuous improvement from the firearms examiner community. The entire codebase is available on <Link to="https://github.com/striae-org/striae" target="_blank" rel="noopener noreferrer">GitHub</Link>. We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination.
+        Striae is an open-source and free service dedicated to providing streamlined comparison annotation services for forensic firearms and tool mark examiners worldwide. The entire codebase is available on <Link to="https://github.com/striae-org/striae" target="_blank" rel="noopener noreferrer">GitHub</Link>, supporting transparency, collaboration, and continuous improvement from the firearms examiner community.
       </p>
       <p>
-        By making Striae open source, we aim to foster community involvement, maintain accountability for security and privacy, and ensure that users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
+        By supporting Striae, you help cover essential cloud hosting, ongoing development, and improved user support—ensuring continued free access for the forensic community. Your support allows us to maintain this valuable resource while fostering community involvement and accountability for security and privacy.
+      </p>
+      <div className={styles.patreonWidget}>
+        <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
+      </div>
+      <p>
+        We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination. Users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
       </p>      
       <p>
         Thank you for your support, and we hope Striae is a valuable addition to your comparison toolkit!
