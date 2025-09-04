@@ -56,12 +56,31 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   
   useEffect(() => {
     if (isFooterModalOpen && typeof window !== 'undefined') {      
-      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
+      const loadPatreonScript = () => {        
+        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
+        if (existingScript) {
+          existingScript.remove();
+        }
+
         const script = document.createElement('script');
         script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
         script.async = true;
+        
+        script.onload = () => {          
+          const win = window as typeof window & { patreon?: { initializeWidgets?: () => void } };
+          if (win.patreon && win.patreon.initializeWidgets) {
+            win.patreon.initializeWidgets();
+          }
+        };
+        
         document.head.appendChild(script);
-      }
+      };
+      
+      const timer = setTimeout(loadPatreonScript, 100);
+      
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, [isFooterModalOpen]);
 
