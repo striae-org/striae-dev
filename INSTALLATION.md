@@ -401,9 +401,132 @@ wrangler deploy
 
 ---
 
-## Step 6: Configuration Files
+## Step 6: Configure CORS for All Workers
 
-### 6.1 Update Configuration Files
+**Important**: All workers have CORS (Cross-Origin Resource Sharing) headers that must be updated to match your domain. By default, they're configured for `https://www.striae.org`.
+
+### 6.1 Update CORS Headers in Worker Source Files
+
+Each worker needs its CORS headers updated to allow requests from your domain:
+
+**1. User Worker** (`workers/user-worker/src/user-worker.js`):
+```javascript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
+  'Content-Type': 'application/json'
+};
+```
+
+**2. Data Worker** (`workers/data-worker/src/data-worker.js`):
+```javascript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
+  'Content-Type': 'application/json'
+};
+```
+
+**3. Images Worker** (`workers/image-worker/src/image-worker.js`):
+```javascript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Custom-Auth-Key',
+  'Content-Type': 'application/json'
+};
+```
+
+**4. Keys Worker** (`workers/keys-worker/src/keys.js`):
+```javascript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
+  'Content-Type': 'text/plain'
+};
+```
+
+**5. Turnstile Worker** (`workers/turnstile-worker/src/turnstile.js`):
+```javascript
+const CORS_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'POST',
+  'Access-Control-Allow-Headers': 'Content-Type'
+};
+```
+
+**6. PDF Worker** (`workers/pdf-worker/src/pdf-worker.js`):
+```javascript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://your-domain.com', // Update this
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
+```
+
+### 6.2 Redeploy Workers After CORS Updates
+
+After updating CORS headers, redeploy each worker:
+
+```bash
+# Redeploy all workers with updated CORS
+cd workers/user-worker && wrangler deploy && cd ../..
+cd workers/data-worker && wrangler deploy && cd ../..
+cd workers/image-worker && wrangler deploy && cd ../..
+cd workers/keys-worker && wrangler deploy && cd ../..
+cd workers/turnstile-worker && wrangler deploy && cd ../..
+cd workers/pdf-worker && wrangler deploy && cd ../..
+```
+
+Or use a batch script:
+```bash
+for worker in user-worker data-worker image-worker keys-worker turnstile-worker pdf-worker; do
+  echo "Deploying $worker..."
+  cd "workers/$worker"
+  wrangler deploy
+  cd "../.."
+done
+```
+
+### 6.3 CORS Security Notes
+
+- **Use HTTPS**: Always use `https://` in CORS origins
+- **Exact Match**: CORS requires exact domain matching (including subdomains)
+- **No Wildcards**: Avoid using `*` for Access-Control-Allow-Origin in production
+- **Multiple Domains**: If you need multiple domains, implement dynamic CORS checking
+- **Testing**: Use browser developer tools to verify CORS headers are correct
+
+### 6.4 Verify CORS Configuration
+
+Test CORS headers using curl or browser developer tools:
+
+```bash
+# Test CORS preflight request
+curl -X OPTIONS \
+  -H "Origin: https://your-domain.com" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: Content-Type" \
+  https://your-worker.your-subdomain.workers.dev
+
+# Should return Access-Control-Allow-Origin header
+```
+
+**Common CORS Issues:**
+- ❌ **Mixed HTTP/HTTPS**: Ensure both frontend and workers use HTTPS
+- ❌ **Subdomain Mismatch**: `www.domain.com` ≠ `domain.com`
+- ❌ **Port Differences**: Development vs production port differences
+- ❌ **Missing Preflight**: Some requests require OPTIONS preflight handling
+
+---
+
+## Step 7: Configuration Files
+
+### 7.1 Update Configuration Files
 
 1. **Copy example configurations**:
 ```bash
@@ -463,9 +586,9 @@ mode = "smart"
 
 ---
 
-## Step 7: Deploy Frontend (Cloudflare Pages)
+## Step 8: Deploy Frontend (Cloudflare Pages)
 
-### 7.1 Build and Deploy
+### 8.1 Build and Deploy
 
 ```bash
 # Build the application
@@ -475,7 +598,7 @@ npm run build
 npm run deploy
 ```
 
-### 7.2 Configure Pages Environment Variables
+### 8.2 Configure Pages Environment Variables
 
 **Note:** If you used the automated deployment scripts in Step 3.4, you still need to manually set these variables in the Cloudflare Pages Dashboard:
 
@@ -483,7 +606,7 @@ npm run deploy
 - `SESSION_SECRET`: Your custom session secret
 - `SL_API_KEY`: Your SendLayer API key
 
-### 7.3 Configure Custom Domain
+### 8.3 Configure Custom Domain
 
 1. Go to Cloudflare Pages → Your project → Custom domains
 2. Add your custom domain
@@ -491,9 +614,9 @@ npm run deploy
 
 ---
 
-## Step 8: Testing and Verification
+## Step 9: Testing and Verification
 
-### 8.1 Test Authentication Flow
+### 9.1 Test Authentication Flow
 
 1. Navigate to your deployed application
 2. Test user registration
@@ -501,14 +624,14 @@ npm run deploy
 4. Test multi-factor authentication (MFA)
 5. Test password reset functionality
 
-### 8.2 Test Core Features
+### 9.2 Test Core Features
 
 1. **Image Upload**: Test image upload functionality
 2. **Data Storage**: Test data saving and retrieval
 3. **PDF Generation**: Test PDF export features
 4. **Turnstile**: Verify bot protection is working
 
-### 8.3 Test Worker Endpoints
+### 9.3 Test Worker Endpoints
 
 Verify each worker is responding correctly:
 - Keys worker: Authentication and key management
@@ -518,11 +641,33 @@ Verify each worker is responding correctly:
 - Turnstile worker: Bot protection
 - PDF worker: PDF generation
 
+### 9.4 Verify CORS Configuration
+
+Test that CORS is working correctly by:
+
+1. **Browser Developer Tools**: Check that requests from your frontend to workers succeed without CORS errors
+2. **Network Tab**: Verify that OPTIONS preflight requests return proper CORS headers
+3. **Manual Testing**: Use curl to test CORS headers:
+
+```bash
+# Test CORS for each worker
+curl -X OPTIONS \
+  -H "Origin: https://your-domain.com" \
+  -H "Access-Control-Request-Method: POST" \
+  https://your-worker-url.workers.dev
+```
+
+Expected response should include:
+- `Access-Control-Allow-Origin: https://your-domain.com`
+- Appropriate `Access-Control-Allow-Methods`
+- Appropriate `Access-Control-Allow-Headers`
+
 ---
 
-## Step 9: Security Checklist
+## Step 10: Security Checklist
 
 - [ ] All environment variables are set correctly
+- [ ] CORS is properly configured for all workers with your domain
 - [ ] CORS is properly configured for R2
 - [ ] Firebase authentication is working
 - [ ] Turnstile is blocking bots
