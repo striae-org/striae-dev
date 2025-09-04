@@ -41,7 +41,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           const apiKey = await getUserApiKey();
           const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
             headers: {
-              'X-User-Auth': apiKey
+              'X-Custom-Auth-Key': apiKey
             }
           });
           
@@ -116,7 +116,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Auth': apiKey
+          'X-Custom-Auth-Key': apiKey
         },
         body: JSON.stringify({
           email,

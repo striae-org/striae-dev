@@ -43,7 +43,7 @@ export const saveNotes = async (
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Auth': apiKey
+        'X-Custom-Auth-Key': apiKey
       },
       body: JSON.stringify(dataToSave)
     });
@@ -68,7 +68,7 @@ export const getNotes = async (
 
     const response = await fetch(url, {
       headers: {
-        'X-User-Auth': apiKey
+        'X-Custom-Auth-Key': apiKey
       }
     });
 

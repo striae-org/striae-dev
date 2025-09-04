@@ -1,5 +1,3 @@
-import { WorkerEntrypoint } from "cloudflare:workers";
-
 /**
  * @typedef {Object} Env
  * @property {string} R2_KEY_SECRET
@@ -23,41 +21,13 @@ const corsHeaders = {
 const hasValidHeader = (request, env) => 
   request.headers.get("X-Custom-Auth-Key") === env.KEYS_AUTH;
 
-export default class KeysWorker extends WorkerEntrypoint {
-  /**
-   * RPC method to get an API key by name
-   * @param {string} keyName - The name of the key to retrieve
-   * @returns {Promise<string>} The API key value
-   */
-  async getKey(keyName) {
-    if (!keyName || !(keyName in this.env)) {
-      throw new Error(`Key '${keyName}' not found`);
-    }
-    return this.env[keyName];
-  }
-
-  /**
-   * RPC method to verify auth password
-   * @param {string} password - The password to verify
-   * @returns {Promise<boolean>} Whether the password is valid
-   */
-  async verifyAuthPassword(password) {
-    if (!password) {
-      return false;
-    }
-    return password === this.env.AUTH_PASSWORD;
-  }
-  /**
-   * HTTP fetch handler for backward compatibility
-   * @param {Request} request 
-   * @returns {Promise<Response>}
-   */
-  async fetch(request) {
+export default {
+  async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
 
-    if (!hasValidHeader(request, this.env)) {
+    if (!hasValidHeader(request, env)) {
       return new Response('Forbidden', { 
         status: 403,
         headers: corsHeaders
@@ -71,7 +41,15 @@ export default class KeysWorker extends WorkerEntrypoint {
     if (request.method === 'POST' && path === 'verify-auth-password') {
       try {
         const { password } = await request.json();
-        const isValid = await this.verifyAuthPassword(password);
+        
+        if (!password) {
+          return new Response(JSON.stringify({ valid: false }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        
+        const isValid = password === env.AUTH_PASSWORD;
         
         return new Response(JSON.stringify({ valid: isValid }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -95,17 +73,16 @@ export default class KeysWorker extends WorkerEntrypoint {
         });
       }
 
-      try {
-        const key = await this.getKey(keyName);
-        return new Response(key, {
-          headers: corsHeaders
-        });
-      } catch (error) {
+      if (!(keyName in env)) {
         return new Response('Key not found', { 
           status: 404,
           headers: corsHeaders 
         });
       }
+
+      return new Response(env[keyName], {
+        headers: corsHeaders
+      });
     }
 
     return new Response('Method not allowed', {
@@ -113,4 +90,4 @@ export default class KeysWorker extends WorkerEntrypoint {
       headers: corsHeaders
     });
   }
-}
+};

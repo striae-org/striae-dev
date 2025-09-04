@@ -43,7 +43,7 @@ export const listCases = async (user: User): Promise<string[]> => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Auth': apiKey
+        'X-Custom-Auth-Key': apiKey
       }
     });
 
@@ -104,7 +104,7 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Auth': apiKey
+        'X-Custom-Auth-Key': apiKey
       }
     });
 
@@ -141,7 +141,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Auth': dataApiKey
+        'X-Custom-Auth-Key': dataApiKey
       },
       body: JSON.stringify(newCase)
     });
@@ -155,7 +155,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Auth': userApiKey
+        'X-Custom-Auth-Key': userApiKey
       },
       body: JSON.stringify({ cases: [rootCaseData] })
     });
@@ -192,7 +192,7 @@ export const renameCase = async (
 
   // Get old case data from data worker
   const oldCaseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/data.json`, {
-    headers: { 'X-User-Auth': dataApiKey }
+    headers: { 'X-Custom-Auth-Key': dataApiKey }
   });
 
   if (!oldCaseResponse.ok) {
@@ -211,7 +211,7 @@ export const renameCase = async (
   await fetch(`${DATA_WORKER_URL}/${user.uid}/${newCaseNumber}/data.json`, {
     method: 'PUT',
     headers: {
-      'X-User-Auth': dataApiKey,
+      'X-Custom-Auth-Key': dataApiKey,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(newCaseData)
@@ -223,7 +223,7 @@ export const renameCase = async (
       try {
         // Try to get the notes file for this image
         const notesResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/${file.id}/data.json`, {
-          headers: { 'X-User-Auth': dataApiKey }
+          headers: { 'X-Custom-Auth-Key': dataApiKey }
         });
 
         if (notesResponse.ok) {
@@ -233,7 +233,7 @@ export const renameCase = async (
           await fetch(`${DATA_WORKER_URL}/${user.uid}/${newCaseNumber}/${file.id}/data.json`, {
             method: 'PUT',
             headers: {
-              'X-User-Auth': dataApiKey,
+              'X-Custom-Auth-Key': dataApiKey,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(notesData)
@@ -256,7 +256,7 @@ export const renameCase = async (
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Auth': userApiKey
+      'X-Custom-Auth-Key': userApiKey
     },
     body: JSON.stringify({ cases: [rootCaseData] })
   });
@@ -270,7 +270,7 @@ export const renameCase = async (
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Auth': userApiKey
+      'X-Custom-Auth-Key': userApiKey
     },
     body: JSON.stringify({ casesToDelete: [oldCaseNumber] })
   });
@@ -282,7 +282,7 @@ export const renameCase = async (
   // Delete old case from data worker
   await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/data.json`, {
     method: 'DELETE',
-    headers: { 'X-User-Auth': dataApiKey }
+    headers: { 'X-Custom-Auth-Key': dataApiKey }
   });
 
   // Clean up old notes JSON files
@@ -292,7 +292,7 @@ export const renameCase = async (
         // Delete old notes file if it exists
         await fetch(`${DATA_WORKER_URL}/${user.uid}/${oldCaseNumber}/${file.id}/data.json`, {
           method: 'DELETE',
-          headers: { 'X-User-Auth': dataApiKey }
+          headers: { 'X-Custom-Auth-Key': dataApiKey }
         });
       } catch (error) {
         console.warn(`Failed to delete old notes for file ${file.id}:`, error);
@@ -312,7 +312,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
 
   // Get case data from data worker
   const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    headers: { 'X-User-Auth': dataApiKey }
+    headers: { 'X-Custom-Auth-Key': dataApiKey }
   });
 
   if (!caseResponse.ok) {
@@ -333,7 +333,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
   // Delete case file using data worker
   await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
     method: 'DELETE',
-    headers: { 'X-User-Auth': dataApiKey }
+    headers: { 'X-Custom-Auth-Key': dataApiKey }
   });
 
   // Delete case from KV store
@@ -341,7 +341,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Auth': userApiKey
+      'X-Custom-Auth-Key': userApiKey
     },
     body: JSON.stringify({ casesToDelete: [caseNumber] } as CasesToDelete)
   });

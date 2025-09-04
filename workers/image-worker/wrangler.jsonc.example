@@ -10,13 +10,6 @@
   "observability": { 
 	"enabled": true
   },
-
-  "services": [
-    {
-      "binding": "KEYS_WORKER",
-      "service": "striae-keys"
-    }
-  ],
   
   "routes": [
     {

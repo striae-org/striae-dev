@@ -6,7 +6,7 @@ const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-Auth',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
@@ -15,37 +15,26 @@ const createResponse = (data, status = 200) => new Response(
   { status, headers: corsHeaders }
 );
 
-const hasValidToken = async (request, env) => {
+const hasValidToken = (request, env) => {
   const authHeader = request.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  
-  try {
-    const token = authHeader.replace("Bearer ", "");
-    const expectedToken = await env.KEYS_WORKER.getKey('IMAGES_API_TOKEN');
-    return token === expectedToken;
-  } catch (error) {
-    console.error('Error validating token:', error);
-    return false;
-  }
+  const expectedToken = `Bearer ${env.API_TOKEN}`;
+  console.log('Auth check:', {
+    received: authHeader ? '[REDACTED]' : 'None',
+    match: authHeader === expectedToken
+  });
+  return authHeader === expectedToken;
 };
 
 /**
  * Handle image upload requests
  */
 async function handleImageUpload(request, env) {
-  if (!(await hasValidToken(request, env))) {
+  if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const formData = await request.formData();
-  
-  // Get API token and account ID from keys worker
-  const apiToken = await env.KEYS_WORKER.getKey('IMAGES_API_TOKEN');
-  const accountId = await env.KEYS_WORKER.getKey('ACCOUNT_HASH');
-  
-  const endpoint = `${API_BASE}/${accountId}/images/v1`;
+  const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1`;
 
   // Add requireSignedURLs to form data
   formData.append('requireSignedURLs', 'true');
@@ -53,7 +42,7 @@ async function handleImageUpload(request, env) {
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiToken}`,
+      'Authorization': `Bearer ${env.API_TOKEN}`,
     },
     body: formData
   });
@@ -66,22 +55,17 @@ async function handleImageUpload(request, env) {
  */
 
 async function handleImageDelete(request, env) {
-  if (!(await hasValidToken(request, env))) {
+  if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const url = new URL(request.url);
   const imageId = url.pathname.split('/').pop();
-  
-  // Get API token and account ID from keys worker
-  const apiToken = await env.KEYS_WORKER.getKey('IMAGES_API_TOKEN');
-  const accountId = await env.KEYS_WORKER.getKey('ACCOUNT_HASH');
-  
-  const endpoint = `${API_BASE}/${accountId}/images/v1/${imageId}`;
+  const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1/${imageId}`;
   const response = await fetch(endpoint, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${apiToken}`,
+      'Authorization': `Bearer ${env.API_TOKEN}`,
     }
   });
   const data = await response.json();
@@ -127,7 +111,7 @@ async function generateSignedUrl(url) {
 }
 
 async function handleImageServing(request, env) {
-  if (!(await hasValidToken(request, env))) {
+  if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
 

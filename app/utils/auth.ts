@@ -3,55 +3,34 @@ import paths from '~/config/config.json';
 const KEYS_URL = paths.keys_url;
 const KEYS_AUTH = paths.keys_auth;
 
-// Legacy functions maintained for backward compatibility with frontend auth
-// Workers now use service bindings instead of these functions
+type KeyType = 'USER_DB_AUTH' | 'R2_KEY_SECRET' | 'IMAGES_API_TOKEN' | 'ACCOUNT_HASH';
 
-export async function getUserApiKey(): Promise<string> {
-  const keyResponse = await fetch(`${KEYS_URL}/USER_DB_AUTH`, {
+async function getApiKey(keyType: KeyType): Promise<string> {
+  const keyResponse = await fetch(`${KEYS_URL}/${keyType}`, {
     headers: {
       'X-Custom-Auth-Key': KEYS_AUTH
     }
   });
   if (!keyResponse.ok) {
-    throw new Error('Failed to retrieve USER_DB_AUTH');
+    throw new Error(`Failed to retrieve ${keyType}`);
   }
   return keyResponse.text();
+}
+
+export async function getUserApiKey(): Promise<string> {
+  return getApiKey('USER_DB_AUTH');
 }
 
 export async function getDataApiKey(): Promise<string> {
-  const keyResponse = await fetch(`${KEYS_URL}/R2_KEY_SECRET`, {
-    headers: {
-      'X-Custom-Auth-Key': KEYS_AUTH
-    }
-  });
-  if (!keyResponse.ok) {
-    throw new Error('Failed to retrieve R2_KEY_SECRET');
-  }
-  return keyResponse.text();
+  return getApiKey('R2_KEY_SECRET');
 }
 
 export async function getImageApiKey(): Promise<string> {
-  const keyResponse = await fetch(`${KEYS_URL}/IMAGES_API_TOKEN`, {
-    headers: {
-      'X-Custom-Auth-Key': KEYS_AUTH
-    }
-  });
-  if (!keyResponse.ok) {
-    throw new Error('Failed to retrieve IMAGES_API_TOKEN');
-  }
-  return keyResponse.text();
+  return getApiKey('IMAGES_API_TOKEN');
 }
 
 export async function getAccountHash(): Promise<string> {
-  const keyResponse = await fetch(`${KEYS_URL}/ACCOUNT_HASH`, {
-    headers: {
-      'X-Custom-Auth-Key': KEYS_AUTH
-    }
-  });
-  if (!keyResponse.ok) {
-    throw new Error('Failed to retrieve ACCOUNT_HASH');
-  }
-  return keyResponse.text();
+  return getApiKey('ACCOUNT_HASH');
 }
 
 export async function verifyAuthPassword(password: string): Promise<boolean> {

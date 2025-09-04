@@ -1,26 +1,13 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-User-Auth',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
 async function authenticate(request, env) {
-  const authKey = request.headers.get('X-User-Auth');
-  if (!authKey) {
-    throw new Error('Unauthorized');
-  }
-  
-  try {
-    // Get the expected auth key from the keys worker
-    const expectedAuth = await env.KEYS_WORKER.getKey('USER_DB_AUTH');
-    if (authKey !== expectedAuth) {
-      throw new Error('Unauthorized');
-    }
-  } catch (error) {
-    console.error('Error validating auth:', error);
-    throw new Error('Unauthorized');
-  }
+  const authKey = request.headers.get('X-Custom-Auth-Key');
+  if (authKey !== env.USER_DB_AUTH) throw new Error('Unauthorized');
 }
 
 async function handleGetUser(env, userUid) {
