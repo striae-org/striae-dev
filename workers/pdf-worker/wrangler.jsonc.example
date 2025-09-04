@@ -1,0 +1,24 @@
+{
+  "name": "browser-worker",
+  "account_id": "YOUR_ACCOUNT_ID",
+  "main": "src/pdf-worker.js",
+  "compatibility_date": "2023-03-14",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "browser": {
+    "binding": "BROWSER"
+  },
+  "observability": { 
+	"enabled": true
+  },
+
+  "routes": [
+    {
+      "pattern": "PDF_WORKER_CUSTOM_DOMAIN",
+      "custom_domain": true
+    }
+  ],
+
+  "placement": { "mode": "smart" }
+}

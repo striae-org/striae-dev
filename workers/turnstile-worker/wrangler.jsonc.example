@@ -1,0 +1,19 @@
+{
+  "name": "striae-turnstile",
+  "account_id": "YOUR_ACCOUNT_ID",
+  "main": "src/turnstile.js",
+  "compatibility_date": "2023-03-14",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],  
+  "observability": { 
+	"enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "TURNSTILE_WORKER_CUSTOM_DOMAIN",
+      "custom_domain": true
+    }
+  ],
+  "placement": { "mode": "smart" }
+}
