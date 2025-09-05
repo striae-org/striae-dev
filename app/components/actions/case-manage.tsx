@@ -13,6 +13,12 @@ interface CaseData {
   files: FileData[];
 }
 
+interface UserData {
+  cases: Omit<CaseData, 'files'>[];
+  updatedAt: string;
+  [key: string]: any;
+}
+
 interface FileData {
   id: string;
   originalFilename: string;
@@ -30,34 +36,60 @@ const MAX_CASE_NUMBER_LENGTH = 25;
 
 export const listCases = async (user: User): Promise<string[]> => {
   try {
-    // Call server-side API route instead of direct worker API
-    // This way API keys never leave the server
-    const response = await fetch(`/api/cases?uid=${encodeURIComponent(user.uid)}`, {
+    const apiKey = await getUserApiKey();
+    
+    // Get user data from KV store
+    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
-        // No API keys needed here - handled server-side
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
       }
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch cases:', response.status);
+      console.error('Failed to fetch user data:', response.status);
       return [];
     }
 
-    const data = await response.json() as { cases: string[]; success?: boolean; error?: string };
+    const userData: UserData = await response.json();
     
-    if (data.error) {
-      console.error('Server error:', data.error);
+    if (!userData?.cases) {
       return [];
     }
 
-    return data.cases || [];
+    const caseNumbers = userData.cases.map(c => c.caseNumber);
+    return sortCaseNumbers(caseNumbers);
     
   } catch (error) {
     console.error('Error listing cases:', error);
     return [];
   }
+};
+
+const sortCaseNumbers = (cases: string[]): string[] => {
+  return cases.sort((a, b) => {
+    // Extract all numbers and letters
+    const getComponents = (str: string) => {
+      const numbers = str.match(/\d+/g)?.map(Number) || [];
+      const letters = str.match(/[A-Za-z]+/g)?.join('') || '';
+      return { numbers, letters };
+    };
+
+    const aComponents = getComponents(a);
+    const bComponents = getComponents(b);
+
+    // Compare numbers first
+    const maxLength = Math.max(aComponents.numbers.length, bComponents.numbers.length);
+    for (let i = 0; i < maxLength; i++) {
+      const aNum = aComponents.numbers[i] || 0;
+      const bNum = bComponents.numbers[i] || 0;
+      if (aNum !== bNum) return aNum - bNum;
+    }
+
+    // If all numbers match, compare letters
+    return aComponents.letters.localeCompare(bComponents.letters);
+  });
 };
 
 export const validateCaseNumber = (caseNumber: string): boolean => {
