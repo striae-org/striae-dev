@@ -758,3 +758,11 @@ For support and questions:
 ## License
 
 This project is licensed under the terms specified in the LICENSE file.
+
+---
+
+## Credits
+
+This project was entirely designed and developed by [Stephen J. Lu](https://www.stephenjlu.com)
+
+---
