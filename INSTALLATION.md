@@ -88,7 +88,7 @@ ls -la
    - **Domain**: Your domain (e.g., `striae.org`)
    - **Mode**: Managed or Non-Interactive (recommended)
 4. Note down:
-   - **Site Key** (CFT_PUBLIC_KEY)
+   - **Site Key** (for frontend configuration)
    - **Secret Key** (CFT_SECRET_KEY)
 
 ### 2.2 Cloudflare Images Setup
@@ -174,14 +174,12 @@ All required variables are documented in the `.env` file. Here's what you need t
 - `IMAGES_API_TOKEN` - Cloudflare Images API token
 - `IMAGES_ACCOUNT_HASH` - Cloudflare Images Account Hash  
 - `HMAC_KEY` - Cloudflare Images HMAC signing key
-- `CFT_PUBLIC_KEY` - Cloudflare Turnstile public key
 - `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
 
 **External Services:**
 - `SL_API_KEY` - SendLayer API token
 
 **Custom Security Tokens** (generate your own):
-- `SESSION_SECRET` - Cookie storage token (32+ characters)
 - `R2_KEY_SECRET` - R2 authentication token
 - `USER_DB_AUTH` - KV authentication token
 - `KEYS_AUTH` - Key handler authentication token
@@ -230,7 +228,6 @@ The scripts will:
 ### 3.5 Manual Pages Environment Variables
 
 After running the deployment script, manually set these variables in the **Cloudflare Pages Dashboard**:
-- `SESSION_SECRET`
 - `SL_API_KEY`
 - `AUTH_PASSWORD`
 
@@ -352,7 +349,6 @@ wrangler deploy
 
 **Manual configuration** (if not using automated scripts):
 - `ACCOUNT_HASH`: Your Images Account Hash
-- `ACCOUNT_ID`: Your Cloudflare Account ID
 - `AUTH_PASSWORD`: Your custom auth password
 - `IMAGES_API_TOKEN`: Your Images API token
 - `KEYS_AUTH`: Your custom keys auth token
@@ -644,7 +640,6 @@ npm run deploy
 **Note:** If you used the automated deployment scripts in Step 3.4, you still need to manually set these variables in the Cloudflare Pages Dashboard:
 
 - `AUTH_PASSWORD`: Your custom registration password
-- `SESSION_SECRET`: Your custom session secret
 - `SL_API_KEY`: Your SendLayer API key
 
 ### 8.3 Configure Custom Domain
