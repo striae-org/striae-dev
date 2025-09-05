@@ -32,8 +32,51 @@ Before starting the installation, ensure you have the following accounts and ser
 ```bash
 git clone https://github.com/striae-org/striae.git
 cd striae
-npm install
 ```
+
+### 1.1: Extract Node Package Dependencies
+
+The repository includes a pre-configured node package that contains the exact dependencies required for Striae to function properly.
+
+```bash
+# Navigate to the node-package directory
+cd node-package
+```
+
+**Windows (using 7-Zip):**
+```cmd
+# Using 7-Zip command line
+7z x node-package.7z -o..
+
+# Or extract manually using 7-Zip GUI:
+# Right-click node-package.7z → 7-Zip → Extract to "..\\" → Extract
+```
+
+**Linux/macOS (requires p7zip):**
+```bash
+# Install p7zip if not already installed:
+# Ubuntu/Debian: sudo apt-get install p7zip-full
+# macOS: brew install p7zip
+# CentOS/RHEL: sudo yum install p7zip
+
+# Extract the 7z archive
+7z x node-package.7z -o..
+```
+
+**Verification:**
+```bash
+# Navigate back to project root after extraction
+cd ..
+
+# Verify the extraction was successful
+ls -la
+# You should see: node_modules/, package.json, package-lock.json, postcss.config.js
+```
+
+> ⚠️ **Important**: This pre-configured node package is the only tested configuration that works with Striae. Do not run `npm install` or modify these dependencies unless absolutely necessary.
+
+> 💡 **Note**: The node package contains all dependencies with the exact versions required for compatibility with Cloudflare Workers and the Remix framework used by Striae.
+
 
 ---
 
