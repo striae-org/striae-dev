@@ -316,7 +316,7 @@ export const Signup = () => {
               required
               disabled={sending}
             />
-            <span>I have read the notice and understand Striae is intended for professional use only. Additionally, I understand that I may need to resubmit this form to receive a new access password on a semi-annual basis.</span>
+            <span>I have read the notice and understand Striae is intended for <Link to="https://help.striae.org/striae-users-guide/getting-started/code-of-responsible-use" target="_blank" rel="noopener noreferrer">professional use</Link> only. Additionally, I understand that I may need to resubmit this form to receive a new access password on a semi-annual basis.</span>
           </label>
 
           <Turnstile
