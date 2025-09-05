@@ -31,3 +31,36 @@ export async function createUserSession(
     },
   });
 }
+
+export async function setUserSession(user: { uid: string; email: string }) {
+  const session = await sessionStorage.getSession();
+  session.set("userId", user.uid);
+  session.set("userEmail", user.email);
+  
+  return await sessionStorage.commitSession(session);
+}
+
+export async function getUserFromSession(request: Request) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  
+  const userId = session.get("userId");
+  const userEmail = session.get("userEmail");
+  
+  if (!userId) return null;
+  
+  return { uid: userId, email: userEmail };
+}
+
+export async function logout(request: Request) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await sessionStorage.destroySession(session),
+    },
+  });
+}
