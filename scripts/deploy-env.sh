@@ -32,7 +32,6 @@ source .env
 # Validate required variables
 required_vars=(
     "ACCOUNT_ID"
-    "SESSION_SECRET" 
     "SL_API_KEY"
     "AUTH_PASSWORD"
     "KEYS_AUTH"
@@ -40,7 +39,7 @@ required_vars=(
     "R2_KEY_SECRET"
     "ACCOUNT_HASH"
     "IMAGES_API_TOKEN"
-    "CFT_PUBLIC_KEY"
+    "API_TOKEN"
     "CFT_SECRET_KEY"
 )
 
@@ -78,8 +77,7 @@ echo -e "\n${BLUE}🔐 Deploying secrets to workers...${NC}"
 
 # Keys Worker
 set_worker_secrets "Keys Worker" "workers/keys-worker" \
-    "ACCOUNT_ID" "ACCOUNT_HASH" "AUTH_PASSWORD" "IMAGES_API_TOKEN" \
-    "KEYS_AUTH" "R2_KEY_SECRET" "USER_DB_AUTH" "CFT_PUBLIC_KEY" "CFT_SECRET_KEY"
+    "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN" "AUTH_PASSWORD"
 
 # User Worker  
 set_worker_secrets "User Worker" "workers/user-worker" \
@@ -104,7 +102,6 @@ echo -e "\n${GREEN}🎉 All worker secrets deployed successfully!${NC}"
 
 # Remind about Pages environment variables
 echo -e "\n${YELLOW}⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:${NC}"
-echo "   - SESSION_SECRET"
 echo "   - SL_API_KEY" 
 echo "   - AUTH_PASSWORD"
 

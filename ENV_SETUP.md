@@ -39,20 +39,16 @@ This directory contains scripts and configuration files for managing Striae's en
 ## Environment Variables by Service
 
 ### Cloudflare Pages
-- `SESSION_SECRET` - Session management (32+ chars)
 - `SL_API_KEY` - SendLayer email service
 - `AUTH_PASSWORD` - Custom registration password
 
 ### Keys Worker
-- `ACCOUNT_ID` - Cloudflare Account ID
 - `ACCOUNT_HASH` - Cloudflare Images Account Hash
 - `AUTH_PASSWORD` - Custom registration password
 - `IMAGES_API_TOKEN` - Cloudflare Images API token (for keys worker)
 - `KEYS_AUTH` - Custom keys authentication token
 - `R2_KEY_SECRET` - Custom R2 authentication token
 - `USER_DB_AUTH` - Custom KV authentication token
-- `CFT_PUBLIC_KEY` - Cloudflare Turnstile public key
-- `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
 
 ### User Worker
 - `USER_DB_AUTH` - Custom KV authentication token

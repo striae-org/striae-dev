@@ -30,15 +30,12 @@ echo.
 
 echo === Keys Worker ===
 echo cd workers\keys-worker
-echo wrangler secret put ACCOUNT_ID --name striae-keys
-echo wrangler secret put ACCOUNT_HASH --name striae-keys  
-echo wrangler secret put AUTH_PASSWORD --name striae-keys
-echo wrangler secret put IMAGES_API_TOKEN --name striae-keys
 echo wrangler secret put KEYS_AUTH --name striae-keys
-echo wrangler secret put R2_KEY_SECRET --name striae-keys
 echo wrangler secret put USER_DB_AUTH --name striae-keys
-echo wrangler secret put CFT_PUBLIC_KEY --name striae-keys
-echo wrangler secret put CFT_SECRET_KEY --name striae-keys
+echo wrangler secret put R2_KEY_SECRET --name striae-keys
+echo wrangler secret put ACCOUNT_HASH --name striae-keys  
+echo wrangler secret put IMAGES_API_TOKEN --name striae-keys
+echo wrangler secret put AUTH_PASSWORD --name striae-keys
 echo cd ..\..
 echo.
 
@@ -72,7 +69,6 @@ echo 📄 PDF Worker: No environment variables needed
 echo.
 
 echo ⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:
-echo    - SESSION_SECRET
 echo    - SL_API_KEY
 echo    - AUTH_PASSWORD
 echo.
