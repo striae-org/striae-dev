@@ -2,8 +2,6 @@
 
 This guide provides step-by-step instructions for deploying Striae, a Firearms Examiner's Comparison Companion, on Cloudflare infrastructure.
 
-> 🚀 **New in this version**: Streamlined environment variables setup with automated deployment scripts! See Step 3 for the improved setup process.
-
 ## Prerequisites
 
 Before starting the installation, ensure you have the following accounts and services set up:
