@@ -90,11 +90,10 @@
   max-width: 560px;
   aspect-ratio: 16 / 9;
   margin: 1.5em auto;
-  display: flex;
+  display: flex;  
   justify-content: center;
   align-items: center;
-  background: #000;
-  border-radius: 8px;
+  background: #000;  
   overflow: hidden;
 }
 
