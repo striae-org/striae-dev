@@ -102,7 +102,7 @@
 | **UI/UX** | 📱 Homepage mobile improvements | 📈 Better user experience |
 | **Infrastructure** | ⚙️ Worker optimization | 🔧 Improved performance |
 | **Community** | 💝 Funding integration | 🤝 Project sustainability |
-| **Documentation** | 📚 Comprehensive guides | 📖 Better developer & user onboarding |
+| **Documentation** | 📚 Comprehensive guides | 📖 Better user & developer onboarding |
 
 ---
 
