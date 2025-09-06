@@ -117,13 +117,13 @@ ls -la
 
 1. Navigate to Cloudflare Dashboard → R2 Object Storage
 2. Create a new R2 bucket for data storage
-3. Configure CORS settings for your bucket:
+3. Configure CORS settings for your bucket, replacing the allowed origin with your custom domain:
 
 ```json
 [
   {
     "AllowedOrigins": [
-      "https://www.striae.org"
+      "https://your-domain.com"
     ],
     "AllowedMethods": [
       "GET",
