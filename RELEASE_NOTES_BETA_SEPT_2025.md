@@ -38,12 +38,6 @@
 ### Code Quality & Maintenance
 
 - **Extensive comment cleanup** across 23+ files removing over 170 lines of redundant code
-- **Dependency updates** including major version bumps for:
-  - Wrangler (3.57.1 → 4.32.0)
-  - Vite (5.4.19 → 7.1.3)
-  - Tailwind CSS (3.4.17 → 4.1.12)
-  - Firebase (11.1.0 → 12.1.0)
-  - TypeScript and ESLint updates
 
 ### Development Experience
 

@@ -1,9 +1,11 @@
 # 🔫 Striae - A Firearms Examiner's Comparison Companion
 
 ## 🌐 Application URL
+
 **[Live App](https://www.striae.org)**
 
 ## 📚 Documentation
+
 **[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)**
 
 **[Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)**
@@ -11,6 +13,7 @@
 **[Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/environment-variables-setup)**
 
 ## 💬 Contact & Support
+
 **[Striae Support](https://www.striae.org/support)**
 
 **[Striae on Discord](https://discord.gg/ESUPhTPwHx)**
@@ -18,6 +21,16 @@
 ---
 
 ## 📋 Changelog
+
+## [2025-09-06] - *[Release v0.9.06-beta](https://github.com/striae-org/striae/releases/tag/v0.9.06-beta)*
+
+- **Installation & Setup Improvements** - Comprehensive installation guide and simplified setup process
+- **Worker Infrastructure Enhancements** - Security hardening and configuration portability improvements
+- **UI/UX Enhancements** - Added homepage about section, improved mobile responsiveness, and enhanced authentication components
+- **Security & Data Management** - Free email domain filtering and enhanced authentication security measures
+- **Community & Project Management** - Patreon integration, GitHub issue templates, and Code of Conduct
+- **Bug Fixes & Optimizations** - PostCSS fixes, configuration improvements, and dependency updates
+- **Developer Experience** - Enhanced documentation, worker optimizations, and deployment script improvements
 
 ## [2025-09-01] - *[Release v0.9.0-beta](https://github.com/striae-org/striae/releases/tag/v0.9.0)*
 
