@@ -393,9 +393,6 @@ wrangler deploy
 ```bash
 cd ../image-worker
 npm install
-```
-
-```bash
 wrangler deploy
 ```
 
