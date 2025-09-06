@@ -56,6 +56,7 @@ echo cd workers\image-worker
 echo wrangler secret put ACCOUNT_ID --name striae-images
 echo wrangler secret put ACCOUNT_HASH --name striae-images
 echo wrangler secret put API_TOKEN --name striae-images
+echo wrangler secret put HMAC_KEY --name striae-images
 echo cd ..\..
 echo.
 
@@ -74,7 +75,6 @@ echo    - AUTH_PASSWORD
 echo.
 
 echo ⚠️  ALSO REMEMBER TO:
-echo    - Update HMAC_KEY in workers\image-worker\src\image-worker.js
 echo    - Configure KV namespace ID in workers\user-worker\wrangler.jsonc
 echo    - Configure R2 bucket name in workers\data-worker\wrangler.jsonc
 echo.

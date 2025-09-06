@@ -233,9 +233,8 @@ After running the deployment script, manually set these variables in the **Cloud
 
 ### 3.6 Final Manual Steps
 
-1. **Update HMAC Key**: Edit `workers/image-worker/src/image-worker.js` and replace `YOUR_HMAC_KEY` with your actual HMAC key
-2. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
-3. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
+1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
+2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
 
 > 📚 **Detailed Documentation**: See `ENV_SETUP.md` for comprehensive environment setup documentation, troubleshooting, and manual deployment options.
 
@@ -396,12 +395,6 @@ cd ../image-worker
 npm install
 ```
 
-**Important**: Before deploying, update the HMAC key in the source code:
-
-1. Open `src/image-worker.js`
-2. Find the line with `YOUR_HMAC_KEY`
-3. Replace it with your actual HMAC key from Cloudflare Images
-
 ```bash
 wrangler deploy
 ```
@@ -412,6 +405,7 @@ wrangler deploy
 - `ACCOUNT_HASH`: Your Images Account Hash
 - `ACCOUNT_ID`: Your Cloudflare Account ID
 - `API_TOKEN`: Your Images API token
+- `HMAC_KEY`: Your Images HMAC signing key
 
 ### 5.5 Turnstile Worker
 
@@ -761,7 +755,7 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 
 1. **CORS Errors**: Ensure R2 CORS configuration includes your domain
 2. **Authentication Failures**: Verify Firebase configuration and worker tokens
-3. **Image Upload Issues**: Check HMAC key configuration in image worker
+3. **Image Upload Issues**: Check environment variable configuration in image worker
 4. **Worker Errors**: Verify environment variables and bindings are set correctly
 
 ### Useful Commands

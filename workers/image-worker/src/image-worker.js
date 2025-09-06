@@ -1,7 +1,3 @@
-/**
- * REPLACE 'YOUR_HMAC_KEY' WITH YOUR ACTUAL HMAC KEY FOR SIGNED URLS
- */
-
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
 /**
@@ -80,15 +76,14 @@ async function handleImageDelete(request, env) {
  * Handle Signed URL generation
  */
 
-const KEY = 'YOUR_HMAC_KEY';
 const EXPIRATION = 60 * 60; // 1 hour
 
 const bufferToHex = buffer =>
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
 
-async function generateSignedUrl(url) {
+async function generateSignedUrl(url, env) {
   const encoder = new TextEncoder();
-  const secretKeyData = encoder.encode(KEY);
+  const secretKeyData = encoder.encode(env.HMAC_KEY);
   const key = await crypto.subtle.importKey(
     'raw',
     secretKeyData,
@@ -123,7 +118,7 @@ async function handleImageServing(request, env) {
   const imageDeliveryURL = new URL(
     url.pathname.slice(1).replace('https:/imagedelivery.net', 'https://imagedelivery.net')
   );
-  return generateSignedUrl(imageDeliveryURL);
+  return generateSignedUrl(imageDeliveryURL, env);
 }
 
 /**
