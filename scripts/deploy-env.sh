@@ -41,6 +41,7 @@ required_vars=(
     "IMAGES_API_TOKEN"
     "API_TOKEN"
     "CFT_SECRET_KEY"
+    "HMAC_KEY"
 )
 
 echo -e "${YELLOW}🔍 Validating required environment variables...${NC}"
@@ -89,7 +90,7 @@ set_worker_secrets "Data Worker" "workers/data-worker" \
 
 # Images Worker
 set_worker_secrets "Images Worker" "workers/image-worker" \
-    "ACCOUNT_ID" "ACCOUNT_HASH" "API_TOKEN"
+    "ACCOUNT_ID" "ACCOUNT_HASH" "API_TOKEN" "HMAC_KEY"
 
 # Turnstile Worker
 set_worker_secrets "Turnstile Worker" "workers/turnstile-worker" \
@@ -106,7 +107,6 @@ echo "   - SL_API_KEY"
 echo "   - AUTH_PASSWORD"
 
 echo -e "\n${YELLOW}⚠️  ALSO REMEMBER TO:${NC}"
-echo "   - Update HMAC_KEY in workers/image-worker/src/image-worker.js"
 echo "   - Configure KV namespace ID in workers/user-worker/wrangler.jsonc"
 echo "   - Configure R2 bucket name in workers/data-worker/wrangler.jsonc"
 

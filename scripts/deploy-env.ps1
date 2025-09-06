@@ -59,7 +59,8 @@ $requiredVars = @(
     "ACCOUNT_HASH",
     "IMAGES_API_TOKEN",
     "API_TOKEN",
-    "CFT_SECRET_KEY"
+    "CFT_SECRET_KEY",
+    "HMAC_KEY"
 )
 
 Write-Host "🔍 Validating required environment variables..." -ForegroundColor Yellow
@@ -143,7 +144,7 @@ Set-WorkerSecrets -WorkerName "Data Worker" -WorkerPath "workers/data-worker" -S
 
 # Images Worker
 Set-WorkerSecrets -WorkerName "Images Worker" -WorkerPath "workers/image-worker" -Secrets @(
-    "ACCOUNT_ID", "ACCOUNT_HASH", "API_TOKEN"
+    "ACCOUNT_ID", "ACCOUNT_HASH", "API_TOKEN", "HMAC_KEY"
 )
 
 # Turnstile Worker
@@ -168,7 +169,6 @@ Write-Host "   - AUTH_PASSWORD" -ForegroundColor White
 
 Write-Host ""
 Write-Host "⚠️  ALSO REMEMBER TO:" -ForegroundColor Yellow
-Write-Host "   - Update HMAC_KEY in workers/image-worker/src/image-worker.js" -ForegroundColor White
 Write-Host "   - Configure KV namespace ID in workers/user-worker/wrangler.jsonc" -ForegroundColor White
 Write-Host "   - Configure R2 bucket name in workers/data-worker/wrangler.jsonc" -ForegroundColor White
 

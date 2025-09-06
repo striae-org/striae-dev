@@ -60,6 +60,7 @@ This directory contains scripts and configuration files for managing Striae's en
 - `ACCOUNT_ID` - Cloudflare Account ID
 - `ACCOUNT_HASH` - Cloudflare Images Account Hash
 - `API_TOKEN` - Cloudflare Images API token
+- `HMAC_KEY` - Cloudflare Images HMAC signing key
 
 ### Turnstile Worker
 - `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
@@ -81,11 +82,10 @@ wrangler secret put KEYS_AUTH --name striae-keys
 
 ## Important Notes
 
-1. **HMAC Key**: Must be updated directly in `workers/image-worker/src/image-worker.js`
-2. **KV Binding**: Configure namespace ID in `workers/user-worker/wrangler.jsonc`
-3. **R2 Binding**: Configure bucket name in `workers/data-worker/wrangler.jsonc`
-4. **Pages Variables**: Set in Cloudflare Pages Dashboard manually
-5. **Security**: Never commit `.env` with real values
+1. **KV Binding**: Configure namespace ID in `workers/user-worker/wrangler.jsonc`
+2. **R2 Binding**: Configure bucket name in `workers/data-worker/wrangler.jsonc`
+3. **Pages Variables**: Set in Cloudflare Pages Dashboard manually
+4. **Security**: Never commit `.env` with real values
 
 ## Generating Secure Tokens
 
