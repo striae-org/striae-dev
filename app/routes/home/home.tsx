@@ -114,7 +114,7 @@ export default function Home() {
               
               <h3 className={styles.sectionTitle}>Unique Position in Forensics</h3>
               <p>
-                Striae distinguishes itself as a cloud-native application targeting firearms examiners with purpose-built annotation workflows, data management, and reporting functions rarely offered by other platforms designed for broader forensic use cases. Its architecture is tailored for seamless evidence linking, intuitive digital annotation, and strict data lifecycle control, all optimized for the unique workflows of firearms examination.
+                Striae distinguishes itself as a cloud-native application aiming to benefit firearms examiners with purpose-built annotation workflows, data management, and reporting functions rarely offered by other platforms designed for broader forensic use cases. Its architecture is tailored for seamless evidence linking, intuitive digital annotation, and strict data lifecycle control, all optimized for the unique workflows of firearms examination.
               </p>
               
               <h3 className={styles.sectionTitle}>Benefits of Being Cloud-Native (with Cloudflare)</h3>
