@@ -15,7 +15,7 @@
 
 ### Worker Infrastructure Enhancements
 
-- **🔒 Security Hardening** - Moved HMAC_KEY to environment variables for image worker
+- **🔒 Security Hardening** - Moved `HMAC_KEY` to environment variables for image worker
 - **📝 Configuration Portability** - Improved worker configuration examples and templates  
 - **🚀 Deployment Scripts** - Updated environment variable deployment scripts for cross-platform compatibility
 - **📊 Secrets Management** - Improved secrets management and environment configuration
