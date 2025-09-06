@@ -72,7 +72,7 @@
 ### Configuration & Setup
 
 - **🗂️ CORS Configuration** - Clarified CORS setup in installation guide
-- **📝 Environment Configuration** - Fixed .env.example commenting and setup instructions
+- **📝 Environment Configuration** - Fixed `.env.example` commenting and setup instructions
 
 ### UI/UX Fixes
 
