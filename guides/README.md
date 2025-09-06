@@ -8,83 +8,69 @@ This documentation provides comprehensive guidance for developers working on Str
 
 New to Striae? Start here:
 
-1. **[Project Overview](./PROJECT_OVERVIEW.md)** - Understand what Striae is and does
-2. **[Installation Guide](./INSTALLATION.md)** - Set up your development environment
+1. **[Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)** - Understand what Striae is and does
+2. **[Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)** - Set up your development environment
 
 ## Core Documentation
 
 ### Architecture and Design
 
-- **[Architecture Guide](./ARCHITECTURE.md)** - System architecture and design patterns
-- **[Component Guide](./COMPONENT_GUIDE.md)** - Frontend component architecture
-- **[API Reference](./API_REFERENCE.md)** - Complete API documentation for all workers
+- **[Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)** - System architecture and design patterns
+- **[Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)** - Frontend component architecture
+- **[API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)** - Complete API documentation for all workers
 
 ### Development Guides
 
-- **[Security Guide](./SECURITY.md)** - Security architecture and best practices
-- **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment procedures
-- **[Environment Setup](./ENV_SETUP.md)** - Environment variables and configuration
+- **[Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)** - Security architecture and best practices
+- **[Environment Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)** - Environment variables and configuration
 
 ## Documentation Organization
 
 ### By Experience Level
 
 #### New Developers
-- Start with [Project Overview](./PROJECT_OVERVIEW.md)
-- Follow [Installation Guide](./INSTALLATION.md)
-- Review [Component Guide](./COMPONENT_GUIDE.md)
+- Start with [Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
+- Follow [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)
+- Review [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
 
 #### Experienced Developers
-- Review [Architecture Guide](./ARCHITECTURE.md)
-- Study [API Reference](./API_REFERENCE.md)
-- Understand [Security Guide](./SECURITY.md)
-
-#### DevOps/Infrastructure
-- Focus on [Deployment Guide](./DEPLOYMENT.md)
-- Review [Security Guide](./SECURITY.md)
-- Study [Environment Setup](./ENV_SETUP.md)
+- Review [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)
+- Study [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
+- Understand [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)
 
 ### By Topic
 
 #### Frontend Development
-- [Component Guide](./COMPONENT_GUIDE.md)
-- [Architecture Guide](./ARCHITECTURE.md) (Frontend section)
-- [Security Guide](./SECURITY.md) (Application Security section)
+- [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
+- [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) (Frontend section)
+- [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide) (Application Security section)
 
 #### Backend Development
-- [API Reference](./API_REFERENCE.md)
-- [Architecture Guide](./ARCHITECTURE.md) (Backend section)
-- [Security Guide](./SECURITY.md) (Authentication section)
-
-#### Infrastructure & Deployment
-- [Deployment Guide](./DEPLOYMENT.md)
-- [Environment Setup](./ENV_SETUP.md)
-- [Security Guide](./SECURITY.md) (Network Security section)
+- [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
+- [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) (Backend section)
+- [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide) (Authentication section)
 
 ## Document Summaries
 
-### [Project Overview](./PROJECT_OVERVIEW.md)
+### [Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
 High-level introduction to Striae, including project structure, tech stack, and key differentiators. Essential reading for understanding the project's purpose and scope.
 
-### [Installation Guide](./INSTALLATION.md)
+### [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)
 Detailed installation and setup instructions for development and production environments. Covers prerequisites, configuration, and deployment procedures.
 
-### [Architecture Guide](./ARCHITECTURE.md)
+### [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)
 In-depth system architecture documentation covering frontend, backend, data layer, and security architecture. Includes component relationships and data flow diagrams.
 
-### [Component Guide](./COMPONENT_GUIDE.md)
+### [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
 Frontend-focused guide covering React component architecture, state management patterns, styling approaches, and development best practices.
 
-### [API Reference](./API_REFERENCE.md)
+### [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
 Complete API documentation for all Cloudflare Workers, including endpoints, authentication, request/response formats, and usage examples.
 
-### [Security Guide](./SECURITY.md)
+### [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)
 This guide covers security practices, authentication flows, and security considerations for developers working on the Striae project.
 
-### [Deployment Guide](./DEPLOYMENT.md)
-Production deployment procedures including environment setup, CI/CD pipelines, monitoring, and maintenance procedures.
-
-### [Environment Setup](./ENV_SETUP.md)
+### [Environment Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)
 Detailed guide for configuring environment variables, API keys, and service integrations across development, staging, and production environments.
 
 ## Contributing to Documentation

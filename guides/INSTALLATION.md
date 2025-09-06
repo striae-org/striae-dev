@@ -236,7 +236,7 @@ After running the deployment script, manually set these variables in the **Cloud
 1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
 2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
 
-> 📚 **Detailed Documentation**: See `ENV_SETUP.md` for comprehensive environment setup documentation, troubleshooting, and manual deployment options.
+> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
 
 ---
 
@@ -711,14 +711,14 @@ Expected response should include:
 **Striae now includes an automated environment variables management system:**
 
 1. **Centralized Configuration**: All environment variables organized in `.env` file by service
-2. **Automated Deployment**: Scripts for Linux, macOS, Windows, and PowerShell
+2. **Automated Environment Setup**: Scripts for Linux, macOS, Windows, and PowerShell
 3. **Template System**: Safe `.env.example` file for version control
-4. **Comprehensive Documentation**: See `ENV_SETUP.md` for detailed instructions
+4. **Comprehensive Documentation**: See [Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup) for detailed instructions
 
 ### Key Improvements Made
 
 1. **Streamlined Environment Setup**: Single `.env` file replaces manual variable collection
-2. **Automated Secret Deployment**: One command deploys all worker secrets
+2. **Automated Secret Management**: One command configures all worker secrets
 3. **Cross-Platform Support**: Scripts for all operating systems
 4. **Better Organization**: Variables grouped by worker/service usage
 5. **Enhanced Security**: Template system prevents accidental credential commits

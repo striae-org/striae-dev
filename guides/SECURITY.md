@@ -1,4 +1,4 @@
-# Security Guide for Developers
+# Striae Security Guide
 
 ## Overview
 

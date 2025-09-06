@@ -10,7 +10,7 @@
 
 **[Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)**
 
-**[Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/environment-variables-setup)**
+**[Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)**
 
 ## 💬 Contact & Support
 
