@@ -1,6 +1,7 @@
 import { Link } from '@remix-run/react';
 import { useEffect } from 'react';
 import styles from './footer.module.css';
+import config from '../../config/config.json';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -40,7 +41,7 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae v0.9.0-beta</Link> © {year}. All rights reserved.
+          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {config.version}</Link> © {year}. All rights reserved.
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
