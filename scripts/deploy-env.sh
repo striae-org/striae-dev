@@ -90,7 +90,7 @@ set_worker_secrets "Data Worker" "workers/data-worker" \
 
 # Images Worker
 set_worker_secrets "Images Worker" "workers/image-worker" \
-    "ACCOUNT_ID" "ACCOUNT_HASH" "API_TOKEN" "HMAC_KEY"
+    "ACCOUNT_ID" "API_TOKEN" "HMAC_KEY"
 
 # Turnstile Worker
 set_worker_secrets "Turnstile Worker" "workers/turnstile-worker" \

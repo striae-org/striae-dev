@@ -144,7 +144,7 @@ Set-WorkerSecrets -WorkerName "Data Worker" -WorkerPath "workers/data-worker" -S
 
 # Images Worker
 Set-WorkerSecrets -WorkerName "Images Worker" -WorkerPath "workers/image-worker" -Secrets @(
-    "ACCOUNT_ID", "ACCOUNT_HASH", "API_TOKEN", "HMAC_KEY"
+    "ACCOUNT_ID", "API_TOKEN", "HMAC_KEY"
 )
 
 # Turnstile Worker

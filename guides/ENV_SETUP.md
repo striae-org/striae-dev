@@ -58,7 +58,6 @@ This directory contains scripts and configuration files for managing Striae's en
 
 ### Images Worker
 - `ACCOUNT_ID` - Cloudflare Account ID
-- `ACCOUNT_HASH` - Cloudflare Images Account Hash
 - `API_TOKEN` - Cloudflare Images API token
 - `HMAC_KEY` - Cloudflare Images HMAC signing key
 
