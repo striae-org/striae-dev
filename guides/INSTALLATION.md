@@ -57,9 +57,6 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
 13. [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
     - [Useful Commands](#useful-commands)
-14. [Support](#support)
-15. [License](#license)
-16. [Credits](#credits)
 
 ## Prerequisites
 
