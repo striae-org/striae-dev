@@ -15,11 +15,3 @@ firebase-debug.log
 *.txt
 *.toml
 *.jsonc
-
-# Local dev files
-data-worker.js
-image-worker.js
-keys.js
-pdf-worker.js
-turnstile.js
-user-worker.js
