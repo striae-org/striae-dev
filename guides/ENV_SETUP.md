@@ -41,7 +41,6 @@ This directory (/scripts) contains scripts and configuration files for managing 
 ### Cloudflare Pages
 - `SL_API_KEY` - SendLayer email service
 - `AUTH_PASSWORD` - Custom registration password
-- `SESSION_SECRET` - Secret key for rate limiting session cookies
 
 ### Keys Worker
 - `ACCOUNT_HASH` - Cloudflare Images Account Hash

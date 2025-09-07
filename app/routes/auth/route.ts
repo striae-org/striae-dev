@@ -1,1 +1,1 @@
-export { Login as default, meta, action } from './login'
+export { Login as default, meta } from './login'

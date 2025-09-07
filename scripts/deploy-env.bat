@@ -71,7 +71,6 @@ echo.
 echo ⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:
 echo    - SL_API_KEY
 echo    - AUTH_PASSWORD
-echo    - SESSION_SECRET
 echo.
 
 echo ⚠️  ALSO REMEMBER TO:

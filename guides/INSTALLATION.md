@@ -240,7 +240,6 @@ All required variables are documented in the `.env` file. Here's what you need t
 - `USER_DB_AUTH` - KV authentication token
 - `KEYS_AUTH` - Key handler authentication token
 - `AUTH_PASSWORD` - Registration password
-- `SESSION_SECRET` - Session cookie secret for rate limiting
 
 ### 3.3 Generate Security Tokens
 
@@ -287,7 +286,6 @@ The scripts will:
 After running the deployment script, manually set these variables in the **Cloudflare Pages Dashboard**:
 - `SL_API_KEY`
 - `AUTH_PASSWORD`
-- `SESSION_SECRET`
 
 ### 3.6 Final Manual Steps
 
@@ -689,7 +687,6 @@ npm run deploy
 
 - `AUTH_PASSWORD`: Your custom registration password
 - `SL_API_KEY`: Your SendLayer API key
-- `SESSION_SECRET`: Your session secret
 
 ### 8.3 Configure Custom Domain
 

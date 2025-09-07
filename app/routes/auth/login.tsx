@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import { ActionFunctionArgs, json } from '@remix-run/cloudflare';
 import { auth } from '~/services/firebase';
 import {
     signInWithEmailAndPassword, 
@@ -23,79 +22,8 @@ import { Icon } from '~/components/icon/icon';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
-import { getUserApiKey, verifyAuthPassword } from '~/utils/auth';
-import { checkRateLimit, recordFailedAttempt, clearRateLimit } from '~/services/session';
+import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
-
-export async function action({ request, context }: ActionFunctionArgs) {
-  if (request.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, { status: 405 });
-  }
-
-  const formData = await request.formData();
-  const password = formData.get('password') as string;
-  
-  // Access the SESSION_SECRET from Cloudflare Pages environment variables
-  const sessionSecret = (context.env as Record<string, string>)?.SESSION_SECRET;
-
-  if (!password) {
-    return json({ error: 'Password is required' }, { status: 400 });
-  }
-
-  if (!sessionSecret) {
-    console.error('SESSION_SECRET environment variable is not configured');
-    return json({ error: 'Server configuration error' }, { status: 500 });
-  }
-
-  try {
-    // Check rate limit first
-    const rateLimitCheck = await checkRateLimit(request, sessionSecret);
-    
-    if (rateLimitCheck.isLocked) {
-      return json({
-        success: false,
-        isLocked: true,
-        attemptsRemaining: 0,
-        error: 'Too many failed attempts. Please try again later.',
-      }, { status: 429 });
-    }
-
-    // Verify password
-    const isValidPassword = await verifyAuthPassword(password);
-    
-    if (isValidPassword) {
-      // Clear rate limit on successful login
-      const headers = await clearRateLimit(request, sessionSecret);
-      return json({
-        success: true,
-        isLocked: false,
-        attemptsRemaining: 5,
-      }, { headers });
-    } else {
-      // Record failed attempt
-      const failedAttemptResult = await recordFailedAttempt(request, sessionSecret);
-      return json({
-        success: false,
-        isLocked: failedAttemptResult.isLocked,
-        attemptsRemaining: failedAttemptResult.attemptsRemaining,
-        error: failedAttemptResult.isLocked 
-          ? 'Too many failed attempts. Please try again later.'
-          : `Incorrect access password. ${failedAttemptResult.attemptsRemaining} attempts remaining.`,
-      }, { 
-        status: failedAttemptResult.isLocked ? 429 : 401,
-        headers: failedAttemptResult.headers 
-      });
-    }
-  } catch (error) {
-    console.error('Error verifying auth password with rate limit:', error);
-    return json({
-      success: false,
-      isLocked: false,
-      attemptsRemaining: 0,
-      error: 'Unable to verify password. Please try again later.',
-    }, { status: 500 });
-  }
-}
 
 export const meta = () => {
   return baseMeta({
