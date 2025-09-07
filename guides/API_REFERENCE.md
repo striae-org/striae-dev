@@ -566,7 +566,7 @@ POST /
 ### JavaScript/TypeScript Client
 
 ```typescript
-class StriaAPI {
+class StriaeAPI {
   constructor(private apiKey: string, private baseUrl: string) {}
 
   async getUser(userUid: string): Promise<UserData> {
