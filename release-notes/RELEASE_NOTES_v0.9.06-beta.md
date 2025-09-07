@@ -117,7 +117,7 @@ The v0.9.06-beta release focuses heavily on **user & developer experience**, **s
 
 For support, installation guidance, or community discussion, visit:
 
-- **[Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)**
+- **[Documentation](https://developers.striae.org/striae-dev/get-started/document-index)**
 - **[Discord Community](https://discord.gg/ESUPhTPwHx)**
 - **[Support Portal](https://www.striae.org/support)**
 

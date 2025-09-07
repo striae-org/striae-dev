@@ -6,7 +6,9 @@
 
 ## 📚 Documentation
 
-**[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-documentation-index)**
+## Documentation
+
+**[Striae Documentation](https://developers.striae.org/striae-dev/get-started/document-index)**
 
 ## 💬 Contact & Support
 

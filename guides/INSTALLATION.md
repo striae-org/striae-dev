@@ -295,7 +295,7 @@ After running the deployment script, manually set these variables in the **Cloud
 1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
 2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
 
-> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
+> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
 
 ---
 
@@ -771,7 +771,7 @@ Expected response should include:
 1. **Centralized Configuration**: All environment variables organized in `.env` file by service
 2. **Automated Environment Setup**: Scripts for Linux, macOS, Windows, and PowerShell
 3. **Template System**: Safe `.env.example` file for version control
-4. **Comprehensive Documentation**: See [Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup) for detailed instructions
+4. **Comprehensive Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for detailed instructions
 
 ### Key Improvements Made
 
@@ -834,7 +834,7 @@ npm run dev
 ## Support
 
 For support and questions:
-- **Documentation**: [Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
+- **Documentation**: [Striae Documentation](https://developers.striae.org/striae-dev/get-started/document-index)
 - **Support Portal**: [Striae Support](https://www.striae.org/support)
 - **Discord**: [Striae on Discord](https://discord.gg/ESUPhTPwHx)
 

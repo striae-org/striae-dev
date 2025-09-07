@@ -77,11 +77,11 @@ Striae is built with several key principles:
 For new developers joining the project:
 
 1. Read this overview to understand the project scope
-2. Follow the [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide) to set up your development environment
-3. Review the [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) to understand the system design
-4. Study the [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide) for proper error management patterns
-5. Check the [API Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference) for backend integrations
-6. Explore the [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide) for frontend development
+2. Follow the [Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide) to set up your development environment
+3. Review the [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture) to understand the system design
+4. Study the [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling) for proper error management patterns
+5. Check the [API Documentation](https://developers.striae.org/striae-dev/guides/api-reference) for backend integrations
+6. Explore the [Component Guide](https://developers.striae.org/striae-dev/guides/components) for frontend development
 
 ## Project Status
 

@@ -1,6 +1,6 @@
 # Environment Variables Setup
 
-This directory contains scripts and configuration files for managing Striae's environment variables across all Cloudflare Workers and Pages.
+This directory (/scripts) contains scripts and configuration files for managing Striae's environment variables across all Cloudflare Workers and Pages.
 
 ## Files Overview
 

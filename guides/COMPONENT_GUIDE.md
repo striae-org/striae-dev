@@ -862,7 +862,7 @@ useEffect(() => {
 1. ✅ Create component directory
 2. ✅ Implement TypeScript interfaces
 3. ✅ Add CSS Module styling
-4. ✅ Include error handling (follow [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide))
+4. ✅ Include error handling (follow [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling))
 5. ✅ Add loading states
 6. ✅ Implement accessibility features
 7. ✅ Add documentation
@@ -871,6 +871,6 @@ useEffect(() => {
 
 - **Single Responsibility**: Each component has one clear purpose
 - **Type Safety**: Full TypeScript coverage
-- **Error Boundaries**: Graceful error handling (see [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide))
+- **Error Boundaries**: Graceful error handling (see [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling))
 - **Performance**: Optimized for large datasets
 - **Maintainability**: Clear, documented code

@@ -8,75 +8,75 @@ This documentation provides comprehensive guidance for developers working on Str
 
 New to Striae? Start here:
 
-1. **[Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)** - Understand what Striae is and does
-2. **[Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)** - Set up your development environment
+1. **[Project Overview](https://developers.striae.org/striae-dev/get-started/project-overview)** - Understand what Striae is and does
+2. **[Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)** - Set up your development environment
 
 ## Core Documentation
 
 ### Architecture and Design
 
-- **[Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)** - System architecture and design patterns
-- **[Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)** - Frontend component architecture
-- **[API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)** - Complete API documentation for all workers
+- **[Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture)** - System architecture and design patterns
+- **[Component Guide](https://developers.striae.org/striae-dev/guides/components)** - Frontend component architecture
+- **[API Reference](https://developers.striae.org/striae-dev/guides/api-reference)** - Complete API documentation for all workers
 
 ### Development Guides
 
-- **[Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)** - Security architecture and best practices
-- **[Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide)** - Comprehensive error handling patterns and best practices
-- **[Environment Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)** - Environment variables and configuration
+- **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security architecture and best practices
+- **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
+- **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
 
 ## Documentation Organization
 
 ### By Experience Level
 
 #### New Developers
-- Start with [Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
-- Follow [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)
-- Review [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
+- Start with [Project Overview](https://developers.striae.org/striae-dev/get-started/project-overview)
+- Follow [Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)
+- Review [Component Guide](https://developers.striae.org/striae-dev/guides/components)
 
 #### Experienced Developers
-- Review [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)
-- Study [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
-- Understand [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)
+- Review [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture)
+- Study [API Reference](https://developers.striae.org/striae-dev/guides/api-reference)
+- Understand [Security Guide](https://developers.striae.org/striae-dev/guides/security)
 
 ### By Topic
 
 #### Frontend Development
-- [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
-- [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide) (Error display patterns)
-- [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) (Frontend section)
-- [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide) (Application Security section)
+- [Component Guide](https://developers.striae.org/striae-dev/guides/components)
+- [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling) (Error display patterns)
+- [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture) (Frontend section)
+- [Security Guide](https://developers.striae.org/striae-dev/guides/security) (Application Security section)
 
 #### Backend Development
-- [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
-- [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide) (Backend error patterns)
-- [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) (Backend section)
-- [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide) (Authentication section)
+- [API Reference](https://developers.striae.org/striae-dev/guides/api-reference)
+- [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling) (Backend error patterns)
+- [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture) (Backend section)
+- [Security Guide](https://developers.striae.org/striae-dev/guides/security) (Authentication section)
 
 ## Document Summaries
 
-### [Project Overview](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)
+### [Project Overview](https://developers.striae.org/striae-dev/get-started/project-overview)
 High-level introduction to Striae, including project structure, tech stack, and key differentiators. Essential reading for understanding the project's purpose and scope.
 
-### [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)
+### [Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)
 Detailed installation and setup instructions for development and production environments. Covers prerequisites, configuration, and deployment procedures.
 
-### [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide)
+### [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture)
 In-depth system architecture documentation covering frontend, backend, data layer, and security architecture. Includes component relationships and data flow diagrams.
 
-### [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)
+### [Component Guide](https://developers.striae.org/striae-dev/guides/components)
 Frontend-focused guide covering React component architecture, state management patterns, styling approaches, and development best practices.
 
-### [API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)
+### [API Reference](https://developers.striae.org/striae-dev/guides/api-reference)
 Complete API documentation for all Cloudflare Workers, including endpoints, authentication, request/response formats, and usage examples.
 
-### [Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)
+### [Security Guide](https://developers.striae.org/striae-dev/guides/security)
 This guide covers security practices, authentication flows, and security considerations for developers working on the Striae project.
 
-### [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide)
+### [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)
 Comprehensive guide covering error handling patterns, centralized error services, UI error display, and best practices for both frontend and backend error management.
 
-### [Environment Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)
+### [Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)
 Detailed guide for configuring environment variables, API keys, and service integrations across development, staging, and production environments.
 
 ## Contributing to Documentation

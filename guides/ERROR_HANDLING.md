@@ -668,9 +668,9 @@ export const handleCanvasError = (error: unknown): string => {
 
 ## Related Documentation
 
-- **[Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide)** - Component patterns and architecture
-- **[Security Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-security-guide)** - Security-related error handling
-- **[API Reference](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference)** - API error responses and handling
+- **[Component Guide](https://developers.striae.org/striae-dev/guides/components)** - Component patterns and architecture
+- **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security-related error handling
+- **[API Reference](https://developers.striae.org/striae-dev/guides/api-reference)** - API error responses and handling
 
 ---
 
