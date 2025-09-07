@@ -14,16 +14,13 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
    - [2.2 Cloudflare Images Setup](#22-cloudflare-images-setup)
    - [2.3 Cloudflare KV Setup](#23-cloudflare-kv-setup)
    - [2.4 Cloudflare R2 Setup](#24-cloudflare-r2-setup)
-4. [Step 3: Environment Variables Setup](#step-3-environment-variables-setup)
-   - [3.1 Initialize Environment Configuration](#31-initialize-environment-configuration)
-   - [3.2 Required Environment Variables](#32-required-environment-variables)
-   - [3.3 Generate Security Tokens](#33-generate-security-tokens)
-   - [3.4 Automated Environment Deployment](#34-automated-environment-deployment)
-   - [3.5 Manual Pages Environment Variables](#35-manual-pages-environment-variables)
-   - [3.6 Final Manual Steps](#36-final-manual-steps)
-5. [Step 4: Configure Worker Files](#step-4-configure-worker-files)
-   - [4.1 Copy Configuration Files](#41-copy-configuration-files)
-   - [4.2 Update Worker Configurations](#42-update-worker-configurations)
+4. [Step 3: Configure Worker Files](#step-3-configure-worker-files)
+   - [3.1 Copy Configuration Files](#31-copy-configuration-files)
+   - [3.2 Update Worker Configurations](#32-update-worker-configurations)
+5. [Step 4: Configure CORS for All Workers](#step-4-configure-cors-for-all-workers)
+   - [4.1 Update CORS Headers in Worker Source Files](#41-update-cors-headers-in-worker-source-files)
+   - [4.2 CORS Security Notes](#42-cors-security-notes)
+   - [4.3 Verify CORS Configuration](#43-verify-cors-configuration)
 6. [Step 5: Deploy Cloudflare Workers](#step-5-deploy-cloudflare-workers)
    - [5.1 Keys Worker](#51-keys-worker)
    - [5.2 User Worker](#52-user-worker)
@@ -31,11 +28,13 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
    - [5.4 Images Worker](#54-images-worker)
    - [5.5 Turnstile Worker](#55-turnstile-worker)
    - [5.6 PDF Worker](#56-pdf-worker)
-7. [Step 6: Configure CORS for All Workers](#step-6-configure-cors-for-all-workers)
-   - [6.1 Update CORS Headers in Worker Source Files](#61-update-cors-headers-in-worker-source-files)
-   - [6.2 Redeploy Workers After CORS Updates](#62-redeploy-workers-after-cors-updates)
-   - [6.3 CORS Security Notes](#63-cors-security-notes)
-   - [6.4 Verify CORS Configuration](#64-verify-cors-configuration)
+7. [Step 6: Environment Variables Setup](#step-6-environment-variables-setup)
+   - [6.1 Initialize Environment Configuration](#61-initialize-environment-configuration)
+   - [6.2 Required Environment Variables](#62-required-environment-variables)
+   - [6.3 Generate Security Tokens](#63-generate-security-tokens)
+   - [6.4 Automated Environment Deployment](#64-automated-environment-deployment)
+   - [6.5 Manual Pages Environment Variables](#65-manual-pages-environment-variables)
+   - [6.6 Final Manual Steps](#66-final-manual-steps)
 8. [Step 7: Configuration Files](#step-7-configuration-files)
    - [7.1 Update Configuration Files](#71-update-configuration-files)
 9. [Step 8: Deploy Frontend (Cloudflare Pages)](#step-8-deploy-frontend-cloudflare-pages)
@@ -201,106 +200,11 @@ ls -la
 
 ---
 
-## Step 3: Environment Variables Setup
-
-Striae uses a centralized environment variables system that organizes all secrets by their usage across different workers and the Pages application.
-
-### 3.1 Initialize Environment Configuration
-
-1. **Copy the environment template:**
-
-```bash
-cp .env.example .env
-```
-
-2. **Fill in your actual values in the `.env` file**
-
-The `.env` file is organized by service and includes:
-- **Pages Worker Variables**: Session management and email service
-- **Keys Worker Variables**: Authentication and key management  
-- **Individual Worker Variables**: Service-specific secrets
-- **Cloudflare Service Keys**: Images, Turnstile, R2, KV credentials
-
-### 3.2 Required Environment Variables
-
-All required variables are documented in the `.env` file. Here's what you need to collect:
-
-**Cloudflare Services:**
-- `ACCOUNT_ID` - Your Cloudflare Account ID
-- `IMAGES_API_TOKEN` - Cloudflare Images API token
-- `ACCOUNT_HASH` - Cloudflare Images Account Hash
-- `HMAC_KEY` - Cloudflare Images HMAC signing key
-- `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
-
-**External Services:**
-- `SL_API_KEY` - SendLayer API token
-
-**Custom Security Tokens** (generate your own):
-- `R2_KEY_SECRET` - R2 authentication token
-- `USER_DB_AUTH` - KV authentication token
-- `KEYS_AUTH` - Key handler authentication token
-- `AUTH_PASSWORD` - Registration password
-
-### 3.3 Generate Security Tokens
-
-Generate secure random tokens for the custom authentication variables:
-
-```bash
-# Session secret (64 characters recommended)
-openssl rand -hex 32
-
-# Custom auth tokens (32 characters)
-openssl rand -hex 16
-
-# Alternative format
-openssl rand -base64 24
-```
-
-### 3.4 Automated Environment Deployment
-
-Once your `.env` file is configured, use the automated deployment scripts:
-
-**Linux/macOS/WSL:**
-```bash
-./scripts/deploy-env.sh
-```
-
-**Windows PowerShell:**
-```powershell
-.\scripts\deploy-env.ps1
-```
-
-**Windows Command Prompt:**
-```cmd
-scripts\deploy-env.bat
-```
-
-The scripts will:
-- ✅ Validate all required variables are set
-- ✅ Deploy secrets to each worker automatically  
-- ✅ Provide clear progress feedback
-- ✅ Show remaining manual steps
-
-### 3.5 Manual Pages Environment Variables
-
-After running the deployment script, manually set these variables in the **Cloudflare Pages Dashboard**:
-- `SL_API_KEY`
-- `AUTH_PASSWORD`
-
-### 3.6 Final Manual Steps
-
-1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
-2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
-
-> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
-
----
-
-## Step 4: Configure Worker Files
+## Step 3: Configure Worker Files
 
 Before deploying workers, you need to configure each worker's `wrangler.jsonc` file:
 
-### 4.1 Copy Configuration Files
+### 3.1 Copy Configuration Files
 
 For each worker, copy the example configuration:
 
@@ -325,7 +229,7 @@ cd ../pdf-worker
 cp wrangler.jsonc.example wrangler.jsonc
 ```
 
-### 4.2 Update Worker Configurations
+### 3.2 Update Worker Configurations
 
 In each `wrangler.jsonc` file, update the following:
 
@@ -386,109 +290,11 @@ In each `wrangler.jsonc` file, update the following:
 
 ---
 
-## Step 5: Deploy Cloudflare Workers
-
-**Note:** If you completed Step 3.4 (Automated Environment Deployment), the environment variables are already set and you can skip directly to deploying the workers. The automated scripts handle all the secret configuration.
-
-Deploy each worker in the following order:
-
-### 5.1 Keys Worker
-
-```bash
-cd workers/keys-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
-
-**Manual configuration** (if not using automated scripts):
-- `ACCOUNT_HASH`: Your Images Account Hash
-- `AUTH_PASSWORD`: Your custom auth password
-- `IMAGES_API_TOKEN`: Your Images API token
-- `KEYS_AUTH`: Your custom keys auth token
-- `R2_KEY_SECRET`: Your custom R2 secret
-- `USER_DB_AUTH`: Your custom user DB auth token
-
-### 5.2 User Worker
-
-```bash
-cd ../user-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
-
-1. KV binding is configured in `wrangler.jsonc`:
-   - Binding name: `USER_DB`
-   - KV namespace ID: Set in your wrangler.jsonc file
-
-**Manual configuration** (if not using automated scripts):
-- `USER_DB_AUTH`: Your custom user DB auth token
-
-### 5.3 Data Worker
-
-```bash
-cd ../data-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
-
-1. R2 binding is configured in `wrangler.jsonc`:
-   - Binding name: `STRIAE_DATA`
-   - Bucket name: Set in your wrangler.jsonc file
-
-**Manual configuration** (if not using automated scripts):
-- `R2_KEY_SECRET`: Your custom R2 secret
-
-### 5.4 Images Worker
-
-```bash
-cd ../image-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
-
-**Manual configuration** (if not using automated scripts):
-- `ACCOUNT_ID`: Your Cloudflare Account ID
-- `API_TOKEN`: Your Images API token
-- `HMAC_KEY`: Your Images HMAC signing key
-
-### 5.5 Turnstile Worker
-
-```bash
-cd ../turnstile-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
-
-**Manual configuration** (if not using automated scripts):
-- `CFT_SECRET_KEY`: Your Cloudflare Turnstile secret key
-
-### 5.6 PDF Worker
-
-```bash
-cd ../pdf-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ No environment variables needed (uses browser binding only)
-
----
-
-## Step 6: Configure CORS for All Workers
+## Step 4: Configure CORS for All Workers
 
 **Important**: All workers have CORS (Cross-Origin Resource Sharing) headers that must be updated to match your domain. By default, they're configured for `https://www.striae.org`.
 
-### 6.1 Update CORS Headers in Worker Source Files
+### 4.1 Update CORS Headers in Worker Source Files
 
 Each worker needs its CORS headers updated to allow requests from your domain:
 
@@ -552,31 +358,7 @@ const corsHeaders = {
 };
 ```
 
-### 6.2 Redeploy Workers After CORS Updates
-
-After updating CORS headers, redeploy each worker:
-
-```bash
-# Redeploy all workers with updated CORS
-cd workers/user-worker && wrangler deploy && cd ../..
-cd workers/data-worker && wrangler deploy && cd ../..
-cd workers/image-worker && wrangler deploy && cd ../..
-cd workers/keys-worker && wrangler deploy && cd ../..
-cd workers/turnstile-worker && wrangler deploy && cd ../..
-cd workers/pdf-worker && wrangler deploy && cd ../..
-```
-
-Or use a batch script:
-```bash
-for worker in user-worker data-worker image-worker keys-worker turnstile-worker pdf-worker; do
-  echo "Deploying $worker..."
-  cd "workers/$worker"
-  wrangler deploy
-  cd "../.."
-done
-```
-
-### 6.3 CORS Security Notes
+### 4.2 CORS Security Notes
 
 - **Use HTTPS**: Always use `https://` in CORS origins
 - **Exact Match**: CORS requires exact domain matching (including subdomains)
@@ -584,7 +366,7 @@ done
 - **Multiple Domains**: If you need multiple domains, implement dynamic CORS checking
 - **Testing**: Use browser developer tools to verify CORS headers are correct
 
-### 6.4 Verify CORS Configuration
+### 4.3 Verify CORS Configuration
 
 Test CORS headers using curl or browser developer tools:
 
@@ -604,6 +386,200 @@ curl -X OPTIONS \
 - ❌ **Subdomain Mismatch**: `www.domain.com` ≠ `domain.com`
 - ❌ **Port Differences**: Development vs production port differences
 - ❌ **Missing Preflight**: Some requests require OPTIONS preflight handling
+
+---
+
+## Step 5: Deploy Cloudflare Workers
+
+**✅ Prerequisites**: Before deploying workers, ensure you have:
+1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
+2. ✅ Updated CORS settings in worker source files in Step 4
+
+Deploy each worker to make them available for environment variable setup in Step 6.
+
+Deploy each worker in the following order:
+
+### 5.1 Keys Worker
+
+```bash
+cd workers/keys-worker
+npm install
+wrangler deploy
+```
+
+**Manual configuration reference** (environment variables will be set up in Step 6):
+- `ACCOUNT_HASH`: Your Images Account Hash
+- `AUTH_PASSWORD`: Your custom auth password
+- `IMAGES_API_TOKEN`: Your Images API token
+- `KEYS_AUTH`: Your custom keys auth token
+- `R2_KEY_SECRET`: Your custom R2 secret
+- `USER_DB_AUTH`: Your custom user DB auth token
+
+### 5.2 User Worker
+
+```bash
+cd ../user-worker
+npm install
+wrangler deploy
+```
+
+1. KV binding is configured in `wrangler.jsonc`:
+   - Binding name: `USER_DB`
+   - KV namespace ID: Set in your wrangler.jsonc file
+
+**Manual configuration reference** (environment variables will be set up in Step 6):
+- `USER_DB_AUTH`: Your custom user DB auth token
+
+### 5.3 Data Worker
+
+```bash
+cd ../data-worker
+npm install
+wrangler deploy
+```
+
+1. R2 binding is configured in `wrangler.jsonc`:
+   - Binding name: `STRIAE_DATA`
+   - Bucket name: Set in your wrangler.jsonc file
+
+**Manual configuration reference** (environment variables will be set up in Step 6):
+- `R2_KEY_SECRET`: Your custom R2 secret
+
+### 5.4 Images Worker
+
+```bash
+cd ../image-worker
+npm install
+wrangler deploy
+```
+
+**Manual configuration reference** (environment variables will be set up in Step 6):
+- `ACCOUNT_ID`: Your Cloudflare Account ID
+- `API_TOKEN`: Your Images API token
+- `HMAC_KEY`: Your Images HMAC signing key
+
+### 5.5 Turnstile Worker
+
+```bash
+cd ../turnstile-worker
+npm install
+wrangler deploy
+```
+
+**Manual configuration reference** (environment variables will be set up in Step 6):
+- `CFT_SECRET_KEY`: Your Cloudflare Turnstile secret key
+
+### 5.6 PDF Worker
+
+```bash
+cd ../pdf-worker
+npm install
+wrangler deploy
+```
+
+**Environment variables:** ✅ No environment variables needed (uses browser binding only)
+
+---
+
+## Step 6: Environment Variables Setup
+
+**⚠️ Important**: This step should be done AFTER configuring worker files (Step 3) and CORS settings (Step 4), and AFTER deploying workers (Step 5). The deployment scripts now require properly configured worker files to function correctly.
+
+Striae uses a centralized environment variables system that organizes all secrets by their usage across different workers and the Pages application.
+
+### 6.1 Initialize Environment Configuration
+
+1. **Copy the environment template:**
+
+```bash
+cp .env.example .env
+```
+
+2. **Fill in your actual values in the `.env` file**
+
+The `.env` file is organized by service and includes:
+- **Pages Worker Variables**: Session management and email service
+- **Keys Worker Variables**: Authentication and key management  
+- **Individual Worker Variables**: Service-specific secrets
+- **Cloudflare Service Keys**: Images, Turnstile, R2, KV credentials
+
+### 6.2 Required Environment Variables
+
+All required variables are documented in the `.env` file. Here's what you need to collect:
+
+**Cloudflare Services:**
+- `ACCOUNT_ID` - Your Cloudflare Account ID
+- `IMAGES_API_TOKEN` - Cloudflare Images API token
+- `ACCOUNT_HASH` - Cloudflare Images Account Hash
+- `HMAC_KEY` - Cloudflare Images HMAC signing key
+- `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
+
+**External Services:**
+- `SL_API_KEY` - SendLayer API token
+
+**Custom Security Tokens** (generate your own):
+- `R2_KEY_SECRET` - R2 authentication token
+- `USER_DB_AUTH` - KV authentication token
+- `KEYS_AUTH` - Key handler authentication token
+- `AUTH_PASSWORD` - Registration password
+
+### 6.3 Generate Security Tokens
+
+Generate secure random tokens for the custom authentication variables:
+
+```bash
+# Session secret (64 characters recommended)
+openssl rand -hex 32
+
+# Custom auth tokens (32 characters)
+openssl rand -hex 16
+
+# Alternative format
+openssl rand -base64 24
+```
+
+### 6.4 Automated Environment Deployment
+
+**✅ Prerequisites**: Before running these scripts, ensure you have:
+1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
+2. ✅ Updated CORS settings in worker source files in Step 4  
+3. ✅ Successfully deployed all workers in Step 5
+
+Once your `.env` file is configured and workers are deployed, use the automated deployment scripts:
+
+**Linux/macOS/WSL:**
+```bash
+./scripts/deploy-env.sh
+```
+
+**Windows PowerShell:**
+```powershell
+.\scripts\deploy-env.ps1
+```
+
+**Windows Command Prompt:**
+```cmd
+scripts\deploy-env.bat
+```
+
+The scripts will:
+- ✅ Validate all required variables are set
+- ✅ Deploy secrets to each worker automatically  
+- ✅ Provide clear progress feedback
+- ✅ Show remaining manual steps
+
+### 6.5 Manual Pages Environment Variables
+
+After running the deployment script, manually set these variables in the **Cloudflare Pages Dashboard**:
+- `SL_API_KEY`
+- `AUTH_PASSWORD`
+
+### 6.6 Final Manual Steps
+
+1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
+2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
+
+> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
 
 ---
 

@@ -62,54 +62,117 @@ set_worker_secrets() {
     local secrets=("$@")
     
     echo -e "\n${BLUE}🔧 Setting secrets for $worker_name...${NC}"
-    cd "$worker_path"
+    
+    # Check if worker has a wrangler configuration file
+    if [ ! -f "$worker_path/wrangler.jsonc" ] && [ ! -f "$worker_path/wrangler.toml" ]; then
+        echo -e "${RED}❌ Error: No wrangler configuration found for $worker_name${NC}"
+        echo -e "${YELLOW}   Please copy wrangler.jsonc.example to wrangler.jsonc and configure it first.${NC}"
+        return 1
+    fi
+    
+    # Change to worker directory
+    pushd "$worker_path" > /dev/null
+    
+    # Get the worker name from the configuration file
+    local config_worker_name
+    if [ -f "wrangler.jsonc" ]; then
+        config_worker_name=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' wrangler.jsonc | sed 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+    elif [ -f "wrangler.toml" ]; then
+        config_worker_name=$(grep '^name[[:space:]]*=' wrangler.toml | sed 's/.*=[[:space:]]*["\x27]\([^"\x27]*\)["\x27].*/\1/')
+    fi
+    
+    if [ -z "$config_worker_name" ]; then
+        echo -e "${RED}❌ Error: Could not determine worker name from configuration${NC}"
+        popd > /dev/null
+        return 1
+    fi
+    
+    echo -e "${YELLOW}  Using worker name: $config_worker_name${NC}"
     
     for secret in "${secrets[@]}"; do
         echo -e "${YELLOW}  Setting $secret...${NC}"
-        echo "${!secret}" | wrangler secret put "$secret" --name "$(basename $worker_path)"
+        if ! echo "${!secret}" | wrangler secret put "$secret" --name "$config_worker_name"; then
+            echo -e "${RED}❌ Failed to set $secret for $worker_name${NC}"
+            popd > /dev/null
+            return 1
+        fi
     done
     
     echo -e "${GREEN}✅ $worker_name secrets configured${NC}"
-    cd - > /dev/null
+    popd > /dev/null
 }
 
 # Deploy secrets to each worker
 echo -e "\n${BLUE}🔐 Deploying secrets to workers...${NC}"
 
+# Check if workers are configured
+echo -e "${YELLOW}🔍 Checking worker configurations...${NC}"
+workers_configured=0
+total_workers=5
+
+for worker_dir in workers/*/; do
+    if [ -f "$worker_dir/wrangler.jsonc" ] || [ -f "$worker_dir/wrangler.toml" ]; then
+        workers_configured=$((workers_configured + 1))
+    fi
+done
+
+if [ $workers_configured -eq 0 ]; then
+    echo -e "${RED}❌ No workers are configured!${NC}"
+    echo -e "${YELLOW}   Please copy wrangler.jsonc.example to wrangler.jsonc in each worker directory and configure them.${NC}"
+    echo -e "${YELLOW}   Then run this script again.${NC}"
+    exit 1
+elif [ $workers_configured -lt $total_workers ]; then
+    echo -e "${YELLOW}⚠️  Warning: Only $workers_configured of $total_workers workers are configured.${NC}"
+    echo -e "${YELLOW}   Some workers may not have their secrets deployed.${NC}"
+fi
+
 # Keys Worker
-set_worker_secrets "Keys Worker" "workers/keys-worker" \
-    "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN" "AUTH_PASSWORD"
+if ! set_worker_secrets "Keys Worker" "workers/keys-worker" \
+    "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN" "AUTH_PASSWORD"; then
+    echo -e "${YELLOW}⚠️  Skipping Keys Worker (not configured)${NC}"
+fi
 
 # User Worker  
-set_worker_secrets "User Worker" "workers/user-worker" \
-    "USER_DB_AUTH"
+if ! set_worker_secrets "User Worker" "workers/user-worker" \
+    "USER_DB_AUTH"; then
+    echo -e "${YELLOW}⚠️  Skipping User Worker (not configured)${NC}"
+fi
 
 # Data Worker
-set_worker_secrets "Data Worker" "workers/data-worker" \
-    "R2_KEY_SECRET"
+if ! set_worker_secrets "Data Worker" "workers/data-worker" \
+    "R2_KEY_SECRET"; then
+    echo -e "${YELLOW}⚠️  Skipping Data Worker (not configured)${NC}"
+fi
 
 # Images Worker
-set_worker_secrets "Images Worker" "workers/image-worker" \
-    "ACCOUNT_ID" "API_TOKEN" "HMAC_KEY"
+if ! set_worker_secrets "Images Worker" "workers/image-worker" \
+    "ACCOUNT_ID" "API_TOKEN" "HMAC_KEY"; then
+    echo -e "${YELLOW}⚠️  Skipping Images Worker (not configured)${NC}"
+fi
 
 # Turnstile Worker
-set_worker_secrets "Turnstile Worker" "workers/turnstile-worker" \
-    "CFT_SECRET_KEY"
+if ! set_worker_secrets "Turnstile Worker" "workers/turnstile-worker" \
+    "CFT_SECRET_KEY"; then
+    echo -e "${YELLOW}⚠️  Skipping Turnstile Worker (not configured)${NC}"
+fi
 
 # PDF Worker (no secrets needed)
 echo -e "\n${BLUE}📄 PDF Worker: No environment variables needed${NC}"
 
-echo -e "\n${GREEN}🎉 All worker secrets deployed successfully!${NC}"
+echo -e "\n${GREEN}🎉 Worker secrets deployment completed!${NC}"
 
 # Remind about Pages environment variables
 echo -e "\n${YELLOW}⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:${NC}"
 echo "   - SL_API_KEY" 
 echo "   - AUTH_PASSWORD"
 
-echo -e "\n${YELLOW}⚠️  ALSO REMEMBER TO:${NC}"
+echo -e "\n${YELLOW}⚠️  WORKER CONFIGURATION REMINDERS:${NC}"
+echo "   - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory"
 echo "   - Configure KV namespace ID in workers/user-worker/wrangler.jsonc"
 echo "   - Configure R2 bucket name in workers/data-worker/wrangler.jsonc"
+echo "   - Update ACCOUNT_ID and custom domains in all worker configurations"
 
 echo -e "\n${BLUE}📝 For manual deployment, use these commands:${NC}"
-echo "   wrangler secret put VARIABLE_NAME --name worker-name"
+echo "   cd workers/[worker-name]"
+echo "   wrangler secret put VARIABLE_NAME --name [worker-name]"
 echo -e "\n${GREEN}✨ Environment setup complete!${NC}"
