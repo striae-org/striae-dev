@@ -1,5 +1,46 @@
 # Striae API Reference
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Authentication](#authentication)
+   - [Authentication Methods](#authentication-methods)
+   - [CORS Policy](#cors-policy)
+3. [User Worker API](#user-worker-api)
+   - [Endpoints](#endpoints)
+     - [Get User Data](#get-user-data)
+     - [Create/Update User](#createupdate-user)
+     - [Delete User](#delete-user)
+     - [Add Cases to User](#add-cases-to-user)
+     - [Remove Cases from User](#remove-cases-from-user)
+4. [Image Worker API](#image-worker-api)
+   - [Endpoints](#endpoints-1)
+     - [Upload Image](#upload-image)
+     - [Get Signed URL](#get-signed-url)
+     - [Delete Image](#delete-image)
+5. [PDF Worker API](#pdf-worker-api)
+   - [Endpoints](#endpoints-2)
+     - [Generate PDF](#generate-pdf)
+6. [Data Worker API](#data-worker-api)
+   - [Endpoints](#endpoints-3)
+     - [Get File Data](#get-file-data)
+     - [Save File Data](#save-file-data)
+     - [Delete File](#delete-file)
+7. [Keys Worker API](#keys-worker-api)
+   - [Endpoints](#endpoints-4)
+     - [Get Environment Key](#get-environment-key)
+     - [Verify Auth Password](#verify-auth-password)
+8. [Turnstile Worker API](#turnstile-worker-api)
+   - [Endpoints](#endpoints-5)
+     - [Verify CAPTCHA](#verify-captcha)
+9. [Error Handling](#error-handling)
+   - [Standard Error Response Format](#standard-error-response-format)
+   - [Common Error Codes](#common-error-codes)
+   - [HTTP Status Codes](#http-status-codes)
+10. [SDK Examples](#sdk-examples)
+    - [JavaScript/TypeScript Client](#javascripttypescript-client)
+    - [Error Handling Example](#error-handling-example)
+
 ## Overview
 
 Striae's backend consists of six Cloudflare Workers that provide specialized API services. All APIs use RESTful conventions and return JSON responses.

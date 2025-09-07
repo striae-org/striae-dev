@@ -6,11 +6,7 @@
 
 ## 📚 Documentation
 
-**[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview)**
-
-**[Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide)**
-
-**[Environment Variables Setup](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide/environment-variables-setup)**
+**[Striae Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-documentation-index)**
 
 ## 💬 Contact & Support
 

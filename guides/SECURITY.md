@@ -1,5 +1,44 @@
 # Striae Security Guide
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Authentication Architecture](#authentication-architecture)
+   - [Firebase Authentication](#firebase-authentication)
+     - [Implemented Features](#implemented-features)
+   - [Password Security Requirements](#password-security-requirements)
+   - [Multi-Factor Authentication (MFA)](#multi-factor-authentication-mfa)
+     - [MFA Flow](#mfa-flow)
+3. [Access Control](#access-control)
+   - [Initial Access Gate](#initial-access-gate)
+4. [API Security](#api-security)
+   - [Worker Authentication](#worker-authentication)
+   - [CORS Configuration](#cors-configuration)
+   - [API Key Management](#api-key-management)
+5. [Data Security](#data-security)
+   - [Signed URLs for Images](#signed-urls-for-images)
+   - [Environment Variable Security](#environment-variable-security)
+6. [Error Handling](#error-handling)
+   - [Secure Error Responses](#secure-error-responses)
+   - [HTTP Status Codes](#http-status-codes)
+7. [Security Configuration](#security-configuration)
+   - [Firebase Configuration](#firebase-configuration)
+   - [Required Environment Setup](#required-environment-setup)
+8. [Development Security Practices](#development-security-practices)
+   - [Local Development](#local-development)
+   - [Testing Authentication](#testing-authentication)
+   - [Secret Management](#secret-management)
+9. [Security Limitations](#security-limitations)
+   - [Not Currently Implemented](#not-currently-implemented)
+   - [Cloudflare Worker Logging](#cloudflare-worker-logging)
+   - [Known Considerations](#known-considerations)
+10. [Security Checklist for New Features](#security-checklist-for-new-features)
+    - [Before Adding New Endpoints](#before-adding-new-endpoints)
+    - [Before Deploying](#before-deploying)
+11. [Incident Response](#incident-response)
+    - [If Security Issue Discovered](#if-security-issue-discovered)
+    - [Monitoring](#monitoring)
+
 ## Overview
 
 This guide covers security practices, authentication flows, and security considerations for developers working on the Striae project.

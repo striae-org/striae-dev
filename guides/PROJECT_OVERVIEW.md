@@ -79,8 +79,9 @@ For new developers joining the project:
 1. Read this overview to understand the project scope
 2. Follow the [Installation Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-installation-guide) to set up your development environment
 3. Review the [Architecture Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-architecture-guide) to understand the system design
-4. Check the [API Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference) for backend integrations
-5. Explore the [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide) for frontend development
+4. Study the [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide) for proper error management patterns
+5. Check the [API Documentation](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-api-reference) for backend integrations
+6. Explore the [Component Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/striae-component-guide) for frontend development
 
 ## Project Status
 

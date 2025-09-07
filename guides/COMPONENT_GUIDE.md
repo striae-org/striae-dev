@@ -1,5 +1,65 @@
 # Striae Component Guide
 
+## Table of Contents
+
+1. [Component Architecture Overview](#component-architecture-overview)
+2. [Component Directory Structure](#component-directory-structure)
+3. [Core Components](#core-components)
+   - [1. Authentication Components](#1-authentication-components)
+     - [AuthPassword](#authpassword-appcomponentsauthauth-passwordtsx)
+     - [MFAEnrollment](#mfaenrollment-appcomponentsauthmfa-enrollmenttsx)
+     - [MFAVerification](#mfaverification-appcomponentsauthmfa-verificationtsx)
+   - [2. Canvas System](#2-canvas-system)
+     - [Canvas](#canvas-appcomponentscanvascanvastsx)
+   - [3. Sidebar System](#3-sidebar-system)
+     - [SidebarContainer](#sidebarcontainer-appcomponentssidebarsidebar-containertsx)
+     - [Sidebar](#sidebar-appcomponentssidebarsidebartsx)
+     - [Case Sidebar](#case-sidebar-appcomponentssidebarcase-sidebartsx)
+     - [Notes Sidebar](#notes-sidebar-appcomponentssidebarnotes-sidebartsx)
+     - [Cases Modal](#cases-modal-appcomponentssidebarcases-modaltsx)
+     - [Notes Modal](#notes-modal-appcomponentssidebarnotes-modaltsx)
+   - [4. Action Components](#4-action-components)
+     - [Case Management](#case-management-appcomponentsactionscase-managetsx)
+     - [Image Management](#image-management-appcomponentsactionsimage-managetsx)
+     - [PDF Generation](#pdf-generation-appcomponentsactionsgenerate-pdftsx)
+     - [Notes Management](#notes-management-appcomponentsactionsnotes-managetsx)
+     - [Sign Out](#sign-out-appcomponentsactionssignouttsx)
+   - [5. UI Components](#5-ui-components)
+     - [Button System](#button-system-appcomponentsbutton)
+     - [Color System](#color-system-appcomponentscolorscolorstsx)
+     - [Footer Component](#footer-component-appcomponentsfooterfootertsx)
+     - [Icon System](#icon-system-appcomponentsiconiconstsx)
+     - [Mobile Warning](#mobile-warning-appcomponentsmobilemobile-warningtsx)
+     - [Notice System](#notice-system-appcomponentsnoticenoticetsx)
+     - [Toast System](#toast-system-appcomponentstoasttoasttsx)
+     - [Toolbar](#toolbar-appcomponentstoolbartoolbartsx)
+     - [Turnstile CAPTCHA](#turnstile-captcha-appcomponentsturnstileturnstiletsx)
+     - [Theme Provider](#theme-provider-appcomponentstheme-providertheme-providertsx)
+   - [6. User Management Components](#6-user-management-components)
+     - [User Profile Management](#user-profile-management-appcomponentsuseraanage-profiletsx)
+     - [InactivityWarning](#inactivitywarning-appcomponentsuserinactivity-warningtsx)
+4. [Component State Management](#component-state-management)
+   - [Local State Patterns](#local-state-patterns)
+   - [Context Usage](#context-usage)
+     - [AuthContext](#authcontext-appcontextsauthcontexttsx)
+   - [Custom Hooks](#custom-hooks)
+     - [useEmailSyncToKV](#useemailsynctokv-apphooksuseemailsynctots)
+     - [useInactivityTimeout](#useinactivitytimeout-apphooksuseinactivitytimeoutts)
+5. [Component Communication Patterns](#component-communication-patterns)
+   - [Props Down, Events Up](#props-down-events-up)
+   - [Event Handling](#event-handling)
+   - [Modal and Dialog Patterns](#modal-and-dialog-patterns)
+6. [Styling Approach](#styling-approach)
+   - [CSS Modules](#css-modules)
+   - [Style Conventions](#style-conventions)
+7. [Performance Considerations](#performance-considerations)
+   - [Component Lifecycle](#component-lifecycle)
+8. [Accessibility Features](#accessibility-features)
+   - [Built-in Accessibility](#built-in-accessibility)
+9. [Development Guidelines](#development-guidelines)
+   - [Component Creation Checklist](#component-creation-checklist)
+   - [Best Practices](#best-practices)
+
 ## Component Architecture Overview
 
 Striae's frontend is built using React components organized in a modular structure. This guide covers the major components, their purposes, and how they interact within the application.
@@ -802,7 +862,7 @@ useEffect(() => {
 1. ✅ Create component directory
 2. ✅ Implement TypeScript interfaces
 3. ✅ Add CSS Module styling
-4. ✅ Include error handling
+4. ✅ Include error handling (follow [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide))
 5. ✅ Add loading states
 6. ✅ Implement accessibility features
 7. ✅ Add documentation
@@ -811,6 +871,6 @@ useEffect(() => {
 
 - **Single Responsibility**: Each component has one clear purpose
 - **Type Safety**: Full TypeScript coverage
-- **Error Boundaries**: Graceful error handling
+- **Error Boundaries**: Graceful error handling (see [Error Handling Guide](https://docs.stephenjlu.com/docs-stephenjlu/striae-overview/striae-overview/error-handling-guide))
 - **Performance**: Optimized for large datasets
 - **Maintainability**: Clear, documented code
