@@ -166,17 +166,44 @@ async function generateSignedUrl(url, env) {
 
 ### Environment Variable Security
 
-All sensitive configuration is stored as environment variables:
+All sensitive configuration is stored as environment variables across the workers:
 
 ```typescript
 // Environment variables used across workers:
-// - USER_DB_AUTH: User worker authentication
-// - R2_KEY_SECRET: Data worker authentication  
-// - IMAGES_API_TOKEN: Image worker authentication
-// - KEYS_AUTH: Keys worker authentication
-// - AUTH_PASSWORD: Initial access password
-// - HMAC_KEY: Image URL signing key
+// 
+// User Worker:
+// - USER_DB_AUTH: User worker authentication token
+// - USER_DB: KV namespace binding for user data
+//
+// Data Worker:
+// - R2_KEY_SECRET: Data worker authentication token
+// - STRIAE_DATA: R2 bucket binding for file storage
+//
+// Image Worker:
+// - API_TOKEN: Cloudflare Images API authentication
+// - ACCOUNT_ID: Cloudflare account identifier for Images API
+// - HMAC_KEY: HMAC secret key for signed URL generation
+//
+// Keys Worker:
+// - KEYS_AUTH: Keys worker authentication token
+// - AUTH_PASSWORD: Initial application access password
+// - R2_KEY_SECRET: Referenced for key distribution
+// - ACCOUNT_HASH: Account hash for client-side operations
+// - IMAGES_API_TOKEN: Referenced for key distribution
+// - USER_DB_AUTH: Referenced for key distribution
+//
+// PDF Worker:
+// - BROWSER: Puppeteer browser binding (no auth required)
+//
+// Turnstile Worker:
+// - CFT_SECRET_KEY: Cloudflare Turnstile secret key
 ```
+
+**Security Notes:**
+- All authentication tokens are unique, randomly generated secrets
+- KV and R2 bindings are configured in wrangler.jsonc files
+- No environment variables are exposed to client-side code
+- Keys Worker acts as a secure distribution point for other worker tokens
 
 ## Error Handling
 
@@ -263,9 +290,38 @@ interface FirebaseConfig {
 
 - **Role-Based Permissions**: All authenticated users have same access
 - **Rate Limiting**: No request throttling in workers
-- **Persistent Audit Logging**: Only console logging available
+- **Custom Audit Logging**: No application-level audit trail system
 - **API Versioning**: No versioning strategy for breaking changes
 - **Account Lockout**: Relies on Firebase default protections
+
+### Cloudflare Worker Logging
+
+While custom audit logging is not implemented, Cloudflare provides built-in logging capabilities for Workers:
+
+**Available Logging Features:**
+- **Real-time Logs**: Console logs from workers available in Cloudflare dashboard
+- **Request Analytics**: HTTP request metrics, response codes, and performance data
+- **Error Tracking**: Automatic capture of worker exceptions and errors
+- **Tail Logs**: Live streaming of worker execution logs via `wrangler tail`
+
+**Log Retention Policy:**
+- **Real-time Logs**: Available for immediate viewing during development
+- **Analytics Data**: Retained for up to 30 days on Pro plans, longer on Enterprise
+- **Error Logs**: Captured in Cloudflare's error tracking system
+- **Console Logs**: Viewable in real-time but not persistently stored without external logging
+
+**What Gets Logged:**
+- Worker execution times and performance metrics
+- HTTP request/response details (headers, status codes, response times)
+- Console.log() statements from worker code
+- Unhandled exceptions and stack traces
+- Geographic request distribution and caching metrics
+
+**Limitations:**
+- No built-in request payload logging for security reasons
+- Console logs are not permanently stored without external log aggregation
+- No user action audit trail beyond HTTP request logs
+- Limited historical log search capabilities
 
 ### Known Considerations
 
@@ -306,6 +362,35 @@ interface FirebaseConfig {
 
 ### Monitoring
 
-- **Console Logs**: Monitor worker logs for errors
-- **Firebase Console**: Check authentication metrics
-- **Cloudflare Analytics**: Monitor traffic patterns
+Current monitoring capabilities include:
+
+- **Console Logs**: Monitor worker logs for errors through Cloudflare dashboard
+- **Firebase Console**: Check authentication metrics and user activity
+- **Cloudflare Analytics**: Monitor traffic patterns, request volumes, and geographic distribution
+
+**Accessing Cloudflare Worker Logs:**
+
+```bash
+# Real-time log streaming during development
+wrangler tail --name striae-users
+wrangler tail --name striae-images
+
+# View logs in Cloudflare Dashboard:
+# 1. Navigate to Workers & Pages
+# 2. Select specific worker
+# 3. Go to "Logs" tab for real-time view
+# 4. Use "Analytics" tab for historical metrics
+```
+
+**Log Analysis Recommendations:**
+
+- Monitor authentication failure patterns
+- Track API response times and error rates
+- Review geographic access patterns for anomalies
+- Set up external log aggregation for long-term storage if needed
+
+**Available Metrics:**
+- Request count and error rates by worker
+- Response time percentiles and performance trends
+- Geographic distribution of requests
+- Cache hit/miss ratios for static assets
