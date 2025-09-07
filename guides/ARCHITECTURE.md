@@ -56,6 +56,7 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 ## High-Level Architecture
 
 ```
+    FRONTEND                 BACKEND                EXTERNAL
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Client App    │    │  Cloudflare      │    │   External      │
 │   (Remix/React) │────│  Workers & Pages │────│   Services      │
@@ -63,7 +64,7 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
          │                       │                       │
          │                       │                       │
     ┌────▼────┐      ┌───────────▼───────────┐      ┌────▼────┐
-    │Firebase │      │   KV   │  R2   │ CF  │      │SendLayer│
+    │Firebase │      │   KV   │  R2   │ CF   │      │SendLayer│
     │  Auth   │      │Storage │Storage│Images│      │  Email  │
     └─────────┘      └────────┴───────┴──────┘      └─────────┘
 ```
