@@ -53,6 +53,7 @@ $requiredVars = @(
     "ACCOUNT_ID",
     "SL_API_KEY",
     "AUTH_PASSWORD",
+    "SESSION_SECRET",
     "KEYS_AUTH",
     "USER_DB_AUTH",
     "R2_KEY_SECRET",
@@ -166,6 +167,7 @@ Write-Host ""
 Write-Host "⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:" -ForegroundColor Yellow
 Write-Host "   - SL_API_KEY" -ForegroundColor White
 Write-Host "   - AUTH_PASSWORD" -ForegroundColor White
+Write-Host "   - SESSION_SECRET" -ForegroundColor White
 
 Write-Host ""
 Write-Host "⚠️  ALSO REMEMBER TO:" -ForegroundColor Yellow

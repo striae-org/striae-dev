@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from '@remix-run/react';
-import { verifyAuthPassword } from '~/utils/auth';
+import { Link, useFetcher } from '@remix-run/react';
 import styles from './auth-password.module.css';
 
 interface AuthPasswordProps {
@@ -10,35 +9,56 @@ interface AuthPasswordProps {
 export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
+  const [isLockedOut, setIsLockedOut] = useState(false);
+  const fetcher = useFetcher<{
+    success: boolean;
+    isLocked: boolean;
+    attemptsRemaining: number;
+    error?: string;
+  }>();
+
+  const isLoading = fetcher.state === 'submitting';
+
+  // Handle fetcher response
+  useEffect(() => {
+    if (fetcher.data) {
+      const { success, isLocked, attemptsRemaining, error } = fetcher.data;
+      
+      setIsLockedOut(isLocked);
+      setAttemptsRemaining(attemptsRemaining);
+      
+      if (success) {
+        sessionStorage.setItem('auth-access-granted', 'true');
+        onAccessGranted();
+      } else if (error) {
+        setError(error);
+        setPassword('');
+      }
+    }
+  }, [fetcher.data, onAccessGranted]);
 
   useEffect(() => {
     if (sessionStorage.getItem('auth-access-granted') === 'true') {
       onAccessGranted();
+      return;
     }
   }, [onAccessGranted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');    
-
-    try {      
-      const isValidPassword = await verifyAuthPassword(password);      
-      
-      if (isValidPassword) {
-        sessionStorage.setItem('auth-access-granted', 'true');
-        onAccessGranted();
-      } else {
-        setError('Incorrect access password. Please re-register if you need access.');
-        setPassword('');
-      }
-    } catch (error) {
-      setError('Unable to verify password. Please try again later.');
-      console.error('Error verifying auth password:', error);
-    }
     
-    setIsLoading(false);
+    if (isLockedOut) {
+      setError('Too many failed attempts. Please try again later.');
+      return;
+    }
+
+    setError('');
+    
+    const formData = new FormData();
+    formData.append('password', password);
+    
+    fetcher.submit(formData, { method: 'post' });
   };
 
   return (
@@ -60,18 +80,28 @@ export const AuthPassword = ({ onAccessGranted }: AuthPasswordProps) => {
             placeholder="Enter access password"
             className={styles.input}
             required
-            disabled={isLoading}
+            disabled={isLoading || isLockedOut}
             autoComplete="off"
           />
           
-          {error && <p className={styles.error}>{error}</p>}
+          {isLockedOut ? (
+            <p className={styles.error}>
+              Too many failed attempts. Please try again later.
+            </p>
+          ) : error ? (
+            <p className={styles.error}>{error}</p>
+          ) : !isLockedOut && attemptsRemaining < 5 ? (
+            <p className={styles.error}>
+              {attemptsRemaining} attempts remaining
+            </p>
+          ) : null}
           
           <button 
             type="submit" 
             className={styles.button}
-            disabled={isLoading || !password}
+            disabled={isLoading || !password || isLockedOut}
           >
-            {isLoading ? 'Verifying...' : 'Access Striae'}
+            {isLoading ? 'Verifying...' : isLockedOut ? 'Locked Out' : 'Access Striae'}
           </button>
         </form>
         
