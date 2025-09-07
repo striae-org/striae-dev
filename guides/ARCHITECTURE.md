@@ -103,8 +103,8 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 - File validation and processing
 
 **API Endpoints**:
-- `POST /upload` - Upload new image
-- `GET /{imageId}/signed-url` - Get signed URL for image access
+- `POST /` - Upload new image
+- `GET /{imageDeliveryPath}` - Generate signed URL for imagedelivery.net path
 - `DELETE /{imageId}` - Delete image
 
 **Key Features**:
@@ -126,13 +126,14 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 **Technology**: Puppeteer for PDF generation
 
 **API Endpoints**:
-- `POST /generate` - Generate PDF report
+- `POST /` - Generate PDF report
 
 **Key Features**:
 - HTML to PDF conversion
 - Annotation overlay rendering
 - Custom branding and headers
 - Date and metadata integration
+- No authentication required
 
 #### 4. Data Worker (`workers/data-worker/`)
 
@@ -167,6 +168,16 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 - Authentication middleware
 - Security policy enforcement
 
+**API Endpoints**:
+- `GET /{keyName}` - Retrieve environment variable value by name
+- `POST /verify-auth-password` - Verify initial access password
+
+**Key Features**:
+- Secure key distribution for other workers
+- Initial application access control
+- Password verification for app entry gate
+- Custom authentication via X-Custom-Auth-Key header
+
 #### 6. Turnstile Worker (`workers/turnstile-worker/`)
 
 **Purpose**: CAPTCHA verification
@@ -176,6 +187,15 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 - Bot protection
 - Form submission validation
 - Abuse prevention
+
+**API Endpoints**:
+- `POST /` - Verify Cloudflare Turnstile token
+
+**Key Features**:
+- No authentication required
+- Token validation with Cloudflare Turnstile service
+- IP address logging for verification
+- JSON response with verification results
 
 ## Data Architecture
 
@@ -187,18 +207,25 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 - `USER_DB` - User profiles and metadata
 
 **Data Structure**:
+
 ```typescript
 // User Data (KV Storage)
 interface UserData {
   uid: string;
-  email: string;
+  email: string | null;
   firstName: string;
   lastName: string;
   company: string;
   permitted: boolean;
   cases: CaseReference[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+}
+
+// Case Reference (nested in UserData)
+interface CaseReference {
+  caseNumber: string;
+  createdAt: string;
 }
 ```
 
@@ -208,13 +235,21 @@ interface UserData {
 - `striae-data` - Case files and annotation data
 
 **Data Structure**:
+
 ```typescript
 // Case Data (R2 Storage)
 interface CaseData {
   caseNumber: string;
   files: FileData[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+}
+
+// File Data (nested in CaseData)
+interface FileData {
+  id: string;
+  originalFilename: string;
+  uploadedAt: string;
 }
 
 // Annotation Data (R2 Storage)
@@ -223,10 +258,18 @@ interface AnnotationData {
   rightCase: string;
   leftItem: string;
   rightItem: string;
+  caseFontColor: string;
   classType: 'Bullet' | 'Cartridge Case' | 'Other';
+  customClass?: string;
+  classNote: string;
+  indexType: 'number' | 'color';
+  indexNumber?: string;
+  indexColor?: string;
   supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
+  hasSubclass?: boolean;
+  includeConfirmation: boolean;
   additionalNotes: string;
-  // ... additional fields
+  updatedAt?: string;
 }
 ```
 
