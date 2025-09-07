@@ -54,7 +54,6 @@ echo.
 echo === Images Worker ===
 echo cd workers\image-worker
 echo wrangler secret put ACCOUNT_ID --name striae-images
-echo wrangler secret put ACCOUNT_HASH --name striae-images
 echo wrangler secret put API_TOKEN --name striae-images
 echo wrangler secret put HMAC_KEY --name striae-images
 echo cd ..\..

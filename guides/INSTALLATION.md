@@ -103,9 +103,9 @@ ls -la
    - **HMAC Key** for signed URLs (HMAC_KEY)
 5. Go to Images → Overview and note:
    - **Account ID** (ACCOUNT_ID)
-   - **Account Hash** (IMAGES_ACCOUNT_HASH)
+   - **Account Hash** (ACCOUNT_HASH)
 6. Go to Manage Account → Account API Tokens and create:
-   - **Images API Token** with read and write permissions to Cloudflare Images (IMAGES_API_TOKEN)
+   - **Images API Token** with read and write permissions to Cloudflare Images (IMAGES_API_TOKEN: Keys Worker; API_TOKEN: Images Worker)
 
 ### 2.3 Cloudflare KV Setup
 
@@ -172,7 +172,7 @@ All required variables are documented in the `.env` file. Here's what you need t
 **Cloudflare Services:**
 - `ACCOUNT_ID` - Your Cloudflare Account ID
 - `IMAGES_API_TOKEN` - Cloudflare Images API token
-- `IMAGES_ACCOUNT_HASH` - Cloudflare Images Account Hash  
+- `ACCOUNT_HASH` - Cloudflare Images Account Hash
 - `HMAC_KEY` - Cloudflare Images HMAC signing key
 - `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
 
@@ -399,7 +399,6 @@ wrangler deploy
 **Environment variables:** ✅ Already configured if you used the automated deployment scripts (Step 3.4)
 
 **Manual configuration** (if not using automated scripts):
-- `ACCOUNT_HASH`: Your Images Account Hash
 - `ACCOUNT_ID`: Your Cloudflare Account ID
 - `API_TOKEN`: Your Images API token
 - `HMAC_KEY`: Your Images HMAC signing key
