@@ -8,7 +8,7 @@ Striae's frontend is built using React components organized in a modular structu
 
 ```text
 app/components/
-├── actions/          # Data manipulation components
+├── actions/          # Data handling components
 ├── auth/             # Authentication components
 ├── button/           # Reusable button components
 ├── canvas/           # Main canvas for image annotation
