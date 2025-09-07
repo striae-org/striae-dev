@@ -12,7 +12,7 @@
    - [2. Canvas System](#2-canvas-system)
      - [Canvas](#canvas-appcomponentscanvascanvastsx)
    - [3. Sidebar System](#3-sidebar-system)
-     - [SidebarContainer](#sidebarcontainer-appcomponentssidebarsidebar-containertsx)
+     - [Sidebar Container](#sidebar-container-appcomponentssidebarsidebar-containertsx)
      - [Sidebar](#sidebar-appcomponentssidebarsidebartsx)
      - [Case Sidebar](#case-sidebar-appcomponentssidebarcase-sidebartsx)
      - [Notes Sidebar](#notes-sidebar-appcomponentssidebarnotes-sidebartsx)
@@ -174,7 +174,7 @@ interface CanvasProps {
 
 ### 3. Sidebar System
 
-#### SidebarContainer (`app/components/sidebar/sidebar-container.tsx`)
+#### Sidebar Container (`app/components/sidebar/sidebar-container.tsx`)
 
 **Purpose**: Main sidebar wrapper with footer integration
 
