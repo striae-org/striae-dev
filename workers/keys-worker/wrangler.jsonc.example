@@ -1,5 +1,5 @@
 {
-  "name": "striae-keys",
+  "name": "insert-your-keys-worker-name",
   "account_id": "YOUR_ACCOUNT_ID",
   "main": "src/keys.js",
   "compatibility_date": "2023-03-14",

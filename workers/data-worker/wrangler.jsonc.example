@@ -1,5 +1,5 @@
 {
-  "name": "striae-data",
+  "name": "insert-your-data-worker-name",
   "account_id": "YOUR_ACCOUNT_ID",
   "main": "src/data-worker.js",
   "compatibility_date": "2023-03-14",
@@ -14,7 +14,7 @@
   "r2_buckets": [
     {
       "binding": "STRIAE_DATA",
-      "bucket_name": "striae-data"
+      "bucket_name": "insert-your-r2-bucket-name"
     }
   ],
 
