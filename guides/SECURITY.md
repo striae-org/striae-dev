@@ -210,6 +210,11 @@ All sensitive configuration is stored as environment variables across the worker
 ```typescript
 // Environment variables used across workers:
 // 
+// Cloudflare Pages:
+// - SESSION_SECRET: Secret key for rate limiting session cookies
+// - SL_API_KEY: SendLayer email service authentication
+// - AUTH_PASSWORD: Initial application access password
+//
 // User Worker:
 // - USER_DB_AUTH: User worker authentication token
 // - USER_DB: KV namespace binding for user data
