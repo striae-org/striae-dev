@@ -35,8 +35,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const formData = await request.formData();
   const password = formData.get('password') as string;
   
-  // Access the SESSION_SECRET from Cloudflare Pages environment variables
-  const sessionSecret = (context.env as Record<string, string>)?.SESSION_SECRET;
+  // Access the SESSION_SECRET from environment
+  // In production: context.cloudflare.env.SESSION_SECRET
+  // In development: process.env.SESSION_SECRET
+  const cloudflareEnv = context.cloudflare?.env as { SESSION_SECRET?: string } | undefined;
+  const sessionSecret = cloudflareEnv?.SESSION_SECRET || process.env.SESSION_SECRET;
 
   if (!password) {
     return json({ error: 'Password is required' }, { status: 400 });
