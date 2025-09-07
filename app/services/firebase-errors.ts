@@ -17,9 +17,14 @@ export const ERROR_MESSAGES = {
   
   // MFA Errors
   MFA_REQUIRED: 'Multi-factor authentication required',
-  MFA_INVALID_CODE: 'Invalid verification code',
-  MFA_CODE_EXPIRED: 'Verification code expired',
+  MFA_INVALID_CODE: 'Invalid verification code. Please check your code and try again.',
+  MFA_CODE_EXPIRED: 'Verification code has expired. Please request a new code.',
   MFA_TOO_MANY_REQUESTS: 'Too many requests. Please try again later',
+  MFA_INVALID_PHONE: 'Please enter a valid phone number',
+  MFA_NO_VERIFICATION_ID: 'No verification ID found. Please request a new code.',
+  MFA_RECAPTCHA_EXPIRED: 'reCAPTCHA expired. Please try again.',
+  MFA_RECAPTCHA_ERROR: 'reCAPTCHA not initialized. Please refresh and try again.',
+  MFA_CODE_REQUIRED: 'Please enter the verification code',
   
   // General
   GENERAL_ERROR: 'Something went wrong. Please contact support.',
@@ -79,4 +84,9 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
   
   console.error('Unknown Error:', err);
   return { message: ERROR_MESSAGES.GENERAL_ERROR };
+};
+
+// Helper function to get validation error messages
+export const getValidationError = (type: keyof typeof ERROR_MESSAGES): string => {
+  return ERROR_MESSAGES[type];
 };

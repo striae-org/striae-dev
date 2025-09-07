@@ -62,6 +62,22 @@
   line-height: 1.5;
 }
 
+.errorMessage {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  margin-bottom: var(--spaceL);
+  text-align: left;
+  line-height: 1.4;
+}
+
+.errorMessage:empty {
+  display: none;
+}
+
 .input {
   width: 100%;
   padding: var(--spaceM);
