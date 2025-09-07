@@ -8,7 +8,7 @@ import {
   multiFactor,
   User
 } from 'firebase/auth';
-import { handleAuthError } from '~/services/firebase-errors';
+import { handleAuthError, getValidationError } from '~/services/firebase-errors';
 import styles from './mfa-enrollment.module.css';
 
 interface MFAEnrollmentProps {
@@ -34,6 +34,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
   const [verificationId, setVerificationId] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -49,7 +50,9 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
         // reCAPTCHA solved, allow SMS sending
       },
       'expired-callback': () => {
-        onError('reCAPTCHA expired. Please try again.');
+        const error = getValidationError('MFA_RECAPTCHA_EXPIRED');
+        setErrorMessage(error);
+        onError(error);
       }
     });
     setRecaptchaVerifier(verifier);
@@ -68,16 +71,21 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
 
   const sendVerificationCode = async () => {
     if (!phoneNumber.trim()) {
-      onError('Please enter a valid phone number');
+      const error = getValidationError('MFA_INVALID_PHONE');
+      setErrorMessage(error);
+      onError(error);
       return;
     }
 
     if (!recaptchaVerifier) {
-      onError('reCAPTCHA not initialized. Please refresh and try again.');
+      const error = getValidationError('MFA_RECAPTCHA_ERROR');
+      setErrorMessage(error);
+      onError(error);
       return;
     }
 
     setIsLoading(true);
+    setErrorMessage(''); // Clear any previous errors
     try {
       // Format phone number if it doesn't start with +
       const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
@@ -100,7 +108,9 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       onError(''); // Clear any previous errors
     } catch (error: unknown) {
       const authError = error as { code?: string; message?: string };
-      onError(handleAuthError(authError).message);
+      const errorMsg = handleAuthError(authError).message;
+      setErrorMessage(errorMsg);
+      onError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -108,16 +118,21 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
 
   const enrollMFA = async () => {
     if (!verificationCode.trim()) {
-      onError('Please enter the verification code');
+      const error = getValidationError('MFA_CODE_REQUIRED');
+      setErrorMessage(error);
+      onError(error);
       return;
     }
 
     if (!verificationId) {
-      onError('No verification ID found. Please request a new code.');
+      const error = getValidationError('MFA_NO_VERIFICATION_ID');
+      setErrorMessage(error);
+      onError(error);
       return;
     }
 
     setIsLoading(true);
+    setErrorMessage(''); // Clear any previous errors
     try {
       const cred = PhoneAuthProvider.credential(verificationId, verificationCode);
       const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(cred);
@@ -128,14 +143,17 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
     } catch (error: unknown) {
       console.error('Error enrolling MFA:', error);
       const authError = error as { code?: string; message?: string };
+      let errorMsg = '';
       if (authError.code === 'auth/invalid-verification-code') {
-        onError('Invalid verification code. Please check your code and try again.');
+        errorMsg = getValidationError('MFA_INVALID_CODE');
       } else if (authError.code === 'auth/code-expired') {
-        onError('Verification code has expired. Please request a new code.');
+        errorMsg = getValidationError('MFA_CODE_EXPIRED');
         setCodeSent(false);
       } else {
-        onError(handleAuthError(authError).message);
+        errorMsg = handleAuthError(authError).message;
       }
+      setErrorMessage(errorMsg);
+      onError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -165,14 +183,23 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
         </div>
 
         <div className={styles.content}>
+          {errorMessage && (
+            <div className={styles.errorMessage}>
+              {errorMessage}
+            </div>
+          )}
+          
           {!codeSent ? (
             <div className={styles.phoneStep}>
-              <h3>Step 1: Enter Your Phone Number</h3>
+              <h3>Step 1: Enter Your Mobile Number</h3>
               <input
                 type="tel"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="5551234567"
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  if (errorMessage) setErrorMessage(''); // Clear error on input
+                }}
+                placeholder="ex. +15551234567"
                 className={styles.input}
                 disabled={isLoading}
               />
@@ -196,7 +223,10 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
               <input
                 type="text"
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => {
+                  setVerificationCode(e.target.value.replace(/\D/g, ''));
+                  if (errorMessage) setErrorMessage(''); // Clear error on input
+                }}
                 placeholder="123456"
                 maxLength={6}
                 className={styles.input}
@@ -216,6 +246,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                   onClick={() => {
                     setCodeSent(false);
                     setVerificationCode('');
+                    setErrorMessage(''); // Clear errors when changing phone number
                   }}
                   disabled={isLoading}
                   className={styles.secondaryButton}

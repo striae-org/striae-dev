@@ -7,6 +7,7 @@ import {
   UserCredential
 } from 'firebase/auth';
 import { auth } from '~/services/firebase';
+import { handleAuthError, getValidationError } from '~/services/firebase-errors';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -24,6 +25,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   const [codeSent, setCodeSent] = useState(false);
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -37,6 +39,11 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       size: 'invisible',
       callback: () => {
         // reCAPTCHA solved
+      },
+      'expired-callback': () => {
+        const error = getValidationError('MFA_RECAPTCHA_EXPIRED');
+        setErrorMessage(error);
+        onError(error);
       }
     });
     setRecaptchaVerifier(verifier);
@@ -44,12 +51,18 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
     return () => {
       verifier.clear();
     };
-  }, [isClient]);
+  }, [isClient, onError]);
 
   const sendVerificationCode = async () => {
-    if (!recaptchaVerifier) return;
+    if (!recaptchaVerifier) {
+      const error = getValidationError('MFA_RECAPTCHA_ERROR');
+      setErrorMessage(error);
+      onError(error);
+      return;
+    }
 
     setLoading(true);
+    setErrorMessage(''); // Clear any previous errors
     try {
       const phoneAuthProvider = new PhoneAuthProvider(auth);
       
@@ -62,8 +75,10 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       setVerificationId(vId);
       setCodeSent(true);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send verification code';
-      onError(errorMessage);
+      const authError = error as { code?: string; message?: string };
+      const errorMsg = handleAuthError(authError).message;
+      setErrorMessage(errorMsg);
+      onError(errorMsg);
       if (recaptchaVerifier) {
         recaptchaVerifier.clear();
       }
@@ -73,9 +88,22 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   };
 
   const verifyCode = async () => {
-    if (!verificationId || !verificationCode) return;
+    if (!verificationId) {
+      const error = getValidationError('MFA_NO_VERIFICATION_ID');
+      setErrorMessage(error);
+      onError(error);
+      return;
+    }
+    
+    if (!verificationCode.trim()) {
+      const error = getValidationError('MFA_CODE_REQUIRED');
+      setErrorMessage(error);
+      onError(error);
+      return;
+    }
 
     setLoading(true);
+    setErrorMessage(''); // Clear any previous errors
     try {
       const credential = PhoneAuthProvider.credential(verificationId, verificationCode);
       const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(credential);
@@ -83,8 +111,17 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       const result = await resolver.resolveSignIn(multiFactorAssertion);
       onSuccess(result);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Invalid verification code';
-      onError(errorMessage);
+      const authError = error as { code?: string; message?: string };
+      let errorMsg = '';
+      if (authError.code === 'auth/invalid-verification-code') {
+        errorMsg = getValidationError('MFA_INVALID_CODE');
+      } else if (authError.code === 'auth/code-expired') {
+        errorMsg = getValidationError('MFA_CODE_EXPIRED');
+      } else {
+        errorMsg = handleAuthError(authError).message;
+      }
+      setErrorMessage(errorMsg);
+      onError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -102,6 +139,12 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       <div className={styles.modal}>
         <h2 className={styles.title}>Two-Factor Authentication Required</h2>
         
+        {errorMessage && (
+          <div className={styles.errorMessage}>
+            {errorMessage}
+          </div>
+        )}
+        
         {resolver.hints.length > 1 && (
           <div className={styles.hintSelection}>
             <label htmlFor="hint-select" className={styles.label}>Choose verification method:</label>
@@ -109,7 +152,10 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
               id="hint-select"
               title="Select verification method"
               value={selectedHintIndex} 
-              onChange={(e) => setSelectedHintIndex(Number(e.target.value))}
+              onChange={(e) => {
+                setSelectedHintIndex(Number(e.target.value));
+                if (errorMessage) setErrorMessage(''); // Clear error when changing method
+              }}
               className={styles.select}
             >
               {resolver.hints.map((hint, index) => (
@@ -143,7 +189,10 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
               type="text"
               placeholder="Enter 6-digit code"
               value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
+              onChange={(e) => {
+                setVerificationCode(e.target.value);
+                if (errorMessage) setErrorMessage(''); // Clear error on input
+              }}
               className={styles.input}
               maxLength={6}
             />
@@ -160,6 +209,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
                   setCodeSent(false);
                   setVerificationCode('');
                   setVerificationId('');
+                  setErrorMessage(''); // Clear errors when requesting new code
                 }}
                 className={styles.secondaryButton}
               >
