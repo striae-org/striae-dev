@@ -8,7 +8,7 @@ Striae's frontend is built using React components organized in a modular structu
 
 ```text
 app/components/
-├── actions/           # Data manipulation components
+├── actions/          # Data manipulation components
 ├── auth/             # Authentication components
 ├── button/           # Reusable button components
 ├── canvas/           # Main canvas for image annotation
@@ -84,6 +84,7 @@ app/components/
 - High-resolution image rendering
 - Annotation overlay display
 - Loading states and error handling
+- Flash effects for user feedback (subclass characteristics)
 
 **Key Props**:
 
@@ -148,7 +149,152 @@ interface SidebarContainerProps {
 - File upload and selection
 - Image management controls
 
+#### Case Sidebar (`app/components/sidebar/case-sidebar.tsx`)
+
+**Purpose**: Case-specific sidebar functionality
+
+**Features**:
+
+- Case creation and management
+- File upload interface
+- Image selection and deletion
+- Case validation and error handling
+
+**Key Props**:
+
+```typescript
+interface CaseSidebarProps {
+  user: User;
+  onImageSelect: (file: FileData) => void;
+  onCaseChange: (caseNumber: string) => void;
+  imageLoaded: boolean;
+  setImageLoaded: (loaded: boolean) => void;
+  onNotesClick: () => void;
+  files: FileData[];
+  setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
+  caseNumber: string;
+  setCaseNumber: (caseNumber: string) => void;
+  currentCase: string | null;
+  setCurrentCase: (caseNumber: string) => void;
+}
+```
+
+#### Notes Sidebar (`app/components/sidebar/notes-sidebar.tsx`)
+
+**Purpose**: Annotation and notes management interface
+
+**Features**:
+
+- Comprehensive annotation forms
+- Color selection integration
+- Classification options (Bullet, Cartridge Case, Other)
+- Support level selection (ID, Exclusion, Inconclusive)
+- Index type management (number/color)
+- Subclass characteristics
+- Additional notes handling
+
+**Key Props**:
+
+```typescript
+interface NotesSidebarProps {
+  currentCase: string;
+  onReturn: () => void;
+  user: User;
+  imageId: string;
+  onAnnotationRefresh?: () => void;
+}
+```
+
+**Data Types**:
+
+```typescript
+type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
+type IndexType = 'number' | 'color';
+type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
+```
+
+#### Cases Modal (`app/components/sidebar/cases-modal.tsx`)
+
+**Purpose**: Case selection and management modal
+
+**Features**:
+
+- Paginated case listing
+- Case selection interface
+- Loading states and error handling
+- Keyboard navigation (Escape key)
+
+**Props**:
+
+```typescript
+interface CasesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectCase: (caseNum: string) => void;
+  currentCase: string;
+  user: User;
+}
+```
+
+#### Notes Modal (`app/components/sidebar/notes-modal.tsx`)
+
+**Purpose**: Additional notes editing modal
+
+**Features**:
+
+- Text area for detailed notes
+- Save/cancel functionality
+- Keyboard event handling
+- Temporary state management
+
+**Props**:
+
+```typescript
+interface NotesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  notes: string;
+  onSave: (notes: string) => void;
+}
+```
+
 ### 4. Action Components
+
+#### Case Management (`app/components/actions/case-manage.tsx`)
+
+**Purpose**: Complete case lifecycle management
+
+**Key Functions**:
+
+```typescript
+export const validateCaseNumber = (caseNumber: string): boolean
+export const checkExistingCase = async (
+  caseNumber: string, 
+  user: User
+): Promise<boolean>
+export const createNewCase = async (
+  caseNumber: string, 
+  user: User
+): Promise<{ success: boolean; message: string }>
+export const renameCase = async (
+  oldCaseNumber: string,
+  newCaseNumber: string,
+  user: User
+): Promise<{ success: boolean; message: string }>
+export const deleteCase = async (
+  caseNumber: string,
+  user: User
+): Promise<{ success: boolean; message: string }>
+export const listCases = async (user: User): Promise<string[]>
+```
+
+**Features**:
+
+- Case number validation
+- Duplicate case detection
+- Case creation and deletion
+- Case renaming functionality
+- User case list management
 
 #### Image Management (`app/components/actions/image-manage.tsx`)
 
@@ -172,6 +318,23 @@ export const deleteImage = async (
   imageId: string, 
   apiKey: string
 ): Promise<void>
+
+export const fetchFiles = async (
+  caseNumber: string,
+  apiKey: string
+): Promise<FileData[]>
+
+export const uploadFile = async (
+  file: File,
+  caseNumber: string,
+  apiKey: string
+): Promise<{ success: boolean; message: string; fileData?: FileData }>
+
+export const deleteFile = async (
+  fileId: string,
+  caseNumber: string,
+  apiKey: string
+): Promise<{ success: boolean; message: string }>
 ```
 
 #### PDF Generation (`app/components/actions/generate-pdf.tsx`)
@@ -207,6 +370,42 @@ export const generatePDF = async (
 - Data validation and sanitization
 - Error handling for API operations
 
+**Key Functions**:
+
+```typescript
+export const getNotes = async (
+  caseNumber: string,
+  imageId: string,
+  apiKey: string
+): Promise<AnnotationData | null>
+
+export const saveNotes = async (
+  caseNumber: string,
+  imageId: string,
+  notesData: AnnotationData,
+  apiKey: string
+): Promise<{ success: boolean; message: string }>
+```
+
+#### Sign Out (`app/components/actions/signout.tsx`)
+
+**Purpose**: User authentication logout
+
+**Features**:
+
+- Firebase sign out
+- Local storage cleanup
+- Redirect handling
+- Error handling
+
+**Props**:
+
+```typescript
+interface SignOutProps {
+  redirectTo?: string;
+}
+```
+
 ### 5. UI Components
 
 #### Button System (`app/components/button/`)
@@ -216,8 +415,51 @@ export const generatePDF = async (
 **Components**:
 
 - `Button` - Standard button with variants
-- `IconButton` - Button with icon integration
-- `LoadingButton` - Button with loading states
+
+**Props**:
+
+```typescript
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'small' | 'medium' | 'large';
+  className?: string;
+}
+```
+
+#### Color System (`app/components/colors/colors.tsx`)
+
+**Purpose**: Color selection interface
+
+**Features**:
+
+- Predefined color palette
+- Custom color wheel
+- Color validation
+- Real-time preview
+
+**Props**:
+
+```typescript
+interface ColorSelectorProps {
+  selectedColor: string;
+  onColorSelect: (color: string) => void;
+}
+```
+
+#### Footer Component (`app/components/footer/footer.tsx`)
+
+**Purpose**: Application footer with navigation and social links
+
+**Features**:
+
+- External link navigation
+- Patreon integration
+- Dynamic year display
+- Terms and privacy links
 
 #### Icon System (`app/components/icon/icon.tsx`)
 
@@ -228,13 +470,49 @@ export const generatePDF = async (
 - SVG icon system
 - Consistent sizing and styling
 - Type-safe icon names
+- Available icons: eye, eye-off, class, ID, index, notes, number, print, other unused/misc icons
 
 **Usage**:
 
 ```tsx
 <Icon icon="eye" />
 <Icon icon="eye-off" />
-<Icon icon="upload" />
+```
+
+#### Mobile Warning (`app/components/mobile/mobile-warning.tsx`)
+
+**Purpose**: Mobile device usage warning
+
+**Features**:
+
+- Responsive design detection
+- Route-specific display
+- User experience guidance
+- Desktop-only enforcement
+
+#### Notice System (`app/components/notice/notice.tsx`)
+
+**Purpose**: Modal notification display
+
+**Features**:
+
+- Dynamic content rendering
+- Keyboard event handling (Escape key)
+- Customizable button text
+- Overlay backdrop
+
+**Props**:
+
+```typescript
+interface NoticeProps {
+  isOpen: boolean;
+  onClose: () => void;
+  notice: {
+    title: string;
+    content: React.ReactNode;
+    buttonText?: string;
+  };
+}
 ```
 
 #### Toast System (`app/components/toast/toast.tsx`)
@@ -252,23 +530,107 @@ export const generatePDF = async (
 ```typescript
 interface ToastProps {
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'warning';
   isVisible: boolean;
   onClose: () => void;
 }
 ```
 
-### 6. User Management Components
+#### Toolbar (`app/components/toolbar/toolbar.tsx`)
 
-#### UserProfile (`app/components/user/user-profile.tsx`)
-
-**Purpose**: User information display and management
+**Purpose**: Main application toolbar
 
 **Features**:
 
-- User data display
-- Profile editing capabilities
-- Case assignment management
+- Tool selection management
+- PDF generation controls
+- Visibility toggle
+- Active tool state tracking
+
+**Props**:
+
+```typescript
+interface ToolbarProps {
+  onToolSelect?: (toolId: ToolId, active: boolean) => void;
+  onGeneratePDF?: () => void;
+  canGeneratePDF?: boolean;
+  onVisibilityChange?: (visible: boolean) => void;
+  isGeneratingPDF?: boolean;
+}
+
+type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibility';
+```
+
+#### Turnstile CAPTCHA (`app/components/turnstile/turnstile.tsx`)
+
+**Purpose**: Cloudflare Turnstile CAPTCHA integration
+
+**Features**:
+
+- Security verification
+- Theme customization
+- Widget lifecycle management
+- Callback handling
+
+**Props**:
+
+```typescript
+interface TurnstileProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+  onWidgetId?: (id: string) => void;
+  success?: boolean;
+  theme?: 'light' | 'dark' | 'auto';
+}
+```
+
+#### Theme Provider (`app/components/theme-provider/theme-provider.tsx`)
+
+**Purpose**: Application theme management
+
+**Features**:
+
+- Theme context provision
+- Theme persistence
+- System theme detection
+- Theme switching functionality
+
+**Theme Types** (`app/components/theme-provider/theme.ts`):
+
+```typescript
+type Theme = 'light' | 'dark' | 'system';
+```
+
+### 6. User Management Components
+
+#### User Profile Management (`app/components/user/manage-profile.tsx`)
+
+**Purpose**: Comprehensive user profile management
+
+**Features**:
+
+- Profile information editing (display name, email, company)
+- Email verification workflow
+- Password change functionality
+- User reauthentication
+- Firebase integration
+- Error handling with detailed messages
+
+**Props**:
+
+```typescript
+interface ManageProfileProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+```
+
+**Key Features**:
+
+- Email update with verification
+- Display name modification
+- Company information management
+- Current password verification
+- Firebase error handling integration
 
 #### InactivityWarning (`app/components/user/inactivity-warning.tsx`)
 
@@ -354,6 +716,32 @@ interface ComponentProps {
   onError: (message: string) => void;
   onDataChange: (data: DataType) => void;
 }
+```
+
+### Modal and Dialog Patterns
+
+Many components follow consistent modal patterns:
+
+```typescript
+// Common modal interface
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Keyboard event handling for modals
+useEffect(() => {
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  if (isOpen) {
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }
+}, [isOpen, onClose]);
 ```
 
 ## Styling Approach
