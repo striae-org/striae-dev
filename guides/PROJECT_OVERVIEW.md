@@ -86,3 +86,24 @@ For new developers joining the project:
 ## Project Status
 
 Striae is currently in **Beta** with active development. The beta period ends January 1, 2026. The project is actively maintained and welcomes contributions from the forensic technology community.
+
+---
+
+## Support
+
+For support and questions:
+- **Documentation**: [Striae Documentation](https://developers.striae.org/striae-dev/get-started/document-index)
+- **Support Portal**: [Striae Support](https://www.striae.org/support)
+- **Discord**: [Striae on Discord](https://discord.gg/ESUPhTPwHx)
+
+---
+
+## License
+
+This project is licensed under the terms specified in the LICENSE file.
+
+---
+
+## Credits
+
+This project was entirely designed and developed by [Stephen J. Lu](https://www.stephenjlu.com)
