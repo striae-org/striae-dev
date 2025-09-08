@@ -7,6 +7,7 @@
 3. [Development Workflow](#development-workflow)
    - [Fork Management](#fork-management)
    - [Branch Strategy](#branch-strategy)
+   - [Development Environment Setup](#development-environment-setup)
    - [Commit Guidelines](#commit-guidelines)
 4. [Pull Request Process](#pull-request-process)
    - [PR Requirements](#pr-requirements)
@@ -30,25 +31,39 @@
 
 This guide establishes the development protocols and best practices for contributing to the Striae project. Following these guidelines ensures code quality, security, and maintainability while facilitating effective collaboration among contributors.
 
+**👥 Developer Types**: This guide covers protocols for both internal developers (with team access) and external contributors (community members).
+
 ## Repository Structure
 
-The Striae project uses a fork-based development model with the following repositories:
+The Striae project uses different repository access patterns depending on your developer status:
 
-- **Production Repository**: `striae-org/striae` (`master` branch)
-- **Development Fork**: `striae-org/striae-dev` (`master` branch)
-- **Contributor Forks**: Individual forks from `striae-org/striae-dev`
+### For External Contributors:
+- **Production Repository**: `striae-org/striae` (fork this to your account)
+- **Your Fork**: `your-username/striae` (where you make changes)
+- **Contribution Flow**: Your Fork → Pull Request to `striae-org/striae`
+
+### For Internal Developers:
+- **Development Repository**: `striae-org/striae-dev` (direct access)
+- **Production Repository**: `striae-org/striae` (for reference)
+- **Contribution Flow**: Branch in `striae-org/striae-dev` → Pull Request within same repo
 
 ## Development Workflow
 
 ### Fork Management
 
-1. **Development Work**: All development must be performed on the `striae-org/striae-dev` fork
-2. **Fork Synchronization**: Keep your fork synchronized with the upstream `striae-org/striae-dev` repository
-3. **No Direct Development**: Never develop directly on the production repository `striae-org/striae`
+**For External Contributors:**
+
+1. **Fork the Repository**: Fork `striae-org/striae` to your GitHub account
+2. **Clone Your Fork**: Work from your personal fork
+3. **Keep Updated**: Regularly sync your fork with the upstream repository
 
 ```bash
+# Initial setup
+git clone https://github.com/YOUR_USERNAME/striae.git
+cd striae
+
 # Add upstream remote (one-time setup)
-git remote add upstream https://github.com/striae-org/striae-dev.git
+git remote add upstream https://github.com/striae-org/striae.git
 
 # Sync your fork regularly
 git fetch upstream
@@ -57,7 +72,25 @@ git merge upstream/master
 git push origin master
 ```
 
+**For Internal Developers:**
+
+1. **Direct Access**: Clone `striae-org/striae-dev` directly (no forking needed)
+2. **Branch-Based Workflow**: Create feature branches within the shared repository
+3. **Keep Updated**: Regularly pull latest changes from the development repository
+
+```bash
+# Clone the development repository
+git clone https://github.com/striae-org/striae-dev.git
+cd striae-dev
+
+# Stay updated
+git checkout master
+git pull origin master
+```
+
 ### Branch Strategy
+
+**Universal Guidelines (Both Developer Types):**
 
 1. **Feature Branches**: Create descriptive feature branches from the latest `master` branch
 2. **Branch Naming**: Use descriptive names following the pattern:
@@ -66,12 +99,37 @@ git push origin master
    - `hotfix/critical-fix`
    - `docs/documentation-update`
 
+**For External Contributors:**
 ```bash
-# Example branch creation
+# Branch creation in your fork
 git checkout master
 git pull upstream master
 git checkout -b feature/user-authentication-improvements
 ```
+
+**For Internal Developers:**
+```bash
+# Branch creation in shared repository
+git checkout master
+git pull origin master
+git checkout -b feature/user-authentication-improvements
+```
+
+### Development Environment Setup
+
+**External Contributors:**
+- Must set up their own Cloudflare services (Pages, Workers, KV, R2, Images, Turnstile)
+- Must configure their own Firebase project with authentication
+- Must obtain their own SendLayer API key
+- Must manually configure all environment variables and config files
+- Follow the complete installation guide
+
+**Internal Developers:**
+- Receive access to shared Cloudflare services (no separate setup needed)
+- Use pre-configured Firebase authentication and MFA
+- Access to shared SendLayer API service
+- Receive complete `.env` files and configuration files
+- Can skip most installation steps and focus on development
 
 ### Commit Guidelines
 
@@ -113,9 +171,19 @@ on devices with different pixel densities.
 
 ### PR Requirements
 
-1. **Target Repository**: All pull requests must be submitted to `striae-org/striae-dev` ONLY
-2. **Branch Protection**: Ensure your branch is up-to-date with the target branch
-3. **PR Template**: Use the provided PR template and fill out all sections
+**For External Contributors:**
+1. **Target Repository**: Submit pull requests from your fork to `striae-org/striae`
+2. **Cross-Repository PR**: Your fork → `striae-org/striae`
+3. **Branch Protection**: Ensure your branch is up-to-date with the target branch
+
+**For Internal Developers:**
+1. **Target Repository**: Submit pull requests within `striae-org/striae-dev` (branch → master)
+2. **Same-Repository PR**: Your feature branch → `striae-dev` master branch
+3. **Direct Access**: Work within the shared development repository
+
+**Both Developer Types:**
+- Use the provided PR template and fill out all sections
+- Ensure branch is up-to-date before submitting
 
 ### Review Process
 
@@ -288,11 +356,22 @@ If you're interested in becoming an internal developer with direct access to the
 
 - **Contact**: Stephen at [dev@striae.org](mailto:dev@striae.org)
 - **Benefits**: Internal developers receive:
-  - Full credentials and configuration files
-  - Direct contribution access to `striae-org/striae-dev`
-  - Access to [https://dev.striae.org](https://dev.striae.org) for testing
-  - Enhanced development privileges and resources
-  - Private communication channels on Discord
+  - **Pre-configured Environment**: Complete `.env` files with all required variables
+  - **Cloudflare Access**: Access to shared Cloudflare services (no separate account needed)
+  - **Pre-configured Services**: Firebase authentication, MFA, and SendLayer API already set up
+  - **Configuration Files**: All `config.json`, `firebase.ts`, and `wrangler.jsonc` files ready to use
+  - **Direct Repository Access**: Push access to `striae-org/striae-dev`
+  - **Development Environment**: Access to [https://dev.striae.org](https://dev.striae.org) for testing
+  - **Enhanced Development Privileges**: Streamlined setup and deployment process
+  - **Private Communication Channels**: Access to Discord #development channel
+  - **Faster Development Cycle**: Skip complex setup steps and focus on coding
+
+**Internal Developer Workflow:**
+1. Clone `striae-org/striae-dev` directly
+2. Use provided configuration files
+3. Create feature branches within the shared repository
+4. Submit pull requests within the same repository
+5. Test on the shared development environment
 
 ---
 
