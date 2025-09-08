@@ -6,6 +6,7 @@ app/config
 /.cache
 /build
 
+
 *.env
 *.dev.vars
 .dns
@@ -15,3 +16,4 @@ firebase-debug.log
 *.txt
 *.toml
 *.jsonc
+/app/components/turnstile/keys.json
