@@ -14,7 +14,7 @@
    "kv_namespaces": [
     {
       "binding": "USER_DB",
-      "id": "INSERT_YOUR_KV_NAMESPACE"
+      "id": "YOUR_KV_NAMESPACE_ID_UUID_HERE"
     }
   ],
 

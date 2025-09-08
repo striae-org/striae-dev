@@ -55,6 +55,7 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
     - [Quick Start Summary](#quick-start-summary)
 13. [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
+    - [KV Namespace Configuration Issues](#kv-namespace-configuration-issues)
     - [Useful Commands](#useful-commands)
 
 ## Prerequisites
@@ -165,8 +166,18 @@ ls -la
 ### 2.3 Cloudflare KV Setup
 
 1. Navigate to Cloudflare Dashboard → Storage & Databases → KV
-2. Create a new KV namespace named `user-db` (or your preferred name)
-3. Note down the KV namespace ID
+2. Click "+ Create Instance" in the upper right corner
+3. Create a new KV namespace:
+   - **Namespace name**: `USER_DB` (or your preferred name)
+   - Click "Create"
+
+4. **⚠️ IMPORTANT: Record the Namespace ID**
+   - After creating the namespace, you'll see it listed in the KV dashboard
+   - **Copy the "Namespace ID"** (UUID format: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
+   - **Save this ID** - you'll need it for Step 3 (Configure Worker Files)
+   - Example: `680e629649f957baa393b83d11ca17c6`
+
+> **Important Note:** The Namespace ID is different from the namespace name. You need the UUID-format ID, not the name "USER_DB". This ID will be used in your worker configuration files.
 
 ### 2.4 Cloudflare R2 Setup
 
@@ -235,8 +246,23 @@ In each `wrangler.jsonc` file, update the following:
 
 1. **Replace `YOUR_ACCOUNT_ID`** with your actual Cloudflare Account ID
 2. **Replace custom domain patterns** with your actual domains (optional but recommended)
-3. **Update KV namespace ID** in user-worker (replace `USER_DB` with actual namespace ID)
-4. **Update R2 bucket name** in data-worker (replace `striae-data` with your bucket name)
+3. **🔑 Update KV namespace ID** in user-worker:
+   - Open `workers/user-worker/wrangler.jsonc`
+   - Find the `kv_namespaces` section
+   - Replace `insert-your-kv-namespace-id` with the **Namespace ID** you saved from Step 2.3
+   - Example: `"id": "680e629649f957baa393b83d11ca17c6"`
+4. **Update R2 bucket name** in data-worker (replace `insert-your-r2-bucket-name` with your bucket name)
+
+> **KV Namespace Configuration Example:**
+> ```json
+> "kv_namespaces": [
+>   {
+>     "binding": "USER_DB",
+>     "id": "680e629649f957baa393b83d11ca17c6"
+>   }
+> ]
+> ```
+> ⚠️ Use the UUID-format **Namespace ID**, not the namespace name!
 
 **Example for user-worker/wrangler.jsonc:**
 ```json
@@ -785,6 +811,38 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 2. **Authentication Failures**: Verify Firebase configuration and worker tokens
 3. **Image Upload Issues**: Check environment variable configuration in image worker
 4. **Worker Errors**: Verify environment variables and bindings are set correctly
+
+### KV Namespace Configuration Issues
+
+**Error: `KV namespace 'USER_DB' is not valid [code: 10042]`**
+
+This error occurs when the KV namespace configuration uses a name instead of the UUID-format ID:
+
+1. **Check Your Configuration**: Open `workers/user-worker/wrangler.jsonc`
+2. **Verify the ID Format**: The `id` field should be a UUID (e.g., `680e629649f957baa393b83d11ca17c6`), not a name like `USER_DB`
+3. **Get the Correct ID**: 
+   - Go to Cloudflare Dashboard → Workers & Pages → KV
+   - Find your `USER_DB` namespace
+   - Copy the "Namespace ID" (UUID format)
+4. **Update the Configuration**:
+   ```json
+   "kv_namespaces": [
+     {
+       "binding": "USER_DB",
+       "id": "your-actual-uuid-here"
+     }
+   ]
+   ```
+5. **Redeploy**: Run `wrangler deploy` in the user-worker directory
+
+**Error: `A request to the Cloudflare API (/accounts/.../storage/kv/namespaces/...) failed`**
+
+This usually indicates:
+- The namespace ID doesn't exist
+- Wrong account ID in `wrangler.jsonc`
+- Authentication issues with Cloudflare
+
+Double-check your Account ID and KV namespace ID in the Cloudflare dashboard.
 
 ### Useful Commands
 
