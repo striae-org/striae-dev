@@ -2,12 +2,14 @@
 
 This guide provides step-by-step instructions for deploying Striae, a Firearms Examiner's Comparison Companion, on Cloudflare infrastructure.
 
+> **👥 Internal Developers**: If you are an internal developer with the striae-org team, you can skip most of the setup process! See the [Internal Developer Quick Start](#internal-developer-quick-start) section below.
+
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
-   - [Required Accounts & Services](#required-accounts--services)
+   - [External Developers - Required Accounts & Services](#external-developers---required-accounts--services)
    - [Cloudflare Services Required](#cloudflare-services-required)
-   - [Internal Developers](#internal-developers)
+   - [Internal Developer Quick Start](#internal-developer-quick-start)
 2. [Step 1: Clone and Prepare the Project](#step-1-clone-and-prepare-the-project)
    - [1.1: Extract Node Package Dependencies](#11-extract-node-package-dependencies)
 3. [Step 2: Cloudflare Service Configuration](#step-2-cloudflare-service-configuration)
@@ -59,13 +61,15 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
 
 ## Prerequisites
 
-Before starting the installation, ensure you have the following accounts and services set up:
+Before starting the installation, choose your setup path based on your developer status:
 
-### Required Accounts & Services
+### External Developers - Required Accounts & Services
 
-1. **Firebase Project** with Authentication enabled and properly configured
-2. **Cloudflare Account** with a registered domain name
-3. **SendLayer Account** with API access
+**If you are setting up Striae independently**, you'll need to configure all services yourself:
+
+1. **Cloudflare Account** with a registered domain name (for all Cloudflare services)
+2. **Firebase Project** with Authentication enabled and properly configured
+3. **SendLayer Account** with API access for email services
 4. **Node.js** version 20.0.0 or higher
 5. **Git** for cloning the repository
 
@@ -78,25 +82,67 @@ Before starting the installation, ensure you have the following accounts and ser
 - **Cloudflare KV** (for user database)
 - **Cloudflare R2** (for data storage)
 
-### Internal Developers
+### Internal Developer Quick Start
 
-**If you are an internal developer**, you will receive pre-configured credentials and configuration files that streamline the installation process:
+**If you are an internal developer with the striae-org team**, you have a much simpler setup process:
 
-- **Complete `.env` file** with all required environment variables
-- **Pre-configured `wrangler.jsonc` files** for all workers
-- **Firebase configuration files** ready for use
-- **Access to [https://dev.striae.org](https://dev.striae.org)** for testing
+#### ✅ Already Set Up for You:
+- **Cloudflare Account & Services** - Access provided through shared developer account (Pages, Workers, KV, R2, Images, Turnstile)
+- **Firebase Authentication & MFA** - Pre-configured and ready to use
+- **SendLayer API** - Email services already configured  
+- **Environment Variables** - Complete `.env` file provided
+- **Configuration Files** - All `config.json`, `firebase.ts`, and worker configs ready
+- **Development Access** - Access to [https://dev.striae.org](https://dev.striae.org) for testing
 
-Internal developers can skip most manual configuration steps and use the provided files directly. Contact Stephen at [dev@striae.org](mailto:dev@striae.org) to become an internal developer.
+#### 📋 Your Requirements:
+1. **Node.js** version 20.0.0 or higher
+2. **Git** access to contribute to `striae-org/striae-dev` fork
+3. **Development on separate branches only** - All contributions must be on dev branches, never directly to main/master
+
+#### 🚀 Quick Setup Process:
+1. **Clone the dev fork**: `git clone https://github.com/striae-org/striae-dev.git`
+2. **Create your dev branch**: `git checkout -b your-feature-branch`
+3. **Use provided files**: Copy the complete `.env` and config files you receive
+4. **Extract dependencies**: Follow Step 1.1 to extract the node package
+5. **Deploy workers**: Skip configuration steps, go directly to worker deployment
+6. **Start developing**: You're ready to contribute!
+
+#### 📞 Getting Internal Developer Access:
+Contact Stephen at [dev@striae.org](mailto:dev@striae.org) to:
+- Receive your pre-configured environment files
+- Get access to the shared Cloudflare developer account
+- Get access to the development fork
+- Join the internal development workflow
+
+> **🔒 Development Workflow**: All internal development must be contributed to the `striae-org/striae-dev` fork on separate dev branches only. Direct commits to main/master branches are not permitted.
 
 ---
 
 ## Step 1: Clone and Prepare the Project
 
+**For External Developers:**
+1. **Fork the repository** to your GitHub account:
+   - Go to [https://github.com/striae-org/striae](https://github.com/striae-org/striae)
+   - Click the "Fork" button to create your own copy
+2. **Clone your fork**:
 ```bash
-git clone https://github.com/striae-org/striae.git
+git clone https://github.com/YOUR_USERNAME/striae.git
 cd striae
 ```
+
+**For Internal Developers:**
+```bash
+# Clone the development fork directly (you have push access)
+git clone https://github.com/striae-org/striae-dev.git
+cd striae-dev
+
+# Create your feature branch immediately
+git checkout -b your-feature-branch-name
+```
+
+> **🔒 External Developer Note**: After forking and making changes, you'll submit pull requests from your fork back to the main `striae-org/striae` repository.
+
+> **🔒 Internal Developer Note**: All development must be done on separate dev branches within the `striae-org/striae-dev` fork. Never commit directly to main/master branches.
 
 ### 1.1: Extract Node Package Dependencies
 
@@ -145,6 +191,10 @@ ls -la
 ---
 
 ## Step 2: Cloudflare Service Configuration
+
+**🎯 Internal Developers**: **Skip this entire step**. You have access to pre-configured Cloudflare services through the shared developer account. All Turnstile, Images, KV, and R2 services are already set up and configured.
+
+**📋 External Developers**: This section guides you through setting up your own Cloudflare services required for Striae.
 
 ### 2.1 Cloudflare Turnstile Setup
 
@@ -222,6 +272,10 @@ ls -la
 ---
 
 ## Step 3: Configure Worker Files
+
+**🎯 Internal Developers**: **Skip this entire step**. You will receive pre-configured `wrangler.jsonc` files for all workers with the correct account IDs, namespace IDs, and bucket names already set up.
+
+**📋 External Developers**: Before deploying workers, you need to configure each worker's `wrangler.jsonc` file with your own Cloudflare account details.
 
 Before deploying workers, you need to configure each worker's `wrangler.jsonc` file:
 
@@ -327,6 +381,10 @@ In each `wrangler.jsonc` file, update the following:
 ---
 
 ## Step 4: Configure CORS for All Workers
+
+**🎯 Internal Developers**: **Skip this entire step**. CORS headers are already configured for the development environment (`https://dev.striae.org`) in the provided worker files.
+
+**📋 External Developers**: All workers have CORS (Cross-Origin Resource Sharing) headers that must be updated to match your domain.
 
 **Important**: All workers have CORS (Cross-Origin Resource Sharing) headers that must be updated to match your domain. By default, they're configured for `https://www.striae.org`.
 
@@ -521,7 +579,9 @@ wrangler deploy
 
 **⚠️ Important**: This step should be done AFTER configuring worker files (Step 3) and CORS settings (Step 4), and AFTER deploying workers (Step 5). The deployment scripts now require properly configured worker files to function correctly.
 
-**📋 Internal Developers**: If you are an internal developer, you will receive a complete `.env` file with all required variables pre-configured. Simply use the provided file instead of following the manual setup below.
+**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive a complete, pre-configured `.env` file with all required variables. Simply use the provided file and proceed to Step 7.
+
+**📋 External Developers**: This section is for external developers who need to set up their own environment variables and external service accounts.
 
 Striae uses a centralized environment variables system that organizes all secrets by their usage across different workers and the Pages application.
 
@@ -620,11 +680,13 @@ The scripts will:
 
 ## Step 7: Configuration Files
 
-**📋 Internal Developers**: If you are an internal developer, you will receive pre-configured config files. Use the provided files instead of manually updating them below.
+**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive pre-configured config files including `config.json`, `firebase.ts`, `inactivity.ts`, and all Turnstile configurations. Use the provided files and proceed directly to Step 8.
+
+**📋 External Developers**: This section is for external developers who need to manually configure their application settings and Firebase integration.
 
 ### 7.1 Update Configuration Files
 
-**For Standard Installation:**
+**For External Developers:**
 
 1. **Copy example configurations**:
 ```bash
@@ -633,14 +695,9 @@ cp app/config-example/firebase.ts app/config/firebase.ts
 cp app/config-example/inactivity.ts app/config/inactivity.ts
 ```
 
-**For Internal Developers:**
+**External Developer Configuration:**
 
-1. **Use the provided configuration files** (received from the development team)
-2. **Skip manual configuration** and proceed to Step 8
-
-**Standard Installation Configuration:**
-
-2. **Update `app/config/config.json`**:
+1. **Update `app/config/config.json`**:
 Replace all worker URLs with your deployed worker URLs:
 ```json
 {
@@ -747,6 +804,10 @@ wrangler pages secret list --project-name=your-pages-project-name
 
 ## Step 9: Testing and Verification
 
+**🎯 Internal Developers**: You can test your changes on the pre-configured development environment at [https://dev.striae.org](https://dev.striae.org). Firebase authentication, MFA, and all external services are already configured and functional.
+
+**📋 External Developers**: Follow the complete testing steps below to verify your installation.
+
 ### 9.1 Test Authentication Flow
 
 1. Navigate to your deployed application
@@ -842,11 +903,21 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 
 ### Quick Start Summary
 
-1. **Setup Environment**: `cp .env.example .env` → Fill values → `./scripts/deploy-env.sh`
-2. **Configure Workers**: Copy `wrangler.jsonc.example` files and update settings
-3. **Deploy Workers**: `npm install && wrangler deploy` for each worker
-4. **Configure App**: Update config files with worker URLs
-5. **Deploy Frontend**: `npm run deploy` and set Pages environment variables
+**For Internal Developers:**
+1. **Clone dev fork**: `git clone https://github.com/striae-org/striae-dev.git`
+2. **Create dev branch**: `git checkout -b your-feature-branch`
+3. **Use provided files**: Place received `.env`, config files, and `wrangler.jsonc` files in project
+4. **Extract dependencies**: Follow Step 1.1 to extract node package
+5. **Deploy workers**: Skip all configuration steps (2-4, 6-7), go directly to Step 5 worker deployment
+6. **Start developing**: Test on [https://dev.striae.org](https://dev.striae.org)
+
+**For External Developers:**
+1. **Fork & Clone**: Fork `striae-org/striae` to your account → Clone your fork
+2. **Setup Environment**: `cp .env.example .env` → Fill values → `./scripts/deploy-env.sh`
+3. **Configure Workers**: Copy `wrangler.jsonc.example` files and update settings
+4. **Deploy Workers**: `npm install && wrangler deploy` for each worker
+5. **Configure App**: Update config files with worker URLs
+6. **Deploy Frontend**: `npm run deploy` and set Pages environment variables
 
 ---
 
