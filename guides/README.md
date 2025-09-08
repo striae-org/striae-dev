@@ -21,7 +21,7 @@ New to Striae? Start here:
 
 ### Development Guides
 
-- **[Development Protocol Guide](DEVELOPMENT_PROTOCOL.md)** - Complete development workflow, commit guidelines, and contribution standards
+- **[Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)** - Complete development workflow, commit guidelines, and contribution standards
 - **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security architecture and best practices
 - **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
 - **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
@@ -56,7 +56,7 @@ New to Striae? Start here:
 
 ## Document Summaries
 
-### [Development Protocol Guide](DEVELOPMENT_PROTOCOL.md)
+### [Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)
 Comprehensive development workflow guide covering repository structure, commit guidelines, pull request process, code quality standards, and contribution protocols. Essential reading for all contributors.
 
 ### [Project Overview](https://developers.striae.org/striae-dev/get-started/project-overview)
