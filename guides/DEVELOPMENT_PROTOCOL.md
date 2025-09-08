@@ -29,8 +29,8 @@ This guide establishes the development protocols and best practices for contribu
 
 The Striae project uses a fork-based development model with the following repositories:
 
-- **Production Repository**: `striae-org/striae` (main/master branch)
-- **Development Fork**: `striae-org/striae-dev` (development branch)
+- **Production Repository**: `striae-org/striae` (`master` and `dev` branches)
+- **Development Fork**: `striae-org/striae-dev` (`master` branch)
 - **Contributor Forks**: Individual forks from `striae-org/striae-dev`
 
 ## Development Workflow
@@ -204,10 +204,20 @@ Related to #456
 
 ## Release Management
 
-1. **Semantic Versioning**: Follow semantic versioning (MAJOR.MINOR.PATCH)
-2. **Release Notes**: Maintain comprehensive release notes
-3. **Changelog**: Update CHANGELOG.md for each release
-4. **Tag Management**: Use proper Git tags for releases
+1. **Versioning Scheme**: Follow the project's versioning format:
+   - **Beta Releases**: `v0.#.#-beta` (e.g., `v0.9.06-beta`)
+     - First number: Always `0` for beta releases
+     - Second number: Month (1-12)
+     - Third number: Date (01-31)
+   - **Production Releases**: `v#.##.##` (e.g., `v1.01.00`)
+     - First number: Major release (breaking changes, major features)
+     - Second number: Minor release (new features, enhancements)
+     - Third number: Patch release (bug fixes, small improvements)
+2. **Release Notes**: Maintain comprehensive release notes for each version
+3. **Changelog**: Update `README.md` changelog for each release
+4. **Tag Management**: Use proper Git tags matching the version format (`v0.#.#-beta` or `v#.##.##`)
+5. **Beta to Production**: Beta versions should be thoroughly tested before removing the `-beta` suffix and promoting version numbers to production releases
+6. **Release Immutability**: Once a release is tagged and published, it is immutable and cannot be modified. If issues are discovered, create a new release with an incremented version number
 
 ## Issue Management
 
