@@ -33,8 +33,6 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
    - [6.2 Required Environment Variables](#62-required-environment-variables)
    - [6.3 Generate Security Tokens](#63-generate-security-tokens)
    - [6.4 Automated Environment Deployment](#64-automated-environment-deployment)
-   - [6.5 Manual Pages Environment Variables](#65-manual-pages-environment-variables)
-   - [6.6 Final Manual Steps](#66-final-manual-steps)
 8. [Step 7: Configuration Files](#step-7-configuration-files)
    - [7.1 Update Configuration Files](#71-update-configuration-files)
 9. [Step 8: Deploy Frontend (Cloudflare Pages)](#step-8-deploy-frontend-cloudflare-pages)
@@ -594,17 +592,6 @@ The scripts will:
 - ✅ Provide clear progress feedback
 - ✅ Show remaining manual steps
 
-### 6.5 Manual Pages Environment Variables
-
-After running the deployment script, manually set these variables in the **Cloudflare Pages Dashboard**:
-- `SL_API_KEY`
-- `AUTH_PASSWORD`
-
-### 6.6 Final Manual Steps
-
-1. **Configure KV Namespace**: Update the namespace ID in `workers/user-worker/wrangler.jsonc`
-2. **Configure R2 Bucket**: Update the bucket name in `workers/data-worker/wrangler.jsonc`
-
 > 📚 **Detailed Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
 
 ---
@@ -685,10 +672,37 @@ npm run deploy
 
 ### 8.2 Configure Pages Environment Variables
 
-**Note:** If you used the automated deployment scripts in Step 3.4, you still need to manually set these variables in the Cloudflare Pages Dashboard:
+**Important:** This step must be done AFTER deploying your frontend, as the Pages project needs to exist before you can set environment variables.
+
+If you used the automated deployment scripts in Step 6.4, you still need to set these variables for the Pages project:
 
 - `AUTH_PASSWORD`: Your custom registration password
 - `SL_API_KEY`: Your SendLayer API key
+
+**Method 1: Cloudflare Dashboard (Recommended)**
+1. Go to **Cloudflare Dashboard** → **Compute (Workers)** → **Your Pages Project**
+2. Navigate to **Settings** → **Variables and Secrets**
+3. Add the secrets:
+   - `AUTH_PASSWORD`: Your custom registration password
+   - `SL_API_KEY`: Your SendLayer API key
+
+**Method 2: CLI (Alternative)**
+```bash
+# Set Pages environment variables using Wrangler CLI
+# Replace 'your-pages-project-name' with your actual project name
+
+wrangler pages secret put AUTH_PASSWORD --project-name=your-pages-project-name
+# When prompted, enter your custom registration password
+
+wrangler pages secret put SL_API_KEY --project-name=your-pages-project-name
+# When prompted, enter your SendLayer API key
+```
+
+**Verify Variables Are Set:**
+```bash
+# List all environment variables for your Pages project
+wrangler pages secret list --project-name=your-pages-project-name
+```
 
 ### 8.3 Configure Custom Domain
 
@@ -821,7 +835,7 @@ This error occurs when the KV namespace configuration uses a name instead of the
 1. **Check Your Configuration**: Open `workers/user-worker/wrangler.jsonc`
 2. **Verify the ID Format**: The `id` field should be a UUID (e.g., `680e629649f957baa393b83d11ca17c6`), not a name like `USER_DB`
 3. **Get the Correct ID**: 
-   - Go to Cloudflare Dashboard → Workers & Pages → KV
+   - Go to Cloudflare Dashboard → Storage & Databases → KV
    - Find your `USER_DB` namespace
    - Copy the "Namespace ID" (UUID format)
 4. **Update the Configuration**:
