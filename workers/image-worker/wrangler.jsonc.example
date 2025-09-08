@@ -1,5 +1,5 @@
 {
-  "name": "striae-images",
+  "name": "insert-your-images-worker-name",
   "account_id": "YOUR_ACCOUNT_ID",
   "main": "src/image-worker.js",
   "compatibility_date": "2023-03-14",

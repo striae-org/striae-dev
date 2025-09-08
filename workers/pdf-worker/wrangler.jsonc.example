@@ -1,5 +1,5 @@
 {
-  "name": "browser-worker",
+  "name": "insert-your-pdf-worker-name",
   "account_id": "YOUR_ACCOUNT_ID",
   "main": "src/pdf-worker.js",
   "compatibility_date": "2023-03-14",

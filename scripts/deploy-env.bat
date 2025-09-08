@@ -25,43 +25,52 @@ echo ⚠️  IMPORTANT: This batch file provides the commands to run manually.
 echo For automated deployment, use PowerShell or WSL with the bash script.
 echo.
 
+echo.
+echo ⚠️  IMPORTANT: Before running these commands:
+echo    1. Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory
+echo    2. Configure the worker names and settings in each wrangler.jsonc file
+echo    3. Use the correct worker name from your configuration (not the hardcoded names below)
+echo.
+
 echo 🔐 Manual commands to deploy secrets to workers:
+echo.
+echo NOTE: Replace [worker-name] with the actual name from your wrangler.jsonc file
 echo.
 
 echo === Keys Worker ===
 echo cd workers\keys-worker
-echo wrangler secret put KEYS_AUTH --name striae-keys
-echo wrangler secret put USER_DB_AUTH --name striae-keys
-echo wrangler secret put R2_KEY_SECRET --name striae-keys
-echo wrangler secret put ACCOUNT_HASH --name striae-keys  
-echo wrangler secret put IMAGES_API_TOKEN --name striae-keys
-echo wrangler secret put AUTH_PASSWORD --name striae-keys
+echo wrangler secret put KEYS_AUTH --name [worker-name]
+echo wrangler secret put USER_DB_AUTH --name [worker-name]
+echo wrangler secret put R2_KEY_SECRET --name [worker-name]
+echo wrangler secret put ACCOUNT_HASH --name [worker-name]
+echo wrangler secret put IMAGES_API_TOKEN --name [worker-name]
+echo wrangler secret put AUTH_PASSWORD --name [worker-name]
 echo cd ..\..
 echo.
 
 echo === User Worker ===
 echo cd workers\user-worker
-echo wrangler secret put USER_DB_AUTH --name striae-users
+echo wrangler secret put USER_DB_AUTH --name [worker-name]
 echo cd ..\..
 echo.
 
 echo === Data Worker ===
-echo cd workers\data-worker  
-echo wrangler secret put R2_KEY_SECRET --name striae-data
+echo cd workers\data-worker
+echo wrangler secret put R2_KEY_SECRET --name [worker-name]
 echo cd ..\..
 echo.
 
 echo === Images Worker ===
 echo cd workers\image-worker
-echo wrangler secret put ACCOUNT_ID --name striae-images
-echo wrangler secret put API_TOKEN --name striae-images
-echo wrangler secret put HMAC_KEY --name striae-images
+echo wrangler secret put ACCOUNT_ID --name [worker-name]
+echo wrangler secret put API_TOKEN --name [worker-name]
+echo wrangler secret put HMAC_KEY --name [worker-name]
 echo cd ..\..
 echo.
 
 echo === Turnstile Worker ===
 echo cd workers\turnstile-worker
-echo wrangler secret put CFT_SECRET_KEY --name striae-turnstile
+echo wrangler secret put CFT_SECRET_KEY --name [worker-name]
 echo cd ..\..
 echo.
 
@@ -73,9 +82,11 @@ echo    - SL_API_KEY
 echo    - AUTH_PASSWORD
 echo.
 
-echo ⚠️  ALSO REMEMBER TO:
+echo ⚠️  WORKER CONFIGURATION REMINDERS:
+echo    - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory
 echo    - Configure KV namespace ID in workers\user-worker\wrangler.jsonc
 echo    - Configure R2 bucket name in workers\data-worker\wrangler.jsonc
+echo    - Update ACCOUNT_ID and custom domains in all worker configurations
 echo.
 
 echo ✨ Use PowerShell or WSL for automated deployment!
