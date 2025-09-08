@@ -7,6 +7,7 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
 1. [Prerequisites](#prerequisites)
    - [Required Accounts & Services](#required-accounts--services)
    - [Cloudflare Services Required](#cloudflare-services-required)
+   - [Internal Developers](#internal-developers)
 2. [Step 1: Clone and Prepare the Project](#step-1-clone-and-prepare-the-project)
    - [1.1: Extract Node Package Dependencies](#11-extract-node-package-dependencies)
 3. [Step 2: Cloudflare Service Configuration](#step-2-cloudflare-service-configuration)
@@ -76,6 +77,17 @@ Before starting the installation, ensure you have the following accounts and ser
 - **Cloudflare Images** (for image storage and processing)
 - **Cloudflare KV** (for user database)
 - **Cloudflare R2** (for data storage)
+
+### Internal Developers
+
+**If you are an internal developer**, you will receive pre-configured credentials and configuration files that streamline the installation process:
+
+- **Complete `.env` file** with all required environment variables
+- **Pre-configured `wrangler.jsonc` files** for all workers
+- **Firebase configuration files** ready for use
+- **Access to [https://dev.striae.org](https://dev.striae.org)** for testing
+
+Internal developers can skip most manual configuration steps and use the provided files directly. Contact Stephen at [dev@striae.org](mailto:dev@striae.org) to become an internal developer.
 
 ---
 
@@ -509,14 +521,24 @@ wrangler deploy
 
 **⚠️ Important**: This step should be done AFTER configuring worker files (Step 3) and CORS settings (Step 4), and AFTER deploying workers (Step 5). The deployment scripts now require properly configured worker files to function correctly.
 
+**📋 Internal Developers**: If you are an internal developer, you will receive a complete `.env` file with all required variables pre-configured. Simply use the provided file instead of following the manual setup below.
+
 Striae uses a centralized environment variables system that organizes all secrets by their usage across different workers and the Pages application.
 
 ### 6.1 Initialize Environment Configuration
+
+**For Standard Installation:**
 
 1. **Copy the environment template:**
 
 ```bash
 cp .env.example .env
+```
+
+**For Internal Developers:**
+
+1. **Use the provided `.env` file** (received from the development team)
+2. **Skip to Step 6.4** (Automated Environment Deployment)
 ```
 
 2. **Fill in your actual values in the `.env` file**
@@ -598,7 +620,11 @@ The scripts will:
 
 ## Step 7: Configuration Files
 
+**📋 Internal Developers**: If you are an internal developer, you will receive pre-configured config files. Use the provided files instead of manually updating them below.
+
 ### 7.1 Update Configuration Files
+
+**For Standard Installation:**
 
 1. **Copy example configurations**:
 ```bash
@@ -606,6 +632,13 @@ cp app/config-example/config.json app/config/config.json
 cp app/config-example/firebase.ts app/config/firebase.ts
 cp app/config-example/inactivity.ts app/config/inactivity.ts
 ```
+
+**For Internal Developers:**
+
+1. **Use the provided configuration files** (received from the development team)
+2. **Skip manual configuration** and proceed to Step 8
+
+**Standard Installation Configuration:**
 
 2. **Update `app/config/config.json`**:
 Replace all worker URLs with your deployed worker URLs:

@@ -166,4 +166,18 @@ Detailed guide for configuring environment variables, API keys, and service inte
 - Contact security team directly
 - Do not discuss security issues in public channels
 
+### Internal Developer Program
+
+If you're interested in becoming an internal developer with enhanced access and privileges:
+
+- **Contact**: Stephen at [dev@striae.org](mailto:dev@striae.org)
+- **What You'll Receive**:
+  - Full credentials and configuration files for development
+  - Direct contribution access to `striae-org/striae-dev` repository
+  - Access to [https://dev.striae.org](https://dev.striae.org) for direct testing
+  - Enhanced development privileges and internal resources
+  - Private communication channels on Discord
+
+Internal developers work closely with the core team and have streamlined access to development infrastructure and testing environments.
+
 ---
