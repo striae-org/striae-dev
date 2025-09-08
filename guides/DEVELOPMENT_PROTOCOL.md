@@ -29,7 +29,7 @@ This guide establishes the development protocols and best practices for contribu
 
 The Striae project uses a fork-based development model with the following repositories:
 
-- **Production Repository**: `striae-org/striae` (`master` and `dev` branches)
+- **Production Repository**: `striae-org/striae` (`master` branch)
 - **Development Fork**: `striae-org/striae-dev` (`master` branch)
 - **Contributor Forks**: Individual forks from `striae-org/striae-dev`
 
