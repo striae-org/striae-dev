@@ -152,6 +152,32 @@ export default function Home() {
                 By combining a cloud-first approach with expert input from the firearms forensics community, Striae delivers a secure, efficient, and globally accessible tool that brings modern best practices in digital evidence handling to a niche forensic discipline largely overlooked by mainstream software solutions.
               </p>
             </div>
+          </div>
+
+          <div className={styles.aboutSection}>
+            <h2 className={styles.aboutTitle}>About the Developer</h2>
+            <div className={styles.aboutContent}>
+              <div className={styles.developerProfile}>
+                <img 
+                  src="/steve2.png" 
+                  alt="Stephen J. Lu" 
+                  className={styles.profileImage}
+                />
+                <div className={styles.developerInfo}>
+                  <h3 className={styles.developerTitle}>Lead Developer</h3>
+                  <h4 className={styles.developerName}>Stephen J. Lu, EMBA, SHRM-CP</h4>
+                </div>
+              </div>
+              <p>
+                Stephen is a lifelong programmer who began his journey with BASIC and Turbo Pascal. During high school, he helped the Programming Club create the school&apos;s first website, and his first personal website—featuring detailed starship specifications and histories from Star Trek—was hosted by GeoCities in the 1990s.
+              </p>
+              <p>
+                Alongside his extensive forensic career, Stephen modernized the California Association of Criminalists&apos; website by implementing current technologies and enhancing the organization&apos;s digital presence for more effective public engagement and professional communication.
+              </p>
+              <p>
+                He is an active member of the Association of Firearm and Tool Mark Examiners, the California Association of Criminalists, and the International Association for Identification, bringing decades of forensic expertise and technological innovation to the development of Striae.
+              </p>
+            </div>
           </div>          
         </div>
       </div>
