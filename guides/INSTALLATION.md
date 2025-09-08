@@ -599,12 +599,6 @@ Striae uses a centralized environment variables system that organizes all secret
 cp .env.example .env
 ```
 
-**For Internal Developers:**
-
-1. **Use the provided `.env` file** (received from the development team)
-2. **Skip to Step 6.4** (Automated Environment Deployment)
-```
-
 2. **Fill in your actual values in the `.env` file**
 
 The `.env` file is organized by service and includes:
@@ -690,8 +684,6 @@ The scripts will:
 
 ### 7.1 Update Configuration Files
 
-**For External Developers:**
-
 1. **Copy example configurations**:
 ```bash
 cp app/config-example/config.json app/config/config.json
@@ -699,9 +691,7 @@ cp app/config-example/firebase.ts app/config/firebase.ts
 cp app/config-example/inactivity.ts app/config/inactivity.ts
 ```
 
-**External Developer Configuration:**
-
-1. **Update `app/config/config.json`**:
+2. **Update `app/config/config.json`**:
 Replace all worker URLs with your deployed worker URLs:
 ```json
 {
