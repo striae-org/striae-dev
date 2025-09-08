@@ -104,8 +104,7 @@ Before starting the installation, choose your setup path based on your developer
 2. **Create your dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Copy the complete `.env` and config files you receive
 4. **Extract dependencies**: Follow Step 1.1 to extract the node package
-5. **Deploy workers**: Skip configuration steps, go directly to worker deployment
-6. **Start developing**: You're ready to contribute!
+5. **Start developing**: Workers are already deployed and ready - you can begin contributing immediately!
 
 #### 📞 Getting Internal Developer Access:
 Contact Stephen at [dev@striae.org](mailto:dev@striae.org) to:
@@ -484,6 +483,10 @@ curl -X OPTIONS \
 ---
 
 ## Step 5: Deploy Cloudflare Workers
+
+**🎯 Internal Developers**: **Skip this entire step**. All Cloudflare Workers are already deployed and maintained by the infrastructure team. You don't need to deploy or manage any workers - they're ready to use immediately with your development environment.
+
+**📋 External Developers**: This section guides you through deploying all required Cloudflare Workers for your own installation.
 
 **✅ Prerequisites**: Before deploying workers, ensure you have:
 1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
@@ -908,8 +911,7 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 2. **Create dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Place received `.env`, config files, and `wrangler.jsonc` files in project
 4. **Extract dependencies**: Follow Step 1.1 to extract node package
-5. **Deploy workers**: Skip all configuration steps (2-4, 6-7), go directly to Step 5 worker deployment
-6. **Start developing**: Test on [https://dev.striae.org](https://dev.striae.org)
+5. **Start developing**: All workers are already deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
 
 **For External Developers:**
 1. **Fork & Clone**: Fork `striae-org/striae` to your account → Clone your fork
