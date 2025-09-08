@@ -47,14 +47,14 @@ git remote add upstream https://github.com/striae-org/striae-dev.git
 
 # Sync your fork regularly
 git fetch upstream
-git checkout main
-git merge upstream/main
-git push origin main
+git checkout master
+git merge upstream/master
+git push origin master
 ```
 
 ### Branch Strategy
 
-1. **Feature Branches**: Create descriptive feature branches from the latest `main` branch
+1. **Feature Branches**: Create descriptive feature branches from the latest `master` branch
 2. **Branch Naming**: Use descriptive names following the pattern:
    - `feature/feature-name`
    - `bugfix/issue-description`
@@ -63,8 +63,8 @@ git push origin main
 
 ```bash
 # Example branch creation
-git checkout main
-git pull upstream main
+git checkout master
+git pull upstream master
 git checkout -b feature/user-authentication-improvements
 ```
 
@@ -272,9 +272,10 @@ Failure to follow these protocols may result in:
 
 For questions about these protocols or development practices:
 
-- Open an issue with the `question` label
-- Contact project administrators
-- Refer to the project documentation
+- **GitHub Issues**: [Open an issue](https://github.com/striae-org/striae/issues) with the `question` label
+- **Email**: Contact project administrators at [dev@striae.org](mailto:dev@striae.org)
+- **Discord**: Contact team members on the [Striae Discord](https://discord.gg/ESUPhTPwHx) #development channel (private)
+- **Documentation**: Refer to the project documentation in the `/guides` directory
 
 ---
 
