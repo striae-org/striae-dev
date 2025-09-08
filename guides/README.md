@@ -21,6 +21,7 @@ New to Striae? Start here:
 
 ### Development Guides
 
+- **[Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)** - Complete development workflow, commit guidelines, and contribution standards
 - **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security architecture and best practices
 - **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
 - **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
@@ -60,6 +61,9 @@ High-level introduction to Striae, including project structure, tech stack, and 
 
 ### [Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)
 Detailed installation and setup instructions for development and production environments. Covers prerequisites, configuration, and deployment procedures.
+
+### [Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)
+Comprehensive development workflow guide covering repository structure, commit guidelines, pull request process, code quality standards, and contribution protocols. Essential reading for all contributors.
 
 ### [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture)
 In-depth system architecture documentation covering frontend, backend, data layer, and security architecture. Includes component relationships and data flow diagrams.
