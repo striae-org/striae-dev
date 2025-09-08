@@ -190,7 +190,7 @@
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--primary);
+  border: 1px solid var(--primary);
   transition: transform var(--durationM) var(--bezierFastoutSlowin);
 }
 
@@ -203,7 +203,7 @@
 }
 
 .developerTitle {
-  font-size: var(--fontSizeBodyL);
+  font-size: var(--fontSizeBodyXL);
   font-weight: var(--fontWeightMedium);
   color: var(--accent);
   margin-bottom: var(--spaceXS);
@@ -213,7 +213,30 @@
   font-size: var(--fontSizeH4);
   font-weight: var(--fontWeightMedium);
   color: var(--primary);
-  margin: 0;
+  margin: 0 0 var(--spaceS) 0;
+}
+
+.socialLinks {
+  display: flex;
+  gap: var(--spaceS);
+  margin-top: var(--spaceXS);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spaceXS);
+  color: gray;
+  border-radius: var(--spaceXS);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  text-decoration: none;
+}
+
+.socialLink:hover {
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 696px) {
@@ -281,5 +304,10 @@
 
   .developerName {
     font-size: var(--fontSizeBodyL);
+  }
+
+  .socialLinks {
+    justify-content: center;
+    margin-top: var(--spaceS);
   }
 }

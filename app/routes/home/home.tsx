@@ -5,6 +5,7 @@ import { Notice } from '~/components/notice/notice';
 //import { Toast } from '~/components/toast/toast';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
+import { Icon } from '~/components/icon/icon';
 
 export const meta = () => {
   return baseMeta({
@@ -164,8 +165,19 @@ export default function Home() {
                   className={styles.profileImage}
                 />
                 <div className={styles.developerInfo}>
-                  <h3 className={styles.developerTitle}>Lead Developer</h3>
-                  <h4 className={styles.developerName}>Stephen J. Lu, EMBA, SHRM-CP</h4>
+                  <div className={styles.developerTitle}>Lead Developer</div>
+                  <div className={styles.developerName}>Stephen J. Lu, EMBA, SHRM-CP</div>
+                  <div className={styles.socialLinks}>
+                    <a 
+                      href="https://www.linkedin.com/in/StephenJLu/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialLink}
+                      aria-label="LinkedIn Profile"
+                    >
+                      <Icon icon="linkedin" size={24} />
+                    </a>
+                  </div>
                 </div>
               </div>
               <p>
