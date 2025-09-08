@@ -2,7 +2,7 @@
 
 This guide provides step-by-step instructions for deploying Striae, a Firearms Examiner's Comparison Companion, on Cloudflare infrastructure.
 
-> **👥 Internal Developers**: If you are an internal developer with the striae-org team, you can skip most of the setup process! See the [Internal Developer Quick Start](#internal-developer-quick-start) section below.
+> **👥 Internal Developers**: If you are an internal developer with the striae-org team, you can skip almost all of the setup process! Frontend, workers, and all infrastructure are already deployed and maintained. See the [Internal Developer Quick Start](#internal-developer-quick-start) section below.
 
 ## Table of Contents
 
@@ -88,11 +88,12 @@ Before starting the installation, choose your setup path based on your developer
 
 #### ✅ Already Set Up for You:
 - **Cloudflare Account & Services** - Access provided through shared developer account (Pages, Workers, KV, R2, Images, Turnstile)
+- **Frontend Deployment** - Fully deployed and maintained at [https://dev.striae.org](https://dev.striae.org)
+- **Worker Deployment** - All backend workers deployed and maintained by infrastructure team
 - **Firebase Authentication & MFA** - Pre-configured and ready to use
 - **SendLayer API** - Email services already configured  
 - **Environment Variables** - Complete `.env` file provided
 - **Configuration Files** - All `config.json`, `firebase.ts`, and worker configs ready
-- **Development Access** - Access to [https://dev.striae.org](https://dev.striae.org) for testing
 
 #### 📋 Your Requirements:
 1. **Node.js** version 20.0.0 or higher
@@ -104,7 +105,7 @@ Before starting the installation, choose your setup path based on your developer
 2. **Create your dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Copy the complete `.env` and config files you receive
 4. **Extract dependencies**: Follow Step 1.1 to extract the node package
-5. **Start developing**: Workers are already deployed and ready - you can begin contributing immediately!
+5. **Start developing**: Frontend and all workers are deployed and maintained - you can begin contributing immediately!
 
 #### 📞 Getting Internal Developer Access:
 Contact Stephen at [dev@striae.org](mailto:dev@striae.org) to:
@@ -753,6 +754,10 @@ mode = "smart"
 
 ## Step 8: Deploy Frontend (Cloudflare Pages)
 
+**🎯 Internal Developers**: **Skip this entire step**. The frontend is already deployed and maintained at [https://dev.striae.org](https://dev.striae.org). All Pages environment variables and configuration are handled by the infrastructure team. You can test your changes on the development environment immediately.
+
+**📋 External Developers**: This section guides you through deploying the frontend to your own Cloudflare Pages.
+
 ### 8.1 Build and Deploy
 
 ```bash
@@ -911,7 +916,7 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 2. **Create dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Place received `.env`, config files, and `wrangler.jsonc` files in project
 4. **Extract dependencies**: Follow Step 1.1 to extract node package
-5. **Start developing**: All workers are already deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
+5. **Start developing**: Frontend and all workers are deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
 
 **For External Developers:**
 1. **Fork & Clone**: Fork `striae-org/striae` to your account → Clone your fork
