@@ -12,6 +12,7 @@
    - [PR Requirements](#pr-requirements)
    - [Review Process](#review-process)
    - [Merge Guidelines](#merge-guidelines)
+   - [PR Description Requirements](#pr-description-requirements)
 5. [Code Quality Standards](#code-quality-standards)
    - [Code Style](#code-style)
    - [Testing Requirements](#testing-requirements)
@@ -20,6 +21,10 @@
 7. [Release Management](#release-management)
 8. [Issue Management](#issue-management)
 9. [Communication Guidelines](#communication-guidelines)
+10. [Additional Best Practices](#additional-best-practices)
+11. [Enforcement](#enforcement)
+12. [Questions and Support](#questions-and-support)
+    - [Internal Developer Program](#internal-developer-program)
 
 ## Overview
 
@@ -276,6 +281,18 @@ For questions about these protocols or development practices:
 - **Email**: Contact project administrators at [dev@striae.org](mailto:dev@striae.org)
 - **Discord**: Contact team members on the [Striae Discord](https://discord.gg/ESUPhTPwHx) #development channel (private)
 - **Documentation**: Refer to the project documentation in the `/guides` directory
+
+### Internal Developer Program
+
+If you're interested in becoming an internal developer with direct access to the development infrastructure:
+
+- **Contact**: Stephen at [dev@striae.org](mailto:dev@striae.org)
+- **Benefits**: Internal developers receive:
+  - Full credentials and configuration files
+  - Direct contribution access to `striae-org/striae-dev`
+  - Access to [https://dev.striae.org](https://dev.striae.org) for testing
+  - Enhanced development privileges and resources
+  - Private communication channels on Discord
 
 ---
 
