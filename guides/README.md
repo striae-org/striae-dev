@@ -56,14 +56,14 @@ New to Striae? Start here:
 
 ## Document Summaries
 
-### [Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)
-Comprehensive development workflow guide covering repository structure, commit guidelines, pull request process, code quality standards, and contribution protocols. Essential reading for all contributors.
-
 ### [Project Overview](https://developers.striae.org/striae-dev/get-started/project-overview)
 High-level introduction to Striae, including project structure, tech stack, and key differentiators. Essential reading for understanding the project's purpose and scope.
 
 ### [Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)
 Detailed installation and setup instructions for development and production environments. Covers prerequisites, configuration, and deployment procedures.
+
+### [Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)
+Comprehensive development workflow guide covering repository structure, commit guidelines, pull request process, code quality standards, and contribution protocols. Essential reading for all contributors.
 
 ### [Architecture Guide](https://developers.striae.org/striae-dev/get-started/project-overview/striae-architecture)
 In-depth system architecture documentation covering frontend, backend, data layer, and security architecture. Includes component relationships and data flow diagrams.
