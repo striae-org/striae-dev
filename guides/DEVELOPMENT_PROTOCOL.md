@@ -98,7 +98,7 @@ feat(auth): implement multi-factor authentication support
 Add MFA functionality with TOTP support and backup codes.
 Includes user settings UI and Firebase integration.
 
-fix(canvas): resolve annotation positioning on mobile devices
+fix(canvas): resolve annotation positioning
 
 Fixes issue where touch events were incorrectly calculated
 on devices with different pixel densities.
@@ -247,12 +247,6 @@ Related to #456
 - Ensure UI changes meet accessibility standards
 - Test with screen readers and keyboard navigation
 - Include proper ARIA labels and semantic HTML
-
-### Mobile Compatibility
-
-- Test changes on mobile devices
-- Ensure responsive design principles are followed
-- Verify touch interactions work correctly
 
 ### Error Handling
 
