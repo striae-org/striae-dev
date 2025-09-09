@@ -11,7 +11,7 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
    - [Cloudflare Services Required](#cloudflare-services-required)
    - [Internal Developer Quick Start](#internal-developer-quick-start)
 2. [Step 1: Clone and Prepare the Project](#step-1-clone-and-prepare-the-project)
-   - [1.1: Extract Node Package Dependencies](#11-extract-node-package-dependencies)
+   - [1.1: Install Dependencies](#11-install-dependencies)
 3. [Step 2: Cloudflare Service Configuration](#step-2-cloudflare-service-configuration)
    - [2.1 Cloudflare Turnstile Setup](#21-cloudflare-turnstile-setup)
    - [2.2 Cloudflare Images Setup](#22-cloudflare-images-setup)
@@ -104,7 +104,7 @@ Before starting the installation, choose your setup path based on your developer
 1. **Clone the dev fork**: `git clone https://github.com/striae-org/striae-dev.git`
 2. **Create your dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Copy the complete `.env` and config files you receive
-4. **Extract dependencies**: Follow Step 1.1 to extract the node package
+4. **Install dependencies**: Run `npm install` to install all required packages
 5. **Start developing**: Frontend and all workers are deployed and maintained - you can begin contributing immediately!
 
 #### 📞 Getting Internal Developer Access:
@@ -144,49 +144,30 @@ git checkout -b your-feature-branch-name
 
 > **🔒 Internal Developer Note**: All development must be done on separate dev branches within the `striae-org/striae-dev` fork. Never commit directly to main/master branches.
 
-### 1.1: Extract Node Package Dependencies
+### 1.1: Install Dependencies
 
-The repository includes a pre-configured node package that contains the exact dependencies required for Striae to function properly.
+Install the required dependencies using npm:
 
 ```bash
-# Navigate to the node-package directory
-cd node-package
+# Install all dependencies
+npm install
 ```
 
-**Windows (using 7-Zip):**
-```cmd
-# Using 7-Zip command line
-7z x node-package.7z -o..
-
-# Or extract manually using 7-Zip GUI:
-# Right-click node-package.7z → 7-Zip → Extract to "..\\" → Extract
-```
-
-**Linux/macOS (requires p7zip):**
-```bash
-# Install p7zip if not already installed:
-# Ubuntu/Debian: sudo apt-get install p7zip-full
-# macOS: brew install p7zip
-# CentOS/RHEL: sudo yum install p7zip
-
-# Extract the 7z archive
-7z x node-package.7z -o..
-```
+This will install all the required Node.js packages including:
+- Remix framework dependencies
+- Cloudflare Workers compatibility packages
+- Build tools and utilities
+- Development dependencies
 
 **Verification:**
 ```bash
-# Navigate back to project root after extraction
-cd ..
-
-# Verify the extraction was successful
+# Verify the installation was successful
 ls -la
-# You should see: node_modules/, package.json, package-lock.json, postcss.config.js
+# You should see: node_modules/, package.json, package-lock.json, and other project files
+
+# Test that the build process works
+npm run build
 ```
-
-> ⚠️ **Important**: This pre-configured node package is the only tested configuration that works with Striae. Do not run `npm install` or modify these dependencies unless absolutely necessary.
-
-> 💡 **Note**: The node package contains all dependencies with the exact versions required for compatibility with Cloudflare Workers and the Remix framework used by Striae.
-
 
 ---
 
@@ -905,16 +886,17 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 1. **Clone dev fork**: `git clone https://github.com/striae-org/striae-dev.git`
 2. **Create dev branch**: `git checkout -b your-feature-branch`
 3. **Use provided files**: Place received `.env`, config files, and `wrangler.jsonc` files in project
-4. **Extract dependencies**: Follow Step 1.1 to extract node package
+4. **Install dependencies**: Run `npm install` to install all required packages
 5. **Start developing**: Frontend and all workers are deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
 
 **For External Developers:**
 1. **Fork & Clone**: Fork `striae-org/striae` to your account → Clone your fork
-2. **Setup Environment**: `cp .env.example .env` → Fill values → `./scripts/deploy-env.sh`
-3. **Configure Workers**: Copy `wrangler.jsonc.example` files and update settings
-4. **Deploy Workers**: `npm install && wrangler deploy` for each worker
-5. **Configure App**: Update config files with worker URLs
-6. **Deploy Frontend**: `npm run deploy` and set Pages environment variables
+2. **Install Dependencies**: Run `npm install` to install all required packages
+3. **Setup Environment**: `cp .env.example .env` → Fill values → `./scripts/deploy-env.sh`
+4. **Configure Workers**: Copy `wrangler.jsonc.example` files and update settings
+5. **Deploy Workers**: `npm install && wrangler deploy` for each worker
+6. **Configure App**: Update config files with worker URLs
+7. **Deploy Frontend**: `npm run deploy` and set Pages environment variables
 
 ---
 
