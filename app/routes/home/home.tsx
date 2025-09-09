@@ -110,14 +110,15 @@ export default function Home() {
             <h2 className={styles.aboutTitle}>About Striae</h2>
             <div className={styles.aboutContent}>
               <p>
+                Through his experience as a forensic firearms examiner, Stephen encountered a critical bottleneck in the comparison workflow: making detailed, concurrent annotations on comparison images was both cumbersome and inefficient. Existing methods forced examiners to print images separately from the comparison workflow and mark them up by hand, providing no streamlined way to link annotations directly to the digital evidence. This time-consuming process could take up to an hour per casefile, especially in complex investigations.
+              </p>
+              <p>
+                Stephen envisioned a better way. Striae was created to streamline forensic comparison workflows by providing an intuitive, cloud-based platform for direct digital annotation and evidence linking. With Striae, examiners can quickly annotate comparison images, seamlessly associate notes with specific evidence, and create well-formatted reports, all in the same workflow environment. Striae transforms painstaking manual tasks into an efficient, integrated digital process, empowering examiners to focus on what matters most: analysis and reporting.
+                </p>
+              <p>
                 Striae is one of the first, and potentially the very first, cloud-native forensic annotation applications built specifically for forensic firearms examination—a highly specialized area seldom addressed by existing forensic technology platforms. This innovative solution harnesses global cloud infrastructure (leveraging Cloudflare) to deliver unmatched capabilities in accessibility, security, and operational efficiency for firearms examiners worldwide.
               </p>
-              
-              <h3 className={styles.sectionTitle}>Unique Position in Forensics</h3>
-              <p>
-                Striae distinguishes itself as a cloud-native application aiming to benefit firearms examiners with purpose-built annotation workflows, data management, and reporting functions rarely offered by other platforms designed for broader forensic use cases. Its architecture is tailored for seamless evidence linking, intuitive digital annotation, and strict data lifecycle control, all optimized for the unique workflows of firearms examination.
-              </p>
-              
+
               <h3 className={styles.sectionTitle}>Benefits of Being Cloud-Native (with Cloudflare)</h3>
               <div className={styles.benefitsList}>
                 <div className={styles.benefit}>
@@ -147,11 +148,6 @@ export default function Home() {
                   <p>Automated evidence preservation, cloud-native traceability, and seamless audit logging accelerate response and minimize disruption if incident review or security triage is needed.</p>
                 </div>
               </div>
-              
-              <h3 className={styles.sectionTitle}>Why This Matters</h3>
-              <p>
-                By combining a cloud-first approach with expert input from the firearms forensics community, Striae delivers a secure, efficient, and globally accessible tool that brings modern best practices in digital evidence handling to a niche forensic discipline largely overlooked by mainstream software solutions.
-              </p>
             </div>
           </div>
 
@@ -185,7 +181,7 @@ export default function Home() {
               </p>
               <p>
                 Alongside his extensive forensic career, Stephen modernized the California Association of Criminalists&apos; website by implementing current technologies and enhancing the organization&apos;s digital presence for more effective public engagement and professional communication.
-              </p>
+              </p>              
               <p>
                 He is an active member of the Association of Firearm and Tool Mark Examiners, the California Association of Criminalists, and the International Association for Identification, bringing decades of forensic expertise and technological innovation to the development of Striae.
               </p>
