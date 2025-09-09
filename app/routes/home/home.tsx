@@ -107,8 +107,9 @@ export default function Home() {
           </div>
           
           <div className={styles.aboutSection}>
-            <h2 className={styles.aboutTitle}>About Striae</h2>
+            <h2 className={styles.aboutTitle}>About Striae</h2>            
             <div className={styles.aboutContent}>
+              <h3 className={styles.sectionTitle}>The Origins of Striae</h3>
               <p>
                 Through his experience as a forensic firearms examiner, Stephen encountered a critical bottleneck in the comparison workflow: making detailed, concurrent annotations on comparison images was both cumbersome and inefficient. Existing methods forced examiners to print images separately from the comparison workflow and mark them up by hand, providing no streamlined way to link annotations directly to the digital evidence. This time-consuming process could take up to an hour per casefile, especially in complex investigations.
               </p>
