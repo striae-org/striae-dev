@@ -13,7 +13,6 @@ app/config
 .wrangler
 .firebase
 firebase-debug.log
-*.txt
 *.toml
 *.jsonc
 /app/components/turnstile/keys.json
