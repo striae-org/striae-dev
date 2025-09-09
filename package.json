@@ -12,7 +12,7 @@
     "start": "node ./scripts/dev.cjs && wrangler pages dev ./build/client",
     "typecheck": "tsc",
     "typegen": "wrangler types",
-    "preview": "node ./scripts/dev.cjs && npm run build && wrangler pages dev",
+    "preview": "npm run build && wrangler pages dev",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {    
