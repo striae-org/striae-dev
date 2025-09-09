@@ -227,7 +227,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spaceXS);
-  color: gray;
+  color: rgba(195, 125, 22, 0.8);
   border-radius: var(--spaceXS);
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   text-decoration: none;
