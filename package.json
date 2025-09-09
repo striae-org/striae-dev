@@ -4,15 +4,15 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
+    "build": "node ./scripts/dev.cjs && remix vite:build",
     "deploy": "npm run build && wrangler pages deploy",
-    "dev": "remix vite:dev",
+    "dev": "node ./scripts/dev.cjs && remix vite:dev",
     "emulators": "firebase emulators:start --only auth",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "wrangler pages dev ./build/client",
+    "start": "node ./scripts/dev.cjs && wrangler pages dev ./build/client",
     "typecheck": "tsc",
     "typegen": "wrangler types",
-    "preview": "npm run build && wrangler pages dev",
+    "preview": "node ./scripts/dev.cjs && npm run build && wrangler pages dev",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {    
