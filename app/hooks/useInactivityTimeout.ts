@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '~/services/firebase';
+import { INACTIVITY_CONFIG } from '~/config/inactivity';
 
 interface UseInactivityTimeoutOptions {
   timeoutMinutes?: number;
@@ -11,8 +12,8 @@ interface UseInactivityTimeoutOptions {
 }
 
 export const useInactivityTimeout = ({
-  timeoutMinutes = 10,
-  warningMinutes = 1,
+  timeoutMinutes = INACTIVITY_CONFIG.TIMEOUT_MINUTES,
+  warningMinutes = INACTIVITY_CONFIG.WARNING_MINUTES,
   onWarning,
   onTimeout,
   enabled = true
@@ -79,15 +80,7 @@ export const useInactivityTimeout = ({
     }
 
     // Activities that reset the timer
-    const activities = [
-      'mousedown',
-      'mousemove',
-      'keypress',
-      'scroll',
-      'touchstart',
-      'click',
-      'keydown'
-    ];
+    const activities = INACTIVITY_CONFIG.TRACKED_ACTIVITIES;
 
     const handleActivity = () => {
       resetTimer();
