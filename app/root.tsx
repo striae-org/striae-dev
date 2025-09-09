@@ -80,8 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEmailSyncToKV();
 
   const { extendSession } = useInactivityTimeout({
-    timeoutMinutes: INACTIVITY_CONFIG.TIMEOUT_MINUTES,
-    warningMinutes: INACTIVITY_CONFIG.WARNING_MINUTES,
     enabled: !!user,
     onWarning: () => {
       setRemainingSeconds(INACTIVITY_CONFIG.WARNING_MINUTES * 60);
