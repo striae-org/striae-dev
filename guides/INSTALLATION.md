@@ -24,37 +24,26 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
    - [4.1 Update CORS Headers in Worker Source Files](#41-update-cors-headers-in-worker-source-files)
    - [4.2 CORS Security Notes](#42-cors-security-notes)
    - [4.3 Verify CORS Configuration](#43-verify-cors-configuration)
-6. [Step 5: Deploy Cloudflare Workers](#step-5-deploy-cloudflare-workers)
-   - [5.1 Keys Worker](#51-keys-worker)
-   - [5.2 User Worker](#52-user-worker)
-   - [5.3 Data Worker](#53-data-worker)
-   - [5.4 Images Worker](#54-images-worker)
-   - [5.5 Turnstile Worker](#55-turnstile-worker)
-   - [5.6 PDF Worker](#56-pdf-worker)
-7. [Step 6: Environment Variables Setup](#step-6-environment-variables-setup)
-   - [6.1 Initialize Environment Configuration](#61-initialize-environment-configuration)
-   - [6.2 Required Environment Variables](#62-required-environment-variables)
-   - [6.3 Generate Security Tokens](#63-generate-security-tokens)
-   - [6.4 Automated Environment Deployment](#64-automated-environment-deployment)
-8. [Step 7: Configuration Files](#step-7-configuration-files)
-   - [7.1 Update Configuration Files](#71-update-configuration-files)
-9. [Step 8: Deploy Frontend (Cloudflare Pages)](#step-8-deploy-frontend-cloudflare-pages)
-   - [8.1 Build and Deploy](#81-build-and-deploy)
-   - [8.2 Configure Pages Environment Variables](#82-configure-pages-environment-variables)
-   - [8.3 Configure Custom Domain](#83-configure-custom-domain)
-10. [Step 9: Testing and Verification](#step-9-testing-and-verification)
-    - [9.1 Test Authentication Flow](#91-test-authentication-flow)
-    - [9.2 Test Core Features](#92-test-core-features)
-    - [9.3 Test Worker Endpoints](#93-test-worker-endpoints)
-    - [9.4 Verify CORS Configuration](#94-verify-cors-configuration)
-11. [Step 10: Security Checklist](#step-10-security-checklist)
-12. [Important Notes & Updates](#important-notes--updates)
-    - [✨ New Environment Setup System](#-new-environment-setup-system)
+6. [Step 5: Environment Variables Setup](#step-5-environment-variables-setup)
+   - [5.1 Initialize Environment Configuration](#51-initialize-environment-configuration)
+   - [5.2 Required Environment Variables](#52-required-environment-variables)
+   - [5.3 Generate Security Tokens](#53-generate-security-tokens)
+7. [Step 6: Configuration Files](#step-6-configuration-files)
+   - [6.1 Update Configuration Files](#61-update-configuration-files)
+8. [Step 7: Complete Deployment](#step-7-complete-deployment)
+   - [7.1 Unified Complete Deployment](#71-unified-complete-deployment)
+9. [Step 8: Testing and Verification](#step-8-testing-and-verification)
+   - [8.1 Test Authentication Flow](#81-test-authentication-flow)
+   - [8.2 Test Core Features](#82-test-core-features)
+   - [8.3 Test Worker Endpoints](#83-test-worker-endpoints)
+   - [8.4 Verify CORS Configuration](#84-verify-cors-configuration)
+10. [Step 9: Security Checklist](#step-9-security-checklist)
+11. [Important Notes & Updates](#important-notes--updates)
+    - [✨ New Complete Deployment System](#-new-complete-deployment-system)
     - [Key Improvements Made](#key-improvements-made)
     - [Required Binding Names](#required-binding-names)
-    - [Custom Domain Setup (Optional)](#custom-domain-setup-optional)
     - [Quick Start Summary](#quick-start-summary)
-13. [Troubleshooting](#troubleshooting)
+12. [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
     - [KV Namespace Configuration Issues](#kv-namespace-configuration-issues)
     - [Useful Commands](#useful-commands)
@@ -464,113 +453,15 @@ curl -X OPTIONS \
 
 ---
 
-## Step 5: Deploy Cloudflare Workers
+## Step 5: Environment Variables Setup
 
-**🎯 Internal Developers**: **Skip this entire step**. All Cloudflare Workers are already deployed and maintained by the infrastructure team. You don't need to deploy or manage any workers - they're ready to use immediately with your development environment.
-
-**📋 External Developers**: This section guides you through deploying all required Cloudflare Workers for your own installation.
-
-**✅ Prerequisites**: Before deploying workers, ensure you have:
-1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
-2. ✅ Updated CORS settings in worker source files in Step 4
-
-Deploy each worker to make them available for environment variable setup in Step 6.
-
-Deploy each worker in the following order:
-
-### 5.1 Keys Worker
-
-```bash
-cd workers/keys-worker
-npm install
-wrangler deploy
-```
-
-**Manual configuration reference** (environment variables will be set up in Step 6):
-- `ACCOUNT_HASH`: Your Images Account Hash
-- `AUTH_PASSWORD`: Your custom auth password
-- `IMAGES_API_TOKEN`: Your Images API token
-- `KEYS_AUTH`: Your custom keys auth token
-- `R2_KEY_SECRET`: Your custom R2 secret
-- `USER_DB_AUTH`: Your custom user DB auth token
-
-### 5.2 User Worker
-
-```bash
-cd ../user-worker
-npm install
-wrangler deploy
-```
-
-1. KV binding is configured in `wrangler.jsonc`:
-   - Binding name: `USER_DB`
-   - KV namespace ID: Set in your wrangler.jsonc file
-
-**Manual configuration reference** (environment variables will be set up in Step 6):
-- `USER_DB_AUTH`: Your custom user DB auth token
-
-### 5.3 Data Worker
-
-```bash
-cd ../data-worker
-npm install
-wrangler deploy
-```
-
-1. R2 binding is configured in `wrangler.jsonc`:
-   - Binding name: `STRIAE_DATA`
-   - Bucket name: Set in your wrangler.jsonc file
-
-**Manual configuration reference** (environment variables will be set up in Step 6):
-- `R2_KEY_SECRET`: Your custom R2 secret
-
-### 5.4 Images Worker
-
-```bash
-cd ../image-worker
-npm install
-wrangler deploy
-```
-
-**Manual configuration reference** (environment variables will be set up in Step 6):
-- `ACCOUNT_ID`: Your Cloudflare Account ID
-- `API_TOKEN`: Your Images API token
-- `HMAC_KEY`: Your Images HMAC signing key
-
-### 5.5 Turnstile Worker
-
-```bash
-cd ../turnstile-worker
-npm install
-wrangler deploy
-```
-
-**Manual configuration reference** (environment variables will be set up in Step 6):
-- `CFT_SECRET_KEY`: Your Cloudflare Turnstile secret key
-
-### 5.6 PDF Worker
-
-```bash
-cd ../pdf-worker
-npm install
-wrangler deploy
-```
-
-**Environment variables:** ✅ No environment variables needed (uses browser binding only)
-
----
-
-## Step 6: Environment Variables Setup
-
-**⚠️ Important**: This step should be done AFTER configuring worker files (Step 3) and CORS settings (Step 4), and AFTER deploying workers (Step 5). The deployment scripts now require properly configured worker files to function correctly.
-
-**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive a complete, pre-configured `.env` file with all required variables. Simply use the provided file and proceed to Step 7.
+**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive a complete, pre-configured `.env` file with all required variables. Simply use the provided file and proceed to Step 8.
 
 **📋 External Developers**: This section is for external developers who need to set up their own environment variables and external service accounts.
 
 Striae uses a centralized environment variables system that organizes all secrets by their usage across different workers and the Pages application.
 
-### 6.1 Initialize Environment Configuration
+### 5.1 Initialize Environment Configuration
 
 **For Standard Installation:**
 
@@ -588,7 +479,7 @@ The `.env` file is organized by service and includes:
 - **Individual Worker Variables**: Service-specific secrets
 - **Cloudflare Service Keys**: Images, Turnstile, R2, KV credentials
 
-### 6.2 Required Environment Variables
+### 5.2 Required Environment Variables
 
 All required variables are documented in the `.env` file. Here's what you need to collect:
 
@@ -608,7 +499,7 @@ All required variables are documented in the `.env` file. Here's what you need t
 - `KEYS_AUTH` - Key handler authentication token
 - `AUTH_PASSWORD` - Registration password
 
-### 6.3 Generate Security Tokens
+### 5.3 Generate Security Tokens
 
 Generate secure random tokens for the custom authentication variables:
 
@@ -623,53 +514,22 @@ openssl rand -hex 16
 openssl rand -base64 24
 ```
 
-### 6.4 Automated Environment Deployment
-
-**✅ Prerequisites**: Before running these scripts, ensure you have:
-1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
-2. ✅ Updated CORS settings in worker source files in Step 4  
-3. ✅ Successfully deployed all workers in Step 5
-
-Once your `.env` file is configured and workers are deployed, use the automated deployment scripts:
-
-**Linux/macOS/WSL:**
-```bash
-./scripts/deploy-env.sh
-```
-
-**Windows PowerShell:**
-```powershell
-.\scripts\deploy-env.ps1
-```
-
-**Windows Command Prompt:**
-```cmd
-scripts\deploy-env.bat
-```
-
-The scripts will:
-- ✅ Validate all required variables are set
-- ✅ Deploy secrets to each worker automatically  
-- ✅ Provide clear progress feedback
-- ✅ Show remaining manual steps
-
-> 📚 **Detailed Documentation**: See [Environment Variables Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup) for comprehensive environment setup documentation, troubleshooting, and manual configuration options.
-
 ---
 
-## Step 7: Configuration Files
+## Step 6: Configuration Files
 
-**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive pre-configured config files including `config.json`, `firebase.ts`, `inactivity.ts`, and all Turnstile configurations. Use the provided files and proceed directly to Step 8.
+**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive pre-configured config files including `config.json`, `firebase.ts`, `inactivity.ts`, `keys.json`, and all Turnstile configurations. Use the provided files and proceed directly to Step 8.
 
 **📋 External Developers**: This section is for external developers who need to manually configure their application settings and Firebase integration.
 
-### 7.1 Update Configuration Files
+### 6.1 Update Configuration Files
 
 1. **Copy example configurations**:
 ```bash
 cp app/config-example/config.json app/config/config.json
 cp app/config-example/firebase.ts app/config/firebase.ts
 cp app/config-example/inactivity.ts app/config/inactivity.ts
+cp app/components/turnstile/keys.json.example app/components/turnstile/keys.json
 ```
 
 2. **Update `app/config/config.json`**:
@@ -723,71 +583,52 @@ mode = "smart"
 
 ---
 
-## Step 8: Deploy Frontend (Cloudflare Pages)
+## Step 7: Complete Deployment
 
-**🎯 Internal Developers**: **Skip this entire step**. The frontend is already deployed and maintained at [https://dev.striae.org](https://dev.striae.org). All Pages environment variables and configuration are handled by the infrastructure team. You can test your changes on the development environment immediately.
+**🎯 Internal Developers**: **Skip this entire step**. All services are already deployed and maintained by the infrastructure team.
 
-**📋 External Developers**: This section guides you through deploying the frontend to your own Cloudflare Pages.
+**📋 External Developers**: Now that all configuration is complete, deploy your entire Striae application with a single unified command.
 
-### 8.1 Build and Deploy
+**✅ Prerequisites**: Before running the complete deployment, ensure you have completed:
+1. ✅ Updated configuration files (`config.json`, `firebase.ts`, `keys.json`, `wrangler.toml`) in Step 6
+2. ✅ Set up environment variables (`.env` file) in Step 5
+3. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
+4. ✅ Updated CORS settings in worker source files in Step 4
+
+### 7.1 Unified Complete Deployment
+
+Deploy everything with a single unified script:
 
 ```bash
-# Build the application
-npm run build
-
-# Deploy to Cloudflare Pages
-npm run deploy
+# Deploy entire Striae application (workers, secrets, pages, and page secrets)
+npm run deploy:all
 ```
 
-### 8.2 Configure Pages Environment Variables
+This unified script will execute the complete deployment process in the correct order:
 
-**Important:** This step must be done AFTER deploying your frontend, as the Pages project needs to exist before you can set environment variables.
+1. **Deploy Workers** - All 6 Cloudflare Workers
+2. **Deploy Worker Secrets** - Environment variables for workers
+3. **Deploy Pages** - Frontend application (includes build)
+4. **Deploy Pages Secrets** - Environment variables for Pages
 
-If you used the automated deployment scripts in Step 6.4, you still need to set these variables for the Pages project:
+The unified deployment script provides:
 
-- `AUTH_PASSWORD`: Your custom registration password
-- `SL_API_KEY`: Your SendLayer API key
-
-**Method 1: Cloudflare Dashboard (Recommended)**
-1. Go to **Cloudflare Dashboard** → **Compute (Workers)** → **Your Pages Project**
-2. Navigate to **Settings** → **Variables and Secrets**
-3. Add the secrets:
-   - `AUTH_PASSWORD`: Your custom registration password
-   - `SL_API_KEY`: Your SendLayer API key
-
-**Method 2: CLI (Alternative)**
-```bash
-# Set Pages environment variables using Wrangler CLI
-# Replace 'your-pages-project-name' with your actual project name
-
-wrangler pages secret put AUTH_PASSWORD --project-name=your-pages-project-name
-# When prompted, enter your custom registration password
-
-wrangler pages secret put SL_API_KEY --project-name=your-pages-project-name
-# When prompted, enter your SendLayer API key
-```
-
-**Verify Variables Are Set:**
-```bash
-# List all environment variables for your Pages project
-wrangler pages secret list --project-name=your-pages-project-name
-```
-
-### 8.3 Configure Custom Domain
-
-1. Go to Cloudflare Pages → Your project → Custom domains
-2. Add your custom domain
-3. Configure DNS records as instructed
+- ✅ **Complete deployment automation** - Deploy everything with one command
+- ✅ **Correct sequencing** - Ensures dependencies are deployed in the right order
+- ✅ **Step-by-step progress tracking** - Clear feedback on each deployment phase
+- ✅ **Comprehensive error handling** - Stops if any step fails, preventing partial deployments
+- ✅ **Success summary** - Shows what was deployed and next steps
+- ✅ **Cross-platform compatibility** - Works on Windows, Mac, and Linux
 
 ---
 
-## Step 9: Testing and Verification
+## Step 8: Testing and Verification
 
 **🎯 Internal Developers**: You can test your changes on the pre-configured development environment at [https://dev.striae.org](https://dev.striae.org). Firebase authentication, MFA, and all external services are already configured and functional.
 
 **📋 External Developers**: Follow the complete testing steps below to verify your installation.
 
-### 9.1 Test Authentication Flow
+### 8.1 Test Authentication Flow
 
 1. Navigate to your deployed application
 2. Test user registration
@@ -795,14 +636,14 @@ wrangler pages secret list --project-name=your-pages-project-name
 4. Test multi-factor authentication (MFA)
 5. Test password reset functionality
 
-### 9.2 Test Core Features
+### 8.2 Test Core Features
 
 1. **Image Upload**: Test image upload functionality
 2. **Data Storage**: Test data saving and retrieval
 3. **PDF Generation**: Test PDF export features
 4. **Turnstile**: Verify bot protection is working
 
-### 9.3 Test Worker Endpoints
+### 8.3 Test Worker Endpoints
 
 Verify each worker is responding correctly:
 - Keys worker: Authentication and key management
@@ -812,7 +653,7 @@ Verify each worker is responding correctly:
 - Turnstile worker: Bot protection
 - PDF worker: PDF generation
 
-### 9.4 Verify CORS Configuration
+### 8.4 Verify CORS Configuration
 
 Test that CORS is working correctly by:
 
@@ -835,7 +676,7 @@ Expected response should include:
 
 ---
 
-## Step 10: Security Checklist
+## Step 9: Security Checklist
 
 - [ ] All environment variables are set correctly
 - [ ] CORS is properly configured for all workers with your domain
@@ -890,13 +731,15 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 5. **Start developing**: Frontend and all workers are deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
 
 **For External Developers:**
+
 1. **Fork & Clone**: Fork `striae-org/striae` to your account → Clone your fork
 2. **Install Dependencies**: Run `npm install` to install all required packages
-3. **Setup Environment**: `cp .env.example .env` → Fill values → `./scripts/deploy-env.sh`
-4. **Configure Workers**: Copy `wrangler.jsonc.example` files and update settings
-5. **Deploy Workers**: `npm install && wrangler deploy` for each worker
-6. **Configure App**: Update config files with worker URLs
-7. **Deploy Frontend**: `npm run deploy` and set Pages environment variables
+3. **Configure Services**: Set up Cloudflare (Turnstile, Images, KV, R2), Firebase, SendLayer
+4. **Configure Workers**: Copy `wrangler.jsonc.example` files → Update with your account details
+5. **Setup Environment**: `cp .env.example .env` → Fill with your credentials
+6. **Configure Application**: Update `config.json`, `firebase.ts`, `keys.json`, `wrangler.toml` files
+7. **Complete Deployment**: `npm run deploy:all` (unified deployment)
+8. **Test & Verify**: Verify all functionality and run security checklist
 
 ---
 
