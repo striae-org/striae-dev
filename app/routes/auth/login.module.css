@@ -134,6 +134,14 @@
   font-size: var(--fontSizeBodyXS);
 }
 
+.hint {
+  color: var(--textLight);
+  text-align: center;
+  margin: calc(var(--spaceS) * -0.5) 0 var(--spaceS) 0;
+  font-size: var(--fontSizeBodyXS);
+  line-height: 1.4;
+}
+
 .toggle {
   text-align: center;
   margin-top: var(--spaceL);

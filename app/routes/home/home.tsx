@@ -77,12 +77,9 @@ export default function Home() {
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
           </div>
           <div className={styles.buttonGroup}>            
-            <Link to="/auth" className={styles.actionButton}>
+            <Link to="/auth" className={styles.signInButton}>
               Sign In
             </Link>
-            <Link to="/access" className={styles.accessButton}>
-              Register Now
-            </Link>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>

@@ -55,19 +55,17 @@
   margin-top: var(--spaceL);
 }
 
-.actionButton,
-.accessButton {
+.actionButton {
   padding: var(--spaceM) var(--spaceL);
   border-radius: var(--spaceXS);
   text-decoration: none;
   font-weight: var(--fontWeightMedium);
   font-size: var(--fontSizeBodyM);
   transition: all var(--durationM) var(--bezierFastoutSlowin);
-}
-
-.actionButton {
   background-color: var(--primary);
   color: var(--white);
+  border: none;
+  cursor: pointer;
 }
 
 .actionButton:hover {
@@ -75,13 +73,21 @@
   text-decoration: none;
 }
 
-.accessButton {
-  background-color: var(--accent);
+.signInButton {
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  text-decoration: none;
+  font-weight: var(--fontWeightMedium);
+  font-size: var(--fontSizeBodyM);
+  transition: all var(--durationM) var(--bezierFastoutSlowin);
+  background-color: #28a745;
   color: var(--white);
+  border: none;
+  cursor: pointer;
 }
 
-.accessButton:hover {
-  background-color: color-mix(in lab, var(--accent) 85%, var(--black));
+.signInButton:hover {
+  background-color: #218838;
   text-decoration: none;
 }
 
@@ -260,7 +266,7 @@
   }
 
   .actionButton,
-  .accessButton {
+  .signInButton {
     width: 100%;
     text-align: center;
   }

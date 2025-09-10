@@ -15,7 +15,6 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { handleAuthError } from '~/services/firebase-errors';
-import { AuthPassword } from '~/components/auth/auth-password';
 import { MFAVerification } from '~/components/auth/mfa-verification';
 import { MFAEnrollment } from '~/components/auth/mfa-enrollment';
 import { Icon } from '~/components/icon/icon';
@@ -24,6 +23,7 @@ import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
 import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
+import freeEmailDomains from 'free-email-domains';
 
 export const meta = () => {
   return baseMeta({
@@ -74,7 +74,6 @@ export const Login = () => {
   const [user, setUser] = useState<User | null>(null);
   const [passwordStrength, setPasswordStrength] = useState('');
   const [isResetting, setIsResetting] = useState(false);
-  const [hasAuthAccess, setHasAuthAccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -89,14 +88,10 @@ export const Login = () => {
     setIsClient(true);
   }, []);
 
-  // Check for existing auth access on mount
-  useEffect(() => {
-    const accessGranted = sessionStorage.getItem('auth-access-granted') === 'true';
-    setHasAuthAccess(accessGranted);
-  }, []);
-
-  const handleAccessGranted = () => {
-    setHasAuthAccess(true);
+  // Email domain validation
+  const validateEmailDomain = (email: string): boolean => {
+    const emailDomain = email.toLowerCase().split('@')[1];
+    return !freeEmailDomains.includes(emailDomain);
   };
 
   const checkPasswordStrength = (password: string): boolean => {
@@ -164,6 +159,12 @@ export const Login = () => {
   try {
     if (!isLogin) {
       // Registration validation
+      if (!validateEmailDomain(email)) {
+        setError('Please use a work email address. Personal email providers (Gmail, Yahoo, etc.) are not allowed');
+        setIsLoading(false);
+        return;
+      }
+      
       if (password !== confirmPassword) {
         setError('Passwords do not match');
         setIsLoading(false);
@@ -284,163 +285,160 @@ export const Login = () => {
 
   return (
     <>
-      {!hasAuthAccess ? (
-        <AuthPassword onAccessGranted={handleAccessGranted} />
+      {user ? (
+        user.emailVerified ? (
+          <Striae user={user} />
+        ) : (
+          <div className={styles.verificationPrompt}>
+            <h2>Email Verification Required</h2>
+            <p>Please check your email and verify your account before continuing.</p>
+            <button 
+              onClick={handleSignOut}
+              className={styles.button}
+            >
+              Sign Out
+            </button>
+          </div>
+        )
+      ) : isResetting ? (
+        <PasswordReset onBack={() => setIsResetting(false)}/>
       ) : (
-        <>
-          {user ? (
-            user.emailVerified ? (
-              <Striae user={user} />
-            ) : (
-              <div className={styles.verificationPrompt}>
-                <h2>Email Verification Required</h2>
-                <p>Please check your email and verify your account before continuing.</p>
-                <button 
-                  onClick={handleSignOut}
-                  className={styles.button}
+        <div className={styles.container}>
+          <Link to="/" className={styles.logoLink}>
+            <div className={styles.logo} />
+          </Link>
+          <div className={styles.formWrapper}>
+            <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
+            
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <input
+                type="email"
+                name="email"
+                placeholder={isLogin ? "Email" : "Work Email Address"}
+                autoComplete="email"
+                className={styles.input}
+                required
+                disabled={isLoading}
+              />
+              {!isLogin && (
+                <p className={styles.hint}>Please use your work email address. Personal email providers (Gmail, Yahoo, Outlook, etc.) are not allowed.</p>
+              )}
+              <div className={styles.passwordField}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
+                  className={styles.input}
+                  required
+                  disabled={isLoading}
+                  onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  Sign Out
+                  <Icon icon={showPassword ? "eye-off" : "eye"} />
                 </button>
               </div>
-            )
-          ) : isResetting ? (
-            <PasswordReset onBack={() => setIsResetting(false)}/>
-          ) : (
-            <div className={styles.container}>
-              <Link to="/" className={styles.logoLink}>
-                <div className={styles.logo} />
-              </Link>
-              <div className={styles.formWrapper}>
-                <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
-                
-                <form onSubmit={handleSubmit} className={styles.form}>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    autoComplete="email"
-                    className={styles.input}
-                    required
-                    disabled={isLoading}
-                  />
+              
+              {!isLogin && (
+                <>
                   <div className={styles.passwordField}>
                     <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="Password"
-                      autoComplete={isLogin ? "current-password" : "new-password"}
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Confirm Password"
+                      autoComplete="new-password"
                       className={styles.input}
                       required
                       disabled={isLoading}
-                      onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
                     />
                     <button
                       type="button"
                       className={styles.passwordToggle}
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                     >
-                      <Icon icon={showPassword ? "eye-off" : "eye"} />
+                      <Icon icon={showConfirmPassword ? "eye-off" : "eye"} />
                     </button>
                   </div>
-                  
-                  {!isLogin && (
-                    <>
-                      <div className={styles.passwordField}>
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          name="confirmPassword"
-                          placeholder="Confirm Password"
-                          autoComplete="new-password"
-                          className={styles.input}
-                          required
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          className={styles.passwordToggle}
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                        >
-                          <Icon icon={showConfirmPassword ? "eye-off" : "eye"} />
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        name="firstName"
-                        required
-                        placeholder="First Name (required)"
-                        autoComplete="given-name"
-                        className={styles.input}
-                        disabled={isLoading}
-                      />
-                      <input
-                        type="text"
-                        name="lastName"
-                        required
-                        placeholder="Last Name (required)"
-                        autoComplete="family-name"
-                        className={styles.input}
-                        disabled={isLoading}
-                      />
-                      <input
-                        type="text"
-                        name="company"
-                        required
-                        placeholder="Lab/Company Name (required)"
-                        autoComplete="organization"
-                        className={styles.input}
-                        disabled={isLoading}
-                      />                      
-                      {passwordStrength && (
-                        <div className={styles.passwordStrength}>
-                          <pre>{passwordStrength}</pre>
-                        </div>
-                      )}
-                    </>
-                  )}
-                  
-                  {isLogin && (
-                    <button 
-                      type="button"
-                      onClick={() => setIsResetting(true)}
-                      className={styles.resetLink}
-                    >
-                      Forgot Password?
-                    </button>
-                  )}
-                  
-                  {error && <p className={styles.error}>{error}</p>}
-                  
-                  <button 
-                    type="submit" 
-                    className={styles.button}
+                  <input
+                    type="text"
+                    name="firstName"
+                    required
+                    placeholder="First Name (required)"
+                    autoComplete="given-name"
+                    className={styles.input}
                     disabled={isLoading}
-                  >
-                    {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
-                  </button>
-                </form>
-                
-                <p className={styles.toggle}>
-                  {isLogin ? "Don't have an account? " : "Already have an account? "}
-                  <button 
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setShowPassword(false);
-                      setShowConfirmPassword(false);
-                      setPasswordStrength('');
-                      setError('');
-                    }}
-                    className={styles.toggleButton}
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    required
+                    placeholder="Last Name (required)"
+                    autoComplete="family-name"
+                    className={styles.input}
                     disabled={isLoading}
-                  >
-                    {isLogin ? 'Register' : 'Login'}
-                  </button>
-                </p>
-              </div>
-            </div>
-          )}
-        </>
+                  />
+                  <input
+                    type="text"
+                    name="company"
+                    required
+                    placeholder="Lab/Company Name (required)"
+                    autoComplete="organization"
+                    className={styles.input}
+                    disabled={isLoading}
+                  />                      
+                  {passwordStrength && (
+                    <div className={styles.passwordStrength}>
+                      <pre>{passwordStrength}</pre>
+                    </div>
+                  )}
+                </>
+              )}
+              
+              {isLogin && (
+                <button 
+                  type="button"
+                  onClick={() => setIsResetting(true)}
+                  className={styles.resetLink}
+                >
+                  Forgot Password?
+                </button>
+              )}
+              
+              {error && <p className={styles.error}>{error}</p>}
+              
+              <button 
+                type="submit" 
+                className={styles.button}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
+              </button>
+            </form>
+            
+            <p className={styles.toggle}>
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
+              <button 
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setShowPassword(false);
+                  setShowConfirmPassword(false);
+                  setPasswordStrength('');
+                  setError('');
+                }}
+                className={styles.toggleButton}
+                disabled={isLoading}
+              >
+                {isLogin ? 'Register' : 'Login'}
+              </button>
+            </p>
+          </div>
+        </div>
       )}
       
       {isClient && showMfaVerification && mfaResolver && (
