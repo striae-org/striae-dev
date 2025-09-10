@@ -18,6 +18,16 @@
 
 ## 📋 Changelog
 
+## [2025-09-10] - *[Release v0.9.10-beta](https://github.com/striae-org/striae/releases/tag/v0.9.10-beta)*
+
+- **Authentication System Enhancements** - Simplified login process with email validation and disabled profile email updates for security
+- **Documentation & Developer Experience** - Comprehensive developer documentation with installation guides, architecture diagrams, and development protocols
+- **UI/UX Improvements** - Enhanced homepage with developer information, consistent card hover effects, and LinkedIn icon integration
+- **Code Quality & Maintenance** - Extensive code cleanup, dependency updates, and unified deployment scripts
+- **Security & Configuration** - Improved Turnstile keys portability, removed redundant configurations, and enhanced gitignore specifications
+- **Developer Tools** - Added Patreon widget development, console flair enhancements, and internal developer workflow improvements
+- **Bug Fixes & Optimizations** - Fixed installation guide issues, removed deprecated mobile references, and streamlined configuration management
+
 ## [2025-09-06] - *[Release v0.9.06-beta](https://github.com/striae-org/striae/releases/tag/v0.9.06-beta)*
 
 - **Installation & Setup Improvements** - Comprehensive installation guide and simplified setup process
