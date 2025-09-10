@@ -10,7 +10,7 @@ export const ERROR_MESSAGES = {
   ACTION_RESTRICTED: 'Operation not allowed',
   PASSWORDS_MISMATCH: 'Passwords do not match',
   WEAK_PASSWORD: 'Password does not meet strength requirements',
-  REQUIRES_RECENT_LOGIN: 'Please sign in again to change your email',
+  REQUIRES_RECENT_LOGIN: 'Please sign in again to complete this action',
   
   // Reset/Verify Errors
   RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',

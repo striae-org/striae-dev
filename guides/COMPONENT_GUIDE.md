@@ -6,7 +6,6 @@
 2. [Component Directory Structure](#component-directory-structure)
 3. [Core Components](#core-components)
    - [1. Authentication Components](#1-authentication-components)
-     - [AuthPassword](#authpassword-appcomponentsauthauth-passwordtsx)
      - [MFAEnrollment](#mfaenrollment-appcomponentsauthmfa-enrollmenttsx)
      - [MFAVerification](#mfaverification-appcomponentsauthmfa-verificationtsx)
    - [2. Canvas System](#2-canvas-system)
@@ -88,22 +87,6 @@ app/components/
 ## Core Components
 
 ### 1. Authentication Components
-
-#### AuthPassword (`app/components/auth/auth-password.tsx`)
-
-**Purpose**: Initial access control before main authentication
-
-**Features**:
-
-- Password-based access gate
-- Session storage for access state
-- Clean, focused interface
-
-**Usage**:
-
-```tsx
-<AuthPassword onAccessGranted={handleAccessGranted} />
-```
 
 #### MFAEnrollment (`app/components/auth/mfa-enrollment.tsx`)
 
@@ -668,8 +651,9 @@ type Theme = 'light' | 'dark' | 'system';
 
 **Features**:
 
-- Profile information editing (display name, email, company)
-- Email verification workflow
+- Profile information editing (display name)
+- Email address viewing (read-only)
+- Company information viewing (read-only)
 - Password change functionality
 - User reauthentication
 - Firebase integration
@@ -686,10 +670,9 @@ interface ManageProfileProps {
 
 **Key Features**:
 
-- Email update with verification
 - Display name modification
-- Company information management
-- Current password verification
+- Company information management (read-only)
+- Email address display (read-only)
 - Firebase error handling integration
 
 #### InactivityWarning (`app/components/user/inactivity-warning.tsx`)

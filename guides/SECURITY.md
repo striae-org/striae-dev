@@ -10,7 +10,7 @@
    - [Multi-Factor Authentication (MFA)](#multi-factor-authentication-mfa)
      - [MFA Flow](#mfa-flow)
 3. [Access Control](#access-control)
-   - [Initial Access Gate](#initial-access-gate)
+   - [Direct Authentication Access](#direct-authentication-access)
 4. [API Security](#api-security)
    - [Worker Authentication](#worker-authentication)
    - [CORS Configuration](#cors-configuration)
@@ -68,7 +68,7 @@ export const auth = getAuth(app);
 
 ### Password Security Requirements
 
-Strong password validation is enforced during registration:
+Strong password validation is enforced during authentication:
 
 ```typescript
 // From app/routes/auth/login.tsx
@@ -107,27 +107,23 @@ export const userHasMFA = (user: User): boolean => {
 
 ## Access Control
 
-### Initial Access Gate
+### Direct Authentication Access
 
-Application requires an initial access password before revealing the login interface:
+Application provides direct access to the authentication interface with email domain restrictions:
 
 ```typescript
-// app/components/auth/auth-password.tsx
-// Verifies against AUTH_PASSWORD environment variable
-export async function verifyAuthPassword(password: string): Promise<boolean> {
-  const response = await fetch(`${KEYS_URL}/verify-auth-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Custom-Auth-Key': KEYS_AUTH
-    },
-    body: JSON.stringify({ password })
-  });
-  
-  const result = await response.json();
-  return result.valid;
-}
+// app/routes/auth/login.tsx
+// Email domain validation using free-email-domains package
+const validateEmailDomain = (email: string): boolean => {
+  const emailDomain = email.toLowerCase().split('@')[1];
+  return !freeEmailDomains.includes(emailDomain);
+};
 ```
+
+**Email Domain Restrictions:**
+- Personal email providers (Gmail, Yahoo, Outlook, etc.) are blocked
+- Only work/institutional email addresses are allowed
+- Uses comprehensive free-email-domains package with 4,779+ blocked domains
 
 ## API Security
 
@@ -225,7 +221,6 @@ All sensitive configuration is stored as environment variables across the worker
 //
 // Keys Worker:
 // - KEYS_AUTH: Keys worker authentication token
-// - AUTH_PASSWORD: Initial application access password
 // - R2_KEY_SECRET: Referenced for key distribution
 // - ACCOUNT_HASH: Account hash for client-side operations
 // - IMAGES_API_TOKEN: Referenced for key distribution

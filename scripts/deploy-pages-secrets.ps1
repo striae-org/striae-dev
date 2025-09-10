@@ -33,7 +33,7 @@ Get-Content ".env" | ForEach-Object {
 }
 
 # Pages-specific environment variables
-$pagesVars = @("SL_API_KEY", "AUTH_PASSWORD")
+$pagesVars = @("SL_API_KEY")
 
 Write-Host "${Yellow}🔍 Validating Pages environment variables...${Reset}"
 foreach ($var in $pagesVars) {

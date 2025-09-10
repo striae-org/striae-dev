@@ -40,11 +40,9 @@ This directory (/scripts) contains scripts and configuration files for managing 
 
 ### Cloudflare Pages
 - `SL_API_KEY` - SendLayer email service
-- `AUTH_PASSWORD` - Custom registration password
 
 ### Keys Worker
 - `ACCOUNT_HASH` - Cloudflare Images Account Hash
-- `AUTH_PASSWORD` - Custom registration password
 - `IMAGES_API_TOKEN` - Cloudflare Images API token (for keys worker)
 - `KEYS_AUTH` - Custom keys authentication token
 - `R2_KEY_SECRET` - Custom R2 authentication token

@@ -33,7 +33,6 @@ source .env
 required_vars=(
     "ACCOUNT_ID"
     "SL_API_KEY"
-    "AUTH_PASSWORD"
     "KEYS_AUTH"
     "USER_DB_AUTH"
     "R2_KEY_SECRET"
@@ -128,7 +127,7 @@ fi
 
 # Keys Worker
 if ! set_worker_secrets "Keys Worker" "workers/keys-worker" \
-    "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN" "AUTH_PASSWORD"; then
+    "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN"; then
     echo -e "${YELLOW}⚠️  Skipping Keys Worker (not configured)${NC}"
 fi
 
@@ -163,8 +162,7 @@ echo -e "\n${GREEN}🎉 Worker secrets deployment completed!${NC}"
 
 # Remind about Pages environment variables
 echo -e "\n${YELLOW}⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:${NC}"
-echo "   - SL_API_KEY" 
-echo "   - AUTH_PASSWORD"
+echo "   - SL_API_KEY"
 
 echo -e "\n${YELLOW}⚠️  WORKER CONFIGURATION REMINDERS:${NC}"
 echo "   - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory"

@@ -4,8 +4,7 @@
  * @property {string} ACCOUNT_HASH
  * @property {string} IMAGES_API_TOKEN
  * @property {string} USER_DB_AUTH
- * @property {string} KEYS_AUTH
- * @property {string} AUTH_PASSWORD
+ * @property {string} KEYS_AUTH 
  */
 
 const corsHeaders = {
@@ -34,31 +33,6 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname.replace('/', '');
     
-    // Handle password verification
-    if (request.method === 'POST' && path === 'verify-auth-password') {
-      try {
-        const { password } = await request.json();
-        
-        if (!password) {
-          return new Response(JSON.stringify({ valid: false }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
-        }
-        
-        const isValid = password === env.AUTH_PASSWORD;
-        
-        return new Response(JSON.stringify({ valid: isValid }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      } catch (error) {
-        return new Response(JSON.stringify({ valid: false }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-    }
-
     // Handle regular key retrieval
     if (request.method === 'GET') {
       const keyName = path;
