@@ -83,7 +83,7 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 
 #### 1. Authentication System
 - **Location**: `app/routes/auth/`
-- **Components**: Login, Registration, MFA
+- **Components**: Login/Registration, MFA
 - **Features**: 
   - Firebase Authentication integration
   - Multi-factor authentication support
@@ -220,12 +220,9 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 
 **API Endpoints**:
 - `GET /{keyName}` - Retrieve environment variable value by name
-- `POST /verify-auth-password` - Verify initial access password
 
 **Key Features**:
 - Secure key distribution for other workers
-- Initial application access control
-- Password verification for app entry gate
 - Custom authentication via X-Custom-Auth-Key header
 
 #### 6. Turnstile Worker (`workers/turnstile-worker/`)

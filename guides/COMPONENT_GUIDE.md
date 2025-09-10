@@ -651,8 +651,9 @@ type Theme = 'light' | 'dark' | 'system';
 
 **Features**:
 
-- Profile information editing (display name, email, company)
-- Email verification workflow
+- Profile information editing (display name)
+- Email address viewing (read-only)
+- Company information viewing (read-only)
 - Password change functionality
 - User reauthentication
 - Firebase integration
@@ -669,10 +670,9 @@ interface ManageProfileProps {
 
 **Key Features**:
 
-- Email update with verification
 - Display name modification
-- Company information management
-- Current password verification
+- Company information management (read-only)
+- Email address display (read-only)
 - Firebase error handling integration
 
 #### InactivityWarning (`app/components/user/inactivity-warning.tsx`)

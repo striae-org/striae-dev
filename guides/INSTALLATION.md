@@ -497,7 +497,6 @@ All required variables are documented in the `.env` file. Here's what you need t
 - `R2_KEY_SECRET` - R2 authentication token
 - `USER_DB_AUTH` - KV authentication token
 - `KEYS_AUTH` - Key handler authentication token
-- `AUTH_PASSWORD` - Registration password
 
 ### 5.3 Generate Security Tokens
 
@@ -634,7 +633,7 @@ The unified deployment script provides:
 ### 8.1 Test Authentication Flow
 
 1. Navigate to your deployed application
-2. Test user registration
+2. Test user authentication (login/registration)
 3. Test user login
 4. Test multi-factor authentication (MFA)
 5. Test password reset functionality

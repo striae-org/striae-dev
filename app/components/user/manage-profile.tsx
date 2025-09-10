@@ -1,14 +1,10 @@
 import { useState, useContext, useEffect } from 'react';
 import { 
-  updateProfile, 
-  verifyBeforeUpdateEmail,   
-  reauthenticateWithCredential, 
-  EmailAuthProvider,    
+  updateProfile
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
-import { Icon } from '../icon/icon';
 import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
@@ -23,15 +19,12 @@ const USER_WORKER_URL = paths.user_worker_url;
 export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const { user } = useContext(AuthContext);  
   const [displayName, setDisplayName] = useState(user?.displayName || '');
-  const [email, setEmail] = useState(user?.email || '');
   const [company, setCompany] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   // Load user data from KV store when modal opens
   useEffect(() => {
@@ -46,8 +39,9 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           });
           
           if (response.ok) {
-            const userData = await response.json() as { company?: string };
+            const userData = await response.json() as { company?: string; email?: string };
             setCompany(userData.company || '');
+            setEmail(userData.email || '');
           }
         } catch (err) {
           console.error('Failed to load user data:', err);
@@ -80,30 +74,11 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     setIsLoading(true);
     setError('');
     setSuccess('');
-    setVerificationSent(false);
     
     try {
       if (!user) throw new Error(ERROR_MESSAGES.NO_USER);
 
-      if (email !== user.email && password) {
-        try {
-          // Step 1: Reauthenticate the user
-          const credential = EmailAuthProvider.credential(user.email!, password);
-          await reauthenticateWithCredential(user, credential);
-          
-          // Step 2: Update email (this changes the user's email immediately)
-          await verifyBeforeUpdateEmail(user, email);
-          
-          setVerificationSent(true);
-          setSuccess('A verification email has been sent to your new address. Please check your inbox to complete the email update!');
-          return;
-        } catch (err) {
-          const { message } = handleAuthError(err);
-          setError(message);
-          return;
-        }
-      }
-       // Update Firebase profile
+      // Update Firebase profile
       await updateProfile(user, {
         displayName
       });
@@ -119,7 +94,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           'X-Custom-Auth-Key': apiKey
         },
         body: JSON.stringify({
-          email,
+          email: user.email, // Use current email, don't allow changes
           firstName: firstName || '',
           lastName: lastName || '',
           // Note: company field intentionally omitted - admin only
@@ -207,36 +182,15 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               type="email"
               value={email}
               autoComplete="email"
-              onChange={(e) => setEmail(e.target.value)}
               className={styles.input}
-              required
+              disabled
+              readOnly
+              style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
             />
+            <p className={styles.helpText}>
+              Email address cannot be changed for security reasons. Contact support if changes are needed.
+            </p>
           </div>
-
-          {email !== user?.email && (
-            <div className={styles.formGroup}>
-              <label htmlFor="password">Current Password (required for email change)</label>
-              <div className={styles.passwordField}>
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  required={email !== user?.email}
-                  autoComplete="current-password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={styles.input}
-                />
-                <button
-                  type="button"
-                  className={styles.passwordToggle}
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  <Icon icon={showPassword ? "eye-off" : "eye"} />
-                </button>
-              </div>
-            </div>
-          )}
 
           {error && <p className={styles.error}>{error}</p>}
           {success && <p className={styles.success}>{success}</p>}
@@ -245,11 +199,9 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 <button 
                   type="submit" 
                   className={styles.primaryButton}
-                  disabled={isLoading || verificationSent}
+                  disabled={isLoading}
                 >
-                  {isLoading ? 'Updating...' : 
-                  verificationSent ? 'Verification Email Sent' : 
-                  'Update Profile'}
+                  {isLoading ? 'Updating...' : 'Update Profile'}
                 </button>
                 <button
                   type="button"

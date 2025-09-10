@@ -68,7 +68,7 @@ export const auth = getAuth(app);
 
 ### Password Security Requirements
 
-Strong password validation is enforced during registration:
+Strong password validation is enforced during authentication:
 
 ```typescript
 // From app/routes/auth/login.tsx
@@ -221,7 +221,6 @@ All sensitive configuration is stored as environment variables across the worker
 //
 // Keys Worker:
 // - KEYS_AUTH: Keys worker authentication token
-// - AUTH_PASSWORD: Initial application access password
 // - R2_KEY_SECRET: Referenced for key distribution
 // - ACCOUNT_HASH: Account hash for client-side operations
 // - IMAGES_API_TOKEN: Referenced for key distribution
