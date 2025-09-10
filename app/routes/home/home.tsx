@@ -2,7 +2,6 @@ import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState, useEffect } from 'react';
 import { Notice } from '~/components/notice/notice';
-//import { Toast } from '~/components/toast/toast';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
 import { Icon } from '~/components/icon/icon';
@@ -15,31 +14,11 @@ export const meta = () => {
 };
 
 export default function Home() {
-  const [isNoticeOpen, setNoticeOpen] = useState(false);
-  //const [isToastVisible, setToastVisible] = useState(false);
+  const [isNoticeOpen, setNoticeOpen] = useState(false);  
 
   const handleNoticeClose = () => {
     setNoticeOpen(false);
-  };
- 
-  {/* Toast Notification
-  const handleToastClose = () => {
-    setToastVisible(false);    
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('domainTransferToastShown', 'true');
-    }
-  };
-    
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const toastShown = sessionStorage.getItem('domainTransferToastShown');
-      if (!toastShown) {
-        setToastVisible(true);
-      }
-    }
-  }, []);
-  */}
-  
+  };  
   
   const [timeLeft, setTimeLeft] = useState<string>('');
 
@@ -188,15 +167,6 @@ export default function Home() {
         </div>
       </div>
       <Notice isOpen={isNoticeOpen} onClose={handleNoticeClose} notice={{ title: 'About Striae', content: <NoticeText /> }} />      
-      {/* Toast Notification
-      <Toast 
-        message="Striae migration has been completed, and all services are fully operational. Thank you for your patience."
-        type="success"
-        isVisible={isToastVisible}
-        onClose={handleToastClose}
-        duration={8000}
-      /> 
-      */}
     </>
   );
 }
