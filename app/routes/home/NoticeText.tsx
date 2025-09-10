@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import styles from '~/components/notice/notice.module.css';
 
 const NoticeText = () => {
-  // Load Patreon script
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const loadPatreonScript = () => {        

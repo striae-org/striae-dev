@@ -62,7 +62,7 @@ export const CaseSidebar = ({
   successAction,
   setSuccessAction,
 }: CaseSidebarProps) => {
-  // Keep only UI-specific local state
+  
   const [isDeletingCase, setIsDeletingCase] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,6 @@ export const CaseSidebar = ({
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Image File Types
     const allowedTypes = [
       'image/png',
       'image/gif', 
@@ -84,8 +83,7 @@ export const CaseSidebar = ({
       'image/webp',
       'image/svg+xml'
     ];
-
-   // Load files effect
+   
   useEffect(() => {
     if (currentCase) {
       setIsLoading(true);
@@ -132,7 +130,7 @@ export const CaseSidebar = ({
       const newCase = await createNewCase(user, caseNumber);
       setCurrentCase(newCase.caseNumber);
       onCaseChange(newCase.caseNumber);
-      setFiles([]); // New case starts with empty files
+      setFiles([]);
       setCaseNumber('');
       setSuccessAction('created');
       setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
@@ -148,29 +146,24 @@ export const CaseSidebar = ({
     const file = event.target.files?.[0];
     if (!file || !currentCase) return;
 
-    // Clear previous errors
     setFileError('');
     setIsUploadingFile(true);
     setUploadProgress(0);
 
-    // Validate file type
     if (!allowedTypes.includes(file.type)) {
       setFileError('Only PNG, GIF, JPEG, WEBP, or SVG files are allowed');
       setIsUploadingFile(false);
       setUploadProgress(0);
       if (fileInputRef.current) fileInputRef.current.value = '';
-      // Clear error after 3 seconds
       setTimeout(() => setFileError(''), 3000);
       return;
     }
 
-    // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
       setFileError('File size must be less than 10 MB');
       setIsUploadingFile(false);
       setUploadProgress(0);
       if (fileInputRef.current) fileInputRef.current.value = '';
-      // Clear error after 3 seconds
       setTimeout(() => setFileError(''), 3000);
       return;
     }
@@ -183,7 +176,6 @@ export const CaseSidebar = ({
     if (fileInputRef.current) fileInputRef.current.value = '';
   } catch (err) {
     setFileError(err instanceof Error ? err.message : 'Upload failed');
-    // Clear error after 3 seconds
     setTimeout(() => setFileError(''), 3000);
   } finally {
     setIsUploadingFile(false);

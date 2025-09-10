@@ -24,7 +24,6 @@ export const useInactivityTimeout = ({
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
 
-  // Only enable the timer if we're on an auth route
   const isAuthRoute = location.pathname.startsWith('/auth');
   const shouldEnable = enabled && isAuthRoute;
 
@@ -58,13 +57,11 @@ export const useInactivityTimeout = ({
     lastActivityRef.current = Date.now();
     clearTimeouts();
 
-    // Set warning timeout
     const warningMs = (timeoutMinutes - warningMinutes) * 60 * 1000;
     if (warningMs > 0) {
       warningTimeoutRef.current = setTimeout(handleWarning, warningMs);
     }
 
-    // Set sign-out timeout
     const timeoutMs = timeoutMinutes * 60 * 1000;
     timeoutRef.current = setTimeout(handleSignOut, timeoutMs);
   }, [shouldEnable, timeoutMinutes, warningMinutes, handleWarning, handleSignOut, clearTimeouts]);
@@ -85,22 +82,18 @@ export const useInactivityTimeout = ({
       return;
     }
 
-    // Activities that reset the timer
     const activities = INACTIVITY_CONFIG.TRACKED_ACTIVITIES;
 
     const handleActivity = () => {
       resetTimer();
     };
 
-    // Add event listeners
     activities.forEach(activity => {
       document.addEventListener(activity, handleActivity, true);
     });
 
-    // Initialize timer
     resetTimer();
 
-    // Cleanup
     return () => {
       activities.forEach(activity => {
         document.removeEventListener(activity, handleActivity, true);

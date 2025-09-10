@@ -81,8 +81,7 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
       setIsLoading(false);
     };
   }, [imageUrl]);
-
-  // Flashing effect for subclass warning
+  
   useEffect(() => {
     if (!activeAnnotations?.has('class') || !annotationData?.hasSubclass) {
       setIsFlashing(false);
@@ -91,12 +90,12 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
 
     const flashInterval = setInterval(() => {
       setIsFlashing(true);
-      setTimeout(() => setIsFlashing(false), 200); // Flash on for 200ms
+      setTimeout(() => setIsFlashing(false), 200);
       setTimeout(() => {
         setIsFlashing(true);
-        setTimeout(() => setIsFlashing(false), 200); // Second flash after 300ms
+        setTimeout(() => setIsFlashing(false), 200);
       }, 300);
-    }, 60000); // Repeat every minute
+    }, 60000);
 
     return () => clearInterval(flashInterval);
   }, [activeAnnotations, annotationData?.hasSubclass]);
