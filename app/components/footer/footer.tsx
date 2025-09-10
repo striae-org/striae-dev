@@ -1,7 +1,6 @@
 import { Link } from '@remix-run/react';
 import { useEffect } from 'react';
 import styles from './footer.module.css';
-import config from '../../config/config.json';
 import { getAppVersion, logAppVersion } from '../../utils/version';
 
 export default function Footer() {
@@ -13,9 +12,9 @@ export default function Footer() {
     logAppVersion();
     
     if (typeof window !== 'undefined') {      
-      if (!document.querySelector('script[src="/scripts/becomePatronButton.bundle.js"]')) {
+      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
         const script = document.createElement('script');
-        script.src = '/scripts/becomePatronButton.bundle.js';
+        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
         script.async = true;
         document.head.appendChild(script);
       }

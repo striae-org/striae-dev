@@ -5,7 +5,7 @@ import { Link } from '@remix-run/react';
 import { Sidebar } from './sidebar';
 import { User } from 'firebase/auth';
 import styles from './sidebar.module.css';
-import config from '../../config/config.json';
+import { getAppVersion } from '../../utils/version';
 
 interface FileData {
   id: string;
@@ -38,6 +38,7 @@ interface SidebarContainerProps {
 export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
   const year = new Date().getFullYear();
+  const appVersion = getAppVersion();
 
   useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
@@ -58,13 +59,13 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   useEffect(() => {
     if (isFooterModalOpen && typeof window !== 'undefined') {      
       const loadPatreonScript = () => {        
-        const existingScript = document.querySelector('script[src="/scripts/becomePatronButton.bundle.js"]');
+        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
         if (existingScript) {
           existingScript.remove();
         }
 
         const script = document.createElement('script');
-        script.src = '/scripts/becomePatronButton.bundle.js';
+        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
         script.async = true;
         
         script.onload = () => {          
@@ -123,7 +124,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
               </div>
               <div className={styles.footerModalCopyright}>
-                Striae {config.version} © {year}. All rights reserved.              
+                Striae {appVersion} © {year}. All rights reserved.              
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>
