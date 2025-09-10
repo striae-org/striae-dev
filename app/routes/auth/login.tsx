@@ -88,10 +88,18 @@ export const Login = () => {
     setIsClient(true);
   }, []);
 
-  // Email domain validation
+  // Email validation with regex and domain checking
   const validateEmailDomain = (email: string): boolean => {
+    // Email regex pattern for basic validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    // First check if email format is valid
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+    
     const emailDomain = email.toLowerCase().split('@')[1];
-    return !freeEmailDomains.includes(emailDomain);
+    return !!emailDomain && !freeEmailDomains.includes(emailDomain);
   };
 
   const checkPasswordStrength = (password: string): boolean => {
