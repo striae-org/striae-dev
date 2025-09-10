@@ -28,7 +28,7 @@
 - **Developer Tools** - Added Patreon widget development, console flair enhancements, and internal developer workflow improvements
 - **Bug Fixes & Optimizations** - Fixed installation guide issues, removed deprecated mobile references, and streamlined configuration management
 
-## [2025-09-06] - *[Release v0.9.06-beta](https://github.com/striae-org/striae/releases/tag/v0.9.06-beta)*
+## [2025-09-06] - *[Release v0.9.10-beta](https://github.com/striae-org/striae/releases/tag/v0.9.10-beta)*
 
 - **Installation & Setup Improvements** - Comprehensive installation guide and simplified setup process
 - **Worker Infrastructure Enhancements** - Security hardening and configuration portability improvements
@@ -38,7 +38,7 @@
 - **Bug Fixes & Optimizations** - PostCSS fixes, configuration improvements, and dependency updates
 - **Developer Experience** - Enhanced documentation, worker optimizations, and deployment script improvements
 
-## [2025-09-01] - *[Release v0.9.0-beta](https://github.com/striae-org/striae/releases/tag/v0.9.0)*
+## [2025-09-01] - *[Release v0.9.10-beta](https://github.com/striae-org/striae/releases/tag/v0.9.10-beta)*
 
 - Global CSS corrections and cleanup
 - Numerous code cleanups and adjustments

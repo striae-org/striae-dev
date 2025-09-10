@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { updateMarkdownVersions } = require('./update-markdown-versions.cjs');
 
 // Read the ASCII art file from the filesystem
 const asciiArtPath = path.join(__dirname, '..', 'public', 'striae-ascii.txt');
@@ -13,3 +14,6 @@ try {
 
 // Pop a lil' logo in the terminal
 console.info(asciiArt);
+
+// Update markdown files with current version
+updateMarkdownVersions();
