@@ -30,7 +30,6 @@ export const InactivityWarning = ({
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          // Trigger sign out when countdown reaches 0
           onSignOut();
           return 0;
         }

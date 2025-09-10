@@ -26,7 +26,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
 
-  // Load user data from KV store when modal opens
   useEffect(() => {
     if (isOpen && user) {
       const loadUserData = async () => {
@@ -52,7 +51,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     }
   }, [isOpen, user]);
 
-  // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -78,12 +76,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     try {
       if (!user) throw new Error(ERROR_MESSAGES.NO_USER);
 
-      // Update Firebase profile
       await updateProfile(user, {
         displayName
       });
 
-      // Update KV store
       const apiKey = await getUserApiKey();
       const [firstName, lastName] = displayName.split(' ');
       
@@ -94,10 +90,9 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           'X-Custom-Auth-Key': apiKey
         },
         body: JSON.stringify({
-          email: user.email, // Use current email, don't allow changes
+          email: user.email,
           firstName: firstName || '',
-          lastName: lastName || '',
-          // Note: company field intentionally omitted - admin only
+          lastName: lastName || '',          
         })
       });
 

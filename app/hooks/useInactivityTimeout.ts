@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useLocation } from '@remix-run/react';
 import { signOut } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import { INACTIVITY_CONFIG } from '~/config/inactivity';
@@ -18,9 +19,13 @@ export const useInactivityTimeout = ({
   onTimeout,
   enabled = true
 }: UseInactivityTimeoutOptions = {}) => {
+  const location = useLocation();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
+
+  const isAuthRoute = location.pathname.startsWith('/auth');
+  const shouldEnable = enabled && isAuthRoute;
 
   const clearTimeouts = useCallback(() => {
     if (timeoutRef.current) {
@@ -47,21 +52,19 @@ export const useInactivityTimeout = ({
   }, [onWarning]);
 
   const resetTimer = useCallback(() => {
-    if (!enabled) return;
+    if (!shouldEnable) return;
 
     lastActivityRef.current = Date.now();
     clearTimeouts();
 
-    // Set warning timeout
     const warningMs = (timeoutMinutes - warningMinutes) * 60 * 1000;
     if (warningMs > 0) {
       warningTimeoutRef.current = setTimeout(handleWarning, warningMs);
     }
 
-    // Set sign-out timeout
     const timeoutMs = timeoutMinutes * 60 * 1000;
     timeoutRef.current = setTimeout(handleSignOut, timeoutMs);
-  }, [enabled, timeoutMinutes, warningMinutes, handleWarning, handleSignOut, clearTimeouts]);
+  }, [shouldEnable, timeoutMinutes, warningMinutes, handleWarning, handleSignOut, clearTimeouts]);
 
   const extendSession = useCallback(() => {
     resetTimer();
@@ -74,34 +77,30 @@ export const useInactivityTimeout = ({
   }, [timeoutMinutes]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (!shouldEnable) {
       clearTimeouts();
       return;
     }
 
-    // Activities that reset the timer
     const activities = INACTIVITY_CONFIG.TRACKED_ACTIVITIES;
 
     const handleActivity = () => {
       resetTimer();
     };
 
-    // Add event listeners
     activities.forEach(activity => {
       document.addEventListener(activity, handleActivity, true);
     });
 
-    // Initialize timer
     resetTimer();
 
-    // Cleanup
     return () => {
       activities.forEach(activity => {
         document.removeEventListener(activity, handleActivity, true);
       });
       clearTimeouts();
     };
-  }, [enabled, resetTimer, clearTimeouts]);
+  }, [shouldEnable, resetTimer, clearTimeouts, location.pathname]);
 
   return {
     extendSession,

@@ -25,6 +25,7 @@ import { INACTIVITY_CONFIG } from '~/config/inactivity';
 import { AuthContext } from '~/contexts/auth.context';
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import { logAppVersion } from '~/utils/version';
 import './reset.module.css';
 
 export const links: LinksFunction = () => [
@@ -32,7 +33,7 @@ export const links: LinksFunction = () => [
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
+    crossOrigin: "anonymous" as const,
   },
   {
     rel: "stylesheet",
@@ -123,6 +124,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    // Log app version on startup
+    logAppVersion();
+  }, []);
+
   return (
     <AuthProvider>
       <Outlet />

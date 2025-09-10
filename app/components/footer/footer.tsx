@@ -2,15 +2,20 @@ import { Link } from '@remix-run/react';
 import { useEffect } from 'react';
 import styles from './footer.module.css';
 import config from '../../config/config.json';
+import { getAppVersion, logAppVersion } from '../../utils/version';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const appVersion = getAppVersion();
   
   useEffect(() => {
+    // Log version to console for debugging
+    logAppVersion();
+    
     if (typeof window !== 'undefined') {      
-      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
+      if (!document.querySelector('script[src="/scripts/becomePatronButton.bundle.js"]')) {
         const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.src = '/scripts/becomePatronButton.bundle.js';
         script.async = true;
         document.head.appendChild(script);
       }
@@ -41,7 +46,7 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {config.version}</Link> © {year}. All rights reserved.
+          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {appVersion}</Link> © {year}. All rights reserved.
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
