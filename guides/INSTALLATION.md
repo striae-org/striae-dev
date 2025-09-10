@@ -518,7 +518,7 @@ openssl rand -base64 24
 
 ## Step 6: Configuration Files
 
-**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive pre-configured config files including `config.json`, `firebase.ts`, `inactivity.ts`, `keys.json`, and all Turnstile configurations. Use the provided files and proceed directly to Step 8.
+**🎯 Internal Developers**: If you are an internal developer, **skip this entire step**. You will receive pre-configured config files including `config.json`, `firebase.ts`, `inactivity.ts`, `keys.json`, and `wrangler.toml`. Use the provided files and proceed directly to Step 8.
 
 **📋 External Developers**: This section is for external developers who need to manually configure their application settings and Firebase integration.
 
@@ -530,6 +530,7 @@ cp app/config-example/config.json app/config/config.json
 cp app/config-example/firebase.ts app/config/firebase.ts
 cp app/config-example/inactivity.ts app/config/inactivity.ts
 cp app/components/turnstile/keys.json.example app/components/turnstile/keys.json
+cp wrangler.toml.example wrangler.toml
 ```
 
 2. **Update `app/config/config.json`**:
@@ -571,7 +572,7 @@ export const firebaseConfig = {
 };
 ```
 
-5. **Update `wrangler.toml`**:
+5. **Update `wrangler.toml` (root directory)**:
 ```toml
 name = "your-striae-app-name"
 compatibility_date = "2024-12-30"
@@ -580,6 +581,8 @@ pages_build_output_dir = "./build/client"
 [placement]
 mode = "smart"
 ```
+
+> **Note**: The root `wrangler.toml` file configures the Cloudflare Pages deployment (frontend), while the `wrangler.jsonc` files in the `workers/` directories configure individual worker services.
 
 ---
 
@@ -590,10 +593,10 @@ mode = "smart"
 **📋 External Developers**: Now that all configuration is complete, deploy your entire Striae application with a single unified command.
 
 **✅ Prerequisites**: Before running the complete deployment, ensure you have completed:
-1. ✅ Updated configuration files (`config.json`, `firebase.ts`, `keys.json`, `wrangler.toml`) in Step 6
-2. ✅ Set up environment variables (`.env` file) in Step 5
-3. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
-4. ✅ Updated CORS settings in worker source files in Step 4
+1. ✅ Configured all worker files (`wrangler.jsonc`) in Step 3
+2. ✅ Updated CORS settings in worker source files in Step 4
+3. ✅ Set up environment variables (`.env` file) in Step 5
+4. ✅ Updated configuration files (`config.json`, `firebase.ts`, `keys.json`, `wrangler.toml`) in Step 6
 
 ### 7.1 Unified Complete Deployment
 
@@ -726,7 +729,7 @@ Each worker can optionally use custom domains. Update the `routes` section in ea
 **For Internal Developers:**
 1. **Clone dev fork**: `git clone https://github.com/striae-org/striae-dev.git`
 2. **Create dev branch**: `git checkout -b your-feature-branch`
-3. **Use provided files**: Place received `.env`, config files, and `wrangler.jsonc` files in project
+3. **Use provided files**: Place received `.env`, config files, `wrangler.toml`, and `wrangler.jsonc` files in correct project directories
 4. **Install dependencies**: Run `npm install` to install all required packages
 5. **Start developing**: Frontend and all workers are deployed and maintained - test on [https://dev.striae.org](https://dev.striae.org)
 
