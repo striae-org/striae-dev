@@ -1,7 +1,6 @@
 import { Link } from '@remix-run/react';
 import { useEffect } from 'react';
 import styles from './footer.module.css';
-import config from '../../config/config.json';
 import { getAppVersion, logAppVersion } from '../../utils/version';
 
 export default function Footer() {
