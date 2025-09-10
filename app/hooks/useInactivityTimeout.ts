@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useLocation } from '@remix-run/react';
 import { signOut } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import { INACTIVITY_CONFIG } from '~/config/inactivity';
@@ -18,9 +19,14 @@ export const useInactivityTimeout = ({
   onTimeout,
   enabled = true
 }: UseInactivityTimeoutOptions = {}) => {
+  const location = useLocation();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastActivityRef = useRef<number>(Date.now());
+
+  // Only enable the timer if we're on an auth route
+  const isAuthRoute = location.pathname.startsWith('/auth');
+  const shouldEnable = enabled && isAuthRoute;
 
   const clearTimeouts = useCallback(() => {
     if (timeoutRef.current) {
@@ -47,7 +53,7 @@ export const useInactivityTimeout = ({
   }, [onWarning]);
 
   const resetTimer = useCallback(() => {
-    if (!enabled) return;
+    if (!shouldEnable) return;
 
     lastActivityRef.current = Date.now();
     clearTimeouts();
@@ -61,7 +67,7 @@ export const useInactivityTimeout = ({
     // Set sign-out timeout
     const timeoutMs = timeoutMinutes * 60 * 1000;
     timeoutRef.current = setTimeout(handleSignOut, timeoutMs);
-  }, [enabled, timeoutMinutes, warningMinutes, handleWarning, handleSignOut, clearTimeouts]);
+  }, [shouldEnable, timeoutMinutes, warningMinutes, handleWarning, handleSignOut, clearTimeouts]);
 
   const extendSession = useCallback(() => {
     resetTimer();
@@ -74,7 +80,7 @@ export const useInactivityTimeout = ({
   }, [timeoutMinutes]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (!shouldEnable) {
       clearTimeouts();
       return;
     }
@@ -101,7 +107,7 @@ export const useInactivityTimeout = ({
       });
       clearTimeouts();
     };
-  }, [enabled, resetTimer, clearTimeouts]);
+  }, [shouldEnable, resetTimer, clearTimeouts, location.pathname]);
 
   return {
     extendSession,

@@ -29,7 +29,6 @@
 7. [Keys Worker API](#keys-worker-api)
    - [Endpoints](#endpoints-4)
      - [Get Environment Key](#get-environment-key)
-     - [Verify Auth Password](#verify-auth-password)
 8. [Turnstile Worker API](#turnstile-worker-api)
    - [Endpoints](#endpoints-5)
      - [Verify CAPTCHA](#verify-captcha)
@@ -497,34 +496,6 @@ GET /{keyName}
 - `200`: Success
 - `400`: Key name required
 - `404`: Key not found
-- `403`: Forbidden
-- `500`: Server error
-
-#### Verify Auth Password
-
-```http
-POST /verify-auth-password
-```
-
-**Description**: Verify authentication password
-
-**Request Body**:
-```json
-{
-  "password": "string"
-}
-```
-
-**Response**:
-```json
-{
-  "valid": boolean
-}
-```
-
-**Status Codes**:
-- `200`: Success
-- `400`: Invalid request
 - `403`: Forbidden
 - `500`: Server error
 
