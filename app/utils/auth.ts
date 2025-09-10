@@ -32,26 +32,3 @@ export async function getImageApiKey(): Promise<string> {
 export async function getAccountHash(): Promise<string> {
   return getApiKey('ACCOUNT_HASH');
 }
-
-export async function verifyAuthPassword(password: string): Promise<boolean> {
-  try {
-    const response = await fetch(`${KEYS_URL}/verify-auth-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': KEYS_AUTH
-      },
-      body: JSON.stringify({ password })
-    });
-    
-    if (!response.ok) {
-      return false;
-    }
-    
-    const result = await response.json() as { valid: boolean };
-    return result.valid;
-  } catch (error) {
-    console.error('Error verifying auth password:', error);
-    return false;
-  }
-}

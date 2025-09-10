@@ -37,11 +37,6 @@ if "%SL_API_KEY%"=="" (
     exit /b 1
 )
 
-if "%AUTH_PASSWORD%"=="" (
-    echo [91m❌ Error: AUTH_PASSWORD is not set in .env file[0m
-    exit /b 1
-)
-
 echo [92m✅ All Pages variables found[0m
 
 REM Get project name from wrangler.toml
@@ -79,20 +74,12 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [93m  Setting AUTH_PASSWORD...[0m
-echo %AUTH_PASSWORD% | wrangler pages secret put AUTH_PASSWORD --project-name %PROJECT_NAME%
-if errorlevel 1 (
-    echo [91m❌ Failed to set AUTH_PASSWORD for Pages project %PROJECT_NAME%[0m
-    exit /b 1
-)
-
 echo.
 echo [92m🎉 Pages secrets deployment completed![0m
 
 echo.
 echo [93m📝 Variables deployed to Pages project '%PROJECT_NAME%':[0m
 echo    ✅ SL_API_KEY
-echo    ✅ AUTH_PASSWORD
 
 echo.
 echo [94m💡 Additional Notes:[0m

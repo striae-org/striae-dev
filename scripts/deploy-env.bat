@@ -44,7 +44,6 @@ echo wrangler secret put USER_DB_AUTH --name [worker-name]
 echo wrangler secret put R2_KEY_SECRET --name [worker-name]
 echo wrangler secret put ACCOUNT_HASH --name [worker-name]
 echo wrangler secret put IMAGES_API_TOKEN --name [worker-name]
-echo wrangler secret put AUTH_PASSWORD --name [worker-name]
 echo cd ..\..
 echo.
 
@@ -79,7 +78,6 @@ echo.
 
 echo ⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:
 echo    - SL_API_KEY
-echo    - AUTH_PASSWORD
 echo.
 
 echo ⚠️  WORKER CONFIGURATION REMINDERS:

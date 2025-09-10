@@ -32,7 +32,6 @@ source .env
 # Pages-specific environment variables
 pages_vars=(
     "SL_API_KEY"
-    "AUTH_PASSWORD"
 )
 
 echo -e "${YELLOW}🔍 Validating Pages environment variables...${NC}"

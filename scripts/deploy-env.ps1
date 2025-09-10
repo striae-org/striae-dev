@@ -52,7 +52,6 @@ Get-Content ".env" | ForEach-Object {
 $requiredVars = @(
     "ACCOUNT_ID",
     "SL_API_KEY",
-    "AUTH_PASSWORD",
     "KEYS_AUTH",
     "USER_DB_AUTH",
     "R2_KEY_SECRET",
@@ -189,7 +188,7 @@ if ($workersConfigured -eq 0) {
 
 # Keys Worker
 if (-not (Set-WorkerSecrets -WorkerName "Keys Worker" -WorkerPath "workers/keys-worker" -Secrets @(
-    "KEYS_AUTH", "USER_DB_AUTH", "R2_KEY_SECRET", "ACCOUNT_HASH", "IMAGES_API_TOKEN", "AUTH_PASSWORD"
+    "KEYS_AUTH", "USER_DB_AUTH", "R2_KEY_SECRET", "ACCOUNT_HASH", "IMAGES_API_TOKEN"
 ))) {
     Write-Host "⚠️  Skipping Keys Worker (not configured)" -ForegroundColor Yellow
 }
@@ -235,7 +234,6 @@ if (-not $WhatIf) {
 Write-Host ""
 Write-Host "⚠️  IMPORTANT: Don't forget to set these variables in Cloudflare Pages Dashboard:" -ForegroundColor Yellow
 Write-Host "   - SL_API_KEY" -ForegroundColor White
-Write-Host "   - AUTH_PASSWORD" -ForegroundColor White
 
 Write-Host ""
 Write-Host "⚠️  WORKER CONFIGURATION REMINDERS:" -ForegroundColor Yellow
