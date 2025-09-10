@@ -8,9 +8,9 @@ export default function Footer() {
   
   useEffect(() => {
     if (typeof window !== 'undefined') {      
-      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
+      if (!document.querySelector('script[src="/scripts/becomePatronButton.bundle.js"]')) {
         const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.src = '/scripts/becomePatronButton.bundle.js';
         script.async = true;
         document.head.appendChild(script);
       }

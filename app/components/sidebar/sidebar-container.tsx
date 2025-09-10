@@ -58,13 +58,13 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   useEffect(() => {
     if (isFooterModalOpen && typeof window !== 'undefined') {      
       const loadPatreonScript = () => {        
-        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
+        const existingScript = document.querySelector('script[src="/scripts/becomePatronButton.bundle.js"]');
         if (existingScript) {
           existingScript.remove();
         }
 
         const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
+        script.src = '/scripts/becomePatronButton.bundle.js';
         script.async = true;
         
         script.onload = () => {          
