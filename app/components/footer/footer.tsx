@@ -10,15 +10,6 @@ export default function Footer() {
   useEffect(() => {
     // Log version to console for debugging
     logAppVersion();
-    
-    if (typeof window !== 'undefined') {      
-      if (!document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
-        script.async = true;
-        document.head.appendChild(script);
-      }
-    }
   }, []);
   
   return (    
@@ -49,8 +40,24 @@ export default function Footer() {
           <br />
             <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
         </p>
-        <div className={styles.patreonWidget}>
-          <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
+        <div className={styles.openCollectiveWidget}>
+          <a 
+            href="https://opencollective.com/striae" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: '#1f87ff',
+              borderRadius: '6px',
+              color: 'white',
+              padding: '8px 16px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              display: 'inline-block'
+            }}
+          >
+            Contribute to our Collective
+          </a>
         </div>
       </div>
     </footer>    
