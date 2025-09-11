@@ -2,7 +2,7 @@
 
 <img alt="Bronze Sponsor" src="https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen" /> &nbsp;&nbsp; <img alt="Silver Sponsor" src="https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen" /> &nbsp;&nbsp; <img alt="Gold Sponsor" src="https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen" />
 
-<img alt="Financial Contributors" src="https://opencollective.com/striae/tiers/badge.svg" /> &nbsp;&nbsp; <object type="image/svg+xml" data="https://opencollective.com/striae/tiers/gold-sponsor.svg?avatarHeight=36&width=600"></object>
+<img alt="Financial Contributors" src="https://opencollective.com/striae/tiers/badge.svg" />
 
 ## 🌐 Application URL
 
