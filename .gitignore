@@ -15,5 +15,4 @@ app/config
 firebase-debug.log
 *.toml
 *.jsonc
-admin-service.json
 /app/components/turnstile/keys.json

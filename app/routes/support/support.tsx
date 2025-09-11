@@ -129,8 +129,8 @@ export const Support = () => {
   const sending = state === 'submitting';    
 
   return (
-    <div className={styles.container}>
-      <Link to="/" className={styles.logoLink}>
+    <div id="top" className={styles.container}>
+      <Link to="/#top" className={styles.logoLink}>
         <div className={styles.logo} />
       </Link>      
       <div className={styles.formWrapper}>
