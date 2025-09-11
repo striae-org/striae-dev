@@ -58,31 +58,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   
   useEffect(() => {
     if (isFooterModalOpen && typeof window !== 'undefined') {      
-      const loadPatreonScript = () => {        
-        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
-        if (existingScript) {
-          existingScript.remove();
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
-        script.async = true;
-        
-        script.onload = () => {          
-          const win = window as typeof window & { patreon?: { initializeWidgets?: () => void } };
-          if (win.patreon && win.patreon.initializeWidgets) {
-            win.patreon.initializeWidgets();
-          }
-        };
-        
-        document.head.appendChild(script);
-      };
-      
-      const timer = setTimeout(loadPatreonScript, 100);
-      
-      return () => {
-        clearTimeout(timer);
-      };
+      // No longer need to load external script since we're using direct links
     }
   }, [isFooterModalOpen]);
 
@@ -129,8 +105,24 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 Designed and developed by <Link to="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</Link>
                 </div>
               </div>
-              <div className={styles.patreonWidget}>
-                <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
+              <div className={styles.openCollectiveWidget}>
+                <a 
+                  href="https://opencollective.com/striae" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: '#1f87ff',
+                    borderRadius: '6px',
+                    color: 'white',
+                    padding: '8px 16px',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'inline-block'
+                  }}
+                >
+                  Contribute to our Collective
+                </a>
               </div>              
             </div>
           </div>

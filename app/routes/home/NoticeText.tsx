@@ -4,34 +4,7 @@ import styles from '~/components/notice/notice.module.css';
 
 const NoticeText = () => {
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const loadPatreonScript = () => {        
-        const existingScript = document.querySelector('script[src="https://c6.patreon.com/becomePatronButton.bundle.js"]');
-        if (existingScript) {
-          existingScript.remove();
-        }
-
-        const script = document.createElement('script');
-        script.src = 'https://c6.patreon.com/becomePatronButton.bundle.js';
-        script.async = true;
-        
-        script.onload = () => {          
-          const win = window as typeof window & { patreon?: { initializeWidgets?: () => void } };
-          if (win.patreon && win.patreon.initializeWidgets) {
-            win.patreon.initializeWidgets();
-          }
-        };
-        
-        document.head.appendChild(script);
-      };
-
-      // Delay script loading to ensure DOM is ready
-      const timer = setTimeout(loadPatreonScript, 100);
-      
-      return () => {
-        clearTimeout(timer);
-      };
-    }
+    // No longer need to load external script since we're using direct links
   }, []);
   return (
     <div>
@@ -91,8 +64,24 @@ const NoticeText = () => {
       <p>
         By supporting Striae, you help cover essential cloud hosting, ongoing development, and improved user support—ensuring continued free access for the forensic community. Your support allows us to maintain this valuable resource while fostering community involvement and accountability for security and privacy.
       </p>
-      <div className={styles.patreonWidget}>
-        <a href="https://www.patreon.com/bePatron?u=185198297" data-patreon-widget-type="become-patron-button">Become a member!</a>
+      <div className={styles.openCollectiveWidget}>
+        <a 
+          href="https://opencollective.com/striae" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            backgroundColor: '#1f87ff',
+            borderRadius: '6px',
+            color: 'white',
+            padding: '8px 16px',
+            textDecoration: 'none',
+            fontSize: '14px',
+            fontWeight: '500',
+            display: 'inline-block'
+          }}
+        >
+          Contribute to our Collective
+        </a>
       </div>
       <p>
         We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination. Users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.

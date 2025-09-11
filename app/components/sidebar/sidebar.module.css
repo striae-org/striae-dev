@@ -210,7 +210,7 @@
   font-size: 0.7rem;  
 }
 
-.patreonWidget {
+.openCollectiveWidget {
   margin-top: var(--spaceXS);
   text-align: center;
   display: flex;
