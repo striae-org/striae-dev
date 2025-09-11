@@ -136,7 +136,7 @@ The v0.9.10-beta release focuses heavily on **documentation improvements**, **au
 - Continued UI/UX refinements
 - Enhanced annotation features
 - Performance optimizations
-- Extended documentation and guides
+- Admin dashboard implementation
 
 For support, installation guidance, or community discussion, visit:
 
