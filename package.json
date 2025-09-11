@@ -16,6 +16,7 @@
     "typegen": "wrangler types",
     "preview": "npm run build && wrangler pages dev",
     "cf-typegen": "wrangler types",
+    "update-versions": "node ./scripts/update-markdown-versions.cjs",
     "deploy-workers": "npm run deploy-workers:data && npm run deploy-workers:image && npm run deploy-workers:keys && npm run deploy-workers:pdf && npm run deploy-workers:turnstile && npm run deploy-workers:user",
     "deploy-workers:secrets": "bash ./scripts/deploy-env.sh",
     "deploy-pages": "bash ./scripts/deploy-pages.sh",
@@ -56,7 +57,7 @@
     "typescript": "^5.9.2",
     "vite": "^6.0.0",
     "vite-tsconfig-paths": "^4.2.1",
-    "wrangler": "^4.35.0"
+    "wrangler": "^3.28.2"
   },
   "engines": {
     "node": ">=20.0.0"
