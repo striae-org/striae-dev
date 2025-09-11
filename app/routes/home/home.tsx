@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <>
-      <div className={styles.container}>
+      <div id="top" className={styles.container}>
         <div className={styles.content}>
           <div className={styles.logo} />
           <div className={styles.title}>

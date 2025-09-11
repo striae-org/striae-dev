@@ -28,19 +28,19 @@ export default function Footer() {
           <Link to="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
             User&apos;s Guide
           </Link>
-          <Link to="/privacy" className={styles.link}>
+          <Link to="/privacy#top" className={styles.link}>
             Privacy Policy
           </Link>
-          <Link to="/terms" className={styles.link}>
+          <Link to="/terms#top" className={styles.link}>
             Terms & Conditions
           </Link>          
-          <Link to="/security" className={styles.link}>
+          <Link to="/security#top" className={styles.link}>
             Security Policy
           </Link>
-          <Link to="/support" className={styles.link}>
+          <Link to="/support#top" className={styles.link}>
             Need Help?
           </Link>
-          <Link to="/bugs" className={styles.link}>
+          <Link to="/bugs#top" className={styles.link}>
             Submit a Bug Report
           </Link>
         </nav>

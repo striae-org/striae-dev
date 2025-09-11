@@ -312,7 +312,7 @@ export const Login = () => {
         <PasswordReset onBack={() => setIsResetting(false)}/>
       ) : (
         <div className={styles.container}>
-          <Link to="/" className={styles.logoLink}>
+          <Link to="/#top" className={styles.logoLink}>
             <div className={styles.logo} />
           </Link>
           <div className={styles.formWrapper}>
