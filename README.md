@@ -1,7 +1,7 @@
 # 🔫 Striae - A Firearms Examiner's Comparison Companion
 
 
-<a href="https://opencollective.com/striae/tiers/backers"><img alt="Bronze Sponsor" src="https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae/tiers/sponsors"><img alt="Silver Sponsor" src="https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae/tiers/gold-sponsor"><img alt="Gold Sponsor" src="https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Financial Contributors" src="https://opencollective.com/striae/tiers/badge.svg" /></a>
+<a href="https://opencollective.com/striae"><img alt="Bronze Sponsor" src="https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Silver Sponsor" src="https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Gold Sponsor" src="https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Financial Contributors" src="https://opencollective.com/striae/tiers/badge.svg" /></a>
 
 <a href="https://opencollective.com/striae"><img src="https://opencollective.com/striae/contribute/button@2x.png?color=blue" width=300 /></a>
 
