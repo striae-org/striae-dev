@@ -59,7 +59,7 @@ const NoticeText = () => {
         <strong>Open Source Commitment & Supporting Striae</strong>
       </p>
       <p>
-        Striae is an open-source and free service dedicated to providing streamlined comparison annotation services for forensic firearms and tool mark examiners worldwide. The entire codebase is available on <Link to="https://github.com/striae-org/striae" target="_blank" rel="noopener noreferrer">GitHub</Link>, supporting transparency, collaboration, and continuous improvement from the firearms examiner community.
+        Striae is an open-source and free service dedicated to providing streamlined comparison annotation services for forensic firearms and tool mark examiners worldwide. The entire codebase is available on <a href="https://github.com/striae-org/striae" target="_blank" rel="noopener noreferrer">GitHub</a>, supporting transparency, collaboration, and continuous improvement from the firearms examiner community.
       </p>
       <p>
         By supporting Striae, you help cover essential cloud hosting, ongoing development, and improved user support—ensuring continued free access for the forensic community. Your support allows us to maintain this valuable resource while fostering community involvement and accountability for security and privacy.
