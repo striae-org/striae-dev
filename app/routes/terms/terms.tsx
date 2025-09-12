@@ -18,7 +18,7 @@ export const Terms = () => {
 </Link>
       <div className={styles.content}>
         <h1>Terms and Conditions</h1>
-        <p className={styles.lastUpdated}>Last updated: September 11, 2025</p>
+        <p className={styles.lastUpdated}>Last updated: September 12, 2025</p>
         <p>Please read these terms and conditions carefully before using Our Service.</p>        
         <section className={styles.section}>
           <h2>Interpretation and Definitions</h2>
