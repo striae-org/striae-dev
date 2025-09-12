@@ -18,8 +18,7 @@ export const Privacy = () => {
 </Link>
       <div className={styles.content}>
         <h1>Privacy Policy</h1>
-        <p className={styles.lastUpdated}>Last updated: August 24, 2025</p>
-        <p><a href="/striae-pp-plain.pdf" download="Striae-Privacy-Policy-Summary.pdf">Download Summary PDF</a></p>
+        <p className={styles.lastUpdated}>Last updated: September 11, 2025</p>        
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
 <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
         
@@ -47,7 +46,7 @@ export const Privacy = () => {
 <p><strong>CCPA</strong> and/or <strong>CPRA</strong> refers to the California Consumer Privacy Act (the &quot;CCPA&quot;) as amended by the California Privacy Rights Act of 2020 (the &quot;CPRA&quot;).</p>
 </li>
 <li>
-<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Striae, <Link to="https://www.striae.org">https://www.striae.org</Link>.</p>
+<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Striae, owned and operated by The Stephenson Jack Lu Living Trust, <Link to="https://www.striae.org">https://www.striae.org</Link>.</p>
 </li>
 <li>
 <p><strong>Consumer</strong>, for the purpose of the CCPA/CPRA, means a natural person who is a California resident. A resident, as defined in the law, includes (1) every individual who is in the USA for other than a temporary or transitory purpose, and (2) every individual who is domiciled in the USA who is outside the USA for a temporary or transitory purpose.</p>
@@ -173,12 +172,12 @@ export const Privacy = () => {
           <h2>Detailed Information on the Processing of Your Personal Data</h2>
           <p>The Service Providers We use may have access to Your Personal Data. These third-party vendors collect, store, use, process and transfer information about Your activity on Our Service in accordance with their Privacy Policies.</p>
 
-          <h3>Analytics</h3>
-          <p>We may use minimal third-party services for diagnostics and security monitoring only (e.g., Firebase Analytics/Authentication). These are not used for targeted advertising, personalization, or sale of information.</p>
+          <h3>Authentication</h3>
+          <p>We may use minimal third-party services for authentication, diagnostics, and security monitoring only (e.g., Firebase Authentication). These are not used for targeted advertising, personalization, or sale of information.</p>
 <ul>
 <li>
-<p><strong>Firebase</strong></p>
-<p>Firebase is an analytics service provided by Google Inc.</p>
+<p><strong>Firebase Authentication</strong></p>
+<p>Firebase Authentication is an authentication service provided by Google Inc.</p>
 <p>You may opt-out of certain Firebase features through Your mobile device settings, such as Your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <Link to="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">https://policies.google.com/privacy</Link></p>
 <p>We also encourage You to review the Google's policy for safeguarding Your data: <Link to="https://support.google.com/analytics/answer/6004245" rel="noopener noreferrer" target="_blank">https://support.google.com/analytics/answer/6004245</Link></p>
 <p>For more information on what type of information Firebase collects, please visit the How Google uses data when You use Our partners' sites or apps webpage: <Link to="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">https://policies.google.com/technologies/partner-sites</Link></p>
@@ -190,6 +189,23 @@ export const Privacy = () => {
 <li>
 <p><strong>SendLayer</strong></p>
 <p>Their Privacy Policy can be viewed at <Link to="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</Link></p>
+</li>
+</ul>
+<h3>Payments/Contributions</h3>
+<p>Users and contributors may choose to support the development of the Service through paid contributions. In that case, we may use third-party services for payment processing (e.g. payment processors).</p>
+<p>We will not store or collect Your payment card details. That information is provided directly to Our third-party payment processors whose use of Your personal information is governed by their Privacy Policy. These payment processors adhere to the standards set by PCI-DSS as managed by the PCI Security Standards Council, which is a joint effort of brands like Visa, Mastercard, American Express and Discover. PCI-DSS requirements help ensure the secure handling of payment information.</p>
+<ul>
+<li>
+<p><strong>Open Collective</strong></p>
+<p>Their Privacy Policy can be viewed at <a href="https://opencollective.com/privacypolicy" rel="external nofollow noopener" target="_blank">https://opencollective.com/privacypolicy</a></p>
+</li>
+</ul>
+<h3>Usage, Performance and Miscellaneous</h3>
+<p>We may use third-party Service Providers to provide, maintain, and improve our Service.</p>
+<ul>
+<li>
+<p><strong>Cloudflare</strong></p>
+<p>Their Privacy Policy can be viewed at <a href="https://www.cloudflare.com/privacypolicy/" rel="external nofollow noopener" target="_blank">https://www.cloudflare.com/privacypolicy/</a></p>
 </li>
 </ul>                
 <h3>Sensitive Data</h3>
@@ -457,6 +473,9 @@ export const Privacy = () => {
 <ul>
 <li>
 <p>By email: info@striae.org</p>
+</li>
+<li>
+<p>Legal Entity: The Stephenson Jack Lu Living Trust</p>
 </li>
 </ul>
         </section>
