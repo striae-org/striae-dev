@@ -93,11 +93,11 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
             <div className={styles.footerModalContent}>
               <div className={styles.footerModalLinks}>
                 <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User&apos;s Guide</a>
-                <a href="/support" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Need Help?</a>
-                <a href="/bugs" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Report a Bug</a>
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Privacy Policy</a>
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Terms of Service</a>
-                <a href="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</a>
+                <Link to="/support" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Need Help?</Link>
+                <Link to="/bugs" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Report a Bug</Link>
+                <Link to="/privacy" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Privacy Policy</Link>
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Terms of Service</Link>
+                <Link to="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</Link>
               </div>
               <div className={styles.footerModalCopyright}>
                 Striae {appVersion} © {year}. All rights reserved.              
