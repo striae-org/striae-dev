@@ -18,7 +18,7 @@ export const Privacy = () => {
 </Link>
       <div className={styles.content}>
         <h1>Privacy Policy</h1>
-        <p className={styles.lastUpdated}>Last updated: September 11, 2025</p>        
+        <p className={styles.lastUpdated}>Last updated: September 12, 2025</p>        
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
 <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
         
@@ -178,17 +178,25 @@ export const Privacy = () => {
 <li>
 <p><strong>Firebase Authentication</strong></p>
 <p>Firebase Authentication is an authentication service provided by Google Inc.</p>
-<p>You may opt-out of certain Firebase features through Your mobile device settings, such as Your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">https://policies.google.com/privacy</a></p>
-<p>We also encourage You to review the Google's policy for safeguarding Your data: <a href="https://support.google.com/analytics/answer/6004245" rel="noopener noreferrer" target="_blank">https://support.google.com/analytics/answer/6004245</a></p>
-<p>For more information on what type of information Firebase collects, please visit the How Google uses data when You use Our partners' sites or apps webpage: <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">https://policies.google.com/technologies/partner-sites</a></p>
+<p>You may opt-out of certain Firebase features through Your mobile device settings, such as Your device advertising settings or by following the instructions provided by Google in their Privacy Policy:
+  <br />
+  <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">https://policies.google.com/privacy</a></p>
+<p>We also encourage You to review the Google's policy for safeguarding Your data:
+  <br />
+  <a href="https://support.google.com/analytics/answer/6004245" rel="noopener noreferrer" target="_blank">https://support.google.com/analytics/answer/6004245</a></p>
+<p>For more information on what type of information Firebase collects, please visit the How Google uses data when You use Our partners' sites or apps webpage:
+  <br />
+  <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">https://policies.google.com/technologies/partner-sites</a></p>
 </li>
 </ul>
-<h3>Email Marketing</h3>
-<p>We may use Email Marketing Service Providers to manage and send emails to You about the Service, Your Account, or other important updates and notices.</p>
+<h3>Email Service</h3>
+<p>We may use Email Service Providers to manage and send emails to You about the Service, Your Account, or other important updates and notices.</p>
 <ul>
 <li>
 <p><strong>SendLayer</strong></p>
-<p>Their Privacy Policy can be viewed at <a href="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</a></p>
+<p>Their Privacy Policy can be viewed at:
+  <br />
+  <a href="https://sendlayer.com/privacy-policy/" rel="noopener noreferrer" target="_blank">https://sendlayer.com/privacy-policy/</a></p>
 </li>
 </ul>
 <h3>Payments/Contributions</h3>
@@ -197,7 +205,9 @@ export const Privacy = () => {
 <ul>
 <li>
 <p><strong>Open Collective</strong></p>
-<p>Their Privacy Policy can be viewed at <a href="https://opencollective.com/privacypolicy" rel="external nofollow noopener" target="_blank">https://opencollective.com/privacypolicy</a></p>
+<p>Their Privacy Policy can be viewed at:
+  <br />
+  <a href="https://opencollective.com/privacypolicy" rel="external nofollow noopener" target="_blank">https://opencollective.com/privacypolicy</a></p>
 </li>
 </ul>
 <h3>Usage, Performance and Miscellaneous</h3>
@@ -205,7 +215,15 @@ export const Privacy = () => {
 <ul>
 <li>
 <p><strong>Cloudflare</strong></p>
-<p>Their Privacy Policy can be viewed at <a href="https://www.cloudflare.com/privacypolicy/" rel="external nofollow noopener" target="_blank">https://www.cloudflare.com/privacypolicy/</a></p>
+<p>Their Privacy Policy can be viewed at:
+  <br />
+  <a href="https://www.cloudflare.com/privacypolicy/" rel="external nofollow noopener" target="_blank">https://www.cloudflare.com/privacypolicy/</a></p>
+</li>
+<li>
+<p><strong>Infinity</strong></p>
+<p>Their Privacy Policy can be viewed at:
+  <br />
+  <a href="https://startinfinity.com/privacy-policy" rel="external nofollow noopener" target="_blank">https://startinfinity.com/privacy-policy</a></p>
 </li>
 </ul>                
 <h3>Sensitive Data</h3>
@@ -428,9 +446,15 @@ export const Privacy = () => {
 <p>If applicable, click &quot;Privacy Preferences&quot;, &quot;Update Privacy Preferences&quot; or &quot;Do Not Sell My Personal Information&quot; buttons listed on the Service to review Your privacy preferences and opt out of cookies and other technologies that We may use. Please note that You will need to opt out from each browser that You use to access the Service.</p>
 <p>Additionally, You can opt out of receiving ads that are personalized as served by Our Service Providers by following Our instructions presented on the Service:</p>
 <ul>
-<li>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/" rel="noopener noreferrer" target="_blank">http://www.networkadvertising.org/choices/</a></li>
-<li>The EDAA's opt-out platform <a href="http://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">http://www.youronlinechoices.com/</a></li>
-<li>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" rel="noopener noreferrer" target="_blank">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
+<li>The NAI's opt-out platform: 
+  <br />
+  <br /><a href="http://www.networkadvertising.org/choices/" rel="noopener noreferrer" target="_blank">http://www.networkadvertising.org/choices/</a></li>
+<li>The EDAA's opt-out platform:
+  <br />
+  <a href="http://www.youronlinechoices.com/" rel="noopener noreferrer" target="_blank">http://www.youronlinechoices.com/</a></li>
+<li>The DAA's opt-out platform: 
+  <br />
+  <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" rel="noopener noreferrer" target="_blank">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
 </ul>
 <p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If You change browsers or delete the cookies saved by Your browser, You will need to opt out again.</p>
 <h4>Mobile Devices</h4>
