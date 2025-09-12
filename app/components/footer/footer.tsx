@@ -16,9 +16,9 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.container}>
         <nav className={styles.nav}>
-          <Link to="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
+          <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
             User&apos;s Guide
-          </Link>
+          </a>
           <Link to="/privacy#top" className={styles.link}>
             Privacy Policy
           </Link>
@@ -36,9 +36,9 @@ export default function Footer() {
           </Link>
         </nav>
         <p className={styles.copyright}>
-          <Link to="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {appVersion}</Link> © {year}. All rights reserved.
+          <a href="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {appVersion}</a> © {year}. All rights reserved.
           <br />
-            <Link to="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</Link>        
+            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
         </p>
         <div className={styles.openCollectiveWidget}>
           <a 
