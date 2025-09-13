@@ -58,10 +58,13 @@ export default function Home() {
           <div className={styles.buttonGroup}>            
             <Link to="/auth" className={styles.signInButton}>
               Sign In
-            </Link>
+            </Link>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>
+            <Link to="/demo" className={styles.actionButton}>
+              Access Demo
+            </Link>
           </div>
           <div className={styles.subtitle}>
             <p>Beta Period Ends January 1, 2026 @ 11:00 AM MST</p>
