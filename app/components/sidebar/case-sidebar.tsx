@@ -119,10 +119,12 @@ export const CaseSidebar = ({
   };
 
   // Function to check file upload permissions (extracted for reuse)
-  const checkFileUploadPermissions = async () => {
+  const checkFileUploadPermissions = async (fileCount?: number) => {
     if (currentCase) {
       try {
-        const permission = await canUploadFile(user, currentCase, files.length);
+        // Use provided fileCount or fall back to current files.length
+        const currentFileCount = fileCount !== undefined ? fileCount : files.length;
+        const permission = await canUploadFile(user, currentCase, currentFileCount);
         setCanUploadNewFile(permission.canUpload);
         setUploadFileError(permission.reason || '');
       } catch (error) {
@@ -233,12 +235,13 @@ export const CaseSidebar = ({
     const uploadedFile = await uploadFile(user, currentCase, file, (progress) => {
       setUploadProgress(progress);
     });
-    setFiles(prev => [...prev, uploadedFile]);
+    const updatedFiles = [...files, uploadedFile];
+    setFiles(updatedFiles);
     if (fileInputRef.current) fileInputRef.current.value = '';
     
     // Refresh file upload permissions after successful upload
-    // This updates the UI for users with limited permissions
-    await checkFileUploadPermissions();
+    // Pass the new file count directly to avoid state update timing issues
+    await checkFileUploadPermissions(updatedFiles.length);
   } catch (err) {
     setFileError(err instanceof Error ? err.message : 'Upload failed');
     setTimeout(() => setFileError(''), 3000);
@@ -254,13 +257,14 @@ export const CaseSidebar = ({
     setFileError('');
     try {
       await deleteFile(user, currentCase, fileId);
-      setFiles(prev => prev.filter(f => f.id !== fileId));      
+      const updatedFiles = files.filter(f => f.id !== fileId);
+      setFiles(updatedFiles);      
       onImageSelect({ id: 'clear', originalFilename: '/clear.jpg', uploadedAt: '' });
       setImageLoaded(false);
       
       // Refresh file upload permissions after successful file deletion
-      // This allows users with limited permissions to upload new files
-      await checkFileUploadPermissions();
+      // Pass the new file count directly to avoid state update timing issues
+      await checkFileUploadPermissions(updatedFiles.length);
     } catch (err) {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
