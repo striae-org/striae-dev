@@ -150,6 +150,33 @@ export default function Home() {
                     >
                       <Icon icon="linkedin" size={24} />
                     </a>
+                    <a 
+                      href="https://github.com/StephenJLu" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialLink}
+                      aria-label="GitHub Profile"
+                    >
+                      <Icon icon="github" size={24} />
+                    </a>
+                    <a 
+                      href="https://bsky.app/profile/stephenjlu.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialLink}
+                      aria-label="Bluesky Profile"
+                    >
+                      <Icon icon="bluesky" size={24} />
+                    </a>
+                    <a 
+                      href="https://stephenjlu.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.socialLink}
+                      aria-label="Website"
+                    >
+                      <Icon icon="globe" size={24} />
+                    </a>
                   </div>
                 </div>
               </div>
