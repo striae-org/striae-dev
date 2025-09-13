@@ -165,6 +165,7 @@ export const CaseSidebar = ({
   const handleCase = async () => {
     setIsLoading(true);
     setError('');
+    setCreateCaseError(''); // Clear permission errors when starting new operation
     
     if (!validateCaseNumber(caseNumber)) {
       setError('Invalid case number format');
@@ -190,6 +191,7 @@ export const CaseSidebar = ({
       // Creating new case - check permissions
       if (!canCreateNewCase) {
         setError(createCaseError || 'You cannot create more cases.');
+        setCreateCaseError(''); // Clear duplicate error
         setIsLoading(false);
         return;
       }
@@ -373,9 +375,6 @@ return (
           </button>
     </div>
     {error && <p className={styles.error}>{error}</p>}
-    {!canCreateNewCase && createCaseError && (
-      <p className={styles.error}>{createCaseError}</p>
-    )}
     {successAction && (
       <p className={styles.success}>
         Case {currentCase} {successAction} successfully!
