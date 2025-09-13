@@ -93,6 +93,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
             <div className={styles.footerModalContent}>
               <div className={styles.footerModalLinks}>
                 <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User&apos;s Guide</a>
+                <a href="https://blog.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Blog</a>
                 <Link to="/support" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Need Help?</Link>
                 <Link to="/bugs" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Report a Bug</Link>
                 <Link to="/privacy" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Privacy Policy</Link>

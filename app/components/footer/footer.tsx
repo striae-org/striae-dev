@@ -14,6 +14,9 @@ export default function Footer() {
           <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
             User&apos;s Guide
           </a>
+          <a href="https://blog.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
+            Blog
+          </a>
           <Link to="/privacy#top" className={styles.link}>
             Privacy Policy
           </Link>
