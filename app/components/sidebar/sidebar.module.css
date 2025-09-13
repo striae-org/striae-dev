@@ -227,6 +227,21 @@
   align-items: center;
 }
 
+.openCollectiveLink {
+  display: inline-block;
+  transition: opacity var(--durationS, 0.2s) var(--bezierFastoutSlowin, ease-out);
+}
+
+.openCollectiveLink:hover {
+  opacity: 0.8;
+}
+
+.openCollectiveImage {
+  height: 30px;
+  width: auto;
+  border-radius: 4px;
+}
+
 .oinBadge {
   text-align: center;
 }

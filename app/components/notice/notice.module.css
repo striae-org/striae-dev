@@ -130,6 +130,21 @@
   margin: var(--spaceL) 0;
 }
 
+.openCollectiveLink {
+  display: inline-block;
+  transition: opacity var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.openCollectiveLink:hover {
+  opacity: 0.8;
+}
+
+.openCollectiveImage {
+  height: 30px;
+  width: auto;
+  border-radius: 4px;
+}
+
 .oinBadgeContainer {
   display: flex;
   justify-content: center;

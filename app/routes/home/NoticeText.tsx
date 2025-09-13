@@ -104,18 +104,13 @@ const NoticeText = () => {
           href="https://opencollective.com/striae" 
           target="_blank" 
           rel="noopener noreferrer"
-          style={{
-            backgroundColor: '#1f87ff',
-            borderRadius: '6px',
-            color: 'white',
-            padding: '8px 16px',
-            textDecoration: 'none',
-            fontSize: '14px',
-            fontWeight: '500',
-            display: 'inline-block'
-          }}
+          className={styles.openCollectiveLink}
         >
-          Contribute to our Collective
+          <img 
+            src="/open-collective.svg" 
+            alt="Contribute to our Open Collective" 
+            className={styles.openCollectiveImage}
+          />
         </a>
       </div>
       <p>

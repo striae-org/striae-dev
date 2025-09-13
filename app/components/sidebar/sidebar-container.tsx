@@ -99,30 +99,19 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 <Link to="/terms" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Terms of Service</Link>
                 <Link to="/security" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>Security Policy</Link>
               </div>
-              <div className={styles.footerModalCopyright}>
-                Striae {appVersion} © {year}. All rights reserved.              
-                <div className={styles.footerModalCopyrightLink}>
-                Designed and developed by <a href="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>
-                </div>
-              </div>
               <div className={styles.badgeContainer}>
                 <div className={styles.openCollectiveWidget}>
                   <a 
                     href="https://opencollective.com/striae" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    style={{
-                      backgroundColor: '#1f87ff',
-                      borderRadius: '6px',
-                      color: 'white',
-                      padding: '8px 16px',
-                      textDecoration: 'none',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      display: 'inline-block'
-                    }}
+                    className={styles.openCollectiveLink}
                   >
-                    Contribute to our Collective
+                    <img 
+                      src="/open-collective.svg" 
+                      alt="Contribute to our Open Collective" 
+                      className={styles.openCollectiveImage}
+                    />
                   </a>
                 </div>
                 <div className={styles.oinBadge}>
@@ -138,6 +127,12 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                       className={styles.oinBadgeImage}
                     />
                   </a>
+                </div>
+              </div>
+              <div className={styles.footerModalCopyright}>
+                Striae {appVersion} © {year}. All rights reserved.              
+                <div className={styles.footerModalCopyrightLink}>
+                Designed and developed by <a href="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>
                 </div>
               </div>              
             </div>

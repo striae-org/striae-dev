@@ -35,29 +35,19 @@ export default function Footer() {
             Submit a Bug Report
           </Link>
         </nav>
-        <p className={styles.copyright}>
-          <a href="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {appVersion}</a> © {year}. All rights reserved.
-          <br />
-            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
-        </p>
         <div className={styles.badgeContainer}>
           <div className={styles.openCollectiveWidget}>
             <a 
               href="https://opencollective.com/striae" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{
-                backgroundColor: '#1f87ff',
-                borderRadius: '6px',
-                color: 'white',
-                padding: '8px 16px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '500',
-                display: 'inline-block'
-              }}
+              className={styles.openCollectiveLink}
             >
-              Contribute to our Collective
+              <img 
+                src="/open-collective.svg" 
+                alt="Contribute to our Open Collective" 
+                className={styles.openCollectiveImage}
+              />
             </a>
           </div>
           <div className={styles.oinBadge}>
@@ -75,6 +65,11 @@ export default function Footer() {
             </a>
           </div>
         </div>
+        <p className={styles.copyright}>
+          <a href="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.link} target="_blank" rel="noopener noreferrer">Striae {appVersion}</a> © {year}. All rights reserved.
+          <br />
+            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
+        </p>
       </div>
     </footer>    
   );
