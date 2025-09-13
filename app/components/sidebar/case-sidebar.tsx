@@ -176,6 +176,7 @@ export const CaseSidebar = ({
       const existingCase = await checkExistingCase(user, caseNumber);
       
       if (existingCase) {
+        // Loading existing case - always allowed
         setCurrentCase(caseNumber);
         onCaseChange(caseNumber);
         const files = await fetchFiles(user, caseNumber);
@@ -183,6 +184,13 @@ export const CaseSidebar = ({
         setCaseNumber('');
         setSuccessAction('loaded');
         setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+        return;
+      }
+
+      // Creating new case - check permissions
+      if (!canCreateNewCase) {
+        setError(createCaseError || 'You cannot create more cases.');
+        setIsLoading(false);
         return;
       }
 
@@ -198,7 +206,7 @@ export const CaseSidebar = ({
       // This updates the UI for users with limited permissions
       await checkUserPermissions();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create case');
+      setError(err instanceof Error ? err.message : 'Failed to load/create case');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -350,7 +358,7 @@ return (
           <div className={`${styles.caseLoad} mb-4`}>
           <button
         onClick={handleCase}
-        disabled={isLoading || !caseNumber || (!canCreateNewCase && permissionChecking === false)}
+        disabled={isLoading || !caseNumber}
         title={!canCreateNewCase ? createCaseError : undefined}
       >
             {isLoading ? 'Loading...' : 'Load/Create Case'}
