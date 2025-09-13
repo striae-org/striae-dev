@@ -61,7 +61,7 @@ const createUserData = (
   firstName,
   lastName,
   company,
-  permitted: false,
+  permitted: true,
   cases: [],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
