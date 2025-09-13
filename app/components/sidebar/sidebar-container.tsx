@@ -130,7 +130,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 </div>
               </div>
               <div className={styles.footerModalCopyright}>
-                Striae {appVersion} © {year}. All rights reserved.              
+                <a href="https://github.com/striae-org/striae/blob/master/LICENSE" className={styles.footerModalCopyrightLinklink} target="_blank" rel="noopener noreferrer">Striae {appVersion}</a> © {year}. All rights reserved.              
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <a href="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>
                 </div>
