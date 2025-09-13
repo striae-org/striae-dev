@@ -1,16 +1,11 @@
 import { Link } from '@remix-run/react';
 import { useEffect } from 'react';
 import styles from './footer.module.css';
-import { getAppVersion, logAppVersion } from '../../utils/version';
+import { getAppVersion } from '../../utils/version';
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const appVersion = getAppVersion();
-  
-  useEffect(() => {
-    // Log version to console for debugging
-    logAppVersion();
-  }, []);
   
   return (    
     <footer className={styles.footer}>
