@@ -17,7 +17,8 @@ import {
 import { 
   canCreateCase, 
   canUploadFile, 
-  getLimitsDescription
+  getLimitsDescription,
+  getUserData
 } from '~/utils/permissions';
 
 interface CaseSidebarProps {
@@ -108,8 +109,14 @@ export const CaseSidebar = ({
       setCanCreateNewCase(casePermission.canCreate);
       setCreateCaseError(casePermission.reason || '');
 
-      const description = await getLimitsDescription(user);
-      setLimitsDescription(description);
+      // Only show limits description for restricted accounts
+      const userData = await getUserData(user);
+      if (userData && !userData.permitted) {
+        const description = await getLimitsDescription(user);
+        setLimitsDescription(description);
+      } else {
+        setLimitsDescription(''); // Clear the description for permitted users
+      }
     } catch (error) {
       console.error('Error checking user permissions:', error);
       setCreateCaseError('Unable to verify account permissions');
@@ -360,10 +367,10 @@ return (
           <div className={`${styles.caseLoad} mb-4`}>
           <button
         onClick={handleCase}
-        disabled={isLoading || !caseNumber}
+        disabled={isLoading || !caseNumber || permissionChecking}
         title={!canCreateNewCase ? createCaseError : undefined}
       >
-            {isLoading ? 'Loading...' : 'Load/Create Case'}
+            {isLoading ? 'Loading...' : permissionChecking ? 'Checking permissions...' : 'Load/Create Case'}
       </button>      
       </div>
       <div className={styles.caseInput}>            
