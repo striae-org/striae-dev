@@ -3,6 +3,8 @@ import paths from '~/config/config.json';
 import { getUserApiKey } from './auth';
 
 const USER_WORKER_URL = paths.user_worker_url;
+const MAX_CASES_FREE = paths.max_cases_free;
+const MAX_FILES_PER_CASE_FREE = paths.max_files_per_case_free;
 
 export interface UserData {
   uid: string;
@@ -68,8 +70,8 @@ export const getUserLimits = (userData: UserData): UserLimits => {
     };
   } else {
     return {
-      maxCases: 1, // Limited users can only create 1 case
-      maxFilesPerCase: 2 // Limited users can only upload 2 files per case
+      maxCases: MAX_CASES_FREE, // Use config value for free users
+      maxFilesPerCase: MAX_FILES_PER_CASE_FREE // Use config value for free users
     };
   }
 };
@@ -160,7 +162,7 @@ export const getLimitsDescription = async (user: User): Promise<string> => {
   try {
     const userData = await getUserData(user);
     if (!userData) {
-      return 'Account limits: 1 case, 2 files per case';
+      return `Account limits: ${MAX_CASES_FREE} case, ${MAX_FILES_PER_CASE_FREE} files per case`;
     }
 
     const limits = getUserLimits(userData);
