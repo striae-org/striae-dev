@@ -97,46 +97,48 @@ export const CaseSidebar = ({
 
   // Check user permissions on mount and when user changes
   useEffect(() => {
-    const checkUserPermissions = async () => {
-      setPermissionChecking(true);
-      try {
-        const casePermission = await canCreateCase(user);
-        setCanCreateNewCase(casePermission.canCreate);
-        setCreateCaseError(casePermission.reason || '');
-
-        const description = await getLimitsDescription(user);
-        setLimitsDescription(description);
-      } catch (error) {
-        console.error('Error checking user permissions:', error);
-        setCreateCaseError('Unable to verify account permissions');
-      } finally {
-        setPermissionChecking(false);
-      }
-    };
-
     checkUserPermissions();
   }, [user]);
 
-  // Check file upload permissions when currentCase or files change
-  useEffect(() => {
-    if (currentCase) {
-      const checkFileUploadPermission = async () => {
-        try {
-          const permission = await canUploadFile(user, currentCase, files.length);
-          setCanUploadNewFile(permission.canUpload);
-          setUploadFileError(permission.reason || '');
-        } catch (error) {
-          console.error('Error checking file upload permission:', error);
-          setCanUploadNewFile(false);
-          setUploadFileError('Unable to verify upload permissions');
-        }
-      };
+  // Function to check user permissions (extracted for reuse)
+  const checkUserPermissions = async () => {
+    setPermissionChecking(true);
+    try {
+      const casePermission = await canCreateCase(user);
+      setCanCreateNewCase(casePermission.canCreate);
+      setCreateCaseError(casePermission.reason || '');
 
-      checkFileUploadPermission();
+      const description = await getLimitsDescription(user);
+      setLimitsDescription(description);
+    } catch (error) {
+      console.error('Error checking user permissions:', error);
+      setCreateCaseError('Unable to verify account permissions');
+    } finally {
+      setPermissionChecking(false);
+    }
+  };
+
+  // Function to check file upload permissions (extracted for reuse)
+  const checkFileUploadPermissions = async () => {
+    if (currentCase) {
+      try {
+        const permission = await canUploadFile(user, currentCase, files.length);
+        setCanUploadNewFile(permission.canUpload);
+        setUploadFileError(permission.reason || '');
+      } catch (error) {
+        console.error('Error checking file upload permission:', error);
+        setCanUploadNewFile(false);
+        setUploadFileError('Unable to verify upload permissions');
+      }
     } else {
       setCanUploadNewFile(true);
       setUploadFileError('');
     }
+  };
+
+  // Check file upload permissions when currentCase or files change
+  useEffect(() => {
+    checkFileUploadPermissions();
   }, [user, currentCase, files.length]);
    
   useEffect(() => {
@@ -189,6 +191,10 @@ export const CaseSidebar = ({
       setCaseNumber('');
       setSuccessAction('created');
       setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+      
+      // Refresh permissions after successful case creation
+      // This updates the UI for users with limited permissions
+      await checkUserPermissions();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create case');
       console.error(err);
@@ -229,6 +235,10 @@ export const CaseSidebar = ({
     });
     setFiles(prev => [...prev, uploadedFile]);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    
+    // Refresh file upload permissions after successful upload
+    // This updates the UI for users with limited permissions
+    await checkFileUploadPermissions();
   } catch (err) {
     setFileError(err instanceof Error ? err.message : 'Upload failed');
     setTimeout(() => setFileError(''), 3000);
@@ -246,7 +256,11 @@ export const CaseSidebar = ({
       await deleteFile(user, currentCase, fileId);
       setFiles(prev => prev.filter(f => f.id !== fileId));      
       onImageSelect({ id: 'clear', originalFilename: '/clear.jpg', uploadedAt: '' });
-      setImageLoaded(false);      
+      setImageLoaded(false);
+      
+      // Refresh file upload permissions after successful file deletion
+      // This allows users with limited permissions to upload new files
+      await checkFileUploadPermissions();
     } catch (err) {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
     }
@@ -296,6 +310,10 @@ export const CaseSidebar = ({
     setFiles([]);
     setSuccessAction('deleted');
     setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+    
+    // Refresh permissions after successful case deletion
+    // This allows users with limited permissions to create a new case
+    await checkUserPermissions();
   } catch (err) {
     setError(err instanceof Error ? err.message : 'Failed to delete case');
   } finally {
