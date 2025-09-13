@@ -19,7 +19,6 @@ import { InactivityWarning } from '~/components/user/inactivity-warning';
 import "./tailwind.css";
 import styles from '~/styles/root.module.css';
 import { auth } from "./services/firebase";
-import { useEmailSyncToKV } from '~/hooks/useEmailSyncToKV';
 import { useInactivityTimeout } from '~/hooks/useInactivityTimeout';
 import { INACTIVITY_CONFIG } from '~/config/inactivity';
 import { AuthContext } from '~/contexts/auth.context';
@@ -76,8 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [showInactivityWarning, setShowInactivityWarning] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
-  
-  useEmailSyncToKV();
 
   const { extendSession } = useInactivityTimeout({
     enabled: !!user,
