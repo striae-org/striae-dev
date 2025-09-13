@@ -14,6 +14,11 @@ import {
   uploadFile,
   deleteFile,
 } from '../actions/image-manage';
+import { 
+  canCreateCase, 
+  canUploadFile, 
+  getLimitsDescription
+} from '~/utils/permissions';
 
 interface CaseSidebarProps {
   user: User;
@@ -72,6 +77,12 @@ export const CaseSidebar = ({
   const [fileError, setFileError] = useState('');
   const [newCaseName, setNewCaseName] = useState('');
   const [showCaseActions, setShowCaseActions] = useState(false);
+  const [canCreateNewCase, setCanCreateNewCase] = useState(true);
+  const [canUploadNewFile, setCanUploadNewFile] = useState(true);
+  const [createCaseError, setCreateCaseError] = useState('');
+  const [uploadFileError, setUploadFileError] = useState('');
+  const [limitsDescription, setLimitsDescription] = useState('');
+  const [permissionChecking, setPermissionChecking] = useState(false);
 
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +94,50 @@ export const CaseSidebar = ({
       'image/webp',
       'image/svg+xml'
     ];
+
+  // Check user permissions on mount and when user changes
+  useEffect(() => {
+    const checkUserPermissions = async () => {
+      setPermissionChecking(true);
+      try {
+        const casePermission = await canCreateCase(user);
+        setCanCreateNewCase(casePermission.canCreate);
+        setCreateCaseError(casePermission.reason || '');
+
+        const description = await getLimitsDescription(user);
+        setLimitsDescription(description);
+      } catch (error) {
+        console.error('Error checking user permissions:', error);
+        setCreateCaseError('Unable to verify account permissions');
+      } finally {
+        setPermissionChecking(false);
+      }
+    };
+
+    checkUserPermissions();
+  }, [user]);
+
+  // Check file upload permissions when currentCase or files change
+  useEffect(() => {
+    if (currentCase) {
+      const checkFileUploadPermission = async () => {
+        try {
+          const permission = await canUploadFile(user, currentCase, files.length);
+          setCanUploadNewFile(permission.canUpload);
+          setUploadFileError(permission.reason || '');
+        } catch (error) {
+          console.error('Error checking file upload permission:', error);
+          setCanUploadNewFile(false);
+          setUploadFileError('Unable to verify upload permissions');
+        }
+      };
+
+      checkFileUploadPermission();
+    } else {
+      setCanUploadNewFile(true);
+      setUploadFileError('');
+    }
+  }, [user, currentCase, files.length]);
    
   useEffect(() => {
     if (currentCase) {
@@ -257,6 +312,11 @@ return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
         <h4>Case Management</h4>
+        {limitsDescription && (
+          <p className={styles.limitsInfo}>
+            {limitsDescription}
+          </p>
+        )}
         <div className={`${styles.caseInput} mb-4`}>
           <input
             type="text"
@@ -268,7 +328,8 @@ return (
           <div className={`${styles.caseLoad} mb-4`}>
           <button
         onClick={handleCase}
-        disabled={isLoading || !caseNumber}
+        disabled={isLoading || !caseNumber || (!canCreateNewCase && permissionChecking === false)}
+        title={!canCreateNewCase ? createCaseError : undefined}
       >
             {isLoading ? 'Loading...' : 'Load/Create Case'}
       </button>      
@@ -282,6 +343,9 @@ return (
           </button>
     </div>
     {error && <p className={styles.error}>{error}</p>}
+    {!canCreateNewCase && createCaseError && (
+      <p className={styles.error}>{createCaseError}</p>
+    )}
     {successAction && (
       <p className={styles.success}>
         Case {currentCase} {successAction} successfully!
@@ -305,9 +369,10 @@ return (
         type="file"
         accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
         onChange={handleFileUpload}
-        disabled={isUploadingFile}
+        disabled={isUploadingFile || !canUploadNewFile}
         className={styles.fileInput}
         aria-label="Upload image file"
+        title={!canUploadNewFile ? uploadFileError : undefined}
       />      
       {isUploadingFile && (
         <>
@@ -323,6 +388,9 @@ return (
           </>
       )}
       {fileError && <p className={styles.error}>{fileError}</p>}
+      {!canUploadNewFile && uploadFileError && (
+        <p className={styles.error}>{uploadFileError}</p>
+      )}
     </div>
       )}
       {!currentCase ? (
@@ -330,31 +398,38 @@ return (
       ) : files.length === 0 ? (
         <p className={styles.emptyState}>No files found for {currentCase}</p>
       ) : (
-        <ul className={styles.fileList}>
-          {files.map((file) => (
-            <li key={file.id}
-              className={styles.fileItem}>
+        <>
+          {!canUploadNewFile && (
+            <div className={styles.limitReached}>
+              <p>Upload limit reached for this case</p>
+            </div>
+          )}
+          <ul className={styles.fileList}>
+            {files.map((file) => (
+              <li key={file.id}
+                className={styles.fileItem}>
+                  <button
+                    className={styles.fileButton}
+                    onClick={() => handleImageSelect(file)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
+                  >
+                  <span className={styles.fileName}>{file.originalFilename}</span>
+                </button>              
                 <button
-                  className={styles.fileButton}
-                  onClick={() => handleImageSelect(file)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                      handleFileDelete(file.id);                                        
+                    }
+                  }}
+                  className={styles.deleteButton}
+                  aria-label="Delete file"
                 >
-                <span className={styles.fileName}>{file.originalFilename}</span>
-              </button>              
-              <button
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-                    handleFileDelete(file.id);                                        
-                  }
-                }}
-                className={styles.deleteButton}
-                aria-label="Delete file"
-              >
-                ×
-              </button>
-            </li>
-          ))}
-        </ul>
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
     <div className={`${styles.sidebarToggle} mb-4`}>
