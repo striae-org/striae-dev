@@ -40,7 +40,7 @@
 4. [Component State Management](#component-state-management)
    - [Local State Patterns](#local-state-patterns)
    - [Context Usage](#context-usage)
-     - [AuthContext](#authcontext-appcontextsauthcontexttsx)
+     - [AuthContext](#authcontext-appcontextsauthcontextts)
    - [Custom Hooks](#custom-hooks)
      - [useEmailSyncToKV](#useemailsynctokv-apphooksuseemailsynctokvts)
      - [useInactivityTimeout](#useinactivitytimeout-apphooksuseinactivitytimeoutts)
@@ -700,7 +700,7 @@ const [data, setData] = useState<DataType | null>(null);
 
 ### Context Usage
 
-#### AuthContext (`app/contexts/auth.context.tsx`)
+#### AuthContext (`app/contexts/auth.context.ts`)
 
 **Purpose**: Global authentication state
 
