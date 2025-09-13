@@ -88,7 +88,7 @@ const NoticeText = () => {
         </a>
       </div>
       <p>
-        As an OIN community member, Striae contributes to a patent non-aggression environment that protects the entire open source ecosystem. This membership demonstrates our commitment to fostering innovation without the threat of patent litigation, ensuring that forensic tools remain accessible and freely available to the scientific community. The OIN's defensive patent strategy helps protect not only Striae but thousands of other open source projects that advance technology for the public good.
+        As an OIN community member, Striae contributes to a patent non-aggression environment that protects the entire open source ecosystem. This membership demonstrates our commitment to fostering innovation without the threat of patent litigation, ensuring that forensic tools remain accessible and freely available to the forensic science community. The OIN's defensive patent strategy helps protect not only Striae but thousands of other open source projects that advance technology for the public good.
       </p>
       <p>
         This protection is particularly important for forensic science applications, where transparency, reproducibility, and peer review are fundamental principles. By participating in the OIN, Striae helps maintain an environment where forensic technology can evolve through collaborative development, free from patent-related barriers that could impede scientific progress or limit access to critical examination tools.
