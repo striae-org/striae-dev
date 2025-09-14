@@ -112,7 +112,8 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   };
 
   const handleDeleteAccountClick = () => {
-    setShowDeleteModal(true);    
+    setShowDeleteModal(true);
+    onClose();
   };
 
   if (!isOpen) return null;
