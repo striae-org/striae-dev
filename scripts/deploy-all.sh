@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# ======================================
+# ========================echo -e "${YELLOW}🔧 Deploying all 7 Cloudflare Workers...${NC}"=============
 # STRIAE COMPLETE DEPLOYMENT SCRIPT
 # ======================================
 # This script deploys the entire Striae application:
 # 1. Worker dependencies installation
-# 2. Workers (all 6 workers)
+# 2. Workers (all 7 workers)
 # 3. Worker secrets/environment variables
 # 4. Pages (frontend)
 # 5. Pages secrets/environment variables
@@ -87,7 +87,7 @@ echo "=========================================="
 echo ""
 echo -e "${BLUE}Deployed Components:${NC}"
 echo "  ✅ Worker dependencies (npm install)"
-echo "  ✅ 6 Cloudflare Workers"
+echo "  ✅ 7 Cloudflare Workers"
 echo "  ✅ Worker environment variables"
 echo "  ✅ Cloudflare Pages frontend"
 echo "  ✅ Pages environment variables"

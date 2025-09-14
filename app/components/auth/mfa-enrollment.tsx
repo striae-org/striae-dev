@@ -9,7 +9,7 @@ import {
   User
 } from 'firebase/auth';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
-import { generateMFAToken, waitForRecaptcha } from '~/utils/recaptcha-sms';
+import { generateMFAToken, waitForRecaptcha, checkSMSFraud, SMSDefenseResult, annotateSMSAssessment } from '~/utils/recaptcha-sms';
 import styles from './mfa-enrollment.module.css';
 
 interface MFAEnrollmentProps {
@@ -36,6 +36,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
   const [resendTimer, setResendTimer] = useState(0);
   const [isClient, setIsClient] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [smsDefenseAssessmentId, setSmsDefenseAssessmentId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -110,15 +111,34 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       // Format phone number if it doesn't start with +
       const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
       
-      // TODO: Send SMS Defense token to backend for fraud check before sending SMS
-      // This will be implemented in Step 5 (backend integration)
-      if (smsDefenseToken) {
-        console.log('SMS Defense token ready for backend fraud check:', {
-          token: smsDefenseToken.substring(0, 20) + '...',
-          phoneNumber: formattedPhone,
-          userId: user.uid,
-          action: 'mfa_enrollment'
-        });
+      // Perform SMS fraud check using SMS Defense
+      if (recaptchaReady) {
+        try {
+          console.log('Performing SMS fraud check for MFA enrollment...');
+          const smsDefenseResult: SMSDefenseResult = await checkSMSFraud(
+            formattedPhone,
+            user.uid,
+            'mfa_enrollment'
+          );
+          
+          setSmsDefenseAssessmentId(smsDefenseResult.assessmentId);
+          
+          if (!smsDefenseResult.allowed) {
+            const error = `SMS verification is temporarily unavailable for this phone number. Risk score: ${(smsDefenseResult.riskScore * 100).toFixed(1)}%`;
+            setErrorMessage(error);
+            onError(error);
+            return;
+          }
+          
+          console.log('SMS Defense check passed:', {
+            riskScore: smsDefenseResult.riskScore,
+            threshold: smsDefenseResult.threshold,
+            assessmentId: smsDefenseResult.assessmentId
+          });
+        } catch (smsDefenseError) {
+          console.warn('SMS Defense check failed, proceeding without protection:', smsDefenseError);
+          // Continue with SMS sending even if SMS Defense fails
+        }
       }
       
       const multiFactorSession = await multiFactor(user).getSession();
@@ -170,9 +190,41 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       
       await multiFactor(user).enroll(multiFactorAssertion, `Phone: ${phoneNumber}`);
       
+      // Annotate SMS Defense assessment as successful
+      if (smsDefenseAssessmentId) {
+        try {
+          const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
+          await annotateSMSAssessment(
+            smsDefenseAssessmentId,
+            formattedPhone,
+            'PASSED_TWO_FACTOR',
+            'LEGITIMATE'
+          );
+          console.log('SMS Defense assessment annotated as successful');
+        } catch (annotationError) {
+          console.warn('Failed to annotate SMS Defense assessment:', annotationError);
+        }
+      }
+      
       onSuccess();
     } catch (error: unknown) {
       console.error('Error enrolling MFA:', error);
+      
+      // Annotate SMS Defense assessment as failed
+      if (smsDefenseAssessmentId) {
+        try {
+          const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
+          await annotateSMSAssessment(
+            smsDefenseAssessmentId,
+            formattedPhone,
+            'FAILED_TWO_FACTOR'
+          );
+          console.log('SMS Defense assessment annotated as failed');
+        } catch (annotationError) {
+          console.warn('Failed to annotate SMS Defense assessment:', annotationError);
+        }
+      }
+      
       const authError = error as { code?: string; message?: string };
       let errorMsg = '';
       if (authError.code === 'auth/invalid-verification-code') {
