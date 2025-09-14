@@ -6,6 +6,7 @@ import { PasswordReset } from '~/routes/auth/passwordReset';
 import { DeleteAccount } from './delete-account';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
+import { getUserData } from '~/utils/permissions';
 import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
@@ -22,6 +23,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
+  const [permitted, setPermitted] = useState(false); // Default to false for safety - will be updated after data loads
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -32,17 +34,15 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     if (isOpen && user) {
       const loadUserData = async () => {
         try {
-          const apiKey = await getUserApiKey();
-          const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-            headers: {
-              'X-Custom-Auth-Key': apiKey
-            }
-          });
+          // Use the same getUserData function as case-sidebar
+          const userData = await getUserData(user);
           
-          if (response.ok) {
-            const userData = await response.json() as { company?: string; email?: string };
+          if (userData) {
             setCompany(userData.company || '');
             setEmail(userData.email || '');
+            setPermitted(userData.permitted === true);
+          } else {
+            // Keep permitted as false if we can't load data
           }
         } catch (err) {
           console.error('Failed to load user data:', err);
@@ -132,6 +132,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           email: user.email
         }}
         company={company}
+        permitted={permitted}
       />
     );
   }
@@ -232,7 +233,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 onClick={handleDeleteAccountClick}
                 className={styles.deleteButton}
               >
-                Delete Account
+                Delete Striae Account
               </button>
             </form>
       </div>

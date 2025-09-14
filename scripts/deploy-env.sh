@@ -128,7 +128,7 @@ fi
 # Keys Worker
 if ! set_worker_secrets "Keys Worker" "workers/keys-worker" \
     "KEYS_AUTH" "USER_DB_AUTH" "R2_KEY_SECRET" "ACCOUNT_HASH" "IMAGES_API_TOKEN"; then
-    echo -e "${YELLOW}⚠️  Skipping Keys Worker (not configured)${NC}"
+ configured)${NC}"
 fi
 
 # User Worker  

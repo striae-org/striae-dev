@@ -26,6 +26,10 @@ New to Striae? Start here:
 - **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
 - **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
 
+### User Documentation
+
+- **[User Manual](USER_MANUAL.md)** - Comprehensive user guide covering account management, case creation, image annotation, and account deletion features
+
 ## Documentation Organization
 
 ### By Experience Level
@@ -82,6 +86,9 @@ Comprehensive guide covering error handling patterns, centralized error services
 
 ### [Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)
 Detailed guide for configuring environment variables, API keys, and service integrations across development, staging, and production environments.
+
+### [User Manual](USER_MANUAL.md)
+Comprehensive end-user guide covering account registration, case management, image annotation, PDF report generation, and account management including deletion procedures. Differentiates between demo and full access account capabilities with detailed security features and troubleshooting guidance.
 
 ## Contributing to Documentation
 

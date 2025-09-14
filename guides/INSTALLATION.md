@@ -371,6 +371,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
+
+// Also update worker URLs for cross-worker communication
+const DATA_WORKER_URL = 'https://data.your-domain.com';
+const IMAGE_WORKER_URL = 'https://images.your-domain.com';
 ```
 
 **2. Data Worker** (`workers/data-worker/src/data-worker.js`):
@@ -486,7 +490,7 @@ All required variables are documented in the `.env` file. Here's what you need t
 
 **Cloudflare Services:**
 - `ACCOUNT_ID` - Your Cloudflare Account ID
-- `IMAGES_API_TOKEN` - Cloudflare Images API token
+- `IMAGES_API_TOKEN` or `API_TOKEN` (for Image Worker) - Cloudflare Images API token
 - `ACCOUNT_HASH` - Cloudflare Images Account Hash
 - `HMAC_KEY` - Cloudflare Images HMAC signing key
 - `CFT_SECRET_KEY` - Cloudflare Turnstile secret key
@@ -498,6 +502,12 @@ All required variables are documented in the `.env` file. Here's what you need t
 - `R2_KEY_SECRET` - R2 authentication token
 - `USER_DB_AUTH` - KV authentication token
 - `KEYS_AUTH` - Key handler authentication token
+
+**Environment Variable Dependencies:**
+- **Account Deletion**: Requires `SL_API_KEY` for email notifications
+- **Case Management**: Requires `R2_KEY_SECRET` for data worker communication
+- **Image Management**: Requires `IMAGES_API_TOKEN` for image worker communication
+- **User Storage**: Requires `USER_DB_AUTH` for KV database access
 
 ### 5.3 Generate Security Tokens
 
