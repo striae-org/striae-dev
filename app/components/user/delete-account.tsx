@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import paths from '~/config/config.json';
+import { getUserApiKey } from '~/utils/auth';
 import styles from './delete-account.module.css';
 
 interface DeleteAccountProps {
@@ -55,37 +56,38 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
     setError('');
     
     try {
-      // Send emails to both user and support
-      const emailResponse = await fetch('/api/send-deletion-email', {
-        method: 'POST',
+      // Get API key for user-worker authentication
+      const apiKey = await getUserApiKey();
+      
+      // Delete the user account via user-worker (includes email sending)
+      const deleteResponse = await fetch(`${paths.user_worker_url}/${user.uid}`, {
+        method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userEmail: user.email,
-          userName: user.displayName || 'User',
-          uid: user.uid,
-          company: company || 'Not provided'
-        }),
+          'X-Custom-Auth-Key': apiKey
+        }
       });
 
-      if (!emailResponse.ok) {
-        throw new Error('Failed to send deletion confirmation emails');
+      if (!deleteResponse.ok) {
+        const errorData = await deleteResponse.json().catch(() => ({})) as { message?: string };
+        throw new Error(errorData.message || 'Failed to delete account');
       }
 
-      // TODO: Add actual account deletion logic here
-      // This should call the user-worker to delete the account
+      const result = await deleteResponse.json() as { success: boolean; message?: string };
       
-      setSuccess(true);
-      
-      // Close modal after a short delay to show success
-      setTimeout(() => {
-        onClose();
-      }, 2000);
+      if (result.success) {
+        setSuccess(true);
+        
+        // Close modal after a short delay to show success
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        throw new Error(result.message || 'Account deletion failed');
+      }
       
     } catch (err) {
       console.error('Delete account error:', err);
-      setError('Failed to delete account. Please try again or contact support.');
+      setError(err instanceof Error ? err.message : 'Failed to delete account. Please try again or contact support.');
     } finally {
       setIsDeleting(false);
     }
