@@ -233,7 +233,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 onClick={handleDeleteAccountClick}
                 className={styles.deleteButton}
               >
-                Delete Account
+                Delete Striae Account
               </button>
             </form>
       </div>

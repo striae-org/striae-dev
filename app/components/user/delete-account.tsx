@@ -154,11 +154,17 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
           {/* Divider */}
           <div className={styles.divider}></div>
 
-          {/* Warning Message */}
+          {/* Warning Message - Conditional based on account type */}
           <div className={styles.warningSection}>
-            <p className={styles.warningText}>
-              Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
-            </p>
+            {permitted ? (
+              <p className={styles.warningText}>
+                Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+              </p>
+            ) : (
+              <p className={styles.warningText}>
+                <strong>Demo Account Deletion Disabled:</strong> Demo accounts cannot be deleted. This restriction helps protect shared demo credentials and ensures demo functionality remains available for evaluation purposes.
+              </p>
+            )}
           </div>
 
           {/* Divider */}
@@ -175,15 +181,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
             <div className={styles.successMessage}>
               <p>✓ Account deletion successful! Confirmation emails have been sent.</p>
               <p>You will be logged out automatically in 3 seconds...</p>
-            </div>
-          )}
-
-          {/* Demo Account Notice */}
-          {!permitted && (
-            <div className={styles.warningSection}>
-              <p className={styles.warningText}>
-                <strong>Demo Account Deletion Disabled:</strong> Demo accounts cannot be deleted. This restriction helps protect shared demo credentials and ensures demo functionality remains available for evaluation purposes.
-              </p>
             </div>
           )}
 
