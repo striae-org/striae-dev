@@ -291,7 +291,7 @@ async function handleDeleteUser(env, userUid) {
     await sendDeletionEmails(env, userObject);
     
     // Delete the user account from the database
-    //await env.USER_DB.delete(userUid);
+    await env.USER_DB.delete(userUid);
     
     return new Response(JSON.stringify({
       success: true,
