@@ -3,6 +3,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
+import { DeleteAccount } from './delete-account';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
@@ -111,14 +112,28 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   };
 
   const handleDeleteAccountClick = () => {
-    setShowDeleteModal(true);
-    onClose();
+    setShowDeleteModal(true);    
   };
 
   if (!isOpen) return null;
 
   if (showResetForm) {
     return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
+  }
+
+  if (showDeleteModal && user) {
+    return (
+      <DeleteAccount 
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        user={{
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email
+        }}
+        company={company}
+      />
+    );
   }
 
   return (
