@@ -71,6 +71,7 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingUser, setIsCheckingUser] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [passwordStrength, setPasswordStrength] = useState('');
   const [isResetting, setIsResetting] = useState(false);
@@ -120,14 +121,55 @@ export const Login = () => {
     return isStrong;
   };  
 
+  // Check if user exists in the USER_DB
+  const checkUserExists = async (uid: string): Promise<boolean> => {
+    try {
+      const apiKey = await getUserApiKey();
+      const response = await fetch(`${USER_WORKER_URL}/${uid}`, {
+        headers: {
+          'X-Custom-Auth-Key': apiKey
+        }
+      });
+      
+      // If response is 404, user doesn't exist
+      if (response.status === 404) {
+        return false;
+      }
+      
+      // If response is ok, user exists
+      if (response.ok) {
+        return true;
+      }
+      
+      // For other errors (500, etc.), log but assume user exists to avoid false positives
+      console.error('Error checking user existence, status:', response.status);
+      return true;
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+      // On network/API errors, assume user exists to avoid false positives
+      return true;
+    }
+  };  
+
    useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
    if (user) {
       if (!user.emailVerified) {
         handleSignOut();
         setError('Please verify your email before logging in');
         return;
       }      
+      
+      // Check if user exists in the USER_DB
+      setIsCheckingUser(true);
+      const userExists = await checkUserExists(user.uid);
+      setIsCheckingUser(false);
+      
+      if (!userExists) {
+        handleSignOut();
+        setError('This account does not exist or has been deleted');
+        return;
+      }
       
       // Check if user has MFA enrolled
       const mfaFactors = multiFactor(user).enrolledFactors;
@@ -145,6 +187,7 @@ export const Login = () => {
       console.log("No user logged in");
       setUser(null);
       setShowMfaEnrollment(false);
+      setIsCheckingUser(false);
     }
   });
 
@@ -423,9 +466,9 @@ export const Login = () => {
               <button 
                 type="submit" 
                 className={styles.button}
-                disabled={isLoading}
+                disabled={isLoading || isCheckingUser}
               >
-                {isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
+                {isCheckingUser ? 'Verifying account...' : isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
               </button>
             </form>
             
@@ -440,7 +483,7 @@ export const Login = () => {
                   setError('');
                 }}
                 className={styles.toggleButton}
-                disabled={isLoading}
+                disabled={isLoading || isCheckingUser}
               >
                 {isLogin ? 'Register' : 'Login'}
               </button>

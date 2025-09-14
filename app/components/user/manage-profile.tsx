@@ -3,6 +3,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
+import { DeleteAccount } from './delete-account';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
 import paths from '~/config/config.json';
@@ -25,6 +26,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -109,10 +111,29 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     }
   };
 
+  const handleDeleteAccountClick = () => {
+    setShowDeleteModal(true);    
+  };
+
   if (!isOpen) return null;
 
   if (showResetForm) {
     return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
+  }
+
+  if (showDeleteModal && user) {
+    return (
+      <DeleteAccount 
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        user={{
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email
+        }}
+        company={company}
+      />
+    );
   }
 
   return (
@@ -206,12 +227,13 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                   Reset Password
                 </button>
               </div>
-              <p className={styles.deleteNotice}>
-                To delete your account, please contact{' '}
-                <a href="mailto:info@striae.org" className={styles.deleteLink}>
-                  info@striae.org
-                </a>
-              </p>
+              <button
+                type="button"
+                onClick={handleDeleteAccountClick}
+                className={styles.deleteButton}
+              >
+                Delete Account
+              </button>
             </form>
       </div>
     </div>

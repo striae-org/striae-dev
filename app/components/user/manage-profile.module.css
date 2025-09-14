@@ -203,3 +203,26 @@
 .deleteLink:hover {
   color: color-mix(in lab, var(--error) 85%, var(--black));
 }
+
+.deleteButton {
+  background-color: var(--error);
+  color: var(--white);
+  border: none;
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  margin-top: var(--spaceXL);
+  width: 100%;
+  font-size: var(--fontSizeBodyS);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: color-mix(in lab, var(--error) 85%, var(--black));
+}
+
+.deleteButton:focus {
+  outline: 2px solid var(--error);
+  outline-offset: 2px;
+}
