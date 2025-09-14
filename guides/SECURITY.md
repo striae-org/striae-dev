@@ -11,6 +11,7 @@
      - [MFA Flow](#mfa-flow)
 3. [Access Control](#access-control)
    - [Direct Authentication Access](#direct-authentication-access)
+   - [Account Deletion Security](#account-deletion-security)
 4. [API Security](#api-security)
    - [Worker Authentication](#worker-authentication)
    - [CORS Configuration](#cors-configuration)
@@ -121,9 +122,39 @@ const validateEmailDomain = (email: string): boolean => {
 ```
 
 **Email Domain Restrictions:**
+
 - Personal email providers (Gmail, Yahoo, Outlook, etc.) are blocked
 - Only work/institutional email addresses are allowed
 - Uses comprehensive free-email-domains package with 4,779+ blocked domains
+
+### Account Deletion Security
+
+Account deletion is protected by multiple security layers:
+
+**Permission-Based Access Control:**
+
+- Demo accounts (`permitted=false`) cannot delete accounts
+- Regular accounts (`permitted=true`) have full deletion access
+- Permission status fetched via `getUserData()` from permissions utilities
+
+**Multi-Factor Confirmation:**
+
+- Requires exact User ID (UID) confirmation
+- Requires exact email address confirmation
+- Both must match current user data exactly
+
+**API Security:**
+
+- Uses authenticated API calls to user-worker
+- Requires valid API key from keys-worker
+- Deletion endpoint validates authentication before processing
+
+**Demo Account Protection:**
+
+```typescript
+// Deletion disabled for demo accounts
+disabled={!permitted || !isConfirmationValid || isDeleting}
+```
 
 ## API Security
 
