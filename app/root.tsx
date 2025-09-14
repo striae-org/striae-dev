@@ -56,6 +56,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <style dangerouslySetInnerHTML={{ __html: themeStyles }} />        
         <Meta />
         <Links />
+        <script 
+          src="https://www.google.com/recaptcha/enterprise.js" 
+          async 
+          defer
+        />
       </head>
       <body className="flex flex-col min-h-screen w-screen max-w-full overflow-x-hidden">
         <ThemeProvider theme={theme} className="">
