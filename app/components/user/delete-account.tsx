@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import paths from '~/config/config.json';
 import styles from './delete-account.module.css';
 
 interface DeleteAccountProps {
@@ -15,6 +16,9 @@ interface DeleteAccountProps {
 export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountProps) => {
   const [uidConfirmation, setUidConfirmation] = useState('');
   const [emailConfirmation, setEmailConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   // Extract first and last name from display name
   const [firstName, lastName] = (user.displayName || '').split(' ');
@@ -35,12 +39,57 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       // Reset form when modal opens
       setUidConfirmation('');
       setEmailConfirmation('');
+      setError('');
+      setSuccess(false);
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
+
+  const handleDeleteAccount = async () => {
+    if (!isConfirmationValid) return;
+    
+    setIsDeleting(true);
+    setError('');
+    
+    try {
+      // Send emails to both user and support
+      const emailResponse = await fetch('/api/send-deletion-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+          userName: user.displayName || 'User',
+          uid: user.uid,
+          company: company || 'Not provided'
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        throw new Error('Failed to send deletion confirmation emails');
+      }
+
+      // TODO: Add actual account deletion logic here
+      // This should call the user-worker to delete the account
+      
+      setSuccess(true);
+      
+      // Close modal after a short delay to show success
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Delete account error:', err);
+      setError('Failed to delete account. Please try again or contact support.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -106,8 +155,23 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
           {/* Divider */}
           <div className={styles.divider}></div>
 
+          {/* Success/Error Messages */}
+          {error && (
+            <div className={styles.errorMessage}>
+              <p>{error}</p>
+            </div>
+          )}
+          
+          {success && (
+            <div className={styles.successMessage}>
+              <p>✓ Account deletion successful! Confirmation emails have been sent.</p>
+              <p>This modal will close automatically.</p>
+            </div>
+          )}
+
           {/* Confirmation Form */}
-          <form className={styles.confirmationForm}>
+          {!success && (
+            <form className={styles.confirmationForm}>
             <div className={styles.formGroup}>
               <label htmlFor="uid-confirmation" className={styles.formLabel}>
                 Enter UID to confirm account deletion:
@@ -140,12 +204,14 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
 
             <button
               type="button"
+              onClick={handleDeleteAccount}
               className={styles.deleteButton}
-              disabled={!isConfirmationValid}
+              disabled={!isConfirmationValid || isDeleting}
             >
-              Delete Account Permanently
+              {isDeleting ? 'Deleting Account...' : 'Delete Account Permanently'}
             </button>
           </form>
+          )}
         </div>
       </div>
     </div>

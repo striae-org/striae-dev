@@ -113,6 +113,41 @@
   border-radius: var(--spaceXS);
 }
 
+/* Success and Error Messages */
+.errorMessage {
+  background-color: color-mix(in lab, var(--error) 10%, transparent);
+  color: var(--error);
+  border: 1px solid color-mix(in lab, var(--error) 25%, transparent);
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
+  margin: var(--spaceL) 0;
+  text-align: center;
+}
+
+.errorMessage p {
+  margin: 0;
+  font-weight: var(--fontWeightMedium);
+}
+
+.successMessage {
+  background-color: color-mix(in lab, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in lab, var(--accent) 25%, transparent);
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
+  margin: var(--spaceL) 0;
+  text-align: center;
+}
+
+.successMessage p {
+  margin: 0;
+  font-weight: var(--fontWeightMedium);
+}
+
+.successMessage p:first-child {
+  margin-bottom: var(--spaceS);
+}
+
 /* Confirmation Form */
 .confirmationForm {
   display: flex;
