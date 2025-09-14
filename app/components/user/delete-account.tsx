@@ -136,11 +136,11 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
           {/* User Information */}
           <div className={styles.userInfo}>
             <div className={styles.infoRow}>
-              <span className={styles.label}>User ID:</span>
+              <span className={styles.label}>UID:</span>
               <span className={styles.value}>{user.uid}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.label}>Display Name:</span>
+              <span className={styles.label}>Name:</span>
               <span className={styles.value}>{fullName || 'Not provided'}</span>
             </div>
             <div className={styles.infoRow}>
@@ -159,7 +159,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
           {/* Warning Message */}
           <div className={styles.warningSection}>
             <p className={styles.warningText}>
-              Deleting your account is irreversible! All account information and data will be deleted from Striae. Please be certain you want to take this action.
+              Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
             </p>
           </div>
 
