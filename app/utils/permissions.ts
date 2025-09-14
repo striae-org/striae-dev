@@ -3,8 +3,8 @@ import paths from '~/config/config.json';
 import { getUserApiKey } from './auth';
 
 const USER_WORKER_URL = paths.user_worker_url;
-const MAX_CASES_FREE = paths.max_cases_free;
-const MAX_FILES_PER_CASE_FREE = paths.max_files_per_case_free;
+const MAX_CASES_DEMO = paths.max_cases_demo;
+const MAX_FILES_PER_CASE_DEMO = paths.max_files_per_case_demo;
 
 export interface UserData {
   uid: string;
@@ -70,8 +70,8 @@ export const getUserLimits = (userData: UserData): UserLimits => {
     };
   } else {
     return {
-      maxCases: MAX_CASES_FREE, // Use config value for free users
-      maxFilesPerCase: MAX_FILES_PER_CASE_FREE // Use config value for free users
+      maxCases: MAX_CASES_DEMO, // Use config value for demo users
+      maxFilesPerCase: MAX_FILES_PER_CASE_DEMO // Use config value for demo users
     };
   }
 };
@@ -162,15 +162,15 @@ export const getLimitsDescription = async (user: User): Promise<string> => {
   try {
     const userData = await getUserData(user);
     if (!userData) {
-      return `Account limits: ${MAX_CASES_FREE} case, ${MAX_FILES_PER_CASE_FREE} files per case`;
+      return `Account limits: ${MAX_CASES_DEMO} case, ${MAX_FILES_PER_CASE_DEMO} files per case`;
     }
 
     const limits = getUserLimits(userData);
     
     if (userData.permitted) {
-      return 'Full access account - no limits';
+      return '';
     } else {
-      return `Trial account limits: ${limits.maxCases} case, ${limits.maxFilesPerCase} files per case`;
+      return `Demo account limits: ${limits.maxCases} case, ${limits.maxFilesPerCase} files per case`;
     }
   } catch (error) {
     console.error('Error getting limits description:', error);
