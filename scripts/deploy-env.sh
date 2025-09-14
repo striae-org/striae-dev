@@ -133,7 +133,7 @@ fi
 
 # User Worker  
 if ! set_worker_secrets "User Worker" "workers/user-worker" \
-    "USER_DB_AUTH" "SL_API_KEY"; then
+    "USER_DB_AUTH" "SL_API_KEY" "R2_KEY_SECRET" "IMAGES_API_TOKEN"; then
     echo -e "${YELLOW}⚠️  Skipping User Worker (not configured)${NC}"
 fi
 

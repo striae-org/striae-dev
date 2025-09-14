@@ -5,6 +5,10 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 };
 
+// Worker URLs - configure these for deployment
+const DATA_WORKER_URL = 'https://data.dev.striae.org';
+const IMAGE_WORKER_URL = 'https://images.dev.striae.org';
+
 async function authenticate(request, env) {
   const authKey = request.headers.get('X-Custom-Auth-Key');
   if (authKey !== env.USER_DB_AUTH) throw new Error('Unauthorized');
@@ -209,6 +213,58 @@ The user has been sent a confirmation email.`,
   }
 }
 
+// Function to delete a single case (similar to case-manage.ts deleteCase)
+async function deleteSingleCase(env, userUid, caseNumber) {
+  const dataApiKey = env.R2_KEY_SECRET;
+  const imageApiKey = env.IMAGES_API_TOKEN;
+
+  try {
+    // Get case data from data worker
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/data.json`, {
+      headers: { 'X-Custom-Auth-Key': dataApiKey }
+    });
+
+    if (!caseResponse.ok) {
+      console.warn(`Case ${caseNumber} not found in data worker`);
+      return;
+    }
+
+    const caseData = await caseResponse.json();
+
+    // Delete all files associated with this case
+    if (caseData.files && caseData.files.length > 0) {
+      for (const file of caseData.files) {
+        try {
+          // Delete image file - correct endpoint
+          await fetch(`${IMAGE_WORKER_URL}/${file.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${imageApiKey}`
+            }
+          });
+          
+          // Delete notes file if exists
+          await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/${file.id}/data.json`, {
+            method: 'DELETE',
+            headers: { 'X-Custom-Auth-Key': dataApiKey }
+          });
+        } catch (fileError) {
+          console.warn(`Failed to delete file ${file.id} for case ${caseNumber}:`, fileError);
+        }
+      }
+    }
+
+    // Delete the case data file
+    await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/data.json`, {
+      method: 'DELETE',
+      headers: { 'X-Custom-Auth-Key': dataApiKey }
+    });
+
+  } catch (error) {
+    console.warn(`Failed to delete case ${caseNumber}:`, error);
+  }
+}
+
 async function handleDeleteUser(env, userUid) {
   try {
     // First, get the user data to include in the deletion emails
@@ -221,6 +277,15 @@ async function handleDeleteUser(env, userUid) {
     }
 
     const userObject = JSON.parse(userData);
+    
+    // Delete all user's cases using the same logic as case-manage.ts
+    if (userObject.cases && userObject.cases.length > 0) {
+      console.log(`Deleting ${userObject.cases.length} cases for user ${userUid}`);
+      
+      for (const caseItem of userObject.cases) {
+        await deleteSingleCase(env, userUid, caseItem.caseNumber);
+      }
+    }
     
     // Send deletion emails before deleting the account
     await sendDeletionEmails(env, userObject);
