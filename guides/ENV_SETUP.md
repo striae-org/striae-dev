@@ -50,6 +50,9 @@ This directory (/scripts) contains scripts and configuration files for managing 
 
 ### User Worker
 - `USER_DB_AUTH` - Custom KV authentication token
+- `SL_API_KEY` - SendLayer email service API key for account deletion emails
+- `R2_KEY_SECRET` - Custom R2 authentication token for data worker API calls
+- `IMAGES_API_TOKEN` - Cloudflare Images API token for image worker API calls
 
 ### Data Worker
 - `R2_KEY_SECRET` - Custom R2 authentication token

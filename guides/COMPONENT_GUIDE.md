@@ -36,7 +36,8 @@
      - [Theme Provider](#theme-provider-appcomponentstheme-providertheme-providertsx)
    - [6. User Management Components](#6-user-management-components)
      - [User Profile Management](#user-profile-management-appcomponentsusermanage-profiletsx)
-     - [InactivityWarning](#inactivitywarning-appcomponentsuserinactivity-warningtsx)
+     - [Delete Account](#delete-account-appcomponentsuserdelete-accounttsx)
+     - [Inactivity Warning](#inactivity-warning-appcomponentsuserinactivity-warningtsx)
 4. [Component State Management](#component-state-management)
    - [Local State Patterns](#local-state-patterns)
    - [Context Usage](#context-usage)
@@ -672,9 +673,53 @@ interface ManageProfileProps {
 - Display name modification
 - Company information management (read-only)
 - Email address display (read-only)
+- User permission status loading
+- Account deletion functionality
 - Firebase error handling integration
 
-#### InactivityWarning (`app/components/user/inactivity-warning.tsx`)
+#### Delete Account (`app/components/user/delete-account.tsx`)
+
+**Purpose**: Secure account deletion with permission-based restrictions
+
+**Features**:
+
+- User account deletion with confirmation
+- Demo account protection (deletion disabled for `permitted=false`)
+- Dual confirmation requirements (UID + email)
+- Conditional messaging based on account type
+- Email notifications on successful deletion
+- Firebase authentication integration
+- Automatic logout after deletion
+
+**Props**:
+
+```typescript
+interface DeleteAccountProps {
+  isOpen: boolean;
+  onClose: () => void;
+  user: {
+    uid: string;
+    displayName: string | null;
+    email: string | null;
+  };
+  company: string;
+  permitted: boolean;
+}
+```
+
+**Permission-Based Behavior**:
+
+- **Regular Accounts** (`permitted=true`): Full deletion functionality with standard warnings
+- **Demo Accounts** (`permitted=false`): Deletion disabled with informational messaging
+
+**Security Features**:
+
+- Requires exact UID confirmation
+- Requires exact email address confirmation
+- Demo account protection
+- API key authentication for deletion requests
+
+#### Inactivity Warning (`app/components/user/inactivity-warning.tsx`)
 
 **Purpose**: Session timeout management
 

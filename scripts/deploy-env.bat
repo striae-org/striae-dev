@@ -50,6 +50,9 @@ echo.
 echo === User Worker ===
 echo cd workers\user-worker
 echo wrangler secret put USER_DB_AUTH --name [worker-name]
+echo wrangler secret put SL_API_KEY --name [worker-name]
+echo wrangler secret put R2_KEY_SECRET --name [worker-name]
+echo wrangler secret put IMAGES_API_TOKEN --name [worker-name]
 echo cd ..\..
 echo.
 

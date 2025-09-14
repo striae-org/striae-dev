@@ -195,7 +195,7 @@ if (-not (Set-WorkerSecrets -WorkerName "Keys Worker" -WorkerPath "workers/keys-
 
 # User Worker  
 if (-not (Set-WorkerSecrets -WorkerName "User Worker" -WorkerPath "workers/user-worker" -Secrets @(
-    "USER_DB_AUTH"
+    "USER_DB_AUTH", "SL_API_KEY", "R2_KEY_SECRET", "IMAGES_API_TOKEN"
 ))) {
     Write-Host "⚠️  Skipping User Worker (not configured)" -ForegroundColor Yellow
 }
