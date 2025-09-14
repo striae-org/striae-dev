@@ -14,9 +14,10 @@ interface DeleteAccountProps {
     email: string | null;
   };
   company: string;
+  permitted: boolean;
 }
 
-export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountProps) => {
+export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: DeleteAccountProps) => {
   const [uidConfirmation, setUidConfirmation] = useState('');
   const [emailConfirmation, setEmailConfirmation] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -177,6 +178,15 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
             </div>
           )}
 
+          {/* Demo Account Notice */}
+          {!permitted && (
+            <div className={styles.warningSection}>
+              <p className={styles.warningText}>
+                <strong>Demo Account Deletion Disabled:</strong> Demo accounts cannot be deleted. This restriction helps protect shared demo credentials and ensures demo functionality remains available for evaluation purposes.
+              </p>
+            </div>
+          )}
+
           {/* Confirmation Form */}
           {!success && (
             <form className={styles.confirmationForm}>
@@ -192,6 +202,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
                 className={styles.confirmationInput}
                 placeholder="Enter your User ID"
                 autoComplete="off"
+                disabled={!permitted}
               />
             </div>
 
@@ -207,6 +218,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
                 className={styles.confirmationInput}
                 placeholder="Enter your email address"
                 autoComplete="off"
+                disabled={!permitted}
               />
             </div>
 
@@ -214,9 +226,13 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
               type="button"
               onClick={handleDeleteAccount}
               className={styles.deleteButton}
-              disabled={!isConfirmationValid || isDeleting}
+              disabled={!permitted || !isConfirmationValid || isDeleting}
             >
-              {isDeleting ? 'Deleting Account...' : 'Delete Account Permanently'}
+              {!permitted 
+                ? 'Demo Account Deletion Disabled' 
+                : isDeleting 
+                  ? 'Deleting Account...' 
+                  : 'Delete Account Permanently'}
             </button>
           </form>
           )}
