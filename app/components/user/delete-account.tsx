@@ -232,7 +232,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
                 ? 'Demo Account Deletion Disabled' 
                 : isDeleting 
                   ? 'Deleting Account...' 
-                  : 'Delete Account Permanently'}
+                  : 'Delete Striae Account'}
             </button>
           </form>
           )}
