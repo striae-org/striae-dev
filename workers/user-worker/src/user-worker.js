@@ -115,11 +115,11 @@ async function sendDeletionEmails(env, userData) {
           <p>This email confirms that your Striae account has been successfully deleted.</p>
           <p><strong>Account Details:</strong></p>
           <ul>
-            <li><strong>User ID:</strong> ${uid}</li>
+            <li><strong>UID:</strong> ${uid}</li>
             <li><strong>Email:</strong> ${email}</li>
-            <li><strong>Company:</strong> ${company || 'Not provided'}</li>
+            <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
           </ul>
-          <p>All your account information and data have been permanently removed from our systems.</p>
+          <p>All your account information and data have been permanently removed from our systems. The account associated with this email address has been disabled.</p>
           <p>If you did not request this deletion or believe this was done in error, please contact our support team immediately at info@striae.org.</p>
           <p>Thank you for using Striae.</p>
           <p>Best regards,<br>The Striae Team</p>
@@ -131,11 +131,11 @@ Dear ${fullName},
 This email confirms that your Striae account has been successfully deleted.
 
 Account Details:
-- User ID: ${uid}
+- UID: ${uid}
 - Email: ${email}
-- Company: ${company || 'Not provided'}
+- Lab/Company: ${company || 'Not provided'}
 
-All your account information and data have been permanently removed from our systems.
+All your account information and data have been permanently removed from our systems. The account associated with this email address has been disabled.
 
 If you did not request this deletion or believe this was done in error, please contact our support team immediately at info@striae.org.
 
@@ -175,10 +175,10 @@ The Striae Team`,
           <p>A user has deleted their Striae account.</p>
           <p><strong>Deleted Account Details:</strong></p>
           <ul>
-            <li><strong>User ID:</strong> ${uid}</li>
+            <li><strong>UID:</strong> ${uid}</li>
             <li><strong>Name:</strong> ${fullName}</li>
             <li><strong>Email:</strong> ${email}</li>
-            <li><strong>Company:</strong> ${company || 'Not provided'}</li>
+            <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
             <li><strong>Deletion Time:</strong> ${new Date().toISOString()}</li>
           </ul>
           <p>The user has been sent a confirmation email.</p>
@@ -188,10 +188,10 @@ The Striae Team`,
 A user has deleted their Striae account.
 
 Deleted Account Details:
-- User ID: ${uid}
+- UID: ${uid}
 - Name: ${fullName}
 - Email: ${email}
-- Company: ${company || 'Not provided'}
+- Lab/Company: ${company || 'Not provided'}
 - Deletion Time: ${new Date().toISOString()}
 
 The user has been sent a confirmation email.`,

@@ -130,9 +130,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
         </header>
 
         <div className={styles.modalContent}>
-          {/* Divider */}
-          <div className={styles.divider}></div>
-
           {/* User Information */}
           <div className={styles.userInfo}>
             <div className={styles.infoRow}>
