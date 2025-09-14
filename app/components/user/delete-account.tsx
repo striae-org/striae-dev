@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '~/services/firebase';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
 import styles from './delete-account.module.css';
@@ -77,10 +79,17 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       if (result.success) {
         setSuccess(true);
         
-        // Close modal after a short delay to show success
-        setTimeout(() => {
-          onClose();
-        }, 2000);
+        // Log out user and close modal after 3 seconds
+        setTimeout(async () => {
+          try {
+            await signOut(auth);
+            onClose();
+          } catch (logoutError) {
+            console.error('Error during logout:', logoutError);
+            // Still close the modal even if logout fails
+            onClose();
+          }
+        }, 3000);
       } else {
         throw new Error(result.message || 'Account deletion failed');
       }
@@ -167,7 +176,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
           {success && (
             <div className={styles.successMessage}>
               <p>✓ Account deletion successful! Confirmation emails have been sent.</p>
-              <p>This modal will close automatically.</p>
+              <p>You will be logged out automatically in 3 seconds...</p>
             </div>
           )}
 
