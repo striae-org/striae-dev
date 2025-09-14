@@ -74,15 +74,15 @@ export async function action({ request, context }: { request: Request, context: 
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>Striae Demo Access Credentials</h2>
-          <p><strong>Email:</strong> demo@striae.org</p>
-          <p><strong>Password:</strong> u@rR#0GE%0p4zSZPYQ^2MJKSk</p>
-          <p><strong>MFA Code:</strong> 133742</p>
+          <p><strong>Email:</strong> ${context.cloudflare.env.DEMO_EMAIL}</p>
+          <p><strong>Password:</strong> ${context.cloudflare.env.DEMO_PASS}</p>
+          <p><strong>MFA Code:</strong> ${context.cloudflare.env.DEMO_MFA}</p>
         </body></html>`,
         "PlainContent": `Striae Demo Access Credentials:
 
-        Email: demo@striae.org
-        Access Password: u@rR#0GE%0p4zSZPYQ^2MJKSk
-        MFA Code: 133742`,
+        Email: ${context.cloudflare.env.DEMO_EMAIL}
+        Access Password: ${context.cloudflare.env.DEMO_PASS}
+        MFA Code: ${context.cloudflare.env.DEMO_MFA}`,
         "Tags": [
           "striae-demo-access"
         ],
