@@ -238,7 +238,10 @@ All sensitive configuration is stored as environment variables across the worker
 // Environment variables used across workers:
 // 
 // User Worker:
-// - USER_DB_AUTH: User worker authentication token
+// - USER_DB_AUTH: User worker authentication token 
+// - SL_API_KEY: SendLayer API key for email services
+// - R2_KEY_SECRET: Data worker authentication token for cross-worker communication
+// - IMAGES_API_TOKEN: Cloudflare Images API token for cross-worker communication
 // - USER_DB: KV namespace binding for user data
 //
 // Data Worker:
