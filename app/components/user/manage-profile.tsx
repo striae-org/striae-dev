@@ -25,6 +25,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -107,6 +108,11 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteAccountClick = () => {
+    setShowDeleteModal(true);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -206,12 +212,13 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                   Reset Password
                 </button>
               </div>
-              <p className={styles.deleteNotice}>
-                To delete your account, please contact{' '}
-                <a href="mailto:info@striae.org" className={styles.deleteLink}>
-                  info@striae.org
-                </a>
-              </p>
+              <button
+                type="button"
+                onClick={handleDeleteAccountClick}
+                className={styles.deleteButton}
+              >
+                Delete Account
+              </button>
             </form>
       </div>
     </div>
