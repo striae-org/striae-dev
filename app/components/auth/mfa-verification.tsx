@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
-import { generateLoginMFAToken, waitForRecaptcha, checkSMSFraud, SMSDefenseResult, annotateSMSAssessment } from '~/utils/recaptcha-sms';
+import { generateLoginMFAToken, waitForRecaptcha } from '~/utils/recaptcha-sms';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -27,7 +27,6 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [smsDefenseAssessmentId, setSmsDefenseAssessmentId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -85,10 +84,19 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
         }
       }
 
-      // Note: SMS Defense fraud check not applicable for MFA verification
-      // because the phone number is not directly accessible from MultiFactorInfo hint
-      // The fraud check was already performed during MFA enrollment
-      console.log('SMS Defense not applicable for MFA verification - using enrollment fraud check results');
+      // Get phone number from hint for fraud check
+      const hint = resolver.hints[selectedHintIndex];
+      // MultiFactorInfo doesn't directly expose phone number, but we can extract from uid
+      const phoneHint = hint.uid || 'unknown';
+
+      // TODO: Send SMS Defense token to backend for fraud check
+      if (smsDefenseToken && phoneHint !== 'unknown') {
+        console.log('SMS Defense token ready for MFA verification fraud check:', {
+          token: smsDefenseToken.substring(0, 20) + '...',
+          hintId: phoneHint,
+          action: 'login_mfa'
+        });
+      }
 
       const phoneAuthProvider = new PhoneAuthProvider(auth);
       
