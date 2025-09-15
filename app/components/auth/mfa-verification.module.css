@@ -175,7 +175,7 @@
 .signOutText {
   color: var(--textLight);
   font-size: var(--fontSizeSmall);
-  margin-bottom: var(--spaceXS);
+  margin-bottom: var(--spaceM);
 }
 
 .sendCode,
