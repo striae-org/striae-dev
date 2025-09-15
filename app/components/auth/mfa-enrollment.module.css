@@ -191,6 +191,19 @@
   cursor: not-allowed;
 }
 
+.signOutContainer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e5e5;
+  text-align: center;
+}
+
+.signOutText {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .overlay {
     padding: 0.5rem;
