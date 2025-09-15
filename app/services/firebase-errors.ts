@@ -11,6 +11,7 @@ export const ERROR_MESSAGES = {
   PASSWORDS_MISMATCH: 'Passwords do not match',
   WEAK_PASSWORD: 'Password does not meet strength requirements',
   REQUIRES_RECENT_LOGIN: 'Please sign in again to complete this action',
+  USER_DISABLED: 'This account has been disabled',
   
   // Reset/Verify Errors
   RESET_EMAIL_SENT: 'Password reset email sent! Check your inbox',
@@ -60,6 +61,8 @@ export const handleAuthError = (err: unknown): { message: string; data?: AuthErr
         return { message: ERROR_MESSAGES.WEAK_PASSWORD, data: errorData };
       case 'auth/requires-recent-login':
         return { message: ERROR_MESSAGES.REQUIRES_RECENT_LOGIN, data: errorData };
+      case 'auth/user-disabled':
+        return { message: ERROR_MESSAGES.USER_DISABLED, data: errorData };
       
       // MFA Errors
       case 'auth/multi-factor-auth-required':
