@@ -70,20 +70,59 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
     }
   }, [resendTimer]);
 
-  const sendVerificationCode = async () => {
-    if (!phoneNumber.trim()) {
-      const error = getValidationError('MFA_INVALID_PHONE');
-      setErrorMessage(error);
-      onError(error);
-      return;
+  // Phone number validation function
+  const validatePhoneNumber = (phone: string): { isValid: boolean; errorMessage?: string } => {
+    if (!phone.trim()) {
+      return { isValid: false, errorMessage: getValidationError('MFA_INVALID_PHONE') };
     }
 
+    // Remove all non-digit characters for validation
+    const cleanPhone = phone.replace(/\D/g, '');
+    
     // Prevent use of example phone numbers
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
     if (cleanPhone === '15551234567' || cleanPhone === '5551234567') {
-      const error = 'Please enter your actual phone number, not the demo number.';
-      setErrorMessage(error);
-      onError(error);
+      return { isValid: false, errorMessage: 'Please enter your actual phone number, not the demo number.' };
+    }
+
+    // Check for valid phone number patterns
+    // US/Canada: 10 or 11 digits (with or without country code)
+    // International: 7-15 digits with country code
+    if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+      return { isValid: false, errorMessage: 'Phone number must be between 7-15 digits.' };
+    }
+
+    // US/Canada specific validation (most common case)
+    if (phone.startsWith('+1') || (!phone.startsWith('+') && cleanPhone.length === 10)) {
+      const usPhone = cleanPhone.startsWith('1') ? cleanPhone.slice(1) : cleanPhone;
+      
+      if (usPhone.length !== 10) {
+        return { isValid: false, errorMessage: 'US/Canada phone numbers must be 10 digits.' };
+      }
+      
+      // Check for invalid area codes (starting with 0 or 1)
+      if (usPhone[0] === '0' || usPhone[0] === '1') {
+        return { isValid: false, errorMessage: 'Invalid area code. Area codes cannot start with 0 or 1.' };
+      }
+      
+      // Check for invalid exchange codes (starting with 0 or 1)
+      if (usPhone[3] === '0' || usPhone[3] === '1') {
+        return { isValid: false, errorMessage: 'Invalid phone number format.' };
+      }
+    }
+
+    // Basic international validation for numbers with country codes
+    if (phone.startsWith('+') && cleanPhone.length < 8) {
+      return { isValid: false, errorMessage: 'International phone numbers must have at least 8 digits including country code.' };
+    }
+
+    return { isValid: true };
+  };
+
+  const sendVerificationCode = async () => {
+    const validation = validatePhoneNumber(phoneNumber);
+    if (!validation.isValid) {
+      setErrorMessage(validation.errorMessage!);
+      onError(validation.errorMessage!);
       return;
     }
 
