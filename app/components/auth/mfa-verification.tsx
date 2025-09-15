@@ -36,30 +36,22 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   useEffect(() => {
     if (!isClient) return;
     
-    // Initialize reCAPTCHA verifier for Firebase Auth
-    // This will use reCAPTCHA Enterprise if configured in Firebase Console
-    try {
-      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {
-          console.log('reCAPTCHA solved for MFA verification');
-        },
-        'expired-callback': () => {
-          const error = getValidationError('MFA_RECAPTCHA_EXPIRED');
-          setErrorMessage(error);
-          onError(error);
-        }
-      });
-      setRecaptchaVerifier(verifier);
-    } catch (error) {
-      console.warn('Failed to initialize reCAPTCHA verifier:', error);
-      // Firebase will fall back to other verification methods
-    }
+    // Initialize reCAPTCHA verifier
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => {
+        // reCAPTCHA solved
+      },
+      'expired-callback': () => {
+        const error = getValidationError('MFA_RECAPTCHA_EXPIRED');
+        setErrorMessage(error);
+        onError(error);
+      }
+    });
+    setRecaptchaVerifier(verifier);
 
     return () => {
-      if (recaptchaVerifier) {
-        recaptchaVerifier.clear();
-      }
+      verifier.clear();
     };
   }, [isClient, onError]);
 
