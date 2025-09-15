@@ -24,6 +24,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');
   const [permitted, setPermitted] = useState(false); // Default to false for safety - will be updated after data loads
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -33,6 +34,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   useEffect(() => {
     if (isOpen && user) {
       const loadUserData = async () => {
+        setIsLoadingUserData(true);
         try {
           // Use the same getUserData function as case-sidebar
           const userData = await getUserData(user);
@@ -46,6 +48,8 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           }
         } catch (err) {
           console.error('Failed to load user data:', err);
+        } finally {
+          setIsLoadingUserData(false);
         }
       };
       
@@ -121,7 +125,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
   }
 
-  if (showDeleteModal && user) {
+  if (showDeleteModal && user && !isLoadingUserData) {
     return (
       <DeleteAccount 
         isOpen={showDeleteModal}
@@ -232,8 +236,9 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                 type="button"
                 onClick={handleDeleteAccountClick}
                 className={styles.deleteButton}
+                disabled={isLoadingUserData}
               >
-                Delete Striae Account
+                {isLoadingUserData ? 'Loading account data...' : 'Delete Striae Account'}
               </button>
             </form>
       </div>
