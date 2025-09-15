@@ -3,7 +3,6 @@ import { signOut } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
-import { Toast } from '~/components/toast/toast';
 import styles from './delete-account.module.css';
 
 interface DeleteAccountProps {
@@ -24,7 +23,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   // Extract first and last name from display name
   const [firstName, lastName] = (user.displayName || '').split(' ');
@@ -47,7 +45,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
       setEmailConfirmation('');
       setError('');
       setSuccess(false);
-      setShowToast(false);
     }
 
     return () => {
@@ -60,7 +57,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
     
     setIsDeleting(true);
     setError('');
-    setShowToast(true); // Show toast notification
     
     try {
       // Get API key for user-worker authentication
@@ -104,7 +100,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
       setError(err instanceof Error ? err.message : 'Failed to delete account. Please try again or contact support.');
     } finally {
       setIsDeleting(false);
-      setShowToast(false); // Hide toast when deletion completes
     }
   };
 
@@ -163,7 +158,12 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
           <div className={styles.warningSection}>
             {permitted ? (
               <p className={styles.warningText}>
-                Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+                {isDeleting 
+                  ? 'Deleting your account now. If you have a lot of data, this may take a while...'
+                  : <>
+                      Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+                    </>
+                }
               </p>
             ) : (
               <p className={styles.warningText}>
@@ -240,14 +240,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
           )}
         </div>
       </div>
-      
-      <Toast
-        message="If you have a lot of data, this could take a while..."
-        type="warning"
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        duration={0} // Keep toast visible until manually closed or deletion completes
-      />
     </div>
   );
 };
