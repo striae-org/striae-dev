@@ -31,6 +31,7 @@ interface GeneratePDFParams {
   setToastType: (type: 'success' | 'error') => void;
   setToastMessage: (message: string) => void;
   setShowToast: (show: boolean) => void;
+  setToastDuration?: (duration: number) => void;
 }
 
 export const generatePDF = async ({
@@ -44,13 +45,15 @@ export const generatePDF = async ({
   setIsGeneratingPDF,
   setToastType,
   setToastMessage,
-  setShowToast
+  setShowToast,
+  setToastDuration
 }: GeneratePDFParams) => {
   setIsGeneratingPDF(true);
   
-  // Show generating toast immediately
+  // Show generating toast immediately with duration 0 (stays until manually closed or completion)
   setToastType('success');
   setToastMessage('Generating PDF report... This may take up to a minute.');
+  if (setToastDuration) setToastDuration(0);
   setShowToast(true);
   
   try {
@@ -132,18 +135,21 @@ export const generatePDF = async ({
       // Show success toast
       setToastType('success');
       setToastMessage('PDF generated successfully!');
+      if (setToastDuration) setToastDuration(4000); // Reset to default duration for success message
       setShowToast(true);
     } else {
       const errorText = await response.text();
       console.error('PDF generation failed:', errorText);
       setToastType('error');
       setToastMessage('Failed to generate PDF report');
+      if (setToastDuration) setToastDuration(4000); // Reset to default duration for error message
       setShowToast(true);
     }
   } catch (error) {
     console.error('Error generating PDF:', error);
     setToastType('error');
     setToastMessage('Error generating PDF report');
+    if (setToastDuration) setToastDuration(4000); // Reset to default duration for error message
     setShowToast(true);
   } finally {
     setIsGeneratingPDF(false);

@@ -158,7 +158,12 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
           <div className={styles.warningSection}>
             {permitted ? (
               <p className={styles.warningText}>
-                Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+                {isDeleting 
+                  ? 'Deleting your account now. If you have a lot of data, this may take a while...'
+                  : <>
+                      Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+                    </>
+                }
               </p>
             ) : (
               <p className={styles.warningText}>
