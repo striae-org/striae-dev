@@ -1,7 +1,12 @@
 # 🔫 Striae - A Firearms Examiner's Comparison Companion
 
-
-<a href="https://opencollective.com/striae"><img alt="Bronze Sponsor" src="https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Silver Sponsor" src="https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Gold Sponsor" src="https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen" /></a> &nbsp;&nbsp; <a href="https://opencollective.com/striae"><img alt="Financial Contributors" src="https://opencollective.com/striae/tiers/badge.svg" /></a>
+[![Bronze Sponsor](https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
+&nbsp;&nbsp;
+[![Silver Sponsor](https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
+&nbsp;&nbsp;
+[![Gold Sponsor](https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
+&nbsp;&nbsp;
+[![Financial Contributors](https://opencollective.com/striae/tiers/badge.svg)](https://opencollective.com/striae)
 
 ## 🌐 Application URL
 
@@ -20,6 +25,15 @@
 ---
 
 ## 📋 Changelog
+
+## [2025-09-15] - *[Release v0.9.15-beta](https://github.com/striae-org/striae/releases/tag/v0.9.15-beta)*
+
+- **Security & Authentication Enhancements** - Comprehensive MFA improvements with phone validation, demo number prevention, and enhanced user validation systems
+- **Complete Account Deletion System** - Major feature implementation with email notifications, safety measures, demo account protection, and auto-logout functionality
+- **User Management & Permissions** - Demo account system with permission-based access control, account limits, and enhanced profile management
+- **Infrastructure & Developer Experience** - Documentation updates, Open Collective integration, automatic versioning, and comprehensive code cleanup
+- **Technical Improvements** - TypeScript conversions, worker enhancements, security policy updates, and automated workflow improvements
+- **UI/UX Enhancements** - Toast notification system, PDF generation improvements, navigation enhancements, and mobile responsiveness upgrades
 
 ## [2025-09-10] - *[Release v0.9.10-beta](https://github.com/striae-org/striae/releases/tag/v0.9.10-beta)*
 
@@ -134,11 +148,11 @@
 
 ## [2025-08-23]
 
-#### ✨ Feature Additions
+### ✨ Feature Additions
 
 - Annotations display completed!
 
-#### 🔒 Security Enhancements
+### 🔒 Security Enhancements
 
 - Replaced Cloudflare Zero Trust with registration password gateway
 - Removed Google-linked sign-in
@@ -162,7 +176,7 @@
 
 ## [2025-08-17]
 
-#### ✅ Added
+### ✅ Added
 
 - Cloudflare Zero Access Gateway integration for enhanced security and streamlined authentication.
 - Minor description/wording updates throughout the app for clarity.
@@ -184,9 +198,7 @@
 
 ## [2025-08-10] - Development Update
 
-#### ⚠️ Development Status
-
-**Striae Development Indefinitely Suspended**
+### Striae Development Indefinitely Suspended
 
 Some of you know that at the end of 2024, I’d been working on a personal project close to my heart — Striae, a Firearms Examiner’s Comparison Companion.
 
