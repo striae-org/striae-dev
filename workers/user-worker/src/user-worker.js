@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 // Worker URLs - configure these for deployment
-const DATA_WORKER_URL = 'https://data.striae.org';
-const IMAGE_WORKER_URL = 'https://images.striae.org';
+const DATA_WORKER_URL = 'https://origin2.striae.org';
+const IMAGE_WORKER_URL = 'https://origin3.striae.org';
 
 async function authenticate(request, env) {
   const authKey = request.headers.get('X-Custom-Auth-Key');
