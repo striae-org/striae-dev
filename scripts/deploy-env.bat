@@ -76,15 +76,6 @@ echo wrangler secret put CFT_SECRET_KEY --name [worker-name]
 echo cd ..\..
 echo.
 
-echo === SMS Defense Worker ===
-echo cd workers\sms-defense-worker
-echo wrangler secret put SMS_DEFENSE_AUTH --name [worker-name]
-echo wrangler secret put RECAPTCHA_API_KEY --name [worker-name]
-echo wrangler secret put RECAPTCHA_SITE_KEY --name [worker-name]
-echo wrangler secret put RECAPTCHA_PROJECT_ID --name [worker-name]
-echo cd ..\..
-echo.
-
 echo 📄 PDF Worker: No environment variables needed
 echo.
 

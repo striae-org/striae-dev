@@ -59,11 +59,7 @@ $requiredVars = @(
     "IMAGES_API_TOKEN",
     "API_TOKEN",
     "CFT_SECRET_KEY",
-    "HMAC_KEY",
-    "SMS_DEFENSE_AUTH",
-    "RECAPTCHA_API_KEY",
-    "RECAPTCHA_SITE_KEY",
-    "RECAPTCHA_PROJECT_ID"
+    "HMAC_KEY"
 )
 
 Write-Host "🔍 Validating required environment variables..." -ForegroundColor Yellow
@@ -223,13 +219,6 @@ if (-not (Set-WorkerSecrets -WorkerName "Turnstile Worker" -WorkerPath "workers/
     "CFT_SECRET_KEY"
 ))) {
     Write-Host "⚠️  Skipping Turnstile Worker (not configured)" -ForegroundColor Yellow
-}
-
-# SMS Defense Worker
-if (-not (Set-WorkerSecrets -WorkerName "SMS Defense Worker" -WorkerPath "workers/sms-defense-worker" -Secrets @(
-    "SMS_DEFENSE_AUTH", "RECAPTCHA_API_KEY", "RECAPTCHA_SITE_KEY", "RECAPTCHA_PROJECT_ID"
-))) {
-    Write-Host "⚠️  Skipping SMS Defense Worker (not configured)" -ForegroundColor Yellow
 }
 
 # PDF Worker (no secrets needed)
