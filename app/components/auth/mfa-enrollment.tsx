@@ -78,6 +78,15 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       return;
     }
 
+    // Prevent use of example phone numbers
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    if (cleanPhone === '15551234567' || cleanPhone === '5551234567') {
+      const error = 'Please enter your actual phone number, not the demo number.';
+      setErrorMessage(error);
+      onError(error);
+      return;
+    }
+
     if (!recaptchaVerifier) {
       const error = getValidationError('MFA_RECAPTCHA_ERROR');
       setErrorMessage(error);
