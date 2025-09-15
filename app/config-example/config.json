@@ -10,9 +10,5 @@
   "pdf_worker_url": "PDF_WORKER_CUSTOM_DOMAIN",
   "keys_auth": "YOUR_KEYS_AUTH_TOKEN",
   "max_cases_demo": 1,
-  "max_files_per_case_demo": 2,
-  "recaptcha": {
-    "site_key": "YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY",
-    "enabled": true
-  }
+  "max_files_per_case_demo": 2
 }

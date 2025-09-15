@@ -9,7 +9,6 @@ import {
   User
 } from 'firebase/auth';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
-import { generateMFAToken, waitForRecaptcha } from '~/utils/recaptcha-sms';
 import styles from './mfa-enrollment.module.css';
 
 interface MFAEnrollmentProps {
@@ -87,39 +86,9 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
 
     setIsLoading(true);
     setErrorMessage(''); // Clear any previous errors
-    
     try {
-      // Wait for reCAPTCHA Enterprise to be ready
-      const recaptchaReady = await waitForRecaptcha(5000);
-      if (!recaptchaReady) {
-        console.warn('reCAPTCHA Enterprise not available, proceeding without SMS Defense');
-      }
-
-      // Generate SMS Defense token if available
-      let smsDefenseToken = null;
-      if (recaptchaReady) {
-        try {
-          smsDefenseToken = await generateMFAToken();
-          console.log('Generated SMS Defense token for MFA enrollment');
-        } catch (tokenError) {
-          console.warn('Failed to generate SMS Defense token:', tokenError);
-          // Continue without SMS Defense token
-        }
-      }
-
       // Format phone number if it doesn't start with +
       const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
-      
-      // TODO: Send SMS Defense token to backend for fraud check before sending SMS
-      // This will be implemented in Step 5 (backend integration)
-      if (smsDefenseToken) {
-        console.log('SMS Defense token ready for backend fraud check:', {
-          token: smsDefenseToken.substring(0, 20) + '...',
-          phoneNumber: formattedPhone,
-          userId: user.uid,
-          action: 'mfa_enrollment'
-        });
-      }
       
       const multiFactorSession = await multiFactor(user).getSession();
       const phoneInfoOptions = {

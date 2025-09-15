@@ -8,7 +8,6 @@ import {
 } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
-import { generateLoginMFAToken, waitForRecaptcha } from '~/utils/recaptcha-sms';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -64,40 +63,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
 
     setLoading(true);
     setErrorMessage(''); // Clear any previous errors
-    
     try {
-      // Wait for reCAPTCHA Enterprise to be ready
-      const recaptchaReady = await waitForRecaptcha(5000);
-      if (!recaptchaReady) {
-        console.warn('reCAPTCHA Enterprise not available for MFA verification');
-      }
-
-      // Generate SMS Defense token if available
-      let smsDefenseToken = null;
-      if (recaptchaReady) {
-        try {
-          smsDefenseToken = await generateLoginMFAToken();
-          console.log('Generated SMS Defense token for MFA verification');
-        } catch (tokenError) {
-          console.warn('Failed to generate SMS Defense token:', tokenError);
-          // Continue without SMS Defense token
-        }
-      }
-
-      // Get phone number from hint for fraud check
-      const hint = resolver.hints[selectedHintIndex];
-      // MultiFactorInfo doesn't directly expose phone number, but we can extract from uid
-      const phoneHint = hint.uid || 'unknown';
-
-      // TODO: Send SMS Defense token to backend for fraud check
-      if (smsDefenseToken && phoneHint !== 'unknown') {
-        console.log('SMS Defense token ready for MFA verification fraud check:', {
-          token: smsDefenseToken.substring(0, 20) + '...',
-          hintId: phoneHint,
-          action: 'login_mfa'
-        });
-      }
-
       const phoneAuthProvider = new PhoneAuthProvider(auth);
       
       const phoneInfoOptions = {
