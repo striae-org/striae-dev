@@ -5,6 +5,7 @@ import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
 import { Icon } from '~/components/icon/icon';
+import { BlogFeed } from '~/components/blog-feed/blog-feed';
 
 export const meta = () => {
   return baseMeta({
@@ -92,6 +93,8 @@ export default function Home() {
             Time until full release:
              <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
           </div>
+          
+          <BlogFeed />
           
           <div className={styles.aboutSection}>
             <h2 className={styles.aboutTitle}>About Striae</h2>            
