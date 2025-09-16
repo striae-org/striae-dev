@@ -24,7 +24,7 @@ export default function Home() {
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   useEffect(() => {
-      const launchDate = new Date('2026-01-01T11:00:00-07:00');
+      const launchDate = new Date('2025-10-01T11:00:00-07:00');
       const updateTimer = () => {
       const now = new Date();
       const diff = launchDate.getTime() - now.getTime();
@@ -76,7 +76,7 @@ export default function Home() {
             </Link>
           </div>
           <div className={styles.subtitle}>
-            <p>Beta Period Ends January 1, 2026 @ 11:00 AM MST</p>
+            <p>Release Candidacy Begins October 1, 2025 @ 11:00 AM MST</p>
             <br />
             <p><a href="https://www.customink.com/fundraising/striae-beta-als-san-diego" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Striae Beta Fundraiser for ALS San Diego in Honor of John Farrell</a></p>
            <div className={styles.youtubeEmbed}>
@@ -90,7 +90,7 @@ export default function Home() {
                 allowFullScreen
               ></iframe>
             </div>
-            Time until full release:
+            Time until candidate release:
              <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
           </div>
           
