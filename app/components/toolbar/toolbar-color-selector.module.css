@@ -1,9 +1,7 @@
 .toolbarColorSelector {
   position: absolute;
-  right: 0;
+  left: calc(100% + var(--spaceM));
   bottom: 0;
-  margin-bottom: var(--spaceM);
-  margin-right: var(--spaceM);
   background: var(--background);
   border-radius: 5px;
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
