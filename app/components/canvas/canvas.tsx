@@ -1,23 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { BoxAnnotations, BoxAnnotation } from './box-annotations/box-annotations';
+import { AnnotationData } from '~/types/annotations';
 import styles from './canvas.module.css';
-
-interface AnnotationData {
-  leftCase: string;
-  rightCase: string;
-  leftItem: string;
-  rightItem: string;
-  caseFontColor: string;
-  classType: 'Bullet' | 'Cartridge Case' | 'Other';
-  customClass?: string;
-  classNote: string;
-  indexType: 'number' | 'color';
-  indexNumber?: string;
-  indexColor?: string;
-  supportLevel: 'ID' | 'Exclusion' | 'Inconclusive';
-  includeConfirmation?: boolean;
-  hasSubclass?: boolean;
-  additionalNotes: string;
-}
 
 interface CanvasProps {
   imageUrl?: string;
@@ -27,6 +11,9 @@ interface CanvasProps {
   error?: string;
   activeAnnotations?: Set<string>;
   annotationData?: AnnotationData | null;
+  onAnnotationUpdate?: (annotationData: AnnotationData) => void;
+  isBoxAnnotationMode?: boolean;
+  boxAnnotationColor?: string;
 }
 
 type ImageLoadError = {
@@ -34,10 +21,34 @@ type ImageLoadError = {
   message: string;
 }
 
-export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAnnotations, annotationData }: CanvasProps) => {
+export const Canvas = ({ 
+  imageUrl, 
+  filename, 
+  company, 
+  firstName, 
+  error, 
+  activeAnnotations, 
+  annotationData,
+  onAnnotationUpdate,
+  isBoxAnnotationMode = false,
+  boxAnnotationColor = '#ff0000'
+}: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  // Handle box annotation changes
+  const handleBoxAnnotationsChange = (boxAnnotations: BoxAnnotation[]) => {
+    if (!onAnnotationUpdate || !annotationData) return;
+    
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      boxAnnotations
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+  };
 
   useEffect(() => {
     if (!imageUrl) {
@@ -149,19 +160,32 @@ export const Canvas = ({ imageUrl, filename, company, firstName, error, activeAn
             )}
             
             <img 
+            ref={imageRef}
             src={imageUrl}
             alt="Case evidence"
             className={styles.image}
             style={{
               border: activeAnnotations?.has('index') && annotationData?.indexType === 'color' && annotationData?.indexColor
                 ? `6px solid ${annotationData.indexColor}`
-                : undefined
+                : undefined,
+              userSelect: 'none'
             }}
             onError={() => setLoadError({
               type: 'network',
               message: 'Failed to load image from network'
             })}
+            draggable={false}
           />
+          
+          {/* Box Annotations Component */}
+          <BoxAnnotations
+            imageRef={imageRef}
+            annotations={annotationData?.boxAnnotations || []}
+            onAnnotationsChange={handleBoxAnnotationsChange}
+            isAnnotationMode={isBoxAnnotationMode}
+            annotationColor={boxAnnotationColor}
+          />
+          
           {/* Annotations Overlay */}
           {activeAnnotations?.has('number') && annotationData && (
             <div className={styles.annotationsOverlay}>

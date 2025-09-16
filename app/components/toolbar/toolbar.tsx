@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button } from '../button/button';
+import { ToolbarColorSelector } from './toolbar-color-selector';
 import styles from './toolbar.module.css';
 
-type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibility';
+type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibility' | 'box';
 
 interface ToolbarProps {
   onToolSelect?: (toolId: ToolId, active: boolean) => void;
@@ -10,6 +11,8 @@ interface ToolbarProps {
   canGeneratePDF?: boolean;
   onVisibilityChange?: (visible: boolean) => void;
   isGeneratingPDF?: boolean;
+  onColorChange?: (color: string) => void;
+  selectedColor?: string;
 }
 
 export const Toolbar = ({ 
@@ -17,10 +20,13 @@ export const Toolbar = ({
   onVisibilityChange, 
   onGeneratePDF, 
   canGeneratePDF, 
-  isGeneratingPDF = false
+  isGeneratingPDF = false,
+  onColorChange,
+  selectedColor = '#ff0000'
 }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
+  const [showColorSelector, setShowColorSelector] = useState(false);
 
   const handleToolClick = (toolId: ToolId) => {
     if (toolId === 'print') {
@@ -41,12 +47,29 @@ export const Toolbar = ({
       const next = new Set(prev);
       if (next.has(toolId)) {
         next.delete(toolId);
+        // Hide color selector when box tool is deactivated
+        if (toolId === 'box') {
+          setShowColorSelector(false);
+        }
       } else {
         next.add(toolId);
+        // Show color selector when box tool is activated
+        if (toolId === 'box') {
+          setShowColorSelector(true);
+        }
       }
       onToolSelect?.(toolId, next.has(toolId));
       return next;
     });    
+  };
+
+  const handleColorConfirm = (color: string) => {
+    onColorChange?.(color);
+    setShowColorSelector(false);
+  };
+
+  const handleColorCancel = () => {
+    setShowColorSelector(false);
   };
 
   return (
@@ -86,11 +109,17 @@ export const Toolbar = ({
         ariaLabel="Support Level"
       />
       <Button
+        iconId="box"
+        isActive={activeTools.has('box')}
+        onClick={() => handleToolClick('box')}
+        ariaLabel="Box Annotations"
+      />
+      <Button
         iconId="notes"
         isActive={activeTools.has('notes')}
         onClick={() => handleToolClick('notes')}
         ariaLabel="Additional Notes"
-      />
+      />      
       <Button
         iconId="print"
         isActive={false}
@@ -101,6 +130,13 @@ export const Toolbar = ({
       />
         </div>
       </div>
+      
+      <ToolbarColorSelector
+        selectedColor={selectedColor}
+        onColorConfirm={handleColorConfirm}
+        onCancel={handleColorCancel}
+        isVisible={showColorSelector && isVisible}
+      />
     </div>
   );
 };
