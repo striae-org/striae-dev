@@ -46,9 +46,9 @@
 
 **Complete PDF Reports with Box Annotation Integration:**
 
-- **[Example Report 1: BOX-TEST-5.2 vs BOX-TEST-6.8](https://www.striae.org/assets/striae-report-123456-BOX-TEST-5.2--123456-BOX-TEST-6.8.pdf)** - Demonstrates box annotations in comparison image report with multiple annotations and precise positioning
+- **[Example Report 1: BOX-TEST-1.1 vs BOX-TEST-1.2](https://www.striae.org/assets/striae-report-123456-BOX-TEST-1.1--123456-BOX-TEST-1.2.pdf)** - Demonstrates box annotations in comparison image report with multiple annotations and precise positioning
 
-- **[Example Report 2: BOX-TEST-1.1 vs BOX-TEST-1.2](https://www.striae.org/assets/striae-report-123456-BOX-TEST-1.1--123456-BOX-TEST-1.2.pdf)** - Shows box annotation rendering consistency between canvas interface and final PDF output
+- **[Example Report 2: BOX-TEST-5.2 vs BOX-TEST-6.8](https://www.striae.org/assets/striae-report-123456-BOX-TEST-5.2--123456-BOX-TEST-6.8.pdf)** - Shows box annotation rendering consistency between canvas interface and final PDF output
 
 *These examples showcase the complete workflow from interactive annotation creation through final PDF report generation, demonstrating the seamless integration of box annotations throughout the comparison image annotation process.*
 
