@@ -8,24 +8,32 @@ Striae is a cloud-native forensic annotation application built specifically for 
 
 ```
 striae/
+├── .github/                     # GitHub configuration and workflows
 ├── app/                          # Main Remix application
+│   ├── assets/                  # Application assets (icons, images)
 │   ├── components/              # React components
+│   ├── config/                  # Configuration files
+│   ├── config-example/          # Example configuration templates
+│   ├── contexts/               # React contexts (auth)
+│   ├── hooks/                  # Custom React hooks
 │   ├── routes/                  # Application routes/pages
 │   ├── services/               # Firebase and external services
-│   ├── utils/                  # Utility functions
-│   ├── hooks/                  # Custom React hooks
-│   ├── contexts/               # React contexts (auth)
-│   └── config/                 # Configuration files
-├── workers/                     # Cloudflare Workers
-│   ├── user-worker/            # User data management
-│   ├── image-worker/           # Image upload/management
-│   ├── pdf-worker/             # PDF generation
-│   ├── data-worker/            # Case data management
-│   ├── keys-worker/            # API key management
-│   └── turnstile-worker/       # CAPTCHA verification
-├── public/                     # Static assets
+│   ├── styles/                 # Global styles and CSS utilities
+│   ├── types/                  # TypeScript type definitions
+│   └── utils/                  # Utility functions
+├── build/                       # Production build output
+├── functions/                  # Cloudflare Pages Functions
 ├── guides/                     # Documentation (this directory)
-└── functions/                  # Cloudflare Pages Functions
+├── public/                     # Static assets
+├── release-notes/              # Version release documentation
+├── scripts/                    # Build and deployment scripts
+└── workers/                     # Cloudflare Workers
+    ├── data-worker/            # Case data management
+    ├── image-worker/           # Image upload/management
+    ├── keys-worker/            # API key management
+    ├── pdf-worker/             # PDF generation
+    ├── turnstile-worker/       # CAPTCHA verification
+    └── user-worker/            # User data management
 ```
 
 ## Tech Stack
