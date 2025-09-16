@@ -61,6 +61,7 @@ export const auth = getAuth(app);
 ```
 
 #### Implemented Features
+
 - **Email/Password Authentication**: Standard email and password login
 - **Email Verification**: Required before account activation
 - **Multi-Factor Authentication (MFA)**: SMS-based second factor
@@ -84,6 +85,7 @@ const checkPasswordStrength = (password: string): boolean => {
 ```
 
 **Requirements:**
+
 - Minimum 10 characters
 - At least one uppercase letter
 - At least one number
@@ -101,6 +103,7 @@ export const userHasMFA = (user: User): boolean => {
 ```
 
 #### MFA Flow
+
 1. User completes email/password authentication
 2. If MFA not enrolled, prompt for phone number enrollment
 3. SMS verification code sent via Firebase
@@ -268,6 +271,7 @@ All sensitive configuration is stored as environment variables across the worker
 ```
 
 **Security Notes:**
+
 - All authentication tokens are unique, randomly generated secrets
 - KV and R2 bindings are configured in wrangler.jsonc files
 - No environment variables are exposed to client-side code
@@ -367,18 +371,21 @@ interface FirebaseConfig {
 While custom audit logging is not implemented, Cloudflare provides built-in logging capabilities for Workers:
 
 **Available Logging Features:**
+
 - **Real-time Logs**: Console logs from workers available in Cloudflare dashboard
 - **Request Analytics**: HTTP request metrics, response codes, and performance data
 - **Error Tracking**: Automatic capture of worker exceptions and errors
 - **Tail Logs**: Live streaming of worker execution logs via `wrangler tail`
 
 **Log Retention Policy:**
+
 - **Real-time Logs**: Available for immediate viewing during development
 - **Analytics Data**: Retained for up to 30 days on Pro plans, longer on Enterprise
 - **Error Logs**: Captured in Cloudflare's error tracking system
 - **Console Logs**: Viewable in real-time but not persistently stored without external logging
 
 **What Gets Logged:**
+
 - Worker execution times and performance metrics
 - HTTP request/response details (headers, status codes, response times)
 - Console.log() statements from worker code
@@ -386,6 +393,7 @@ While custom audit logging is not implemented, Cloudflare provides built-in logg
 - Geographic request distribution and caching metrics
 
 **Limitations:**
+
 - No built-in request payload logging for security reasons
 - Console logs are not permanently stored without external log aggregation
 - No user action audit trail beyond HTTP request logs
@@ -458,6 +466,7 @@ wrangler tail --name striae-images
 - Set up external log aggregation for long-term storage if needed
 
 **Available Metrics:**
+
 - Request count and error rates by worker
 - Response time percentiles and performance trends
 - Geographic distribution of requests
