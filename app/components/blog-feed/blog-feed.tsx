@@ -79,8 +79,8 @@ export const BlogFeed = () => {
   if (loading) {
     return (
       <div className={styles.blogSection}>
-        <h2 className={styles.blogTitle}>Latest from the Striae Blog</h2>
-        <div className={styles.loading}>Loading blog posts...</div>
+        <h2 className={styles.blogTitle}>News and Announcements</h2>
+        <div className={styles.loading}>Loading latest posts...</div>
       </div>
     );
   }
@@ -88,7 +88,7 @@ export const BlogFeed = () => {
   if (error) {
     return (
       <div className={styles.blogSection}>
-        <h2 className={styles.blogTitle}>Latest from the Striae Blog</h2>
+        <h2 className={styles.blogTitle}>News and Announcements</h2>
         <div className={styles.error}>
           <p>{error}</p>
           <a 
@@ -97,7 +97,7 @@ export const BlogFeed = () => {
             rel="noopener noreferrer"
             className={styles.blogLink}
           >
-            Visit the blog directly →
+            Visit the blog →
           </a>
         </div>
       </div>
@@ -106,7 +106,7 @@ export const BlogFeed = () => {
 
   return (
     <div className={styles.blogSection}>
-      <h2 className={styles.blogTitle}>Latest from the Striae Blog</h2>
+      <h2 className={styles.blogTitle}>News and Announcements</h2>
       <div className={styles.blogContent}>
         {posts.map((post, index) => (
           <article key={index} className={styles.blogPost}>
@@ -139,7 +139,7 @@ export const BlogFeed = () => {
             rel="noopener noreferrer"
             className={styles.allPostsLink}
           >
-            View all blog posts →
+            View all posts →
           </a>
         </div>
       </div>
