@@ -1,0 +1,205 @@
+import { useState, useEffect } from 'react';
+import styles from './case-export.module.css';
+
+export type ExportFormat = 'json' | 'csv';
+
+interface CaseExportProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onExport: (caseNumber: string, format: ExportFormat) => void;
+  onExportAll: (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => void;
+  currentCaseNumber?: string;
+}
+
+export const CaseExport = ({ 
+  isOpen, 
+  onClose, 
+  onExport, 
+  onExportAll,
+  currentCaseNumber = '' 
+}: CaseExportProps) => {
+  const [caseNumber, setCaseNumber] = useState(currentCaseNumber);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingAll, setIsExportingAll] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [exportProgress, setExportProgress] = useState<{ current: number; total: number; caseName: string } | null>(null);
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('json');
+
+  // Update caseNumber when currentCaseNumber prop changes
+  useEffect(() => {
+    setCaseNumber(currentCaseNumber);
+  }, [currentCaseNumber]);
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const handleExport = async () => {
+    if (!caseNumber.trim()) {
+      setError('Please enter a case number');
+      return;
+    }
+    
+    setIsExporting(true);
+    setError('');
+    setExportProgress(null);
+    
+    try {
+      await onExport(caseNumber.trim(), selectedFormat);
+      onClose();
+    } catch (error) {
+      console.error('Export failed:', error);
+      setError(error instanceof Error ? error.message : 'Export failed. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportAll = async () => {
+    setIsExportingAll(true);
+    setError('');
+    setExportProgress(null); // Don't show progress until we have real data
+    
+    try {
+      await onExportAll((current: number, total: number, caseName: string) => {
+        setExportProgress({ current, total, caseName });
+      }, selectedFormat);
+      onClose();
+    } catch (error) {
+      console.error('Export all failed:', error);
+      setError(error instanceof Error ? error.message : 'Export all cases failed. Please try again.');
+    } finally {
+      setIsExportingAll(false);
+      setExportProgress(null);
+    }
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  return (
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Export Case Data</h2>
+          <button 
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close modal"
+          >
+            ×
+          </button>
+        </div>
+        
+        <div className={styles.content}>
+          <div className={styles.fieldGroup}>            
+            <div className={styles.inputGroup}>
+              <input
+                id="caseNumber"
+                type="text"
+                className={styles.input}
+                value={caseNumber}
+                onChange={(e) => {
+                  setCaseNumber(e.target.value);
+                  if (error) setError('');
+                }}
+                placeholder="Enter case number"
+                disabled={isExporting || isExportingAll}
+              />
+              <button
+                className={styles.exportButton}
+                onClick={handleExport}
+                disabled={!caseNumber.trim() || isExporting || isExportingAll}
+              >
+                {isExporting ? 'Exporting...' : 'Export Case Data'}
+              </button>
+            </div>
+            
+            <div className={styles.divider}>
+              <span>OR</span>
+            </div>
+            
+            <div className={styles.exportAllSection}>
+              <button
+                className={styles.exportAllButton}
+                onClick={handleExportAll}
+                disabled={isExporting || isExportingAll}
+              >
+                {isExportingAll ? 'Exporting All Cases...' : 'Export All Cases'}
+              </button>              
+            </div>
+            
+            {exportProgress && exportProgress.total > 0 && (
+              <div className={styles.progressSection}>
+                <div className={styles.progressText}>
+                  Exporting case {exportProgress.current} of {exportProgress.total}: {exportProgress.caseName}
+                </div>
+                <div className={styles.progressBar}>
+                  <div 
+                    className={styles.progressFill}
+                    style={{ width: `${(exportProgress.current / exportProgress.total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            
+            {isExportingAll && !exportProgress && (
+              <div className={styles.progressSection}>
+                <div className={styles.progressText}>
+                  Preparing export...
+                </div>
+              </div>
+            )}
+            
+            {error && (
+              <div className={styles.error}>
+                {error}
+              </div>
+            )}
+            
+            <div className={styles.formatSelector}>
+              <span className={styles.formatLabel}>Format:</span>
+              <div className={styles.formatToggle}>
+                <button
+                  type="button"
+                  className={`${styles.formatOption} ${selectedFormat === 'json' ? styles.formatOptionActive : ''}`}
+                  onClick={() => setSelectedFormat('json')}
+                  disabled={isExporting || isExportingAll}
+                >
+                  JSON
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.formatOption} ${selectedFormat === 'csv' ? styles.formatOptionActive : ''}`}
+                  onClick={() => setSelectedFormat('csv')}
+                  disabled={isExporting || isExportingAll}
+                  title="CSV for single case, Excel (.xlsx) with multiple worksheets for all cases"
+                >
+                  CSV/Excel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

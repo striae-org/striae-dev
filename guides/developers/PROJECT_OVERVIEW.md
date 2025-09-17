@@ -60,6 +60,7 @@ striae/
 
 - **Canvas-based annotation system** for comparison image annotation with box annotations
 - **Case management** with file organization
+- **Comprehensive data export** with JSON, CSV, and multi-worksheet Excel formats
 - **PDF report generation** with annotations
 - **Multi-factor authentication** for security
 - **Real-time image annotation** with various marking features including box tool
@@ -96,7 +97,7 @@ For new developers joining the project:
 
 ## Project Status
 
-Striae is currently in **Beta** (v0.9.15.1-beta) with active development. The beta period ends January 1, 2026. The project is actively maintained and welcomes contributions from the forensic technology community.
+Striae is currently in **Beta** (v0.9.17-beta) with active development. The beta period ends January 1, 2026. The project is actively maintained and welcomes contributions from the forensic technology community.
 
 ---
 

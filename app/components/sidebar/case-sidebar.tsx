@@ -1,7 +1,16 @@
 import { User } from 'firebase/auth';
+import {
+  exportCaseData,
+  exportAllCases,
+  downloadCaseAsJSON,
+  downloadCaseAsCSV,
+  downloadAllCasesAsJSON,
+  downloadAllCasesAsCSV
+} from '../actions/case-export';
 import { useState, useEffect, useRef } from 'react';
 import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
+import { CaseExport, ExportFormat } from './case-export/case-export';
 import {
   validateCaseNumber,
   checkExistingCase,
@@ -341,6 +350,58 @@ const handleImageSelect = (file: FileData) => {
     setImageLoaded(true);
   };
 
+  const handleExport = async (exportCaseNumber: string, format: ExportFormat) => {
+    try {
+      console.log(`Starting export for case: "${exportCaseNumber}" in ${format.toUpperCase()} format`);
+      
+      // Use the proper export function with validation
+      const exportData = await exportCaseData(user, exportCaseNumber, {
+        includeAnnotations: true,
+        includeMetadata: true
+      });
+      
+      console.log('Export data generated successfully:', exportData);
+      
+      // Download the exported data in the selected format
+      if (format === 'json') {
+        downloadCaseAsJSON(exportData);
+      } else {
+        downloadCaseAsCSV(exportData);
+      }
+      
+      console.log(`Case export completed for: ${exportCaseNumber} in ${format.toUpperCase()} format`);
+    } catch (error) {
+      console.error('Export failed:', error);
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
+
+  const handleExportAll = async (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => {
+    try {
+      console.log(`Starting export of all cases in ${format.toUpperCase()} format...`);
+      
+      // Export all cases with progress callback
+      const exportData = await exportAllCases(user, {
+        includeAnnotations: true,
+        includeMetadata: true
+      }, onProgress);
+      
+      console.log('All cases export data generated successfully:', exportData);
+      
+      // Download the exported data in the selected format
+      if (format === 'json') {
+        downloadAllCasesAsJSON(exportData);
+      } else {
+        downloadAllCasesAsCSV(exportData);
+      }
+      
+      console.log(`All cases export completed in ${format.toUpperCase()} format`);
+    } catch (error) {
+      console.error('Export all failed:', error);
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
+
 return (
     <div className={styles.caseSection}>
      <div className={styles.caseSection}>
@@ -395,6 +456,14 @@ return (
         onSelectCase={setCaseNumber}
         currentCase={currentCase || ''}
         user={user}
+      />
+      
+      <CaseExport
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={handleExport}
+        onExportAll={handleExportAll}
+        currentCaseNumber={currentCase || ''}
       />
         <div className={styles.filesSection}>
       <h4>{currentCase || 'No Case Selected'}</h4>
