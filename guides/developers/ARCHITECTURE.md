@@ -9,8 +9,9 @@
    - [Key Frontend Components](#key-frontend-components)
      - [1. Authentication System](#1-authentication-system)
      - [2. Canvas System](#2-canvas-system)
-     - [3. Sidebar Management](#3-sidebar-management)
-     - [4. PDF Generation](#4-pdf-generation)
+     - [3. Toolbar System](#3-toolbar-system)
+     - [4. Sidebar Management](#4-sidebar-management)
+     - [5. PDF Generation](#5-pdf-generation)
 4. [Backend Architecture (Cloudflare Workers)](#backend-architecture-cloudflare-workers)
    - [Worker Services Overview](#worker-services-overview)
    - [1. User Worker (`workers/user-worker/`)](#1-user-worker-workersuser-worker)
@@ -109,7 +110,26 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
   - **Type Safety**: Centralized BoxAnnotation and AnnotationData interfaces
   - **Integration**: Seamless connection with toolbar controls and PDF generation
 
-#### 3. Sidebar Management
+#### 3. Toolbar System
+
+- **Location**: `app/components/toolbar/`
+- **Purpose**: Central tool selection and application control
+- **Features**:
+  - Tool selection management (number, class, index, id, notes, box, print, visibility)
+  - PDF generation controls
+  - Box annotation mode with color selector
+  - Visibility toggle for all annotation types
+  - Active tool state tracking
+- **Components**:
+  - **Toolbar**: Main toolbar with tool buttons
+  - **ToolbarColorSelector**: Dynamic color picker for box annotations
+- **Architecture**:
+  - **State Management**: Tool selection propagated to canvas and sidebar components
+  - **Event Handling**: Tool activation triggers mode changes in annotation components
+  - **Integration**: Box tool activation automatically displays color selector
+
+#### 4. Sidebar Management
+
 - **Location**: `app/components/sidebar/`
 - **Features**:
   - Case and file management
@@ -117,7 +137,8 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
   - Annotation inputs
   - Visibility controls
 
-#### 4. PDF Generation
+#### 5. PDF Generation
+
 - **Location**: `app/components/actions/`
 - **Purpose**: Report generation
 - **Features**:

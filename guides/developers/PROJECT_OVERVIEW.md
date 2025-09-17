@@ -55,11 +55,11 @@ striae/
 - **Deployment**: Wrangler (Cloudflare CLI)
 
 ### Key Features
-- **Canvas-based annotation system** for comparison image annotation
+- **Canvas-based annotation system** for comparison image annotation with box annotations
 - **Case management** with file organization
 - **PDF report generation** with annotations
 - **Multi-factor authentication** for security
-- **Real-time image annotation** with various marking features
+- **Real-time image annotation** with various marking features including box tool
 - **Cloud-native architecture** for global accessibility and scalability
 
 ## Development Philosophy

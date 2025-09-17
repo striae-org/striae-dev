@@ -656,6 +656,10 @@ export const handleCanvasError = (error: unknown): string => {
     switch (error.type) {
       case 'INVALID_ANNOTATION':
         return 'Invalid annotation data. Please try again.';
+      case 'INVALID_BOX_ANNOTATION':
+        return 'Invalid box annotation coordinates. Please try drawing again.';
+      case 'BOX_ANNOTATION_TOO_SMALL':
+        return 'Box annotation is too small. Please draw a larger box.';
       case 'CANVAS_LOAD_FAILED':
         return 'Failed to load image. Please refresh and try again.';
       default:
