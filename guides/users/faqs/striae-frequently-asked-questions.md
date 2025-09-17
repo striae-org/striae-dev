@@ -1,9 +1,4 @@
----
-title: Striae - Frequently Asked Questions
-label: Striae Frequently Asked Questions
-slug: striae-frequently-asked-questions
-visibility: PUBLIC
----
+
 ## 🔐 Login & Authentication
 
 **Q: How do I log into Striae for the first time?**
@@ -38,7 +33,7 @@ A: Striae supports the most common and reliable image formats used in forensic d
 
 **Q: What types of annotations can I add to my images?**
 
-A: Striae offers a rich set of six annotation tools designed specifically for firearms examination and forensic comparison. You can add case and item numbers to image corners for clear identification. Class characteristics allow you to document technical details like land impressions or primer shear. Index marks let you highlight the specific comparison point shown in the selected image using colorful borders or alphanumeric labels. The support level tool captures your analytical conclusion—whether the evidence supports identification, exclusion, or remains inconclusive. There’s also a confirmation field for adding reviewer signatures and dates in identifications. Finally, the additional notes tool enables you to record detailed observations that provide further context.
+A: Striae offers a rich set of seven annotation tools designed specifically for firearms examination and forensic comparison. You can add case and item numbers to image corners for clear identification. Class characteristics allow you to document technical details like land impressions or primer shear. Index marks let you highlight the specific comparison point shown in the selected image using colorful borders or alphanumeric labels. The support level tool captures your analytical conclusion—whether the evidence supports identification, exclusion, or remains inconclusive. There’s also a confirmation field for adding reviewer signatures and dates in identifications. Finally, the additional notes tool enables you to record detailed observations that provide further context.
 
 **Q: Can I preview my annotations before creating the PDF report?**
 
@@ -47,6 +42,26 @@ A: Absolutely! The annotation toolbar makes it easy to toggle each annotation ty
 **Q: What’s the difference between Color Index and Number/Letter Index?**
 
 A: Both tools serve to visually mark comparison points, but they do so differently. The Color Index surrounds the entire image with a distinctive colored border, which makes it very clear and immediately recognizable. This method is recommended when you want strong visual emphasis. The Number/Letter Index displays alphanumeric identifiers above the image, which can be useful for referencing specific comparison areas more precisely in your notes. Both systems help maintain clarity and assist in peer review or courtroom presentation.
+
+**Q: How do I use box annotations to highlight specific areas?**
+
+A: Box annotations allow you to draw colored rectangular highlights directly on your images to emphasize specific areas of interest. First, click the Box tool in the annotation toolbar to activate box drawing mode. A color picker will appear, allowing you to select from multiple colors. Then simply click and drag on the image to draw a rectangular box around the area you want to highlight. You can delete boxes after creation by right-clicking or double-clicking them if you've made a mistake. This tool is particularly useful for pointing out specific striae, class characteristics, or other significant comparison points.
+
+**Q: Can I use multiple colors for different box annotations on the same image?**
+
+A: Yes! You can use multiple colors for different box annotations on the same image. Each time you activate the Box tool, you can select a different color from the color picker before drawing. This allows you to color-code different types of features—for example, you might use red boxes for aligned striae and blue boxes for firing pin impressions. All box annotations, regardless of color, are preserved in the PDF output with their exact colors and positions.
+
+**Q: Can I remove or edit box annotations after I've drawn them?**
+
+A: Absolutely! Box annotations are deletable after creation. Simply right-click or double-click on the box to delete it. You can also hide all box annotations using the Box tool button in the toolbar without permanently deleting them. They won't be visible in the PDF if the Box tool is toggled off, but they remain saved in your case for future reference.
+
+**Q: Will my box annotations appear in the PDF report?**
+
+A: Yes, all box annotations are preserved in the PDF output with the same colors and positions as shown on screen. Make sure the Box tool is toggled on in the annotation toolbar before generating your PDF to ensure the boxes appear in your report. The boxes will be displayed as colored rectangular overlays on your image, maintaining their exact placement and colors for professional documentation and presentation.
+
+**Q: Is my original image edited to include the box annotations?**
+
+A: No! Your original image remains unaltered. The box annotations are overlaid on the image in the canvas and during the PDF generation process, but they do *not* modify the original file. This means you can always revert to the unannotated image if needed. Striae does not edit or change your original images in any way, ensuring the integrity of your evidence files is maintained. This holds true for all annotation types, including case numbers, class characteristics, index marks, and support level indicators; they are stored in a separate data structure and rendered dynamically without altering the original images.
 
 ***
 

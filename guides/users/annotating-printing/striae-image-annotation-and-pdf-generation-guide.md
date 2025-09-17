@@ -1,7 +1,7 @@
 
 ## Key Features
 
-* **Visual Annotation Tools:** Add case/item numbers, class characteristics, index marks, support levels, and additional notes directly on images.
+* **Visual Annotation Tools:** Add case/item numbers, class characteristics, index marks, support levels, boxes, and additional notes directly on images. *See the [Box Annotation Guide](box-annotation-guide.md) for detailed box annotation techniques.*
 
 * **Professional PDF Output:** Generate casefile-ready, formatted notes with one click.
 
@@ -77,6 +77,8 @@
 
 * Resize or reposition boxes by clicking and dragging after creation.
 
+*For detailed instructions on using box annotations, see the [Box Annotation Guide](box-annotation-guide.md).*
+
 ### Step 6: Add Additional Notes (Optional)
 
 * Enter detailed observations or measurement info.
@@ -87,15 +89,13 @@
 
 ## Annotation Tools Overview
 
-| **Tool** | **Function**                                   |
-| -------- | ---------------------------------------------- |
-| ![Number](https://www.striae.org/assets/admin/number.png)   | Show/hide case and item numbers                |
-| ![Class](https://www.striae.org/assets/admin/class.png)    | Show/hide class characteristic information     |
-| ![Index](https://www.striae.org/assets/admin/index.png)    | Show/hide index marks (color or number/letter) |
-| ![ID](https://www.striae.org/assets/admin/support.png)       | Show/hide support level conclusion             |
-| ![Box](https://www.striae.org/assets/admin/box.png)      | Show/hide box annotations with custom colors   |
-| ![Notes](https://www.striae.org/assets/admin/notes.png)    | Show/hide additional notes section             |
-| ![Print](https://www.striae.org/assets/admin/print.png)    | Generate PDF with current annotations          |
+* ![Number](https://www.striae.org/assets/admin/number.png) **Number** - Show/hide case and item numbers
+* ![Class](https://www.striae.org/assets/admin/class.png) **Class** - Show/hide class characteristic information
+* ![Index](https://www.striae.org/assets/admin/index.png) **Index** - Show/hide index marks (color or number/letter)
+* ![ID](https://www.striae.org/assets/admin/support.png) **ID** - Show/hide support level conclusion
+* ![Box](https://www.striae.org/assets/admin/box.png) **Box** - Show/hide box annotations with custom colors
+* ![Notes](https://www.striae.org/assets/admin/notes.png) **Notes** - Show/hide additional notes section
+* ![Print](https://www.striae.org/assets/admin/print.png) **Print** - Generate PDF with current annotations
 
 ***
 
@@ -130,6 +130,8 @@
 * Boxes can be resized and repositioned after creation by clicking and dragging.
 
 * All box annotations are preserved in the PDF output with the same colors and positions.
+
+*For comprehensive box annotation techniques and advanced features, refer to the [Box Annotation Guide](box-annotation-guide.md).*
 
 ### Additional Notes
 
@@ -255,15 +257,13 @@
 
 ## Toolbar Quick Guide
 
-| **Button** | **Description**                         |
-| ---------- | --------------------------------------- |
-| ![Numbers](https://www.striae.org/assets/admin/number.png)    | Toggle case/item number display         |
-| ![Class](https://www.striae.org/assets/admin/class.png)      | Toggle object type and class notes      |
-| ![Index](https://www.striae.org/assets/admin/index.png)      | Toggle color border or index label      |
-| ![ID](https://www.striae.org/assets/admin/support.png)         | Toggle support level conclusion display |
-| ![Box](https://www.striae.org/assets/admin/box.png)        | Toggle box annotations with custom colors |
-| ![Notes](https://www.striae.org/assets/admin/notes.png)      | Toggle additional observations section  |
-| ![Print](https://www.striae.org/assets/admin/print.png)      | Generate professional PDF report        |
+* ![Numbers](https://www.striae.org/assets/admin/number.png) **Numbers** - Toggle case/item number display
+* ![Class](https://www.striae.org/assets/admin/class.png) **Class** - Toggle object type and class notes
+* ![Index](https://www.striae.org/assets/admin/index.png) **Index** - Toggle color border or index label
+* ![ID](https://www.striae.org/assets/admin/support.png) **ID** - Toggle support level conclusion display
+* ![Box](https://www.striae.org/assets/admin/box.png) **Box** - Toggle box annotations with custom colors
+* ![Notes](https://www.striae.org/assets/admin/notes.png) **Notes** - Toggle additional observations section
+* ![Print](https://www.striae.org/assets/admin/print.png) **Print** - Generate professional PDF report
 
 ***
 
