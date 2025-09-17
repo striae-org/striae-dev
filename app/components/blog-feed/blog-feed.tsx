@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './blog-feed.module.css';
+import sanitizeHtml from 'sanitize-html';
 
 interface BlogPost {
   title: string;
@@ -53,8 +54,8 @@ export const BlogFeed = () => {
   }, []);
 
   const truncateDescription = (text: string): string => {
-    // Remove HTML tags if any
-    const cleanText = text.replace(/<[^>]*>/g, '');
+    // Remove HTML tags and dangerous scripts using sanitize-html
+    const cleanText = sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} });
     
     // Split into sentences and take first 2-3 sentences
     const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
