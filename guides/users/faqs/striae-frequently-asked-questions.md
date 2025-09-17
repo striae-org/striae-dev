@@ -1,4 +1,17 @@
 
+## Table of Contents
+
+1. [🔐 Login & Authentication](#-login--authentication)
+2. [📊 Case Management](#-case-management)  
+3. [🎯 Image Annotation](#-image-annotation)
+4. [📄 PDF Generation](#-pdf-generation)
+5. [👤 Account Deletion](#-account-deletion)
+6. [🔧 Troubleshooting](#-troubleshooting)
+7. [🛡️ Security & Best Practices](#️-security--best-practices)
+8. [🚀 Getting Started Quickly](#-getting-started-quickly)
+
+***
+
 ## 🔐 Login & Authentication
 
 **Q: How do I log into Striae for the first time?**
