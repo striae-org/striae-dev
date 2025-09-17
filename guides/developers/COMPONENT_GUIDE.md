@@ -19,8 +19,10 @@
      - [Notes Sidebar](#notes-sidebar-appcomponentssidebarnotes-sidebartsx)
      - [Cases Modal](#cases-modal-appcomponentssidebarcases-modaltsx)
      - [Notes Modal](#notes-modal-appcomponentssidebarnotes-modaltsx)
+     - [Case Export](#case-export-appcomponentssidebarcase-exportcase-exporttsx)
    - [4. Action Components](#4-action-components)
      - [Case Management](#case-management-appcomponentsactionscase-managets)
+     - [Case Export](#case-export-appcomponentsactionscase-exportts)
      - [Image Management](#image-management-appcomponentsactionsimage-managets)
      - [PDF Generation](#pdf-generation-appcomponentsactionsgenerate-pdfts)
      - [Notes Management](#notes-management-appcomponentsactionsnotes-managets)
@@ -101,6 +103,8 @@ app/components/
 - Firebase MFA integration
 - reCAPTCHA verification
 
+**Type Definition**: Uses Firebase authentication types for MFA setup
+
 **Key Props**:
 
 - `user: User` - Firebase user object
@@ -118,6 +122,8 @@ app/components/
 - SMS code input and validation
 - Error handling and retry logic
 
+**Type Definition**: Uses Firebase `MultiFactorResolver` interface for MFA challenges
+
 ### 2. Canvas System
 
 #### Canvas (`app/components/canvas/canvas.tsx`)
@@ -130,6 +136,8 @@ app/components/
 - Annotation overlay display
 - Loading states and error handling
 - Flash effects for user feedback (subclass characteristics)
+
+**Type Definition**: Uses `AnnotationData` interface from `app/types/annotations.ts`
 
 **Key Props**:
 
@@ -169,6 +177,8 @@ interface CanvasProps {
 - Hover effects with deletion indicators
 - Transparent styling with colored borders
 - Automatic saving integration with existing annotation system
+
+**Type Definition**: Uses `BoxAnnotation` interface from `app/types/annotations.ts`
 
 **Key Props**:
 
@@ -210,6 +220,8 @@ interface BoxAnnotationsProps {
 - Automatic appearance when box annotation tool is active
 - Reset functionality to restore previous color selection
 
+**Type Definition**: Uses component-specific `ToolbarColorSelectorProps` interface
+
 **Key Props**:
 
 ```typescript
@@ -249,6 +261,8 @@ interface ToolbarColorSelectorProps {
 - Keyboard event handling (Escape key)
 - Patreon widget integration
 
+**Type Definition**: Uses `FileData` interface and Firebase `User` type
+
 **Key Props**:
 
 ```typescript
@@ -273,6 +287,8 @@ interface SidebarContainerProps {
 - File upload and selection
 - Image management controls
 
+**Type Definition**: Uses Firebase `User` type and `FileData` interface
+
 #### Case Sidebar (`app/components/sidebar/case-sidebar.tsx`)
 
 **Purpose**: Case-specific sidebar functionality
@@ -283,6 +299,8 @@ interface SidebarContainerProps {
 - File upload interface
 - Image selection and deletion
 - Case validation and error handling
+
+**Type Definition**: Uses component-specific `CaseSidebarProps` interface with `FileData` and Firebase `User` types
 
 **Key Props**:
 
@@ -317,6 +335,8 @@ interface CaseSidebarProps {
 - Subclass characteristics
 - Additional notes handling
 
+**Type Definition**: Uses component-specific interface with custom types for classification options
+
 **Key Props**:
 
 ```typescript
@@ -348,6 +368,8 @@ type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 - Loading states and error handling
 - Keyboard navigation (Escape key)
 
+**Type Definition**: Uses component-specific `CasesModalProps` interface
+
 **Props**:
 
 ```typescript
@@ -371,6 +393,8 @@ interface CasesModalProps {
 - Keyboard event handling
 - Temporary state management
 
+**Type Definition**: Uses component-specific `NotesModalProps` interface
+
 **Props**:
 
 ```typescript
@@ -381,6 +405,47 @@ interface NotesModalProps {
   onSave: (notes: string) => void;
 }
 ```
+
+#### Case Export (`app/components/sidebar/case-export/case-export.tsx`)
+
+**Purpose**: Comprehensive case data export modal interface
+
+**Features**:
+
+- Case number input with auto-population from current case
+- **Format Selection**: JSON and CSV/Excel export formats with visual toggle
+- **Single Case Export**: Export individual case with complete annotation data
+- **Bulk Export**: Export all cases with real-time progress tracking
+- **Excel Multi-Worksheet**: CSV format creates Excel files with summary and individual case worksheets
+- **Comprehensive Data**: All annotation fields including case identifiers, colors, classifications, and box annotations
+- Loading states and error handling with detailed error messages
+- Keyboard navigation (Escape key) and accessible controls
+- Automatic case number pre-filling when case is loaded
+- Progress visualization for bulk export operations with case-by-case updates
+
+**Type Definition**: Uses component-specific `CaseExportProps` interface
+
+**Props**:
+
+```typescript
+interface CaseExportProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onExport: (caseNumber: string, format: ExportFormat) => void;
+  onExportAll: (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => void;
+  currentCaseNumber?: string;
+}
+
+export type ExportFormat = 'json' | 'csv';
+```
+
+**Enhanced Export Features**:
+
+- **Data Parity**: CSV/Excel exports contain identical data to JSON exports (22 columns total)
+- **Format Indicators**: Clear UI showing "CSV/Excel" with tooltip explaining multi-worksheet functionality
+- **Progress Callbacks**: Real-time progress updates during bulk export operations
+- **Error Recovery**: Graceful handling of failed exports with detailed error reporting
+- **Performance Optimization**: Optional annotation inclusion for faster exports when only metadata is needed
 
 ### 4. Action Components
 
@@ -419,6 +484,68 @@ export const listCases = async (user: User): Promise<string[]>
 - Case creation and deletion
 - Case renaming functionality
 - User case list management
+
+#### Case Export (`app/components/actions/case-export.ts`)
+
+**Purpose**: Comprehensive case data export functionality with multi-format support
+
+**Key Functions**:
+
+```typescript
+export const exportCaseData = async (
+  user: User,
+  caseNumber: string,
+  options: ExportOptions
+): Promise<CaseExportData>
+
+export const exportAllCases = async (
+  user: User,
+  options: ExportOptions,
+  onProgress?: (current: number, total: number, caseName: string) => void
+): Promise<AllCasesExportData>
+
+export const downloadCaseAsJSON = (exportData: CaseExportData): void
+export const downloadCaseAsCSV = (exportData: CaseExportData): void
+export const downloadAllCasesAsJSON = (exportData: AllCasesExportData): void
+export const downloadAllCasesAsCSV = (exportData: AllCasesExportData): void
+
+export interface ExportOptions {
+  includeAnnotations?: boolean;
+  format?: 'json' | 'csv';
+  includeMetadata?: boolean;
+}
+```
+
+**Enhanced Features**:
+
+- **Comprehensive Single Case Export**: Complete file and annotation data collection with metadata
+- **Bulk Export with Progress**: Export all user cases with real-time progress callbacks and error handling
+- **Multi-Format Support**: JSON for structured data, CSV for single cases, Excel (.xlsx) for bulk exports
+- **Excel Multi-Worksheet**: Bulk CSV exports create Excel files with summary worksheet and individual case worksheets
+- **Complete Data Parity**: CSV/Excel formats include all 22 annotation fields matching JSON exports
+- **Enhanced Box Annotations**: Includes coordinates, colors, timestamps, and labels in structured format
+- **Forensic Classification Support**: Full case identifiers, color schemes, support levels, and classification data
+- **Performance Options**: Configurable annotation inclusion for faster exports when only metadata needed
+- **Error Recovery**: Graceful handling of failed case exports with detailed error reporting and continuation
+- **File Download Utilities**: Browser-compatible download functions with proper MIME types and cleanup
+- **Export Validation**: Comprehensive case number and data validation before export operations
+
+**CSV/Excel Export Columns (22 total)**:
+
+1. File ID, Original Filename, Upload Date, Has Annotations
+2. **Case Identifiers**: Left Case, Right Case, Left Item, Right Item  
+3. **Visual Elements**: Case Font Color, Index Type, Index Number, Index Color
+4. **Classifications**: Class Type, Custom Class, Class Note, Support Level
+5. **Options**: Has Subclass, Include Confirmation
+6. **Annotations**: Box Annotations Count, Box Annotations Details (with coordinates, colors, timestamps)
+7. **Metadata**: Additional Notes, Last Updated
+
+**XLSX Library Integration**:
+
+- **Multi-Worksheet Excel**: Summary sheet plus individual case sheets for bulk exports
+- **Structured Data Layout**: Professional formatting with headers and metadata sections
+- **Sheet Naming**: Excel-compatible sheet names with case number identifiers
+- **Error Sheets**: Dedicated worksheets for failed case exports with error details
 
 #### Image Management (`app/components/actions/image-manage.ts`)
 
@@ -522,6 +649,8 @@ export const saveNotes = async (
 - Redirect handling
 - Error handling
 
+**Type Definition**: Uses component-specific `SignOutProps` interface
+
 **Props**:
 
 ```typescript
@@ -539,6 +668,8 @@ interface SignOutProps {
 **Components**:
 
 - `Button` - Standard button with variants
+
+**Type Definition**: Uses component-specific `ButtonProps` interface
 
 **Props**:
 
@@ -565,6 +696,8 @@ interface ButtonProps {
 - Color validation
 - Real-time preview
 
+**Type Definition**: Uses component-specific `ColorSelectorProps` interface
+
 **Props**:
 
 ```typescript
@@ -585,6 +718,8 @@ interface ColorSelectorProps {
 - Dynamic year display
 - Terms and privacy links
 
+**Type Definition**: Uses standard React component types without custom interfaces
+
 #### Icon System (`app/components/icon/icon.tsx`)
 
 **Purpose**: Centralized icon management
@@ -595,6 +730,8 @@ interface ColorSelectorProps {
 - Consistent sizing and styling
 - Type-safe icon names
 - Available icons: eye, eye-off, class, ID, index, notes, number, print, other unused/misc icons
+
+**Type Definition**: Uses custom icon type definitions for type-safe icon selection
 
 **Usage**:
 
@@ -614,6 +751,8 @@ interface ColorSelectorProps {
 - User experience guidance
 - Desktop-only enforcement
 
+**Type Definition**: Uses standard React component types without custom interfaces
+
 #### Notice System (`app/components/notice/notice.tsx`)
 
 **Purpose**: Modal notification display
@@ -624,6 +763,8 @@ interface ColorSelectorProps {
 - Keyboard event handling (Escape key)
 - Customizable button text
 - Overlay backdrop
+
+**Type Definition**: Uses component-specific `NoticeProps` interface
 
 **Props**:
 
@@ -649,6 +790,8 @@ interface NoticeProps {
 - Auto-dismiss functionality
 - Customizable styling
 
+**Type Definition**: Uses component-specific `ToastProps` interface
+
 **Props**:
 
 ```typescript
@@ -671,6 +814,8 @@ interface ToastProps {
 - Visibility toggle
 - Active tool state tracking
 - Box annotation mode with color selector integration
+
+**Type Definition**: Uses component-specific `ToolbarProps` interface and `ToolId` type
 
 **Props**:
 
@@ -697,6 +842,8 @@ type ToolId = 'number' | 'class' | 'index' | 'id' | 'notes' | 'print' | 'visibil
 - Widget lifecycle management
 - Callback handling
 
+**Type Definition**: Uses component-specific `TurnstileProps` interface extending HTML div attributes
+
 **Props**:
 
 ```typescript
@@ -719,6 +866,8 @@ interface TurnstileProps extends React.HTMLAttributes<HTMLDivElement> {
 - System theme detection
 - Theme switching functionality
 
+**Type Definition**: Uses custom `Theme` type definition from theme.ts
+
 **Theme Types** (`app/components/theme-provider/theme.ts`):
 
 ```typescript
@@ -740,6 +889,8 @@ type Theme = 'light' | 'dark' | 'system';
 - User reauthentication
 - Firebase integration
 - Error handling with detailed messages
+
+**Type Definition**: Uses component-specific `ManageProfileProps` interface
 
 **Props**:
 
@@ -772,6 +923,8 @@ interface ManageProfileProps {
 - Email notifications on successful deletion
 - Firebase authentication integration
 - Automatic logout after deletion
+
+**Type Definition**: Uses component-specific `DeleteAccountProps` interface with user object type
 
 **Props**:
 
@@ -810,6 +963,8 @@ interface DeleteAccountProps {
 - Inactivity detection
 - Warning countdown display
 - Session extension handling
+
+**Type Definition**: Uses custom hook types from `useInactivityTimeout` hook
 
 ## Component State Management
 
