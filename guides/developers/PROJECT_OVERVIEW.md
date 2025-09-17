@@ -39,6 +39,7 @@ striae/
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Remix (React-based full-stack framework)
 - **Styling**: CSS Modules + Tailwind CSS
 - **Type Safety**: TypeScript
@@ -46,6 +47,7 @@ striae/
 - **State Management**: React hooks and context
 
 ### Backend/Infrastructure
+
 - **Platform**: Cloudflare Pages + Workers
 - **Database**: Cloudflare KV (Key-Value storage)
 - **Data Storage**: Cloudflare R2 (Object storage)
@@ -55,6 +57,7 @@ striae/
 - **Deployment**: Wrangler (Cloudflare CLI)
 
 ### Key Features
+
 - **Canvas-based annotation system** for comparison image annotation with box annotations
 - **Case management** with file organization
 - **PDF report generation** with annotations
@@ -100,6 +103,7 @@ Striae is currently in **Beta** (v0.9.15.1-beta) with active development. The be
 ## Support
 
 For support and questions:
+
 - **Documentation**: [Striae Documentation](https://developers.striae.org/striae-dev/get-started/document-index)
 - **Support Portal**: [Striae Support](https://www.striae.org/support)
 - **Discord**: [Striae on Discord](https://discord.gg/ESUPhTPwHx)

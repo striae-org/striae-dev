@@ -1,14 +1,4 @@
----
-title: Striae Image Annotation & PDF Generation Guide
-label: Striae Image Annotation & PDF Generation Guide
-slug: striae-image-annotation-and-pdf-generation-guide
-description: >-
-  Striae's annotation and PDF generation system allows forensic firearms
-  examiners to create professional documentation of firearms comparison images.
-  The system provides comprehensive annotation tools and generates high-quality
-  PDF reports suitable for case notes and reporting
-visibility: PUBLIC
----
+
 ## Key Features
 
 * **Visual Annotation Tools:** Add case/item numbers, class characteristics, index marks, support levels, and additional notes directly on images.
@@ -77,7 +67,17 @@ visibility: PUBLIC
 
 * Identification auto-enables confirmation fields for review signatures and dates.
 
-### Step 5: Add Additional Notes (Optional)
+### Step 5: Add Box Annotations (Optional)
+
+* Click the **Box** tool in the annotation toolbar to activate box drawing mode.
+
+* Select desired color from the color picker that appears.
+
+* Click and drag on the image to draw rectangular boxes highlighting areas of interest.
+
+* Resize or reposition boxes by clicking and dragging after creation.
+
+### Step 6: Add Additional Notes (Optional)
 
 * Enter detailed observations or measurement info.
 
@@ -89,12 +89,13 @@ visibility: PUBLIC
 
 | **Tool** | **Function**                                   |
 | -------- | ---------------------------------------------- |
-| Number   | Show/hide case and item numbers                |
-| Class    | Show/hide class characteristic information     |
-| Index    | Show/hide index marks (color or number/letter) |
-| ID       | Show/hide support level conclusion             |
-| Notes    | Show/hide additional notes section             |
-| Print    | Generate PDF with current annotations          |
+| ![Number](https://www.striae.org/assets/admin/number.png)   | Show/hide case and item numbers                |
+| ![Class](https://www.striae.org/assets/admin/class.png)    | Show/hide class characteristic information     |
+| ![Index](https://www.striae.org/assets/admin/index.png)    | Show/hide index marks (color or number/letter) |
+| ![ID](https://www.striae.org/assets/admin/support.png)       | Show/hide support level conclusion             |
+| ![Box](https://www.striae.org/assets/admin/box.png)      | Show/hide box annotations with custom colors   |
+| ![Notes](https://www.striae.org/assets/admin/notes.png)    | Show/hide additional notes section             |
+| ![Print](https://www.striae.org/assets/admin/print.png)    | Generate PDF with current annotations          |
 
 ***
 
@@ -119,6 +120,16 @@ visibility: PUBLIC
 ### Support Level Indicator
 
 * Displays your analytical conclusion below the image in color: green (Identification), red (Exclusion), yellow (Inconclusive).
+
+### Box Annotations
+
+* Draw colored rectangular boxes directly on the image to highlight specific areas of interest.
+
+* Select from multiple colors using the color selector when box tool is active.
+
+* Boxes can be resized and repositioned after creation by clicking and dragging.
+
+* All box annotations are preserved in the PDF output with the same colors and positions.
 
 ### Additional Notes
 
@@ -246,12 +257,13 @@ visibility: PUBLIC
 
 | **Button** | **Description**                         |
 | ---------- | --------------------------------------- |
-| Numbers    | Toggle case/item number display         |
-| Class      | Toggle object type and class notes      |
-| Index      | Toggle color border or index label      |
-| ID         | Toggle support level conclusion display |
-| Notes      | Toggle additional observations section  |
-| Print      | Generate professional PDF report        |
+| ![Numbers](https://www.striae.org/assets/admin/number.png)    | Toggle case/item number display         |
+| ![Class](https://www.striae.org/assets/admin/class.png)      | Toggle object type and class notes      |
+| ![Index](https://www.striae.org/assets/admin/index.png)      | Toggle color border or index label      |
+| ![ID](https://www.striae.org/assets/admin/support.png)         | Toggle support level conclusion display |
+| ![Box](https://www.striae.org/assets/admin/box.png)        | Toggle box annotations with custom colors |
+| ![Notes](https://www.striae.org/assets/admin/notes.png)      | Toggle additional observations section  |
+| ![Print](https://www.striae.org/assets/admin/print.png)      | Generate professional PDF report        |
 
 ***
 
