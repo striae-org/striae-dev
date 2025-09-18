@@ -10,8 +10,10 @@
   background: var(--background);
   border-radius: 5px;
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
+  height: auto;
   overflow: hidden;
-  transition: transform var(--durationXL) var(--bezierFastoutSlowin);
+  transition: height var(--durationXL) var(--bezierFastoutSlowin), 
+              opacity var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .toggleButton {
@@ -24,13 +26,19 @@
   display: flex;
   flex-direction: column;
   gap: var(--spaceS);
+  height: auto;
+  transition: opacity var(--durationM) var(--bezierFastoutSlowin),
+              height var(--durationXL) var(--bezierFastoutSlowin);
 }
 
 .hidden {
-  transform: translateY(-80%);
+  height: calc(40px + (var(--spaceM) * 2));
+  opacity: 0.3;
 }
 
 .hidden .toolbarContent {
   opacity: 0;
   pointer-events: none;
+  height: 0;
+  overflow: hidden;
 }
