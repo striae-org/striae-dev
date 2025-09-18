@@ -58,6 +58,16 @@ export const Toolbar = ({ onToolSelect }: ToolbarProps) => {
 };
 ```
 
+### Mobile Responsiveness Policy
+- **Desktop-First Application**: Striae is designed exclusively for desktop environments
+- **Limited Mobile Support**: Only the home route (`app/routes/home/`) and marketing pages should include mobile responsive CSS classes
+- **No Mobile Classes in App Components**: Components in `app/components/` should NOT include mobile responsive styles or media queries
+- **Rationale**: The forensic annotation workflow requires precise cursor control, large screens, and desktop-specific interactions that are not suitable for mobile devices
+- **Media Query Usage**: 
+  - ✅ **Allowed**: `app/routes/home/`, `app/routes/auth/`, public-facing pages
+  - ❌ **Forbidden**: All components in `app/components/`, application workflow pages
+  - ❌ **Never Use**: Mobile-first responsive patterns in core application features
+
 ### Route Organization
 - **Pattern**: Feature-based routing in `app/routes/[feature]/`
 - **Index routes**: Use `_index.tsx` for route entry points
