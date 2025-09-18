@@ -16,7 +16,7 @@ export interface CaseExportData {
     caseNumber: string;
     exportDate: string;
     exportedBy: string | null;
-    exportVersion: string;
+    striaeExportSchemaVersion: string;
     totalFiles: number;
   };
   files: Array<{
@@ -37,7 +37,7 @@ export interface AllCasesExportData {
   metadata: {
     exportDate: string;
     exportedBy: string | null;
-    exportVersion: string;
+    striaeExportSchemaVersion: string;
     totalCases: number;
     totalFiles: number;
     totalAnnotations: number;
