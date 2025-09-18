@@ -55,16 +55,25 @@ export const BlogFeed = () => {
 
   const truncateDescription = (text: string): string => {
     // Remove HTML tags and dangerous scripts using sanitize-html
-    const cleanText = sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} });
+    const cleanText = sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} }).trim();
     
-    // Split into words and take first 50 words
-    const words = cleanText.split(/\s+/).filter(word => word.trim().length > 0);
-    
-    if (words.length <= 50) {
+    // If the text is 150 characters or less, return it as-is
+    if (cleanText.length <= 150) {
       return cleanText;
     }
     
-    return words.slice(0, 50).join(' ') + '...';
+    // Truncate to 150 characters
+    let truncated = cleanText.substring(0, 150);
+    
+    // Find the last space to avoid cutting off words
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    
+    // If we found a space and it's not too close to the beginning, cut there
+    if (lastSpaceIndex > 100) { // Ensure we don't go too short
+      truncated = truncated.substring(0, lastSpaceIndex);
+    }
+    
+    return truncated + '…';
   };
 
   const formatDate = (dateString: string): string => {
