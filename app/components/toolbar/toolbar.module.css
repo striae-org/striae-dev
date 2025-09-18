@@ -12,7 +12,6 @@
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
   overflow: hidden;
   position: relative;
-  transition: height var(--durationXL) var(--bezierFastoutSlowin);
 }
 
 .toggleButton {
@@ -29,10 +28,6 @@
   gap: var(--spaceS);
   transition: transform var(--durationXL) var(--bezierFastoutSlowin),
               opacity var(--durationM) var(--bezierFastoutSlowin);
-}
-
-.hidden {
-  height: calc(40px + var(--spaceS) + var(--spaceM));
 }
 
 .hidden .toolbarContent {
