@@ -71,6 +71,7 @@
 .actionButton:hover {
   background-color: color-mix(in lab, var(--primary) 85%, var(--black));
   text-decoration: none;
+  transform: translateY(-1px);
 }
 
 .signInButton {
@@ -89,6 +90,7 @@
 .signInButton:hover {
   background-color: #155724;
   text-decoration: none;
+  transform: translateY(-1px);
 }
 
 .youtubeEmbed {
