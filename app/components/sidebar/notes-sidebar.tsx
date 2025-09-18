@@ -328,7 +328,15 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
             id="supportLevel"
             aria-label="Support Level"
             value={supportLevel}
-            onChange={(e) => setSupportLevel(e.target.value as SupportLevel)}
+            onChange={(e) => {
+              const newSupportLevel = e.target.value as SupportLevel;
+              setSupportLevel(newSupportLevel);
+              
+              // Automatically check confirmation field when ID is selected
+              if (newSupportLevel === 'ID') {
+                setIncludeConfirmation(true);
+              }
+            }}
             className={styles.select}
           >
             <option value="">Select support level...</option>
