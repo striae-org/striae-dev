@@ -57,11 +57,14 @@ export const BlogFeed = () => {
     // Remove HTML tags and dangerous scripts using sanitize-html
     const cleanText = sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} });
     
-    // Split into sentences and take first 2-3 sentences
-    const sentences = cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    const truncated = sentences.slice(0, 2).join('. ');
+    // Split into words and take first 50 words
+    const words = cleanText.split(/\s+/).filter(word => word.trim().length > 0);
     
-    return truncated + (sentences.length > 2 ? '...' : '.');
+    if (words.length <= 50) {
+      return cleanText;
+    }
+    
+    return words.slice(0, 50).join(' ') + '...';
   };
 
   const formatDate = (dateString: string): string => {
