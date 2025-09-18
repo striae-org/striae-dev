@@ -11,26 +11,27 @@
   border-radius: 5px;
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
   overflow: hidden;
-  transition: transform var(--durationXL) var(--bezierFastoutSlowin);
+  position: relative;
 }
 
 .toggleButton {
   height: 40px;
   flex-shrink: 0;
   margin-bottom: var(--spaceM);
+  position: relative;
+  z-index: 10;
 }
 
 .toolbarContent {
   display: flex;
   flex-direction: column;
   gap: var(--spaceS);
-}
-
-.hidden {
-  transform: translateY(-80%);
+  transition: transform var(--durationXL) var(--bezierFastoutSlowin),
+              opacity var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .hidden .toolbarContent {
+  transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
 }
