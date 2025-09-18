@@ -11,6 +11,10 @@ export interface CaseData {
   files: FileData[];
 }
 
+export interface CasesToDelete {
+  casesToDelete: string[];
+}
+
 export interface CaseExportData {
   metadata: {
     caseNumber: string;

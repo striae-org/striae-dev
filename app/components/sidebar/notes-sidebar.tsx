@@ -39,7 +39,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
   const [hasSubclass, setHasSubclass] = useState(false);
 
   // Index state
-  const [indexType, setIndexType] = useState<IndexType | ''>('');
+  const [indexType, setIndexType] = useState<IndexType>('color');
   const [indexNumber, setIndexNumber] = useState('');
   const [indexColor, setIndexColor] = useState('');
 
@@ -72,7 +72,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
           setCustomClass(existingNotes.customClass || '');
           setClassNote(existingNotes.classNote || '');
           setHasSubclass(existingNotes.hasSubclass ?? false);
-          setIndexType(existingNotes.indexType || '');
+          setIndexType(existingNotes.indexType || 'color');
           setIndexNumber(existingNotes.indexNumber || '');
           setIndexColor(existingNotes.indexColor || '');
           setSupportLevel(existingNotes.supportLevel || '');
@@ -126,7 +126,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         hasSubclass: hasSubclass,
         
         // Index Information
-        indexType: indexType as IndexType || undefined,
+        indexType: indexType,
         indexNumber: indexNumber,
         indexColor: indexColor || undefined,
 
@@ -302,14 +302,6 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 onChange={() => setIndexType('number')}
               />
               <span>Number/Letter</span>
-            </label>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                checked={indexType === ''}
-                onChange={() => setIndexType('')}
-              />
-              <span>None</span>
             </label>
           </div>
 
