@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# ================================
-# STRIAE ENVIRONMENT SETUP SCRIPT
-# ================================
-# This script helps deploy environment variables to all Cloudflare Workers
-# Make sure you have wrangler CLI installed and authenticated
+# ======================================
+# STRIAE WORKER SECRETS DEPLOYMENT SCRIPT  
+# ======================================
+# This script deploys environment variables/secrets to Cloudflare Workers
+# Run this AFTER workers are deployed to avoid deployment errors
 
 set -e
 
@@ -15,8 +15,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Striae Environment Variables Deployment Script${NC}"
-echo "=================================================="
+echo -e "${BLUE}🔐 Striae Worker Secrets Deployment Script${NC}"
+echo "=========================================="
 
 # Check if .env file exists
 if [ ! -f ".env" ]; then
@@ -28,30 +28,6 @@ fi
 # Source the .env file
 echo -e "${YELLOW}📖 Loading environment variables from .env...${NC}"
 source .env
-
-# Validate required variables
-required_vars=(
-    "ACCOUNT_ID"
-    "SL_API_KEY"
-    "KEYS_AUTH"
-    "USER_DB_AUTH"
-    "R2_KEY_SECRET"
-    "ACCOUNT_HASH"
-    "IMAGES_API_TOKEN"
-    "API_TOKEN"
-    "CFT_SECRET_KEY"
-    "HMAC_KEY"
-)
-
-echo -e "${YELLOW}🔍 Validating required environment variables...${NC}"
-for var in "${required_vars[@]}"; do
-    if [ -z "${!var}" ]; then
-        echo -e "${RED}❌ Error: $var is not set in .env file${NC}"
-        exit 1
-    fi
-done
-
-echo -e "${GREEN}✅ All required variables found${NC}"
 
 # Function to set worker secrets
 set_worker_secrets() {
@@ -173,4 +149,4 @@ echo "   - Update ACCOUNT_ID and custom domains in all worker configurations"
 echo -e "\n${BLUE}📝 For manual deployment, use these commands:${NC}"
 echo "   cd workers/[worker-name]"
 echo "   wrangler secret put VARIABLE_NAME --name [worker-name]"
-echo -e "\n${GREEN}✨ Environment setup complete!${NC}"
+echo -e "\n${GREEN}✨ Worker secrets deployment complete!${NC}"
