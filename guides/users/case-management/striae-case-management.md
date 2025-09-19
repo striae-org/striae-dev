@@ -41,7 +41,7 @@
 - [Advanced Operations: Rename & Delete Cases](#advanced-operations-rename--delete-cases)
   - [Renaming a Case](#renaming-a-case)
   - [Deleting a Case](#deleting-a-case)
-- [Bulk Case Management](#bulk-case-management)
+- [List All Cases](#list-all-cases)
 - [Troubleshooting Common Issues](#troubleshooting-common-issues)
   - [Error Recovery Features](#error-recovery-features)
   - [Manual Recovery Steps](#manual-recovery-steps)
@@ -437,13 +437,13 @@ All export formats include identical data:
 
 ***
 
-## Bulk Case Management
+## List All Cases
 
 * Use **List All Cases** to see and browse every case.
 
 * Cases are sorted intelligently: numbers first, then letters.
 
-* Pagination helps navigate large lists.
+* Pagination (10 per page) helps navigate large lists.
 
 * Click any case to enter it quickly.
 
