@@ -34,6 +34,7 @@ const CSV_HEADERS = [
   'Box Width',
   'Box Height',
   'Box Color',
+  'Box Label',
   'Box Timestamp',
   'Additional Notes',
   'Last Updated'
@@ -125,6 +126,7 @@ function processFileDataForTabular(fileEntry: CaseExportData['files'][0]): strin
         box.width.toString(),
         box.height.toString(),
         box.color || '',
+        box.label || '',
         box.timestamp || '',
         ...additionalData
       ]);
@@ -139,6 +141,7 @@ function processFileDataForTabular(fileEntry: CaseExportData['files'][0]): strin
       '', // Box Width
       '', // Box Height
       '', // Box Color
+      '', // Box Label
       '', // Box Timestamp
       ...additionalFileData
     ]);
