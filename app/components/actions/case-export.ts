@@ -114,33 +114,20 @@ function processFileDataForTabular(fileEntry: CaseExportData['files'][0]): strin
   // If there are box annotations, create a row for each one
   if (fileEntry.annotations?.boxAnnotations && fileEntry.annotations.boxAnnotations.length > 0) {
     fileEntry.annotations.boxAnnotations.forEach((box, index) => {
-      if (index === 0) {
-        // First box annotation: include full file data and additional data
-        rows.push([
-          ...fullFileData,
-          box.id,
-          box.x.toString(),
-          box.y.toString(),
-          box.width.toString(),
-          box.height.toString(),
-          box.color || '',
-          box.timestamp || '',
-          ...additionalFileData
-        ]);
-      } else {
-        // Subsequent box annotations: empty file data and empty additional data
-        rows.push([
-          ...emptyFileData,
-          box.id,
-          box.x.toString(),
-          box.y.toString(),
-          box.width.toString(),
-          box.height.toString(),
-          box.color || '',
-          box.timestamp || '',
-          ...emptyAdditionalData
-        ]);
-      }
+      const rowData = index === 0 ? fullFileData : emptyFileData;
+      const additionalData = index === 0 ? additionalFileData : emptyAdditionalData;
+      
+      rows.push([
+        ...rowData,
+        box.id,
+        box.x.toString(),
+        box.y.toString(),
+        box.width.toString(),
+        box.height.toString(),
+        box.color || '',
+        box.timestamp || '',
+        ...additionalData
+      ]);
     });
   } else {
     // If no box annotations, still include one row with empty box data
