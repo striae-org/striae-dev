@@ -80,12 +80,38 @@ function generateSimpleChecksum(content: string): string {
 }
 
 /**
+ * Generate a secure random password for Excel protection
+ */
+function generateRandomPassword(): string {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const length = 16;
+  let password = '';
+  
+  // Ensure we have at least one of each type
+  password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)]; // Uppercase
+  password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]; // Lowercase
+  password += '0123456789'[Math.floor(Math.random() * 10)]; // Number
+  password += '!@#$%^&*'[Math.floor(Math.random() * 8)]; // Special char
+  
+  // Fill remaining length with random characters
+  for (let i = password.length; i < length; i++) {
+    password += charset[Math.floor(Math.random() * charset.length)];
+  }
+  
+  // Shuffle the password to randomize character positions
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+/**
  * Protect Excel worksheet from editing
  */
-function protectExcelWorksheet(worksheet: any, sheetPassword: string = 'forensic-protection'): void {
+function protectExcelWorksheet(worksheet: any, sheetPassword?: string): string {
+  // Generate random password if none provided
+  const password = sheetPassword || generateRandomPassword();
+  
   // Set worksheet protection
   worksheet['!protect'] = {
-    password: sheetPassword,
+    password: password,
     selectLockedCells: true,
     selectUnlockedCells: true,
     formatCells: false,
@@ -109,6 +135,9 @@ function protectExcelWorksheet(worksheet: any, sheetPassword: string = 'forensic
   
   // Add protection metadata
   worksheet['!margins'] = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+  
+  // Return the password for inclusion in metadata
+  return password;
 }
 function generateMetadataRows(exportData: CaseExportData): string[][] {
   return [
@@ -506,6 +535,7 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): void {
   try {
     const workbook = XLSX.utils.book_new();
+    let exportPassword: string | undefined;
 
     // Create summary worksheet
     const summaryData = [
@@ -554,7 +584,7 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     
     // Protect summary worksheet if forensic protection is enabled
     if (protectForensicData) {
-      protectExcelWorksheet(summaryWorksheet);
+      exportPassword = protectExcelWorksheet(summaryWorksheet);
     }
     
     XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Summary');
@@ -572,8 +602,8 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         ];
         const errorWorksheet = XLSX.utils.aoa_to_sheet(errorData);
         
-        if (protectForensicData) {
-          protectExcelWorksheet(errorWorksheet);
+        if (protectForensicData && exportPassword) {
+          protectExcelWorksheet(errorWorksheet, exportPassword);
         }
         
         XLSX.utils.book_append_sheet(workbook, errorWorksheet, `Case_${caseData.metadata.caseNumber}_Error`);
@@ -613,8 +643,8 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       const caseWorksheet = XLSX.utils.aoa_to_sheet(caseDetailsData);
       
       // Protect worksheet if forensic protection is enabled
-      if (protectForensicData) {
-        protectExcelWorksheet(caseWorksheet);
+      if (protectForensicData && exportPassword) {
+        protectExcelWorksheet(caseWorksheet, exportPassword);
       }
       
       // Clean sheet name for Excel compatibility
@@ -623,12 +653,12 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     });
 
     // Set workbook protection if forensic protection is enabled
-    if (protectForensicData) {
+    if (protectForensicData && exportPassword) {
       workbook.Props = {
         Title: 'Striae Forensic Export - Protected',
         Subject: 'Forensic Evidence Data Export',
         Author: exportData.metadata.exportedBy || 'Striae System',
-        Comments: 'This workbook contains protected forensic evidence data. Modification may compromise evidence integrity.',
+        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected - Password: ${exportPassword}`,
         Company: 'Striae Forensic System'
       };
     }
@@ -656,7 +686,8 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     // Clean up
     window.URL.revokeObjectURL(url);
     
-    console.log(`Excel export${protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName);
+    const passwordInfo = protectForensicData && exportPassword ? ` (Password: ${exportPassword})` : '';
+    console.log(`Excel export${protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName + passwordInfo);
   } catch (error) {
     console.error('Excel export failed:', error);
     throw new Error('Failed to export Excel file');
