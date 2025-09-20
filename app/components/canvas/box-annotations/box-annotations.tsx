@@ -394,13 +394,13 @@ export const BoxAnnotations = ({
 
   // Memoized saved annotations to avoid unnecessary re-renders
   const savedAnnotations = useMemo(() => {
-    // Only show existing box annotations when in box annotation mode
-    if (!isAnnotationMode) return null;
+    // Always show existing box annotations (for read-only viewing)
+    // But only allow interactions when not in read-only mode
     
     return annotations.map((annotation) => (
       <div
         key={annotation.id}
-        className={styles.savedAnnotationBox}
+        className={`${styles.savedAnnotationBox} ${isReadOnly ? styles.readOnlyAnnotation : ''}`}
         style={{
           left: `${annotation.x}%`,
           top: `${annotation.y}%`,
@@ -408,8 +408,13 @@ export const BoxAnnotations = ({
           height: `${annotation.height}%`,
           border: `2px solid ${annotation.color}`,
           backgroundColor: 'transparent',
-          pointerEvents: 'auto' // Always allow interactions with saved boxes
+          pointerEvents: isReadOnly ? 'none' : 'auto', // Disable interactions in read-only mode
+          opacity: isReadOnly ? 0.8 : 1 // Slightly transparent in read-only mode
         }}
+        title={isReadOnly 
+          ? `Read-only annotation: ${annotation.label || 'Unlabeled'}` 
+          : annotation.label || 'Double-click to delete'
+        }
         onDoubleClick={(e) => {
           if (isReadOnly) return;
           e.stopPropagation();
@@ -419,10 +424,6 @@ export const BoxAnnotations = ({
           if (isReadOnly) return;
           handleAnnotationRightClick(e, annotation.id);
         }}
-        title={isReadOnly 
-          ? `${annotation.label ? `Label: ${annotation.label}` : 'Box annotation'}` 
-          : `${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`
-        }
       >
         {annotation.label && (
           <div className={styles.annotationLabel}>
@@ -503,8 +504,8 @@ export const BoxAnnotations = ({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         style={{ 
-          cursor: isAnnotationMode ? 'crosshair' : 'default',
-          pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
+          cursor: isAnnotationMode && !isReadOnly ? 'crosshair' : 'default',
+          pointerEvents: 'auto' // Always allow pointer events for viewing annotations
         }}
       >
         {savedAnnotations}
