@@ -745,7 +745,8 @@ function generateZipReadme(exportData: CaseExportData): string {
 ==================
 
 Case Number: ${exportData.metadata.caseNumber}
-Export Date: ${new Date().toISOString()}
+Export Date: ${exportData.metadata.exportDate}
+Exported By: ${exportData.metadata.exportedBy || 'N/A'}
 Striae Export Schema Version: ${exportData.metadata.striaeExportSchemaVersion}
 
 Summary:
