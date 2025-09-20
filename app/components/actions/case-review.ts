@@ -588,13 +588,17 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
 
     if (caseResponse.ok) {
       const caseData = await caseResponse.json() as { files?: FileData[] };
+      console.log('Read-only case data for cleanup:', caseData);
       
       // Delete all files using image worker
       if (caseData.files && caseData.files.length > 0) {
+        console.log('Deleting files:', caseData.files.map(f => ({ id: f.id, filename: f.originalFilename })));
         await Promise.all(
           caseData.files.map(async (file: FileData) => {
             try {
+              console.log(`Attempting to delete file: ${file.id} (${file.originalFilename})`);
               await deleteFile(user, caseNumber, file.id);
+              console.log(`Successfully deleted file: ${file.id}`);
             } catch (error) {
               console.error(`Failed to delete file ${file.id}:`, error);
               // Continue with cleanup even if one file fails

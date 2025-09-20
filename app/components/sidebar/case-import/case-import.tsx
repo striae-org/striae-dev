@@ -4,9 +4,9 @@ import {
   importCaseForReview, 
   listReadOnlyCases, 
   removeReadOnlyCase,
+  deleteReadOnlyCase,
   ImportResult 
 } from '~/components/actions/case-review';
-import { deleteCase } from '~/components/actions/case-manage';
 import styles from './case-import.module.css';
 
 interface CaseImportProps {
@@ -96,11 +96,8 @@ export const CaseImport = ({
     setSuccess('');
     
     try {
-      // Remove from read-only cases list
-      await removeReadOnlyCase(user, existingReadOnlyCase);
-      
-      // Delete the actual case data
-      await deleteCase(user, existingReadOnlyCase);
+      // Delete the read-only case properly (includes all data cleanup)
+      await deleteReadOnlyCase(user, existingReadOnlyCase);
       
       setExistingReadOnlyCase(null);
       setSuccess(`Removed read-only case "${existingReadOnlyCase}"`);
