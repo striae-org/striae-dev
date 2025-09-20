@@ -74,7 +74,7 @@ function generateSimpleChecksum(content: string): string {
   for (let i = 0; i < content.length; i++) {
     const char = content.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash | 0;
   }
   return Math.abs(hash).toString(16);
 }
@@ -645,7 +645,7 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         Title: 'Striae Case Export - Protected',
         Subject: 'Forensic Evidence Data Export',
         Author: exportData.metadata.exportedBy || 'Striae',
-        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected - Password: ${exportPassword}`,
+        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected.`,
         Company: 'Striae'
       };
     }
