@@ -12,7 +12,7 @@ import {
   AnnotationData,
   ImageUploadResponse 
 } from '~/types';
-import { validateCaseNumber } from './case-manage';
+import { validateCaseNumber, checkExistingCase } from './case-manage';
 import { saveNotes } from './notes-manage';
 
 const USER_WORKER_URL = paths.user_worker_url;
@@ -389,7 +389,13 @@ export async function importCaseForReview(
     
     onProgress?.('Validating case data', 20, `Case: ${result.caseNumber}`);
     
-    // Step 2: Check if read-only case already exists
+    // Step 2a: Check if case already exists in user's regular cases (original analyst)
+    const existingRegularCase = await checkExistingCase(user, result.caseNumber);
+    if (existingRegularCase) {
+      throw new Error(`Case "${result.caseNumber}" already exists in your case list. You cannot import a case for review if you were the original analyst.`);
+    }
+    
+    // Step 2b: Check if read-only case already exists
     const existingCase = await checkReadOnlyCaseExists(user, result.caseNumber);
     if (existingCase && !options.overwriteExisting) {
       throw new Error(`Read-only case "${result.caseNumber}" already exists. Use overwriteExisting option to replace it.`);
