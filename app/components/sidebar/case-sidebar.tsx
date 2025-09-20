@@ -24,6 +24,7 @@ import {
   uploadFile,
   deleteFile,
 } from '../actions/image-manage';
+import { deleteReadOnlyCase } from '../actions/case-review';
 import { 
   canCreateCase, 
   canUploadFile, 
@@ -90,6 +91,7 @@ export const CaseSidebar = ({
   const [limitsDescription, setLimitsDescription] = useState('');
   const [permissionChecking, setPermissionChecking] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isClearingReadOnlyCase, setIsClearingReadOnlyCase] = useState(false);
 
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -372,6 +374,32 @@ export const CaseSidebar = ({
   }
 };
 
+const handleClearReadOnlyCase = async () => {
+  if (!isReadOnly || !currentCase) return;
+  
+  const confirmed = window.confirm(
+    `Are you sure you want to clear the read-only case "${currentCase}"? This will remove it from your review session.`
+  );
+  
+  if (!confirmed) return;
+  
+  setIsClearingReadOnlyCase(true);
+  setError('');
+  
+  try {
+    await deleteReadOnlyCase(user, currentCase);
+    setCurrentCase('');
+    onCaseChange('');
+    setFiles([]);
+    setSuccessAction('deleted');
+    setTimeout(() => setSuccessAction(null), SUCCESS_MESSAGE_TIMEOUT);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to clear read-only case');
+  } finally {
+    setIsClearingReadOnlyCase(false);
+  }
+};
+
 const handleImageSelect = (file: FileData) => {
     onImageSelect(file);
     setImageLoaded(true);
@@ -615,13 +643,23 @@ return (
               </div>
               
               <div className={styles.deleteCaseSection}>
-                <button
-                  onClick={handleDeleteCase}
-                  disabled={isDeletingCase}
-                  className={styles.deleteWarningButton}
-                >
-                  {isDeletingCase ? 'Deleting...' : 'Delete Case'}
-                </button>
+                {isReadOnly ? (
+                  <button
+                    onClick={handleClearReadOnlyCase}
+                    disabled={isClearingReadOnlyCase}
+                    className={styles.clearReadOnlyButton}
+                  >
+                    {isClearingReadOnlyCase ? 'Clearing...' : 'Clear Read-Only Case'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleDeleteCase}
+                    disabled={isDeletingCase}
+                    className={styles.deleteWarningButton}
+                  >
+                    {isDeletingCase ? 'Deleting...' : 'Delete Case'}
+                  </button>
+                )}
               </div>
             </div>
           )}

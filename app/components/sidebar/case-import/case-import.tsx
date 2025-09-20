@@ -35,7 +35,14 @@ export const CaseImport = ({
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check for existing read-only cases when modal opens
+  // Check for existing read-only cases when modal opens AND when component mounts
+  useEffect(() => {
+    if (user) {
+      checkForExistingReadOnlyCase();
+    }
+  }, [user]);
+
+  // Also check when modal opens
   useEffect(() => {
     if (isOpen && user) {
       checkForExistingReadOnlyCase();
@@ -99,8 +106,22 @@ export const CaseImport = ({
       // Delete the read-only case properly (includes all data cleanup)
       await deleteReadOnlyCase(user, existingReadOnlyCase);
       
+      const clearedCaseName = existingReadOnlyCase;
       setExistingReadOnlyCase(null);
-      setSuccess(`Removed read-only case "${existingReadOnlyCase}"`);
+      setSuccess(`Removed read-only case "${clearedCaseName}"`);
+      
+      // Notify parent component about the clear (if currently loaded)
+      if (onImportComplete) {
+        onImportComplete({ 
+          success: true,
+          caseNumber: '',
+          isReadOnly: false,
+          filesImported: 0,
+          annotationsImported: 0,
+          errors: [],
+          warnings: []
+        });
+      }
       
       // Clear success message after a delay
       setTimeout(() => setSuccess(''), 3000);
@@ -206,13 +227,16 @@ export const CaseImport = ({
         <div className={styles.content}>
           <div className={styles.fieldGroup}>
             
-            {/* Existing read-only case warning */}
+            {/* Existing read-only case section */}
             {existingReadOnlyCase && (
               <div className={styles.warningSection}>
                 <div className={styles.warningText}>
-                  <strong>Existing Review Case:</strong> "{existingReadOnlyCase}"
+                  <strong>Current Review Case:</strong> "{existingReadOnlyCase}"
                   <p className={styles.warningSubtext}>
-                    Importing a new case will automatically replace the existing one.
+                    {selectedFile 
+                      ? 'Importing a new case will automatically replace the existing one.'
+                      : 'You can clear this case or import a new one to replace it.'
+                    }
                   </p>
                 </div>
                 <button
@@ -284,16 +308,6 @@ export const CaseImport = ({
               >
                 {isImporting ? 'Importing...' : 'Import'}
               </button>
-              
-              {existingReadOnlyCase && (
-                <button
-                  className={styles.clearButton}
-                  onClick={clearExistingReadOnlyCase}
-                  disabled={isClearing || isImporting}
-                >
-                  {isClearing ? 'Clearing...' : 'Clear Current Case'}
-                </button>
-              )}
               
               <button
                 className={styles.cancelButton}
