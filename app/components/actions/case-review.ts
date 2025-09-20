@@ -12,8 +12,9 @@ import {
   ImageUploadResponse,
   CaseData
 } from '~/types';
-import { validateCaseNumber, checkExistingCase, deleteCase } from './case-manage';
+import { validateCaseNumber, checkExistingCase } from './case-manage';
 import { saveNotes } from './notes-manage';
+import { deleteFile } from './image-manage';
 
 const USER_WORKER_URL = paths.user_worker_url;
 const DATA_WORKER_URL = paths.data_worker_url;
@@ -620,7 +621,6 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
 
       // Delete all files using data worker
       if (caseData.files && caseData.files.length > 0) {
-        const { deleteFile } = await import('./image-manage');
         await Promise.all(
           caseData.files.map((file: FileData) => 
             deleteFile(user, caseNumber, file.id)
