@@ -97,8 +97,14 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
       return null;
     }
 
-    const data = await response.json() as CaseData;
+    const data = await response.json() as CaseData & { isReadOnly?: boolean };
     console.log(`Case data retrieved:`, data);
+    
+    // Check if this is a read-only case - if so, don't consider it as an existing regular case
+    if (data.isReadOnly) {
+      console.log(`Case "${caseNumber}" is read-only, not considering as existing regular case`);
+      return null;
+    }
     
     // Verify the case number matches (extra safety check)
     if (data.caseNumber === caseNumber) {
