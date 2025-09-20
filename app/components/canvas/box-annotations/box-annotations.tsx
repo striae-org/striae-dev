@@ -19,6 +19,14 @@ interface DrawingState {
   currentY: number;
 }
 
+interface LabelDialogState {
+  isVisible: boolean;
+  annotationId: string | null;
+  x: number;
+  y: number;
+  label: string;
+}
+
 export const BoxAnnotations = ({
   imageRef,
   annotations,
@@ -33,6 +41,14 @@ export const BoxAnnotations = ({
     startY: 0,
     currentX: 0,
     currentY: 0
+  });
+
+  const [labelDialog, setLabelDialog] = useState<LabelDialogState>({
+    isVisible: false,
+    annotationId: null,
+    x: 0,
+    y: 0,
+    label: ''
   });
 
   // Get relative coordinates from mouse event
@@ -108,7 +124,24 @@ export const BoxAnnotations = ({
         timestamp: new Date().toISOString()
       };
       
-      onAnnotationsChange([...annotations, newAnnotation]);
+      // Save the annotation immediately
+      const updatedAnnotations = [...annotations, newAnnotation];
+      onAnnotationsChange(updatedAnnotations);
+      
+      // Show label dialog positioned near the annotation
+      if (imageRef.current) {
+        const rect = imageRef.current.getBoundingClientRect();
+        const dialogX = rect.left + (x / 100) * rect.width;
+        const dialogY = rect.top + (y / 100) * rect.height;
+        
+        setLabelDialog({
+          isVisible: true,
+          annotationId: newAnnotation.id,
+          x: dialogX,
+          y: dialogY,
+          label: ''
+        });
+      }
     }
     
     setDrawingState({
@@ -118,7 +151,7 @@ export const BoxAnnotations = ({
       currentX: 0,
       currentY: 0
     });
-  }, [drawingState, isAnnotationMode, annotationColor, annotations, onAnnotationsChange]);
+  }, [drawingState, isAnnotationMode, annotationColor, annotations, onAnnotationsChange, imageRef]);
 
   // Remove a box annotation
   const removeBoxAnnotation = useCallback((annotationId: string) => {
@@ -131,6 +164,39 @@ export const BoxAnnotations = ({
     e.stopPropagation();
     removeBoxAnnotation(annotationId);
   }, [removeBoxAnnotation]);
+
+  // Handle label confirmation
+  const handleLabelConfirm = useCallback(() => {
+    if (!labelDialog.annotationId) return;
+    
+    const updatedAnnotations = annotations.map(annotation => 
+      annotation.id === labelDialog.annotationId 
+        ? { ...annotation, label: labelDialog.label.trim() || undefined }
+        : annotation
+    );
+    
+    onAnnotationsChange(updatedAnnotations);
+    setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+  }, [labelDialog, annotations, onAnnotationsChange]);
+
+  // Handle label cancellation
+  const handleLabelCancel = useCallback(() => {
+    setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+  }, []);
+
+  // Handle label input change
+  const handleLabelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLabelDialog(prev => ({ ...prev, label: e.target.value }));
+  }, []);
+
+  // Handle Enter key in label input
+  const handleLabelKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLabelConfirm();
+    } else if (e.key === 'Escape') {
+      handleLabelCancel();
+    }
+  }, [handleLabelConfirm, handleLabelCancel]);
 
   // Render current drawing box (while dragging)
   const renderCurrentDrawingBox = () => {
@@ -180,25 +246,78 @@ export const BoxAnnotations = ({
           removeBoxAnnotation(annotation.id);
         }}
         onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
-        title="Double-click or right-click to remove"
-      />
+        title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
+      >
+        {annotation.label && (
+          <div className={styles.annotationLabel}>
+            {annotation.label}
+          </div>
+        )}
+      </div>
     ));
   };
 
+  // Render label input dialog
+  const renderLabelDialog = () => {
+    if (!labelDialog.isVisible) return null;
+    
+    return (
+      <div
+        className={styles.labelDialog}
+        style={{
+          position: 'fixed',
+          left: `${labelDialog.x}px`,
+          top: `${labelDialog.y}px`,
+          zIndex: 1000
+        }}
+      >
+        <div className={styles.labelDialogContent}>
+          <div className={styles.labelDialogTitle}>Add Label (Optional)</div>
+          <input
+            type="text"
+            value={labelDialog.label}
+            onChange={handleLabelChange}
+            onKeyDown={handleLabelKeyDown}
+            placeholder="Enter label..."
+            className={styles.labelInput}
+            autoFocus
+          />
+          <div className={styles.labelDialogButtons}>
+            <button
+              onClick={handleLabelConfirm}
+              className={styles.labelConfirmButton}
+            >
+              Confirm
+            </button>
+            <button
+              onClick={handleLabelCancel}
+              className={styles.labelCancelButton}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div 
-      className={`${styles.boxAnnotationsOverlay} ${className || ''}`}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={{ 
-        cursor: isAnnotationMode ? 'crosshair' : 'default',
-        pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
-      }}
-    >
-      {renderSavedAnnotations()}
-      {renderCurrentDrawingBox()}
-    </div>
+    <>
+      <div 
+        className={`${styles.boxAnnotationsOverlay} ${className || ''}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ 
+          cursor: isAnnotationMode ? 'crosshair' : 'default',
+          pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
+        }}
+      >
+        {renderSavedAnnotations()}
+        {renderCurrentDrawingBox()}
+      </div>
+      {renderLabelDialog()}
+    </>
   );
 };
