@@ -484,12 +484,14 @@ return (
         currentCaseNumber={currentCase || ''}
       />
         <div className={styles.filesSection}>
-      <h4>
-        {currentCase || 'No Case Selected'}
+      <div className={isReadOnly && currentCase ? styles.readOnlyContainer : styles.caseHeader}>
+        <h4 className={styles.caseNumber}>
+          {currentCase || 'No Case Selected'}
+        </h4>
         {isReadOnly && currentCase && (
-          <span className={styles.readOnlyBadge}> (Read-Only)</span>
+          <div className={styles.readOnlyBadge}>(Read-Only)</div>
         )}
-      </h4>
+      </div>
       {currentCase && (
         <div className={styles.fileUpload}>
       <label htmlFor="file-upload">Upload Image:</label>
