@@ -121,6 +121,33 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
   }
 };
 
+export const checkCaseIsReadOnly = async (user: User, caseNumber: string): Promise<boolean> => {
+  try {
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      // Case doesn't exist, so it's not read-only
+      return false;
+    }
+
+    const data = await response.json() as { isReadOnly?: boolean };
+    return !!data.isReadOnly;
+    
+  } catch (error) {
+    console.error('Error checking if case is read-only:', error);
+    return false;
+  }
+};
+
 export const createNewCase = async (user: User, caseNumber: string): Promise<CaseData> => {
   try {
     // Check if user can create a new case

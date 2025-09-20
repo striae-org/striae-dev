@@ -9,7 +9,7 @@ import { getNotes, saveNotes } from '~/components/actions/notes-manage';
 import { generatePDF } from '~/components/actions/generate-pdf';
 import { getUserApiKey } from '~/utils/auth';
 import { AnnotationData, FileData } from '~/types';
-import { checkReadOnlyCaseExists } from '~/components/actions/case-review';
+import { checkCaseIsReadOnly } from '~/components/actions/case-manage';
 import paths from '~/config/config.json';
 import styles from './striae.module.css';
 
@@ -105,8 +105,9 @@ export const Striae = ({ user }: StriaePage) => {
       }
 
       try {
-        const readOnlyCase = await checkReadOnlyCaseExists(user, currentCase);
-        setIsReadOnlyCase(!!readOnlyCase);
+        // Check if the case data itself has isReadOnly: true
+        const isReadOnly = await checkCaseIsReadOnly(user, currentCase);
+        setIsReadOnlyCase(isReadOnly);
       } catch (error) {
         console.error('Error checking read-only status:', error);
         setIsReadOnlyCase(false);
