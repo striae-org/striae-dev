@@ -60,8 +60,10 @@ export const Sidebar = ({
   const handleImportComplete = (result: ImportResult) => {
     if (result.success) {
       console.log(`Successfully imported case: ${result.caseNumber}`);
-      // Optionally trigger a case list refresh or other UI updates
-      // You might want to call onCaseChange or setSuccessAction here
+      // Load the imported case automatically
+      onCaseChange(result.caseNumber);
+      setCurrentCase(result.caseNumber);
+      setCaseNumber(result.caseNumber);
       setSuccessAction('loaded');
     }
   };  
