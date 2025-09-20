@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { BoxAnnotation } from '~/types';
 import styles from './box-annotations.module.css';
 
-// Mapping of preset colors to their names for additional notes
+// Constants
 const PRESET_COLOR_NAMES: Record<string, string> = {
   '#ff0000': 'Red',
   '#ff8000': 'Orange', 
@@ -14,7 +14,10 @@ const PRESET_COLOR_NAMES: Record<string, string> = {
   '#ff00ff': 'Magenta',
   '#000000': 'Black',
   '#ffffff': 'White'
-};
+} as const;
+
+const MIN_BOX_SIZE_PERCENT = 1; // Minimum box size as percentage of image
+const DIALOG_OFFSET = 10; // Offset for dialog positioning
 
 interface BoxAnnotationsProps {
   imageRef: React.RefObject<HTMLImageElement | null>;
@@ -71,16 +74,64 @@ export const BoxAnnotations = ({
     label: ''
   });
 
-  // Get relative coordinates from mouse event
-  const getRelativeCoordinates = useCallback((e: React.MouseEvent) => {
-    if (!imageRef.current) return { x: 0, y: 0 };
+  // Ref to track if component is mounted to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Memoized function to get relative coordinates (more stable reference)
+  const getRelativeCoordinates = useCallback((e: React.MouseEvent): { x: number; y: number } => {
+    const imageElement = imageRef.current;
+    if (!imageElement) return { x: 0, y: 0 };
     
-    const rect = imageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    return { x, y };
-  }, [imageRef]);
+    try {
+      const rect = imageElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      
+      // Clamp values to valid range
+      return { 
+        x: Math.max(0, Math.min(100, x)), 
+        y: Math.max(0, Math.min(100, y))
+      };
+    } catch (error) {
+      console.warn('Error calculating relative coordinates:', error);
+      return { x: 0, y: 0 };
+    }
+  }, []); // Remove imageRef dependency for stability
+
+  // Helper function to generate unique annotation ID
+  const generateAnnotationId = useCallback(() => {
+    return `box-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }, []);
+
+  // Helper function to calculate dialog position with viewport boundary checks
+  const calculateDialogPosition = useCallback((x: number, y: number): { x: number; y: number } => {
+    const imageElement = imageRef.current;
+    if (!imageElement) return { x: 0, y: 0 };
+
+    const rect = imageElement.getBoundingClientRect();
+    const dialogX = rect.left + (x / 100) * rect.width;
+    const dialogY = rect.top + (y / 100) * rect.height;
+
+    // Check viewport boundaries and adjust if necessary
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const dialogWidth = 220; // Approximate dialog width
+    const dialogHeight = 120; // Approximate dialog height
+
+    const adjustedX = Math.min(dialogX, viewportWidth - dialogWidth - DIALOG_OFFSET);
+    const adjustedY = Math.min(dialogY, viewportHeight - dialogHeight - DIALOG_OFFSET);
+
+    return {
+      x: Math.max(DIALOG_OFFSET, adjustedX),
+      y: Math.max(DIALOG_OFFSET, adjustedY)
+    };
+  }, []);
 
   // Handle mouse down - start drawing
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -95,16 +146,19 @@ export const BoxAnnotations = ({
     
     e.preventDefault();
     e.stopPropagation();
+    
     const { x, y } = getRelativeCoordinates(e);
     
-    setDrawingState({
-      isDrawing: true,
-      startX: x,
-      startY: y,
-      currentX: x,
-      currentY: y
-    });
-  }, [isAnnotationMode, getRelativeCoordinates, imageRef]);
+    if (isMountedRef.current) {
+      setDrawingState({
+        isDrawing: true,
+        startX: x,
+        startY: y,
+        currentX: x,
+        currentY: y
+      });
+    }
+  }, [isAnnotationMode, getRelativeCoordinates]);
 
   // Handle mouse move - update current drawing box
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -113,16 +167,18 @@ export const BoxAnnotations = ({
     e.preventDefault();
     const { x, y } = getRelativeCoordinates(e);
     
-    setDrawingState(prev => ({
-      ...prev,
-      currentX: x,
-      currentY: y
-    }));
+    if (isMountedRef.current) {
+      setDrawingState(prev => ({
+        ...prev,
+        currentX: x,
+        currentY: y
+      }));
+    }
   }, [drawingState.isDrawing, isAnnotationMode, getRelativeCoordinates]);
 
   // Handle mouse up - complete drawing and save annotation
   const handleMouseUp = useCallback(() => {
-    if (!drawingState.isDrawing || !isAnnotationMode) return;
+    if (!drawingState.isDrawing || !isAnnotationMode || !isMountedRef.current) return;
     
     const { startX, startY, currentX, currentY } = drawingState;
     
@@ -132,10 +188,19 @@ export const BoxAnnotations = ({
     const width = Math.abs(currentX - startX);
     const height = Math.abs(currentY - startY);
     
-    // Only save if box has meaningful size (at least 1% of image)
-    if (width > 1 && height > 1) {
+    // Reset drawing state first
+    setDrawingState({
+      isDrawing: false,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0
+    });
+
+    // Only save if box has meaningful size (at least MIN_BOX_SIZE_PERCENT of image)
+    if (width > MIN_BOX_SIZE_PERCENT && height > MIN_BOX_SIZE_PERCENT) {
       const newAnnotation: BoxAnnotation = {
-        id: `box-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: generateAnnotationId(),
         x,
         y,
         width,
@@ -148,34 +213,32 @@ export const BoxAnnotations = ({
       const updatedAnnotations = [...annotations, newAnnotation];
       onAnnotationsChange(updatedAnnotations);
       
-      // Show label dialog positioned near the annotation
-      if (imageRef.current) {
-        const rect = imageRef.current.getBoundingClientRect();
-        const dialogX = rect.left + (x / 100) * rect.width;
-        const dialogY = rect.top + (y / 100) * rect.height;
-        
-        setLabelDialog({
-          isVisible: true,
-          annotationId: newAnnotation.id,
-          x: dialogX,
-          y: dialogY,
-          label: ''
-        });
-      }
+      // Show label dialog positioned near the annotation with boundary checks
+      const dialogPosition = calculateDialogPosition(x, y);
+      setLabelDialog({
+        isVisible: true,
+        annotationId: newAnnotation.id,
+        x: dialogPosition.x,
+        y: dialogPosition.y,
+        label: ''
+      });
     }
-    
-    setDrawingState({
-      isDrawing: false,
-      startX: 0,
-      startY: 0,
-      currentX: 0,
-      currentY: 0
-    });
-  }, [drawingState, isAnnotationMode, annotationColor, annotations, onAnnotationsChange, imageRef]);
+  }, [
+    drawingState, 
+    isAnnotationMode, 
+    annotationColor, 
+    annotations, 
+    onAnnotationsChange, 
+    generateAnnotationId,
+    calculateDialogPosition
+  ]);
 
-  // Remove a box annotation
+  // Remove a box annotation with validation
   const removeBoxAnnotation = useCallback((annotationId: string) => {
-    onAnnotationsChange(annotations.filter(annotation => annotation.id !== annotationId));
+    if (!annotationId || !isMountedRef.current) return;
+    
+    const updatedAnnotations = annotations.filter(annotation => annotation.id !== annotationId);
+    onAnnotationsChange(updatedAnnotations);
   }, [annotations, onAnnotationsChange]);
 
   // Handle right-click to remove annotation
@@ -185,9 +248,9 @@ export const BoxAnnotations = ({
     removeBoxAnnotation(annotationId);
   }, [removeBoxAnnotation]);
 
-  // Handle label confirmation
+  // Handle label confirmation with improved error handling
   const handleLabelConfirm = useCallback(() => {
-    if (!labelDialog.annotationId) return;
+    if (!labelDialog.annotationId || !isMountedRef.current) return;
     
     // Find the annotation being labeled
     const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
@@ -206,10 +269,9 @@ export const BoxAnnotations = ({
         : annotation
     );
 
-    // If this is a preset color and has a label, prepare additional notes update
-    const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
-    
+    // Prepare additional notes update for preset colors
     let updatedAdditionalNotes = annotationData?.additionalNotes;
+    const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
     
     if (label && presetColorName && annotationData) {
       const existingNotes = annotationData.additionalNotes || '';
@@ -222,15 +284,20 @@ export const BoxAnnotations = ({
     }
 
     // Make a single combined update with both annotations and additional notes
-    if (onAnnotationDataChange && annotationData) {
-      onAnnotationDataChange({
-        ...annotationData,
-        additionalNotes: updatedAdditionalNotes,
-        boxAnnotations: updatedAnnotations
-      });
-    } else {
-      // Fallback to just updating annotations if no combined callback
-      onAnnotationsChange(updatedAnnotations);
+    try {
+      if (onAnnotationDataChange && annotationData) {
+        onAnnotationDataChange({
+          ...annotationData,
+          additionalNotes: updatedAdditionalNotes,
+          boxAnnotations: updatedAnnotations
+        });
+      } else {
+        // Fallback to just updating annotations if no combined callback
+        onAnnotationsChange(updatedAnnotations);
+      }
+    } catch (error) {
+      console.error('Error updating annotation data:', error);
+      // Still try to close dialog even if update fails
     }
     
     setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
@@ -238,11 +305,13 @@ export const BoxAnnotations = ({
 
   // Handle label cancellation
   const handleLabelCancel = useCallback(() => {
+    if (!isMountedRef.current) return;
     setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
   }, []);
 
   // Handle label input change
   const handleLabelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isMountedRef.current) return;
     setLabelDialog(prev => ({ ...prev, label: e.target.value }));
   }, []);
 
@@ -255,8 +324,8 @@ export const BoxAnnotations = ({
     }
   }, [handleLabelConfirm, handleLabelCancel]);
 
-  // Render current drawing box (while dragging)
-  const renderCurrentDrawingBox = () => {
+  // Memoized current drawing box to avoid unnecessary re-renders
+  const currentDrawingBox = useMemo(() => {
     if (!drawingState.isDrawing) return null;
     
     const { startX, startY, currentX, currentY } = drawingState;
@@ -278,46 +347,44 @@ export const BoxAnnotations = ({
         }}
       />
     );
-  };
+  }, [drawingState, annotationColor]);
 
-  // Render saved box annotations
-  const renderSavedAnnotations = () => {
+  // Memoized saved annotations to avoid unnecessary re-renders
+  const savedAnnotations = useMemo(() => {
     // Only show existing box annotations when in box annotation mode
     if (!isAnnotationMode) return null;
     
-    return annotations.map((annotation) => {
-      return (
-        <div
-          key={annotation.id}
-          className={styles.savedAnnotationBox}
-          style={{
-            left: `${annotation.x}%`,
-            top: `${annotation.y}%`,
-            width: `${annotation.width}%`,
-            height: `${annotation.height}%`,
-            border: `2px solid ${annotation.color}`,
-            backgroundColor: 'transparent',
-            pointerEvents: 'auto' // Always allow interactions with saved boxes
-          }}
-          onDoubleClick={(e) => {
-            e.stopPropagation();
-            removeBoxAnnotation(annotation.id);
-          }}
-          onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
-          title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
-        >
-          {annotation.label && (
-            <div className={styles.annotationLabel}>
-              {annotation.label}
-            </div>
-          )}
-        </div>
-      );
-    });
-  };
+    return annotations.map((annotation) => (
+      <div
+        key={annotation.id}
+        className={styles.savedAnnotationBox}
+        style={{
+          left: `${annotation.x}%`,
+          top: `${annotation.y}%`,
+          width: `${annotation.width}%`,
+          height: `${annotation.height}%`,
+          border: `2px solid ${annotation.color}`,
+          backgroundColor: 'transparent',
+          pointerEvents: 'auto' // Always allow interactions with saved boxes
+        }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          removeBoxAnnotation(annotation.id);
+        }}
+        onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
+        title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
+      >
+        {annotation.label && (
+          <div className={styles.annotationLabel}>
+            {annotation.label}
+          </div>
+        )}
+      </div>
+    ));
+  }, [annotations, isAnnotationMode, removeBoxAnnotation, handleAnnotationRightClick]);
 
-  // Render label input dialog
-  const renderLabelDialog = () => {
+  // Memoized label dialog to avoid unnecessary re-renders
+  const labelDialogElement = useMemo(() => {
     if (!labelDialog.isVisible) return null;
     
     // Check if current annotation uses a preset color
@@ -368,7 +435,14 @@ export const BoxAnnotations = ({
         </div>
       </div>
     );
-  };
+  }, [
+    labelDialog, 
+    annotations, 
+    handleLabelChange, 
+    handleLabelKeyDown, 
+    handleLabelConfirm, 
+    handleLabelCancel
+  ]);
 
   return (
     <>
@@ -383,10 +457,10 @@ export const BoxAnnotations = ({
           pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
         }}
       >
-        {renderSavedAnnotations()}
-        {renderCurrentDrawingBox()}
+        {savedAnnotations}
+        {currentDrawingBox}
       </div>
-      {renderLabelDialog()}
+      {labelDialogElement}
     </>
   );
 };
