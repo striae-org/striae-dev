@@ -37,7 +37,8 @@ async function handleGetUser(env, userUid) {
 
 async function handleAddUser(request, env, userUid) {
   try {
-    const { email, firstName, lastName, company, permitted } = await request.json();
+    const requestData = await request.json();
+    const { email, firstName, lastName, company, permitted } = requestData;
     
     // Check for existing user
     const value = await env.USER_DB.get(userUid);
@@ -48,6 +49,7 @@ async function handleAddUser(request, env, userUid) {
       const existing = JSON.parse(value);
       userData = {
         ...existing,
+        // Preserve all existing fields
         email: email || existing.email,
         firstName: firstName || existing.firstName,
         lastName: lastName || existing.lastName,
@@ -55,6 +57,9 @@ async function handleAddUser(request, env, userUid) {
         permitted: permitted !== undefined ? permitted : existing.permitted,
         updatedAt: new Date().toISOString()
       };
+      if (requestData.readOnlyCases !== undefined) {
+        userData.readOnlyCases = requestData.readOnlyCases;
+      }
     } else {
       // Create new user
       userData = {
@@ -67,6 +72,9 @@ async function handleAddUser(request, env, userUid) {
         cases: [],
         createdAt: new Date().toISOString()
       };
+      if (requestData.readOnlyCases !== undefined) {
+        userData.readOnlyCases = requestData.readOnlyCases;
+      }
     }
 
     // Store value in KV
@@ -416,6 +424,7 @@ export default {
       return new Response('Not Found', { status: 404 });
     }
 
+    // Handle regular cases endpoint
     if (isCasesEndpoint) {
       switch (request.method) {
         case 'PUT': return handleAddCases(request, env, userUid);
