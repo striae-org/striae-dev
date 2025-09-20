@@ -49,6 +49,10 @@
       - [AllCasesExportData Interface](#allcasesexportdata-interface)
       - [ExportFormat Type](#exportformat-type)
       - [ExportOptions Interface](#exportoptions-interface)
+    - [Case Import Types](#case-import-types)
+      - [ImportOptions Interface](#importoptions-interface)
+      - [ImportResult Interface](#importresult-interface)
+      - [ReadOnlyCaseMetadata Interface](#readonlycasemetadata-interface)
     - [File Management Types](#file-management-types)
       - [FileData Interface](#filedata-interface)
       - [FileUploadResponse Interface](#fileuploadresponse-interface)
@@ -673,6 +677,7 @@ interface BoxAnnotation {
   width: number;     // Percentage 0-100
   height: number;    // Percentage 0-100
   color: string;     // Hex color code
+  label?: string;    // Optional label text
   timestamp: string; // Creation timestamp (ISO 8601 format)
 }
 ```
@@ -694,6 +699,14 @@ interface UserData {
   cases: Array<{
     caseNumber: string;
     createdAt: string;
+  }>;
+  readOnlyCases?: Array<{
+    caseNumber: string;
+    importedAt: string;
+    originalExportDate: string;
+    originalExportedBy: string;
+    sourceChecksum?: string;
+    isReadOnly: true;
   }>;
   createdAt: string;
   updatedAt?: string;
@@ -876,6 +889,61 @@ interface ExportOptions {
 - **Metadata Rich**: Complete export metadata including timestamps, user info, and summary statistics
 - **Error Handling**: Graceful handling of failed case exports with detailed error information
 - **Progress Tracking**: Real-time progress updates for ZIP generation and image downloads
+
+### Case Import Types
+
+#### ImportOptions Interface
+
+Configuration options for case import operations:
+
+```typescript
+interface ImportOptions {
+  overwriteExisting?: boolean;
+  validateIntegrity?: boolean;
+  preserveTimestamps?: boolean;
+}
+```
+
+#### ImportResult Interface
+
+Result structure returned from case import operations:
+
+```typescript
+interface ImportResult {
+  success: boolean;
+  caseNumber: string;
+  isReadOnly: boolean;
+  filesImported: number;
+  annotationsImported: number;
+  errors?: string[];
+  warnings?: string[];
+}
+```
+
+#### ReadOnlyCaseMetadata Interface
+
+Metadata structure for imported read-only cases:
+
+```typescript
+interface ReadOnlyCaseMetadata {
+  caseNumber: string;
+  importedAt: string;
+  originalExportDate: string;
+  originalExportedBy: string;
+  sourceChecksum?: string;
+  isReadOnly: true;
+}
+```
+
+**Import Features**:
+
+- **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
+- **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
+- **Duplicate Prevention**: Prevents import if user was the original case analyst
+- **Progress Tracking**: Multi-stage progress reporting with detailed status updates
+- **Image Integration**: Automatic upload and association of all case images
+- **Metadata Preservation**: Complete preservation of original export metadata and timestamps
+- **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
 
 **CSV/Excel Export Details**:
 
