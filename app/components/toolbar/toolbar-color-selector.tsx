@@ -62,6 +62,8 @@ export const ToolbarColorSelector = ({
     };
   }, [isVisible, handleCancel]);
 
+  if (!isVisible) return null;
+
   return (
     <div className={styles.toolbarColorSelector}>
       <div className={styles.header}>
