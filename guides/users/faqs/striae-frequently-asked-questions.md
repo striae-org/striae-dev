@@ -3,13 +3,14 @@
 
 1. [🔐 Login & Authentication](#-login--authentication)
 2. [📊 Case Management](#-case-management)  
-3. [📤 Case Data Export](#-case-data-export)
-4. [🎯 Image Annotation](#-image-annotation)
-5. [📄 PDF Generation](#-pdf-generation)
-6. [👤 Account Deletion](#-account-deletion)
-7. [🔧 Troubleshooting](#-troubleshooting)
-8. [🛡️ Security & Best Practices](#️-security--best-practices)
-9. [🚀 Getting Started Quickly](#-getting-started-quickly)
+3. [� Case Import & Review System](#-case-import--review-system)
+4. [�📤 Case Data Export](#-case-data-export)
+5. [🎯 Image Annotation](#-image-annotation)
+6. [📄 PDF Generation](#-pdf-generation)
+7. [👤 Account Deletion](#-account-deletion)
+8. [🔧 Troubleshooting](#-troubleshooting)
+9. [🛡️ Security & Best Practices](#️-security--best-practices)
+10. [🚀 Getting Started Quickly](#-getting-started-quickly)
 
 ***
 
@@ -43,7 +44,35 @@ A: Striae supports the most common and reliable image formats used in forensic d
 
 ***
 
-## 📤 Case Data Export
+## � Case Import & Review System
+
+**Q: How do I import a case that was shared with me?**
+
+A: To import a shared case, use the "Import Case" feature in the case management panel. Click "Import Case" and select the ZIP file that was shared with you (this should be a complete case export from another Striae user). Only ZIP files (.zip) exported from Striae are accepted for security reasons. Once uploaded, the system will extract and import all case data, images, and annotations. The imported case will be added to your case list and you can immediately start reviewing the annotations and data.
+
+**Q: What happens when I import a case - can I edit it?**
+
+A: Imported cases are automatically set to **read-only mode** to preserve the integrity of the original work. You can view all annotations, images, case details, and generate PDF reports, but you cannot modify any of the data, annotations, or upload new images. This read-only protection ensures that imported forensic evidence maintains its original state for chain of custody and audit purposes. If you need to work with similar data, create a new case instead.
+
+**Q: Can I tell if a case was imported from someone else?**
+
+A: Yes! Imported cases are clearly marked with a special "Read-Only" badge in the case management panel and throughout the interface. Additionally, you'll see read-only indicators on all editing features, and the case review panel will display "Read-Only Mode" status. This visual distinction helps you immediately identify which cases are your original work versus cases that were shared with you.
+
+**Q: What's included when I import a case ZIP file?**
+
+A: When you import a case ZIP file, you receive the complete case package including all original images, comprehensive annotation data (all 22 data fields), box annotations with precise coordinates and colors, case metadata and timestamps, and file organization exactly as it was in the original case. The import process preserves all visual elements, classifications, support levels, and detailed notes to maintain complete forensic documentation.
+
+**Q: Why can't I import other file types besides ZIP files?**
+
+A: Striae only accepts ZIP files for case import to ensure security and data integrity. ZIP files from Striae exports contain a verified structure with all necessary components (images, data files, metadata) in a standardized format. This restriction prevents potential security issues from unknown file types and ensures that only legitimate Striae case exports can be imported, maintaining the chain of custody for forensic evidence.
+
+**Q: What should I do if my case import fails?**
+
+A: If case import fails, first verify that you're uploading a valid ZIP file exported from Striae. Check that the file isn't corrupted and that you have a stable internet connection. The system will display specific error messages to help diagnose the issue. Common problems include invalid file formats (ensure it's a .zip file), corrupted ZIP files, or network connectivity issues. If problems persist, try importing the case again or contact support with details about the error message.
+
+***
+
+## �📤 Case Data Export
 
 **Q: How do I export my case data from Striae?**
 

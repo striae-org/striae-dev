@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-09-20] - *[Release v0.9.20-beta](https://github.com/striae-org/striae/releases/tag/v0.9.20-beta)*
+
+- **Export Security Enhancement** - Multi-layer authentication and validation for all case export operations with improved error handling
+- **Case Review Import System** - Comprehensive ZIP package import utility allowing complete case review with automatic read-only protection
+- **Complete Image Integration** - Seamless import of cases with all associated images, annotations, and metadata preservation
+- **Production Code Quality** - Comprehensive console log cleanup while maintaining essential error logging and audit trails
+
 ## [2025-09-18] - *[Release v0.9.18-beta](https://github.com/striae-org/striae/releases/tag/v0.9.18-beta)*
 
 - **Automated Deployment System** - Streamlined deployment scripts with unified `deploy:all` command and enhanced cross-platform support

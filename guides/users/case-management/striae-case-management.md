@@ -38,6 +38,14 @@
   - [Troubleshooting Export Issues](#troubleshooting-export-issues)
     - [Common Export Problems](#common-export-problems)
     - [Export Recovery](#export-recovery)
+- [Case Import and Review System](#case-import-and-review-system)
+  - [Overview](#overview-1)
+  - [Understanding Read-Only Cases](#understanding-read-only-cases)
+  - [How to Import a Case for Review](#how-to-import-a-case-for-review)
+  - [Working with Imported Cases](#working-with-imported-cases)
+  - [Managing Review Cases](#managing-review-cases)
+  - [Import Best Practices](#import-best-practices)
+  - [Troubleshooting Import Issues](#troubleshooting-import-issues)
 - [Advanced Operations: Rename & Delete Cases](#advanced-operations-rename--delete-cases)
   - [Renaming a Case](#renaming-a-case)
   - [Deleting a Case](#deleting-a-case)
@@ -62,6 +70,8 @@
 * **Case Operations:** Rename or delete your cases whenever needed.
 
 * **Data Export:** Export individual cases or all cases with comprehensive annotation data in multiple formats (JSON, CSV, Excel).
+
+* **Case Import & Review:** Import complete case packages (ZIP files) for secure peer review and collaboration with read-only protection.
 
 ***
 
@@ -411,6 +421,151 @@ All export formats include identical data:
 * **Failed Single Case:** Retry the export after checking the case number
 * **Failed Bulk Export:** The system will continue processing other cases even if some fail
 * **Incomplete Downloads:** Re-run the export to get a fresh file
+* **Browser Issues:** Clear browser cache or try an incognito/private window
+
+***
+
+## Case Import and Review System
+
+### Overview
+
+The Case Import and Review System allows you to securely import complete case packages (ZIP files) created by other examiners for peer review and collaboration. Imported cases are automatically protected with read-only access to ensure data integrity while enabling comprehensive review of all case materials.
+
+**Key Benefits:**
+* **Secure Collaboration:** Review complete cases from colleagues without risk of accidental modification
+* **Complete Case Access:** All original images, annotations, and notes are preserved and accessible
+* **Metadata Preservation:** Original export information, analyst details, and timestamps are maintained
+* **Easy Management:** Simple import process with automatic organization and cleanup
+
+### Understanding Read-Only Cases
+
+When you import a case for review:
+
+* **Read-Only Protection:** Imported cases cannot be modified, ensuring original data integrity
+* **Complete Access:** You can view all images, annotations, notes, and case data exactly as the original analyst created them
+* **Separate Organization:** Review cases are kept separate from your regular cases for clear organization
+* **Original Metadata:** All original case information including export date, original analyst, and case history is preserved
+
+**Important Security Features:**
+* You cannot import cases that you originally created (system prevents conflicts)
+* Only one review case can be active at a time to maintain focus and organization
+* All import operations are tracked with timestamps and validation
+
+### How to Import a Case for Review
+
+**Step 1: Access the Import Feature**
+* Open the Case Management Panel on the left sidebar
+* Look for the **"Import Case"** button
+* Click the button to open the import modal
+
+**Step 2: Select Your ZIP File**
+* Choose **"Select ZIP File"** to browse your computer for the case package
+* The system accepts ZIP files exported from Striae with complete case data
+* The ZIP file must *not* be modified after export (except for renaming)
+
+**Step 3: Confirm Import**
+* Click **"Import"** to begin the import process
+* Monitor the progress indicator as the system:
+  - Clears the current loaded case (if any)
+  - Extracts and validates case data
+  - Uploads all images to secure storage
+  - Imports annotations and notes
+  - Sets up read-only access protections
+
+**Step 4: Access Your Review Case**
+* Once import completes, the case automatically loads for review
+* All images, annotations, and notes are immediately accessible
+* Use normal navigation to review all case materials
+
+### Working with Imported Cases
+
+**Viewing Case Data:**
+* Navigate through images using standard controls
+* View all annotations including box annotations, classifications, and notes using the toolbar
+* Generate a PDF report with selected annotations for wet signatures or offline review
+
+**Read-Only Interface:**
+* All editing controls are automatically disabled for imported cases
+* You can view but cannot modify annotations, notes, or case information
+* Image uploads and file management are restricted
+* Case rename and delete operations are prevented
+
+**Navigation:**
+* Use the Case Management Panel to see current review case status
+* The interface clearly indicates when you're viewing a read-only imported case
+* Return to your regular cases by loading a different case number
+
+### Managing Review Cases
+
+**Current Review Case:**
+* Only one review case can be active at a time
+* The current review case is shown in the Case Management Panel
+* Case number is displayed with read-only indicator
+
+**Replacing a Review Case:**
+* To import a new case when one is already loaded, use the "Clear" option
+* Or choose to automatically replace when importing a new case
+* The system safely removes the previous review case data
+
+**Removing Review Cases:**
+* Click **"Clear"** to remove the imported case from your account
+* This action only removes the case from your review list; it doesn't affect the original case data
+* All associated imported data (images, annotations) is safely cleaned up from your account
+
+### Import Best Practices
+
+**Before Importing:**
+* Verify the ZIP file is from a trusted source and contains the case you intend to review
+* Ensure you have sufficient time to complete the review process
+* Clear any current review case if you need to import a different one
+
+**During Import:**
+* Keep the browser window open during the import process
+* Monitor progress indicators and respond to any prompts
+* Allow sufficient time for large cases with many high-resolution images
+
+**While Reviewing:**
+* Take notes externally if you need to document your review findings
+* Use the complete case data to conduct thorough peer review
+* Remember that all viewing is read-only; no changes can be made to the original case
+
+**After Review:**
+* Clear the review case when your analysis is complete
+* Communicate findings to the original analyst through your preferred communication channels
+* Consider exporting your own cases using the same process for reciprocal review
+
+### Troubleshooting Import Issues
+
+**Common Import Problems:**
+
+**ZIP File Not Recognized:**
+* Ensure the file is a valid ZIP archive exported from Striae
+* Check that the file hasn't been modified or corrupted during transfer
+* Verify the ZIP contains the required case data files
+
+**Import Fails with Error:**
+* Check that you're not trying to import a case you originally created
+* Verify your internet connection is stable during the import process
+
+**Images Not Loading:**
+* Large images may take time to process and upload
+* Check network connectivity if image upload appears stalled
+* Retry the import if the process was interrupted
+
+**Case Data Appears Incomplete:**
+* Verify the original export included all necessary data
+* Check with the original analyst if case data seems missing
+* Re-import the case if the first attempt was incomplete or request a new export
+
+**Performance Issues:**
+* Large cases with many high-resolution images may take longer to import
+* Close other browser tabs to free up memory during import
+* Consider importing during off-peak hours for better performance
+
+**Import Recovery:**
+* **Failed Import:** Clear any partial import data and retry with a fresh ZIP file
+* **Corrupted Data:** Re-download the case package from the original source
+* **Incomplete Cases:** Contact the original analyst for a fresh export
 * **Browser Issues:** Clear browser cache or try an incognito/private window
 
 ***

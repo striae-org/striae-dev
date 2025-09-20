@@ -20,9 +20,11 @@
      - [Cases Modal](#cases-modal-appcomponentssidebarcases-modaltsx)
      - [Notes Modal](#notes-modal-appcomponentssidebarnotes-modaltsx)
      - [Case Export](#case-export-appcomponentssidebarcase-exportcase-exporttsx)
+     - [Case Import](#case-import-appcomponentssidebarcase-importcase-importtsx)
    - [4. Action Components](#4-action-components)
      - [Case Management](#case-management-appcomponentsactionscase-managets)
      - [Case Export](#case-export-appcomponentsactionscase-exportts)
+     - [Case Review](#case-review-appcomponentsactionscase-reviewts)
      - [Image Management](#image-management-appcomponentsactionsimage-managets)
      - [PDF Generation](#pdf-generation-appcomponentsactionsgenerate-pdfts)
      - [Notes Management](#notes-management-appcomponentsactionsnotes-managets)
@@ -455,6 +457,45 @@ export type ExportFormat = 'json' | 'csv';
 - **Performance Optimization**: Optional annotation inclusion for faster exports when only metadata is needed
 - **Disabled State Management**: UI components properly synchronized during export operations
 
+#### Case Import (`app/components/sidebar/case-import/case-import.tsx`)
+
+**Purpose**: ZIP package import modal for reviewing complete case data in read-only mode
+
+**Features**:
+
+- **ZIP File Selection**: File browser interface for ZIP package import
+- **Read-Only Case Review**: Imported cases are automatically protected from modification
+- **Progress Tracking**: Real-time import progress with stage-by-stage updates
+- **Existing Case Detection**: Automatic detection and management of existing read-only cases
+- **Image Integration**: Automatic import and association of all case image data and annotations
+- **Metadata Preservation**: Complete preservation of original case metadata and timestamps
+- **Clear Management**: Option to remove imported cases from review bin
+- **Error Handling**: Comprehensive error reporting with detailed failure messages
+- **Security Validation**: Prevents import of cases where user was original analyst
+
+**Type Definition**: Uses component-specific `CaseImportProps` interface
+
+**Props**:
+
+```typescript
+interface CaseImportProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onImportComplete: (caseNumber: string, success: boolean) => void;
+}
+```
+
+**Import Process Features**:
+
+- **ZIP Validation**: Comprehensive validation of ZIP package structure and contents
+- **Case Data Parsing**: Support for JSON format with forensic protection warnings
+- **Duplicate Prevention**: Prevents import if user was original case analyst
+- **Progress Callbacks**: Multi-stage progress reporting (ZIP parsing, image upload, annotation import)
+- **Cleanup Operations**: Automatic cleanup of existing case data when overwriting
+- **File Mapping**: Internal mapping system for connecting imported images to annotation data
+- **Integrity Validation**: Optional case data integrity verification during import
+- **User Profile Integration**: Automatic addition of imported cases to user's read-only case list
+
 ### 4. Action Components
 
 #### Case Management (`app/components/actions/case-manage.ts`)
@@ -568,6 +609,81 @@ export interface ExportOptions {
 - **Sheet Naming**: Excel-compatible sheet names with case number identifiers
 - **Error Sheets**: Dedicated worksheets for failed case exports with error details
 - **Split Annotation Format**: Box annotations displayed in separate rows for better analysis
+
+#### Case Review (`app/components/actions/case-review.ts`)
+
+**Purpose**: ZIP package import system for read-only case review and collaboration
+
+**Key Functions**:
+
+```typescript
+export const importCaseForReview = async (
+  user: User,
+  zipFile: File,
+  options: ImportOptions = {},
+  onProgress?: (stage: string, progress: number, details?: string) => void
+): Promise<ImportResult>
+
+export const listReadOnlyCases = async (user: User): Promise<ReadOnlyCaseMetadata[]>
+
+export const deleteReadOnlyCase = async (user: User, caseNumber: string): Promise<boolean>
+
+export const parseImportZip = async (zipFile: File): Promise<{
+  caseData: CaseExportData;
+  imageFiles: { [filename: string]: Blob };
+  metadata?: any;
+}>
+```
+
+**Core Import Features**:
+
+- **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
+- **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
+- **Duplicate Prevention**: Prevents import if user was the original case analyst
+- **Progress Tracking**: Multi-stage progress reporting with detailed status updates
+- **Image Integration**: Automatic upload and association of all case images
+- **Metadata Preservation**: Complete preservation of original export metadata and timestamps
+- **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
+
+**Type Definitions**:
+
+```typescript
+export interface ImportOptions {
+  overwriteExisting?: boolean;
+  validateIntegrity?: boolean;
+  preserveTimestamps?: boolean;
+}
+
+export interface ImportResult {
+  success: boolean;
+  caseNumber: string;
+  isReadOnly: boolean;
+  filesImported: number;
+  annotationsImported: number;
+  errors?: string[];
+  warnings?: string[];
+}
+
+export interface ReadOnlyCaseMetadata {
+  caseNumber: string;
+  importedAt: string;
+  originalExportDate: string;
+  originalExportedBy: string;
+  sourceChecksum?: string;
+  isReadOnly: true;
+}
+```
+
+**Import Process**:
+
+- **ZIP Validation**: Comprehensive structure and content validation
+- **Case Data Parsing**: JSON format support with forensic protection warning handling
+- **Image Processing**: Blob extraction and upload to image worker
+- **Annotation Import**: Complete annotation data mapping and storage
+- **User Profile Integration**: Automatic addition to user's read-only case bin
+- **Cleanup Operations**: Automatic removal of existing case data when overwriting
+- **Error Recovery**: Graceful handling of import failures with detailed error reporting
+- **Security Validation**: Prevents modification of imported cases and restricts access appropriately
 
 #### Image Management (`app/components/actions/image-manage.ts`)
 
