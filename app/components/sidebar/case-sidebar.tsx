@@ -49,6 +49,7 @@ interface CaseSidebarProps {
   setError: (error: string) => void;
   successAction: CaseActionType;
   setSuccessAction: (action: CaseActionType) => void;
+  isReadOnly?: boolean;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -70,6 +71,7 @@ export const CaseSidebar = ({
   setError,
   successAction,
   setSuccessAction,
+  isReadOnly = false
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -227,6 +229,12 @@ export const CaseSidebar = ({
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Don't allow file upload for read-only cases
+    if (isReadOnly) {
+      console.warn('Cannot upload files for read-only case');
+      return;
+    }
+
     const file = event.target.files?.[0];
     if (!file || !currentCase) return;
 
@@ -273,6 +281,12 @@ export const CaseSidebar = ({
 };
 
   const handleFileDelete = async (fileId: string) => {
+    // Don't allow file deletion for read-only cases
+    if (isReadOnly) {
+      console.warn('Cannot delete files for read-only case');
+      return;
+    }
+
     if (!currentCase) return;
     
     setFileError('');
@@ -472,7 +486,12 @@ return (
         currentCaseNumber={currentCase || ''}
       />
         <div className={styles.filesSection}>
-      <h4>{currentCase || 'No Case Selected'}</h4>
+      <h4>
+        {currentCase || 'No Case Selected'}
+        {isReadOnly && currentCase && (
+          <span className={styles.readOnlyBadge}> (Read-Only)</span>
+        )}
+      </h4>
       {currentCase && (
         <div className={styles.fileUpload}>
       <label htmlFor="file-upload">Upload Image:</label>
@@ -482,7 +501,7 @@ return (
         type="file"
         accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
         onChange={handleFileUpload}
-        disabled={isUploadingFile || !canUploadNewFile}
+        disabled={isUploadingFile || !canUploadNewFile || isReadOnly}
         className={styles.fileInput}
         aria-label="Upload image file"
         title={!canUploadNewFile ? uploadFileError : undefined}
@@ -536,6 +555,8 @@ return (
                   }}
                   className={styles.deleteButton}
                   aria-label="Delete file"
+                  disabled={isReadOnly}
+                  style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                 >
                   ×
                 </button>

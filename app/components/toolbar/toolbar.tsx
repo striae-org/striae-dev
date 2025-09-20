@@ -13,6 +13,7 @@ interface ToolbarProps {
   isGeneratingPDF?: boolean;
   onColorChange?: (color: string) => void;
   selectedColor?: string;
+  isReadOnly?: boolean;
 }
 
 export const Toolbar = ({ 
@@ -22,13 +23,19 @@ export const Toolbar = ({
   canGeneratePDF, 
   isGeneratingPDF = false,
   onColorChange,
-  selectedColor = '#ff0000'
+  selectedColor = '#ff0000',
+  isReadOnly = false
 }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
   const [showColorSelector, setShowColorSelector] = useState(false);
 
   const handleToolClick = (toolId: ToolId) => {
+    // Only disable PDF generation for read-only cases, allow all other tools
+    if (isReadOnly && toolId === 'print') {
+      return;
+    }
+
     if (toolId === 'print') {
       if (onGeneratePDF && canGeneratePDF) {
         onGeneratePDF();
@@ -124,8 +131,8 @@ export const Toolbar = ({
         iconId="print"
         isActive={false}
         onClick={() => handleToolClick('print')}
-        ariaLabel={isGeneratingPDF ? "Generating PDF..." : "Save/Print to PDF"}
-        disabled={!canGeneratePDF || isGeneratingPDF}
+        ariaLabel={isGeneratingPDF ? "Generating PDF..." : isReadOnly ? "Cannot generate PDF for imported cases" : "Save/Print to PDF"}
+        disabled={!canGeneratePDF || isGeneratingPDF || isReadOnly}
         showSpinner={isGeneratingPDF}
       />
         </div>

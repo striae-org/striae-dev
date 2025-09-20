@@ -30,6 +30,7 @@ interface BoxAnnotationsProps {
     additionalNotes?: string;
   };
   onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
+  isReadOnly?: boolean;
 }
 
 interface DrawingState {
@@ -56,7 +57,8 @@ export const BoxAnnotations = ({
   annotationColor,
   className,
   annotationData,
-  onAnnotationDataChange
+  onAnnotationDataChange,
+  isReadOnly = false
 }: BoxAnnotationsProps) => {
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
@@ -135,6 +137,9 @@ export const BoxAnnotations = ({
 
   // Handle mouse down - start drawing
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Don't allow drawing in read-only mode
+    if (isReadOnly) return;
+    
     // Only start drawing if in annotation mode and not clicking on an existing box
     if (!isAnnotationMode || !imageRef.current) return;
     
@@ -406,11 +411,18 @@ export const BoxAnnotations = ({
           pointerEvents: 'auto' // Always allow interactions with saved boxes
         }}
         onDoubleClick={(e) => {
+          if (isReadOnly) return;
           e.stopPropagation();
           removeBoxAnnotation(annotation.id);
         }}
-        onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
-        title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
+        onContextMenu={(e) => {
+          if (isReadOnly) return;
+          handleAnnotationRightClick(e, annotation.id);
+        }}
+        title={isReadOnly 
+          ? `${annotation.label ? `Label: ${annotation.label}` : 'Box annotation'}` 
+          : `${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`
+        }
       >
         {annotation.label && (
           <div className={styles.annotationLabel}>

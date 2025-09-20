@@ -5,7 +5,9 @@ import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './case-sidebar';
 import { NotesSidebar } from './notes-sidebar';
+import { CaseImport } from './case-import';
 import { FileData } from '~/types';
+import { ImportResult } from '../actions/case-review';
 
 interface SidebarProps {
   user: User;
@@ -27,6 +29,7 @@ interface SidebarProps {
   showNotes: boolean;
   setShowNotes: (show: boolean) => void;
   onAnnotationRefresh?: () => void;
+  isReadOnly?: boolean;
 }
 
 export const Sidebar = ({ 
@@ -48,9 +51,20 @@ export const Sidebar = ({
   setSuccessAction,
   showNotes,
   setShowNotes,
-  onAnnotationRefresh
+  onAnnotationRefresh,
+  isReadOnly = false
 }: SidebarProps) => {
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);  
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  const handleImportComplete = (result: ImportResult) => {
+    if (result.success) {
+      console.log(`Successfully imported case: ${result.caseNumber}`);
+      // Optionally trigger a case list refresh or other UI updates
+      // You might want to call onCaseChange or setSuccessAction here
+      setSuccessAction('loaded');
+    }
+  };  
 
   return (
     <div className={styles.sidebar}>
@@ -71,6 +85,11 @@ export const Sidebar = ({
       <ManageProfile 
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
+      />
+      <CaseImport 
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportComplete={handleImportComplete}
       />
       {showNotes ? (
         <NotesSidebar 
@@ -98,8 +117,17 @@ export const Sidebar = ({
           successAction={successAction}
           setSuccessAction={setSuccessAction}
           onNotesClick={() => setShowNotes(true)}
+          isReadOnly={isReadOnly}
         />
       )}
+      <div className={styles.importSection}>
+        <button 
+          onClick={() => setIsImportModalOpen(true)}
+          className={styles.importButton}
+        >
+          Import Case for Review
+        </button>
+      </div>
     </div>
   );
 };
