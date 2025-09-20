@@ -83,12 +83,8 @@ export const Login = () => {
   // Handle case review account toggle changes
   useEffect(() => {
     if (isCaseReviewAccount) {
-      setFirstName('User');
-      setLastName('Review');
       setCompany('CASE REVIEW ONLY');
     } else {
-      setFirstName('');
-      setLastName('');
       setCompany('');
     }
   }, [isCaseReviewAccount]);
@@ -456,7 +452,7 @@ export const Login = () => {
                     placeholder="First Name (required)"
                     autoComplete="given-name"
                     className={styles.input}
-                    disabled={isLoading || isCaseReviewAccount}
+                    disabled={isLoading}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
@@ -467,7 +463,7 @@ export const Login = () => {
                     placeholder="Last Name (required)"
                     autoComplete="family-name"
                     className={styles.input}
-                    disabled={isLoading || isCaseReviewAccount}
+                    disabled={isLoading}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                   />
