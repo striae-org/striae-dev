@@ -590,17 +590,32 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
       const caseData = await caseResponse.json() as { files?: FileData[] };
       console.log('Read-only case data for cleanup:', caseData);
       
-      // Delete all files using image worker
+      // Delete all files using image worker and their annotation data
       if (caseData.files && caseData.files.length > 0) {
         console.log('Deleting files:', caseData.files.map(f => ({ id: f.id, filename: f.originalFilename })));
         await Promise.all(
           caseData.files.map(async (file: FileData) => {
             try {
               console.log(`Attempting to delete file: ${file.id} (${file.originalFilename})`);
+              
+              // Delete image from Cloudflare Images
               await deleteFile(user, caseNumber, file.id);
-              console.log(`Successfully deleted file: ${file.id}`);
+              console.log(`Successfully deleted image: ${file.id}`);
+              
+              // Delete annotation data file for this image
+              const annotationResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${file.id}/data.json`, {
+                method: 'DELETE',
+                headers: { 'X-Custom-Auth-Key': dataApiKey }
+              });
+              
+              if (annotationResponse.ok) {
+                console.log(`Successfully deleted annotation data for image: ${file.id}`);
+              } else {
+                console.log(`No annotation data found for image: ${file.id} (${annotationResponse.status})`);
+              }
+              
             } catch (error) {
-              console.error(`Failed to delete file ${file.id}:`, error);
+              console.error(`Failed to delete file/annotations ${file.id}:`, error);
               // Continue with cleanup even if one file fails
             }
           })
