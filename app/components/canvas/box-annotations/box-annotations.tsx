@@ -2,6 +2,20 @@ import { useState, useCallback } from 'react';
 import { BoxAnnotation } from '~/types';
 import styles from './box-annotations.module.css';
 
+// Mapping of preset colors to their names for additional notes
+const PRESET_COLOR_NAMES: Record<string, string> = {
+  '#ff0000': 'Red',
+  '#ff8000': 'Orange', 
+  '#ffde21': 'Yellow',
+  '#00ff00': 'Green',
+  '#00ffff': 'Cyan',
+  '#0000ff': 'Blue',
+  '#8000ff': 'Purple',
+  '#ff00ff': 'Magenta',
+  '#000000': 'Black',
+  '#ffffff': 'White'
+};
+
 interface BoxAnnotationsProps {
   imageRef: React.RefObject<HTMLImageElement | null>;
   annotations: BoxAnnotation[];
@@ -9,6 +23,10 @@ interface BoxAnnotationsProps {
   isAnnotationMode: boolean;
   annotationColor: string;
   className?: string;
+  annotationData?: {
+    additionalNotes?: string;
+  };
+  onAnnotationDataChange?: (data: { additionalNotes?: string }) => void;
 }
 
 interface DrawingState {
@@ -33,7 +51,9 @@ export const BoxAnnotations = ({
   onAnnotationsChange,
   isAnnotationMode,
   annotationColor,
-  className
+  className,
+  annotationData,
+  onAnnotationDataChange
 }: BoxAnnotationsProps) => {
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
@@ -169,15 +189,43 @@ export const BoxAnnotations = ({
   const handleLabelConfirm = useCallback(() => {
     if (!labelDialog.annotationId) return;
     
+    // Find the annotation being labeled
+    const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
+    if (!targetAnnotation || !labelDialog.label.trim()) {
+      // If no label or annotation not found, just close dialog
+      setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+      return;
+    }
+
+    const label = labelDialog.label.trim();
+    
+    // Update the box annotation with the label
     const updatedAnnotations = annotations.map(annotation => 
       annotation.id === labelDialog.annotationId 
-        ? { ...annotation, label: labelDialog.label.trim() || undefined }
+        ? { ...annotation, label }
         : annotation
     );
-    
     onAnnotationsChange(updatedAnnotations);
+
+    // If this is a preset color and we have annotation data callback, add to additional notes
+    const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+    if (presetColorName && onAnnotationDataChange && annotationData) {
+      const existingNotes = annotationData.additionalNotes || '';
+      const labelEntry = `${presetColorName}: ${label}`;
+      
+      // Append to existing notes with proper formatting
+      const updatedNotes = existingNotes 
+        ? `${existingNotes}\n${labelEntry}`
+        : labelEntry;
+      
+      onAnnotationDataChange({
+        ...annotationData,
+        additionalNotes: updatedNotes
+      });
+    }
+    
     setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
-  }, [labelDialog, annotations, onAnnotationsChange]);
+  }, [labelDialog, annotations, onAnnotationsChange, annotationData, onAnnotationDataChange]);
 
   // Handle label cancellation
   const handleLabelCancel = useCallback(() => {
@@ -261,6 +309,10 @@ export const BoxAnnotations = ({
   const renderLabelDialog = () => {
     if (!labelDialog.isVisible) return null;
     
+    // Check if current annotation uses a preset color
+    const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
+    const isPresetColor = targetAnnotation && PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+    
     return (
       <div
         className={styles.labelDialog}
@@ -274,7 +326,10 @@ export const BoxAnnotations = ({
         <div className={styles.labelDialogContent}>
           <div className={styles.labelDialogTitle}>Add Label (Optional)</div>
           <div className={styles.labelDialogNote}>
-            Note: Labels are for organization only and will not appear in PDF reports.
+            {isPresetColor 
+              ? `Note: Labels for preset colors will appear in PDF reports under Additional Notes.`
+              : `Note: Labels are for organization only and will not appear in PDF reports.`
+            }
           </div>
           <input
             type="text"
