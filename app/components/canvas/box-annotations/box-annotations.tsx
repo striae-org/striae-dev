@@ -175,8 +175,49 @@ export const BoxAnnotations = ({
 
   // Remove a box annotation
   const removeBoxAnnotation = useCallback((annotationId: string) => {
-    onAnnotationsChange(annotations.filter(annotation => annotation.id !== annotationId));
-  }, [annotations, onAnnotationsChange]);
+    // Find the annotation being removed
+    const annotationToRemove = annotations.find(annotation => annotation.id === annotationId);
+    
+    // Filter out the removed annotation
+    const updatedAnnotations = annotations.filter(annotation => annotation.id !== annotationId);
+    
+    // Check if the removed annotation has a preset color and label that needs to be removed from Additional Notes
+    if (annotationToRemove?.label && annotationData && onAnnotationDataChange) {
+      const presetColorName = PRESET_COLOR_NAMES[annotationToRemove.color.toLowerCase()];
+      
+      if (presetColorName) {
+        const labelEntry = `${presetColorName}: ${annotationToRemove.label}`;
+        const existingNotes = annotationData.additionalNotes || '';
+        
+        // Remove the specific entry from Additional Notes
+        let updatedAdditionalNotes = existingNotes;
+        
+        // Handle different positions of the entry (beginning, middle, end)
+        if (existingNotes.includes(labelEntry)) {
+          // Split by lines to find and remove the exact entry
+          const lines = existingNotes.split('\n');
+          const filteredLines = lines.filter(line => line !== labelEntry);
+          updatedAdditionalNotes = filteredLines.join('\n');
+          
+          // Clean up any resulting empty lines at the beginning or end
+          updatedAdditionalNotes = updatedAdditionalNotes.replace(/^\n+|\n+$/g, '');
+        }
+        
+        // Update both annotations and additional notes
+        onAnnotationDataChange({
+          ...annotationData,
+          additionalNotes: updatedAdditionalNotes,
+          boxAnnotations: updatedAnnotations
+        });
+      } else {
+        // No preset color, just update annotations
+        onAnnotationsChange(updatedAnnotations);
+      }
+    } else {
+      // No label or no annotation data callback, just update annotations
+      onAnnotationsChange(updatedAnnotations);
+    }
+  }, [annotations, onAnnotationsChange, annotationData, onAnnotationDataChange]);
 
   // Handle right-click to remove annotation
   const handleAnnotationRightClick = useCallback((e: React.MouseEvent, annotationId: string) => {
