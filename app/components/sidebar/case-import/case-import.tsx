@@ -85,13 +85,10 @@ export const CaseImport = ({
     
     try {
       const readOnlyCases = await listReadOnlyCases(user);
-      console.log('Read-only cases found:', readOnlyCases);
       if (readOnlyCases.length > 0) {
         setExistingReadOnlyCase(readOnlyCases[0].caseNumber);
-        console.log('Set existing read-only case:', readOnlyCases[0].caseNumber);
       } else {
         setExistingReadOnlyCase(null);
-        console.log('No read-only cases found');
       }
     } catch (error) {
       console.error('Error checking existing read-only cases:', error);
@@ -252,11 +249,6 @@ export const CaseImport = ({
               </div>
             )}
             
-            {/* Debug info - remove after testing */}
-            <div style={{ fontSize: '12px', color: '#666', padding: '8px', background: '#f5f5f5' }}>
-              Debug: existingReadOnlyCase = "{existingReadOnlyCase}" (type: {typeof existingReadOnlyCase})
-            </div>
-
             {/* File selector */}
             <div className={styles.fileSection}>
               <div className={styles.fileInputGroup}>
