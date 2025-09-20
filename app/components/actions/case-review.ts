@@ -11,8 +11,7 @@ import {
   FileData, 
   ImageUploadResponse 
 } from '~/types';
-import { validateCaseNumber, checkExistingCase } from './case-manage';
-import { deleteFile } from './image-manage';
+import { validateCaseNumber, checkExistingCase, deleteCase } from './case-manage';
 import { saveNotes } from './notes-manage';
 
 const USER_WORKER_URL = paths.user_worker_url;
@@ -579,59 +578,14 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
  */
 export async function deleteReadOnlyCase(user: User, caseNumber: string): Promise<boolean> {
   try {
-    const dataApiKey = await getDataApiKey();
+    // Use the standard deleteCase function which handles all cleanup properly
+    // This will delete images, annotations, and case data using the stored file IDs
+    await deleteCase(user, caseNumber);
     
-    // First get the case data to find all files that need to be deleted
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      headers: { 'X-Custom-Auth-Key': dataApiKey }
-    });
-
-    if (caseResponse.ok) {
-      const caseData = await caseResponse.json() as { files?: FileData[] };
-      console.log('Read-only case data for cleanup:', caseData);
-      
-      // Delete all files using image worker and their annotation data
-      if (caseData.files && caseData.files.length > 0) {
-        console.log('Deleting files:', caseData.files.map(f => ({ id: f.id, filename: f.originalFilename })));
-        await Promise.all(
-          caseData.files.map(async (file: FileData) => {
-            try {
-              console.log(`Attempting to delete file: ${file.id} (${file.originalFilename})`);
-              
-              // Delete image from Cloudflare Images
-              await deleteFile(user, caseNumber, file.id);
-              console.log(`Successfully deleted image: ${file.id}`);
-              
-              // Delete annotation data file for this image
-              const annotationResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${file.id}/data.json`, {
-                method: 'DELETE',
-                headers: { 'X-Custom-Auth-Key': dataApiKey }
-              });
-              
-              if (annotationResponse.ok) {
-                console.log(`Successfully deleted annotation data for image: ${file.id}`);
-              } else {
-                console.log(`No annotation data found for image: ${file.id} (${annotationResponse.status})`);
-              }
-              
-            } catch (error) {
-              console.error(`Failed to delete file/annotations ${file.id}:`, error);
-              // Continue with cleanup even if one file fails
-            }
-          })
-        );
-      }
-
-      // Delete case data from R2 storage
-      await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-        method: 'DELETE',
-        headers: { 'X-Custom-Auth-Key': dataApiKey }
-      });
-    }
-
     // Remove from user's read-only case list
     await removeReadOnlyCase(user, caseNumber);
     
+    console.log(`Successfully deleted read-only case: ${caseNumber}`);
     return true;
     
   } catch (error) {
