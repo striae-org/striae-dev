@@ -37,7 +37,8 @@ async function handleGetUser(env, userUid) {
 
 async function handleAddUser(request, env, userUid) {
   try {
-    const { email, firstName, lastName, company, permitted } = await request.json();
+    const requestData = await request.json();
+    const { email, firstName, lastName, company, permitted } = requestData;
     
     // Check for existing user
     const value = await env.USER_DB.get(userUid);
@@ -48,6 +49,7 @@ async function handleAddUser(request, env, userUid) {
       const existing = JSON.parse(value);
       userData = {
         ...existing,
+        // Preserve all existing fields
         email: email || existing.email,
         firstName: firstName || existing.firstName,
         lastName: lastName || existing.lastName,
@@ -55,6 +57,9 @@ async function handleAddUser(request, env, userUid) {
         permitted: permitted !== undefined ? permitted : existing.permitted,
         updatedAt: new Date().toISOString()
       };
+      if (requestData.readOnlyCases !== undefined) {
+        userData.readOnlyCases = requestData.readOnlyCases;
+      }
     } else {
       // Create new user
       userData = {
@@ -67,6 +72,9 @@ async function handleAddUser(request, env, userUid) {
         cases: [],
         createdAt: new Date().toISOString()
       };
+      if (requestData.readOnlyCases !== undefined) {
+        userData.readOnlyCases = requestData.readOnlyCases;
+      }
     }
 
     // Store value in KV
@@ -225,7 +233,6 @@ async function deleteSingleCase(env, userUid, caseNumber) {
     });
 
     if (!caseResponse.ok) {
-      console.warn(`Case ${caseNumber} not found in data worker`);
       return;
     }
 
@@ -249,7 +256,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
             headers: { 'X-Custom-Auth-Key': dataApiKey }
           });
         } catch (fileError) {
-          console.warn(`Failed to delete file ${file.id} for case ${caseNumber}:`, fileError);
+          // Continue with other files
         }
       }
     }
@@ -261,7 +268,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
     });
 
   } catch (error) {
-    console.warn(`Failed to delete case ${caseNumber}:`, error);
+    // Continue with user deletion even if case deletion fails
   }
 }
 
@@ -280,8 +287,6 @@ async function handleDeleteUser(env, userUid) {
     
     // Delete all user's cases using the same logic as case-manage.ts
     if (userObject.cases && userObject.cases.length > 0) {
-      console.log(`Deleting ${userObject.cases.length} cases for user ${userUid}`);
-      
       for (const caseItem of userObject.cases) {
         await deleteSingleCase(env, userUid, caseItem.caseNumber);
       }
@@ -419,6 +424,7 @@ export default {
       return new Response('Not Found', { status: 404 });
     }
 
+    // Handle regular cases endpoint
     if (isCasesEndpoint) {
       switch (request.method) {
         case 'PUT': return handleAddCases(request, env, userUid);

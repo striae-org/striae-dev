@@ -40,14 +40,15 @@ const createUserData = (
   email: string | null,
   firstName: string,
   lastName: string,
-  company: string
+  company: string,
+  isCaseReviewAccount: boolean = false
 ): UserData => ({
   uid,
   email,
   firstName,
   lastName,
   company,
-  permitted: true,
+  permitted: !isCaseReviewAccount, // Set to false if it's a case review account
   cases: [],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
@@ -64,6 +65,10 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isCaseReviewAccount, setIsCaseReviewAccount] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [company, setCompany] = useState('');
   
   // MFA state
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
@@ -74,6 +79,15 @@ export const Login = () => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Handle case review account toggle changes
+  useEffect(() => {
+    if (isCaseReviewAccount) {
+      setCompany('CASE REVIEW ONLY');
+    } else {
+      setCompany('');
+    }
+  }, [isCaseReviewAccount]);
 
   // Email validation with regex and domain checking
   const validateEmailDomain = (email: string): boolean => {
@@ -166,11 +180,10 @@ export const Login = () => {
         return;
       }
       
-      console.log("Logged in user:", user.email);
+      console.log("User signed in:", user.email);
       setUser(user);
       setShowMfaEnrollment(false);      
     } else {
-      console.log("No user logged in");
       setUser(null);
       setShowMfaEnrollment(false);
       setIsCheckingUser(false);
@@ -189,9 +202,10 @@ export const Login = () => {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
-  const firstName = formData.get('firstName') as string;
-  const lastName = formData.get('lastName') as string;
-  const company = formData.get('company') as string;
+  // Use state values for these fields instead of FormData
+  const formFirstName = firstName;
+  const formLastName = lastName;
+  const formCompany = company;
 
   try {
     if (!isLogin) {
@@ -217,7 +231,7 @@ export const Login = () => {
       // Registration
       const createCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(createCredential.user, {
-        displayName: `${firstName} ${lastName}`
+        displayName: `${formFirstName} ${formLastName}`
       });
 
       // Get API key      
@@ -227,9 +241,10 @@ export const Login = () => {
       const userData = createUserData(
         createCredential.user.uid,
         createCredential.user.email,
-        firstName,
-        lastName,
-        company || '' // Use company from form, fallback to empty string
+        formFirstName,
+        formLastName,
+        formCompany || '', // Use company from form, fallback to empty string
+        isCaseReviewAccount // Pass the case review flag
       );
 
       const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
@@ -406,6 +421,30 @@ export const Login = () => {
                       <Icon icon={showConfirmPassword ? "eye-off" : "eye"} />
                     </button>
                   </div>
+                  
+                  {/* Case Review Account Toggle */}
+                  <div className={styles.caseReviewToggleSection}>
+                    <span className={styles.caseReviewLabel}>Case Review Account Only:</span>
+                    <div className={styles.caseReviewToggle}>
+                      <button
+                        type="button"
+                        className={`${styles.caseReviewOption} ${!isCaseReviewAccount ? styles.caseReviewOptionActive : ''}`}
+                        onClick={() => setIsCaseReviewAccount(false)}
+                        disabled={isLoading}
+                      >
+                        No
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.caseReviewOption} ${isCaseReviewAccount ? styles.caseReviewOptionActive : ''}`}
+                        onClick={() => setIsCaseReviewAccount(true)}
+                        disabled={isLoading}
+                      >
+                        Yes
+                      </button>
+                    </div>
+                  </div>
+                  
                   <input
                     type="text"
                     name="firstName"
@@ -414,6 +453,8 @@ export const Login = () => {
                     autoComplete="given-name"
                     className={styles.input}
                     disabled={isLoading}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
                   <input
                     type="text"
@@ -423,6 +464,8 @@ export const Login = () => {
                     autoComplete="family-name"
                     className={styles.input}
                     disabled={isLoading}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                   <input
                     type="text"
@@ -431,7 +474,9 @@ export const Login = () => {
                     placeholder="Lab/Company Name (required)"
                     autoComplete="organization"
                     className={styles.input}
-                    disabled={isLoading}
+                    disabled={isLoading || isCaseReviewAccount}
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
                   />                      
                   {passwordStrength && (
                     <div className={styles.passwordStrength}>
@@ -471,6 +516,10 @@ export const Login = () => {
                   setShowConfirmPassword(false);
                   setPasswordStrength('');
                   setError('');
+                  setIsCaseReviewAccount(false);
+                  setFirstName('');
+                  setLastName('');
+                  setCompany('');
                 }}
                 className={styles.toggleButton}
                 disabled={isLoading || isCheckingUser}

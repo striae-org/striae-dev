@@ -49,6 +49,7 @@ interface CaseSidebarProps {
   setError: (error: string) => void;
   successAction: CaseActionType;
   setSuccessAction: (action: CaseActionType) => void;
+  isReadOnly?: boolean;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -70,6 +71,7 @@ export const CaseSidebar = ({
   setError,
   successAction,
   setSuccessAction,
+  isReadOnly = false
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -227,6 +229,11 @@ export const CaseSidebar = ({
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Don't allow file upload for read-only cases
+    if (isReadOnly) {
+      return;
+    }
+
     const file = event.target.files?.[0];
     if (!file || !currentCase) return;
 
@@ -273,6 +280,11 @@ export const CaseSidebar = ({
 };
 
   const handleFileDelete = async (fileId: string) => {
+    // Don't allow file deletion for read-only cases
+    if (isReadOnly) {
+      return;
+    }
+
     if (!currentCase) return;
     
     setFileError('');
@@ -292,6 +304,11 @@ export const CaseSidebar = ({
   };
 
   const handleRenameCase = async () => {
+  // Don't allow renaming read-only cases
+  if (isReadOnly) {
+    return;
+  }
+
   if (!currentCase || !newCaseName) return;
   
   if (!validateCaseNumber(newCaseName)) {
@@ -317,6 +334,11 @@ export const CaseSidebar = ({
 };
 
   const handleDeleteCase = async () => {
+  // Don't allow deleting read-only cases
+  if (isReadOnly) {
+    return;
+  }
+
   if (!currentCase) return;
   
   const confirmed = window.confirm(
@@ -353,8 +375,6 @@ const handleImageSelect = (file: FileData) => {
 
   const handleExport = async (exportCaseNumber: string, format: ExportFormat, includeImages?: boolean) => {
     try {
-      console.log(`Starting export for case: "${exportCaseNumber}" in ${format.toUpperCase()} format${includeImages ? ' with images (ZIP)' : ''}`);
-      
       if (includeImages) {
         // ZIP export with images - only available for single case exports
         await downloadCaseAsZip(user, exportCaseNumber, format);
@@ -365,8 +385,6 @@ const handleImageSelect = (file: FileData) => {
           includeMetadata: true
         });
         
-        console.log('Export data generated successfully:', exportData);
-        
         // Download the exported data in the selected format
         if (format === 'json') {
           downloadCaseAsJSON(exportData);
@@ -375,7 +393,6 @@ const handleImageSelect = (file: FileData) => {
         }
       }
       
-      console.log(`Case export completed for: ${exportCaseNumber} in ${format.toUpperCase()} format${includeImages ? ' with images' : ''}`);
     } catch (error) {
       console.error('Export failed:', error);
       throw error; // Re-throw to be handled by the modal
@@ -384,15 +401,11 @@ const handleImageSelect = (file: FileData) => {
 
   const handleExportAll = async (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => {
     try {
-      console.log(`Starting export of all cases in ${format.toUpperCase()} format...`);
-      
       // Export all cases with progress callback
       const exportData = await exportAllCases(user, {
         includeAnnotations: true,
         includeMetadata: true
       }, onProgress);
-      
-      console.log('All cases export data generated successfully:', exportData);
       
       // Download the exported data in the selected format
       if (format === 'json') {
@@ -401,7 +414,6 @@ const handleImageSelect = (file: FileData) => {
         downloadAllCasesAsCSV(exportData);
       }
       
-      console.log(`All cases export completed in ${format.toUpperCase()} format`);
     } catch (error) {
       console.error('Export all failed:', error);
       throw error; // Re-throw to be handled by the modal
@@ -472,7 +484,14 @@ return (
         currentCaseNumber={currentCase || ''}
       />
         <div className={styles.filesSection}>
-      <h4>{currentCase || 'No Case Selected'}</h4>
+      <div className={isReadOnly && currentCase ? styles.readOnlyContainer : styles.caseHeader}>
+        <h4 className={styles.caseNumber}>
+          {currentCase || 'No Case Selected'}
+        </h4>
+        {isReadOnly && currentCase && (
+          <div className={styles.readOnlyBadge}>(Read-Only)</div>
+        )}
+      </div>
       {currentCase && (
         <div className={styles.fileUpload}>
       <label htmlFor="file-upload">Upload Image:</label>
@@ -482,7 +501,7 @@ return (
         type="file"
         accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
         onChange={handleFileUpload}
-        disabled={isUploadingFile || !canUploadNewFile}
+        disabled={isUploadingFile || !canUploadNewFile || isReadOnly}
         className={styles.fileInput}
         aria-label="Upload image file"
         title={!canUploadNewFile ? uploadFileError : undefined}
@@ -536,6 +555,8 @@ return (
                   }}
                   className={styles.deleteButton}
                   aria-label="Delete file"
+                  disabled={isReadOnly}
+                  style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                 >
                   ×
                 </button>
@@ -548,7 +569,8 @@ return (
     <div className={`${styles.sidebarToggle} mb-4`}>
     <button
           onClick={onNotesClick}
-          disabled={!imageLoaded}          
+          disabled={!imageLoaded || isReadOnly}
+          title={isReadOnly ? "Cannot edit notes for read-only cases" : !imageLoaded ? "Select an image first" : undefined}
         >
           Image Notes
         </button>
@@ -558,11 +580,13 @@ return (
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
             className={styles.caseActionsToggle}
+            disabled={isReadOnly}
+            title={isReadOnly ? "Cannot modify read-only cases" : undefined}
           >
             {showCaseActions ? 'Hide' : 'Rename/Delete Case'}
           </button>
           
-          {showCaseActions && (
+          {showCaseActions && !isReadOnly && (
             <div className={styles.caseActionsContent}>
               <div className={`${styles.caseRename} mb-4`}>
                 <input
@@ -585,8 +609,8 @@ return (
                   disabled={isDeletingCase}
                   className={styles.deleteWarningButton}
                 >
-                  {isDeletingCase ? 'Deleting...' : 'Delete Case'}
-                </button>
+                    {isDeletingCase ? 'Deleting...' : 'Delete Case'}
+                  </button>
               </div>
             </div>
           )}

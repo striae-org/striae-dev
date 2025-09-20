@@ -397,6 +397,28 @@
   cursor: not-allowed;
 }
 
+.clearReadOnlyButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clearReadOnlyButton:hover:not(:disabled) {
+  background-color: #5a359a;
+}
+
+.clearReadOnlyButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
 /* Notes Toggle */
 
 .sidebarToggle {
@@ -448,6 +470,18 @@
 
 .caseActionsToggle:hover {
   background-color: rgba(180, 0, 0, 0.9);
+}
+
+.caseActionsToggle:disabled {
+  background-color: var(--backgroundLight);
+  color: var(--textLight);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.caseActionsToggle:disabled:hover {
+  background-color: var(--backgroundLight);
+  transform: none;
 }
 
 .caseActionsToggle:active {
@@ -513,4 +547,32 @@
 .caseActionsContent .deleteCaseSection button:disabled {
   background-color: #f5c6cb;
   cursor: not-allowed;
+}
+
+/* Case Header Container */
+.caseHeader {
+  /* Normal case header styling (no background) */
+}
+
+.readOnlyContainer {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.caseNumber {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Read-Only Badge */
+.readOnlyBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  color: #856404;
+  margin-top: 0.25rem;
 }

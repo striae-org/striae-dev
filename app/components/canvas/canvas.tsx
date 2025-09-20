@@ -14,6 +14,7 @@ interface CanvasProps {
   onAnnotationUpdate?: (annotationData: AnnotationData) => void;
   isBoxAnnotationMode?: boolean;
   boxAnnotationColor?: string;
+  isReadOnly?: boolean;
 }
 
 type ImageLoadError = {
@@ -31,7 +32,8 @@ export const Canvas = ({
   annotationData,
   onAnnotationUpdate,
   isBoxAnnotationMode = false,
-  boxAnnotationColor = '#ff0000'
+  boxAnnotationColor = '#ff0000',
+  isReadOnly = false
 }: CanvasProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
@@ -40,11 +42,23 @@ export const Canvas = ({
 
   // Handle box annotation changes
   const handleBoxAnnotationsChange = (boxAnnotations: BoxAnnotation[]) => {
-    if (!onAnnotationUpdate || !annotationData) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
       boxAnnotations
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+  };
+
+  // Handle annotation data changes (for additional notes updates)
+  const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
+    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      ...data
     };
     
     onAnnotationUpdate(updatedAnnotationData);
@@ -184,6 +198,9 @@ export const Canvas = ({
             onAnnotationsChange={handleBoxAnnotationsChange}
             isAnnotationMode={isBoxAnnotationMode}
             annotationColor={boxAnnotationColor}
+            annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
+            onAnnotationDataChange={handleAnnotationDataChange}
+            isReadOnly={isReadOnly}
           />
           
           {/* Annotations Overlay */}

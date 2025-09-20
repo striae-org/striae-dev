@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './toolbar-color-selector.module.css';
 
 interface ToolbarColorSelectorProps {
@@ -35,8 +35,6 @@ export const ToolbarColorSelector = ({
   const [tempSelectedColor, setTempSelectedColor] = useState(selectedColor);
   const [showColorWheel, setShowColorWheel] = useState(false);
 
-  if (!isVisible) return null;
-
   const handleConfirm = () => {
     onColorConfirm(tempSelectedColor);
   };
@@ -46,6 +44,25 @@ export const ToolbarColorSelector = ({
     setShowColorWheel(false); // Reset to presets view
     onCancel();
   };
+
+  // Handle keyboard events for escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isVisible) {
+        handleCancel();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isVisible, handleCancel]);
+
+  if (!isVisible) return null;
 
   return (
     <div className={styles.toolbarColorSelector}>

@@ -28,6 +28,7 @@ interface SidebarContainerProps {
   showNotes: boolean;
   setShowNotes: (show: boolean) => void;
   onAnnotationRefresh?: () => void;
+  isReadOnly?: boolean;
 }
 
 export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {

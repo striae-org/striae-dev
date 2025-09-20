@@ -7,14 +7,266 @@ import * as XLSX from 'xlsx';
 
 export type ExportFormat = 'json' | 'csv';
 
-// Constants for export data structure
-const FILE_DATA_COLUMN_COUNT = 19; // Number of columns in the main file data before box annotations
-const ADDITIONAL_DATA_COLUMN_COUNT = 2; // Number of additional columns (Additional Notes, Last Updated)
+// Shared CSV headers for all tabular exports
+const CSV_HEADERS = [
+  'File ID',
+  'Original Filename',
+  'Upload Date',
+  'Has Annotations',
+  'Left Case',
+  'Right Case',
+  'Left Item',
+  'Right Item',
+  'Case Font Color',
+  'Class Type',
+  'Custom Class',
+  'Class Note',
+  'Index Type',
+  'Index Number',
+  'Index Color',
+  'Support Level',
+  'Has Subclass',
+  'Include Confirmation',
+  'Total Box Annotations',
+  'Box ID',
+  'Box X',
+  'Box Y',
+  'Box Width',
+  'Box Height',
+  'Box Color',
+  'Box Label',
+  'Box Timestamp',
+  'Additional Notes',
+  'Last Updated'
+];
 
 export interface ExportOptions {
   includeAnnotations?: boolean;
   format?: 'json' | 'csv';
   includeMetadata?: boolean;
+  includeUserInfo?: boolean;
+  protectForensicData?: boolean; // Enable read-only protection
+}
+
+/**
+ * Add forensic data protection warning to content
+ */
+function addForensicDataWarning(content: string, format: 'csv' | 'json'): string {
+  const warning = format === 'csv' 
+    ? `"FORENSIC DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n`
+    : `/* FORENSIC DATA WARNING
+ * This file contains evidence data for forensic examination.
+ * Any modification may compromise the integrity of the evidence.
+ * Handle according to your organization's chain of custody procedures.
+ * 
+ * File generated: ${new Date().toISOString()}
+ * Checksum: ${generateSimpleChecksum(content)}
+ */\n\n`;
+  
+  return warning + content;
+}
+
+/**
+ * Generate simple checksum for content verification
+ */
+function generateSimpleChecksum(content: string): string {
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash | 0;
+  }
+  return Math.abs(hash).toString(16);
+}
+
+/**
+ * Generate a secure random password for Excel protection
+ */
+function generateRandomPassword(): string {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const length = 16;
+  let password = '';
+  
+  // Ensure we have at least one of each type
+  password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)]; // Uppercase
+  password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]; // Lowercase
+  password += '0123456789'[Math.floor(Math.random() * 10)]; // Number
+  password += '!@#$%^&*'[Math.floor(Math.random() * 8)]; // Special char
+  
+  // Fill remaining length with random characters
+  for (let i = password.length; i < length; i++) {
+    password += charset[Math.floor(Math.random() * charset.length)];
+  }
+  
+  // Shuffle the password to randomize character positions
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+}
+
+/**
+ * Protect Excel worksheet from editing
+ */
+function protectExcelWorksheet(worksheet: any, sheetPassword?: string): string {
+  // Generate random password if none provided
+  const password = sheetPassword || generateRandomPassword();
+  
+  // Set worksheet protection
+  worksheet['!protect'] = {
+    password: password,
+    selectLockedCells: true,
+    selectUnlockedCells: true,
+    formatCells: false,
+    formatColumns: false,
+    formatRows: false,
+    insertColumns: false,
+    insertRows: false,
+    insertHyperlinks: false,
+    deleteColumns: false,
+    deleteRows: false,
+    sort: false,
+    autoFilter: false,
+    pivotTables: false,
+    objects: false,
+    scenarios: false
+  };
+  
+  // Lock all cells by default
+  if (!worksheet['!cols']) worksheet['!cols'] = [];
+  if (!worksheet['!rows']) worksheet['!rows'] = [];
+  
+  // Add protection metadata
+  worksheet['!margins'] = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+  
+  // Return the password for inclusion in metadata
+  return password;
+}
+function generateMetadataRows(exportData: CaseExportData): string[][] {
+  return [
+    ['Case Export Report'],
+    [''],
+    ['Case Number', exportData.metadata.caseNumber],
+    ['Export Date', exportData.metadata.exportDate],
+    ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+    ['Striae Export Schema Version', exportData.metadata.striaeExportSchemaVersion],
+    ['Total Files', exportData.metadata.totalFiles.toString()],
+    [''],
+    ['Summary'],
+    ['Files with Annotations', (exportData.summary?.filesWithAnnotations || 0).toString()],
+    ['Files without Annotations', (exportData.summary?.filesWithoutAnnotations || 0).toString()],
+    ['Total Box Annotations', (exportData.summary?.totalBoxAnnotations || 0).toString()],
+    ['Last Modified', exportData.summary?.lastModified || 'N/A'],
+    [''],
+    ['File Details']
+  ];
+}
+
+/**
+ * Process file data for tabular format (CSV/Excel)
+ */
+function processFileDataForTabular(fileEntry: CaseExportData['files'][0]): string[][] {
+  // Full file data for the first row (excluding Additional Notes and Last Updated)
+  const fullFileData = [
+    fileEntry.fileData.id,
+    fileEntry.fileData.originalFilename,
+    fileEntry.fileData.uploadedAt,
+    fileEntry.hasAnnotations ? 'Yes' : 'No',
+    fileEntry.annotations?.leftCase || '',
+    fileEntry.annotations?.rightCase || '',
+    fileEntry.annotations?.leftItem || '',
+    fileEntry.annotations?.rightItem || '',
+    fileEntry.annotations?.caseFontColor || '',
+    fileEntry.annotations?.classType || '',
+    fileEntry.annotations?.customClass || '',
+    fileEntry.annotations?.classNote || '',
+    fileEntry.annotations?.indexType || '',
+    fileEntry.annotations?.indexNumber || '',
+    fileEntry.annotations?.indexColor || '',
+    fileEntry.annotations?.supportLevel || '',
+    fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
+    fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
+    (fileEntry.annotations?.boxAnnotations?.length || 0).toString()
+  ];
+
+  // Additional Notes and Last Updated (at the end)
+  const additionalFileData = [
+    fileEntry.annotations?.additionalNotes || '',
+    fileEntry.annotations?.updatedAt || ''
+  ];
+
+  // Calculate array sizes programmatically from CSV_HEADERS
+  const fileDataColumnCount = fullFileData.length; // Dynamic count based on actual data
+  const additionalDataColumnCount = additionalFileData.length; // Dynamic count based on actual data
+
+  // Empty row template for subsequent box annotations (file info columns empty)
+  const emptyFileData = Array(fileDataColumnCount).fill('');
+  const emptyAdditionalData = Array(additionalDataColumnCount).fill('');
+
+  const rows: string[][] = [];
+
+  // If there are box annotations, create a row for each one
+  if (fileEntry.annotations?.boxAnnotations && fileEntry.annotations.boxAnnotations.length > 0) {
+    fileEntry.annotations.boxAnnotations.forEach((box, index) => {
+      const rowData = index === 0 ? fullFileData : emptyFileData;
+      const additionalData = index === 0 ? additionalFileData : emptyAdditionalData;
+      
+      rows.push([
+        ...rowData,
+        box.id,
+        box.x.toString(),
+        box.y.toString(),
+        box.width.toString(),
+        box.height.toString(),
+        box.color || '',
+        box.label || '',
+        box.timestamp || '',
+        ...additionalData
+      ]);
+    });
+  } else {
+    // If no box annotations, still include one row with empty box data
+    rows.push([
+      ...fullFileData,
+      '', // Box ID
+      '', // Box X
+      '', // Box Y
+      '', // Box Width
+      '', // Box Height
+      '', // Box Color
+      '', // Box Label
+      '', // Box Timestamp
+      ...additionalFileData
+    ]);
+  }
+
+  return rows;
+}
+
+/**
+ * Generate CSV content from export data
+ */
+function generateCSVContent(exportData: CaseExportData, protectForensicData: boolean = true): string {
+  // Case metadata section
+  const metadataRows = generateMetadataRows(exportData);
+
+  // File data rows
+  const fileRows: string[][] = [];
+  exportData.files.forEach(fileEntry => {
+    const processedRows = processFileDataForTabular(fileEntry);
+    fileRows.push(...processedRows);
+  });
+
+  // Combine all data
+  const allRows = [
+    ...metadataRows,
+    CSV_HEADERS,
+    ...fileRows
+  ];
+
+  const csvContent = allRows.map(row => 
+    row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+
+  // Add forensic protection warning if enabled
+  return protectForensicData ? addForensicDataWarning(csvContent, 'csv') : csvContent;
 }
 
 /**
@@ -30,8 +282,6 @@ export async function exportAllCases(
     includeMetadata = true
   } = options;
 
-  console.log('Starting export of all cases...');
-
   try {
     // Get list of all cases for the user
     const caseNumbers = await listCases(user);
@@ -39,8 +289,6 @@ export async function exportAllCases(
     if (!caseNumbers || caseNumbers.length === 0) {
       throw new Error('No cases found for user');
     }
-
-    console.log(`Found ${caseNumbers.length} cases to export`);
 
     const exportedCases: CaseExportData[] = [];
     let totalFiles = 0;
@@ -60,8 +308,6 @@ export async function exportAllCases(
       }
 
       try {
-        console.log(`Exporting case ${i + 1}/${caseNumbers.length}: ${caseNumber}`);
-        
         const caseExport = await exportCaseData(user, caseNumber, options);
         exportedCases.push(caseExport);
 
@@ -89,7 +335,6 @@ export async function exportAllCases(
         }
 
       } catch (error) {
-        console.warn(`Failed to export case ${caseNumber}:`, error);
         // Create a placeholder entry for failed exports
         exportedCases.push({
           metadata: {
@@ -132,8 +377,6 @@ export async function exportAllCases(
       };
     }
 
-    console.log(`All cases export completed. ${exportedCases.length} cases processed.`);
-    
     // Report completion
     if (onProgress) {
       onProgress(caseNumbers.length, caseNumbers.length, 'Export completed!');
@@ -166,12 +409,10 @@ export async function exportCaseData(
   }
 
   // Check if case exists
-  console.log(`Checking if case "${caseNumber}" exists...`);
   const existingCase = await checkExistingCase(user, caseNumber);
   if (!existingCase) {
     throw new Error(`Case "${caseNumber}" does not exist`);
   }
-  console.log(`Case "${caseNumber}" found, proceeding with export...`);
 
   try {
     // Fetch all files for the case
@@ -215,7 +456,6 @@ export async function exportCaseData(
             }
           }
         } catch (error) {
-          console.warn(`Failed to load annotations for file ${file.id}:`, error);
           // Continue without annotations for this file
         }
       }
@@ -270,7 +510,6 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
     linkElement.setAttribute('download', exportFileName);
     linkElement.click();
     
-    console.log('All cases export download initiated:', exportFileName);
   } catch (error) {
     console.error('Download failed:', error);
     throw new Error('Failed to download all cases export file');
@@ -280,23 +519,45 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 /**
  * Download all cases data as Excel file with multiple worksheets
  */
-export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
+export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): void {
   try {
     const workbook = XLSX.utils.book_new();
+    let exportPassword: string | undefined;
 
     // Create summary worksheet
     const summaryData = [
-      ['Striae - All Cases Export Summary'],
+      protectForensicData ? ['FORENSIC DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
+      protectForensicData ? ['WARNING: This workbook contains forensic evidence data and is protected from editing.'] : [''],
       [''],
       ['Export Date', new Date().toISOString()],
+      ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+      ['Striae Export Schema Version', '1.0'],
       ['Total Cases', exportData.cases.length],
       ['Successful Exports', exportData.cases.filter(c => !c.summary?.exportError).length],
       ['Failed Exports', exportData.cases.filter(c => c.summary?.exportError).length],
+      ['Total Files (All Cases)', exportData.metadata.totalFiles],
+      ['Total Annotations (All Cases)', exportData.metadata.totalAnnotations],
       [''],
-      ['Case Number', 'Export Status', 'Total Files', 'Files with Annotations', 'Files without Annotations', 'Total Box Annotations', 'Last Modified', 'Export Error'],
+      ['Case Details'],
+      [
+        'Case Number', 
+        'Export Status', 
+        'Export Date', 
+        'Exported By', 
+        'Schema Version',
+        'Total Files', 
+        'Files with Annotations', 
+        'Files without Annotations', 
+        'Total Box Annotations', 
+        'Last Modified', 
+        'Export Error'
+      ],
       ...exportData.cases.map(caseData => [
         caseData.metadata.caseNumber,
         caseData.summary?.exportError ? 'Failed' : 'Success',
+        caseData.metadata.exportDate,
+        caseData.metadata.exportedBy || 'N/A',
+        caseData.metadata.striaeExportSchemaVersion,
         caseData.metadata.totalFiles,
         caseData.summary?.filesWithAnnotations || 0,
         caseData.summary?.filesWithoutAnnotations || 0,
@@ -307,6 +568,12 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
     ];
 
     const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
+    
+    // Protect summary worksheet if forensic protection is enabled
+    if (protectForensicData) {
+      exportPassword = protectExcelWorksheet(summaryWorksheet);
+    }
+    
     XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Summary');
 
     // Create a worksheet for each case
@@ -321,127 +588,38 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
           ['Total Files:', caseData.metadata.totalFiles]
         ];
         const errorWorksheet = XLSX.utils.aoa_to_sheet(errorData);
+        
+        if (protectForensicData && exportPassword) {
+          protectExcelWorksheet(errorWorksheet, exportPassword);
+        }
+        
         XLSX.utils.book_append_sheet(workbook, errorWorksheet, `Case_${caseData.metadata.caseNumber}_Error`);
         return;
       }
 
       // For successful cases, create detailed worksheets
+      const metadataRows = generateMetadataRows(caseData);
+      
+      // Create case details with headers
       const caseDetailsData = [
-        [`Case ${caseData.metadata.caseNumber} - Detailed Export`],
+        protectForensicData 
+          ? [`FORENSIC DATA - Case ${caseData.metadata.caseNumber} - PROTECTED`]
+          : [`Case ${caseData.metadata.caseNumber} - Detailed Export`],
+        protectForensicData ? ['WARNING: This worksheet is protected to maintain forensic data integrity.'] : [''],
         [''],
-        ['Case Information'],
-        ['Case Number', caseData.metadata.caseNumber],
-        ['Export Date', caseData.metadata.exportDate],
-        ['Total Files', caseData.metadata.totalFiles],
-        ['Files with Annotations', caseData.summary?.filesWithAnnotations || 0],
-        ['Files without Annotations', caseData.summary?.filesWithoutAnnotations || 0],
-        ['Total Box Annotations', caseData.summary?.totalBoxAnnotations || 0],
-        ['Last Modified', caseData.summary?.lastModified || 'N/A'],
+        ...metadataRows.slice(2, -1), // Skip title and "File Details" header
         [''],
         ['File Details'],
-        [
-          'File ID',
-          'Original Filename', 
-          'Upload Date',
-          'Has Annotations',
-          'Left Case',
-          'Right Case',
-          'Left Item',
-          'Right Item',
-          'Case Font Color',
-          'Class Type',
-          'Custom Class',
-          'Class Note',
-          'Index Type',
-          'Index Number',
-          'Index Color',
-          'Support Level',
-          'Has Subclass',
-          'Include Confirmation',
-          'Total Box Annotations',
-          'Box ID',
-          'Box X',
-          'Box Y',
-          'Box Width',
-          'Box Height',
-          'Box Color',
-          'Box Timestamp',
-          'Additional Notes',
-          'Last Updated'
-        ]
+        CSV_HEADERS
       ];
 
       // Add file data if available
       if (caseData.files && caseData.files.length > 0) {
-        // File data rows - file info only on first row, subsequent rows only have box data
         const fileRows: any[][] = [];
         
         caseData.files.forEach(fileEntry => {
-          // Full file data for the first row (excluding Additional Notes and Last Updated)
-          const fullFileData = [
-            fileEntry.fileData.id,
-            fileEntry.fileData.originalFilename,
-            fileEntry.fileData.uploadedAt,
-            fileEntry.hasAnnotations ? 'Yes' : 'No',
-            fileEntry.annotations?.leftCase || '',
-            fileEntry.annotations?.rightCase || '',
-            fileEntry.annotations?.leftItem || '',
-            fileEntry.annotations?.rightItem || '',
-            fileEntry.annotations?.caseFontColor || '',
-            fileEntry.annotations?.classType || '',
-            fileEntry.annotations?.customClass || '',
-            fileEntry.annotations?.classNote || '',
-            fileEntry.annotations?.indexType || '',
-            fileEntry.annotations?.indexNumber || '',
-            fileEntry.annotations?.indexColor || '',
-            fileEntry.annotations?.supportLevel || '',
-            fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
-            fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
-            fileEntry.annotations?.boxAnnotations?.length || 0
-          ];
-
-          // Additional Notes and Last Updated (at the end)
-          const additionalFileData = [
-            fileEntry.annotations?.additionalNotes || '',
-            fileEntry.annotations?.updatedAt || ''
-          ];
-
-          // Empty row template for subsequent box annotations (file info columns empty)
-          const emptyFileData = Array(FILE_DATA_COLUMN_COUNT).fill('');
-          const emptyAdditionalData = Array(ADDITIONAL_DATA_COLUMN_COUNT).fill('');
-
-          // If there are box annotations, create a row for each one
-          if (fileEntry.annotations?.boxAnnotations && fileEntry.annotations.boxAnnotations.length > 0) {
-            fileEntry.annotations.boxAnnotations.forEach((box, index) => {
-              const rowData = index === 0 ? fullFileData : emptyFileData;
-              const additionalData = index === 0 ? additionalFileData : emptyAdditionalData;
-              
-              fileRows.push([
-                ...rowData,
-                box.id,
-                box.x,
-                box.y,
-                box.width,
-                box.height,
-                box.color || '',
-                box.timestamp || '',
-                ...additionalData
-              ]);
-            });
-          } else {
-            // If no box annotations, still include one row with empty box data
-            fileRows.push([
-              ...fullFileData,
-              '', // Box ID
-              '', // Box X
-              '', // Box Y
-              '', // Box Width
-              '', // Box Height
-              '', // Box Color
-              '', // Box Timestamp
-              ...additionalFileData
-            ]);
-          }
+          const processedRows = processFileDataForTabular(fileEntry);
+          fileRows.push(...processedRows);
         });
         
         caseDetailsData.push(...fileRows);
@@ -451,19 +629,41 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
 
       const caseWorksheet = XLSX.utils.aoa_to_sheet(caseDetailsData);
       
+      // Protect worksheet if forensic protection is enabled
+      if (protectForensicData && exportPassword) {
+        protectExcelWorksheet(caseWorksheet, exportPassword);
+      }
+      
       // Clean sheet name for Excel compatibility
       const sheetName = `Case_${caseData.metadata.caseNumber}`.replace(/[\\\/\?\*\[\]]/g, '_').substring(0, 31);
       XLSX.utils.book_append_sheet(workbook, caseWorksheet, sheetName);
     });
 
+    // Set workbook protection if forensic protection is enabled
+    if (protectForensicData && exportPassword) {
+      workbook.Props = {
+        Title: 'Striae Case Export - Protected',
+        Subject: 'Forensic Evidence Data Export',
+        Author: exportData.metadata.exportedBy || 'Striae',
+        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected.`,
+        Company: 'Striae'
+      };
+    }
+
     // Generate Excel file
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, { 
+      bookType: 'xlsx', 
+      type: 'array',
+      bookSST: true, // Shared string table for better compression
+      cellStyles: true
+    });
     
     // Create blob and download
     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = window.URL.createObjectURL(blob);
     
-    const exportFileName = `striae-all-cases-detailed-${formatDateForFilename(new Date())}.xlsx`;
+    const protectionSuffix = protectForensicData ? '-protected' : '';
+    const exportFileName = `striae-all-cases-detailed${protectionSuffix}-${formatDateForFilename(new Date())}.xlsx`;
     
     const linkElement = document.createElement('a');
     linkElement.href = url;
@@ -473,7 +673,7 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
     // Clean up
     window.URL.revokeObjectURL(url);
     
-    console.log('Excel export with multiple worksheets download initiated:', exportFileName);
+    const passwordInfo = protectForensicData && exportPassword ? ` (Password: ${exportPassword})` : '';
   } catch (error) {
     console.error('Excel export failed:', error);
     throw new Error('Failed to export Excel file');
@@ -481,174 +681,59 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData): void {
 }
 
 /**
- * Download case data as JSON file
+ * Download case data as JSON file with forensic protection options
  */
-export function downloadCaseAsJSON(exportData: CaseExportData): void {
+export function downloadCaseAsJSON(
+  exportData: CaseExportData, 
+  options: ExportOptions = { protectForensicData: true }
+): void {
   try {
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const jsonContent = generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonContent);
     
-    const exportFileName = `striae-case-${exportData.metadata.caseNumber}-export-${formatDateForFilename(new Date())}.json`;
+    const protectionSuffix = options.protectForensicData ? '-protected' : '';
+    const exportFileName = `striae-case-${exportData.metadata.caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.json`;
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileName);
+    
+    if (options.protectForensicData) {
+      linkElement.setAttribute('data-forensic-protected', 'true');
+    }
+    
     linkElement.click();
     
-    console.log('Case export download initiated:', exportFileName);
   } catch (error) {
-    console.error('Download failed:', error);
-    throw new Error('Failed to download export file');
+    console.error('JSON export failed:', error);
+    throw new Error('Failed to download JSON export file');
   }
 }
 
 /**
- * Download case data as comprehensive CSV file
+ * Download case data as comprehensive CSV file with forensic protection options
  */
-export function downloadCaseAsCSV(exportData: CaseExportData): void {
+export function downloadCaseAsCSV(
+  exportData: CaseExportData,
+  options: ExportOptions = { protectForensicData: true }
+): void {
   try {
-    // Case metadata section
-    const metadataRows = [
-      ['Case Export Report'],
-      [''],
-      ['Case Number', exportData.metadata.caseNumber],
-      ['Export Date', exportData.metadata.exportDate],
-      ['Exported By', exportData.metadata.exportedBy || 'N/A'],
-      ['Striae Export Schema Version', exportData.metadata.striaeExportSchemaVersion],
-      ['Total Files', exportData.metadata.totalFiles],
-      [''],
-      ['Summary'],
-      ['Files with Annotations', exportData.summary?.filesWithAnnotations || 0],
-      ['Files without Annotations', exportData.summary?.filesWithoutAnnotations || 0],
-      ['Total Box Annotations', exportData.summary?.totalBoxAnnotations || 0],
-      ['Last Modified', exportData.summary?.lastModified || 'N/A'],
-      [''],
-      ['File Details']
-    ];
-
-    // File details headers (updated for individual box annotations)
-    const fileHeaders = [
-      'File ID',
-      'Original Filename',
-      'Upload Date',
-      'Has Annotations',
-      'Left Case',
-      'Right Case',
-      'Left Item',
-      'Right Item',
-      'Case Font Color',
-      'Class Type',
-      'Custom Class',
-      'Class Note',
-      'Index Type',
-      'Index Number',
-      'Index Color',
-      'Support Level',
-      'Has Subclass',
-      'Include Confirmation',
-      'Total Box Annotations',
-      'Box ID',
-      'Box X',
-      'Box Y',
-      'Box Width',
-      'Box Height',
-      'Box Color',
-      'Box Timestamp',
-      'Additional Notes',
-      'Last Updated'
-    ];
-
-    // File data rows - file info only on first row, subsequent rows only have box data
-    const fileRows: string[][] = [];
-    
-    exportData.files.forEach(fileEntry => {
-      // Full file data for the first row (excluding Additional Notes and Last Updated)
-      const fullFileData = [
-        fileEntry.fileData.id,
-        fileEntry.fileData.originalFilename,
-        fileEntry.fileData.uploadedAt,
-        fileEntry.hasAnnotations ? 'Yes' : 'No',
-        fileEntry.annotations?.leftCase || '',
-        fileEntry.annotations?.rightCase || '',
-        fileEntry.annotations?.leftItem || '',
-        fileEntry.annotations?.rightItem || '',
-        fileEntry.annotations?.caseFontColor || '',
-        fileEntry.annotations?.classType || '',
-        fileEntry.annotations?.customClass || '',
-        fileEntry.annotations?.classNote || '',
-        fileEntry.annotations?.indexType || '',
-        fileEntry.annotations?.indexNumber || '',
-        fileEntry.annotations?.indexColor || '',
-        fileEntry.annotations?.supportLevel || '',
-        fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
-        fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
-        (fileEntry.annotations?.boxAnnotations?.length || 0).toString()
-      ];
-
-      // Additional Notes and Last Updated (at the end)
-      const additionalFileData = [
-        fileEntry.annotations?.additionalNotes || '',
-        fileEntry.annotations?.updatedAt || ''
-      ];
-
-      // Empty row template for subsequent box annotations (file info columns empty)
-      const emptyFileData = Array(FILE_DATA_COLUMN_COUNT).fill('');
-      const emptyAdditionalData = Array(ADDITIONAL_DATA_COLUMN_COUNT).fill('');
-
-      // If there are box annotations, create a row for each one
-      if (fileEntry.annotations?.boxAnnotations && fileEntry.annotations.boxAnnotations.length > 0) {
-        fileEntry.annotations.boxAnnotations.forEach((box, index) => {
-          const rowData = index === 0 ? fullFileData : emptyFileData;
-          const additionalData = index === 0 ? additionalFileData : emptyAdditionalData;
-          
-          fileRows.push([
-            ...rowData,
-            box.id,
-            box.x.toString(),
-            box.y.toString(),
-            box.width.toString(),
-            box.height.toString(),
-            box.color || '',
-            box.timestamp || '',
-            ...additionalData
-          ]);
-        });
-      } else {
-        // If no box annotations, still include one row with empty box data
-        fileRows.push([
-          ...fullFileData,
-          '', // Box ID
-          '', // Box X
-          '', // Box Y
-          '', // Box Width
-          '', // Box Height
-          '', // Box Color
-          '', // Box Timestamp
-          ...additionalFileData
-        ]);
-      }
-    });
-
-    // Combine all data
-    const allRows = [
-      ...metadataRows,
-      fileHeaders,
-      ...fileRows
-    ];
-
-    const csvContent = allRows.map(row => 
-      row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
-    ).join('\n');
-
+    const csvContent = generateCSVContent(exportData, options.protectForensicData);
     const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
-    const exportFileName = `striae-case-${exportData.metadata.caseNumber}-detailed-${formatDateForFilename(new Date())}.csv`;
+    
+    const protectionSuffix = options.protectForensicData ? '-protected' : '';
+    const exportFileName = `striae-case-${exportData.metadata.caseNumber}-detailed${protectionSuffix}-${formatDateForFilename(new Date())}.csv`;
     
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileName);
+    
+    if (options.protectForensicData) {
+      linkElement.setAttribute('data-forensic-protected', 'true');
+    }
+    
     linkElement.click();
     
-    console.log('Comprehensive CSV export download initiated:', exportFileName);
   } catch (error) {
     console.error('CSV export failed:', error);
     throw new Error('Failed to export CSV file');
@@ -687,13 +772,14 @@ export function validateCaseNumberForExport(caseNumber: string): { isValid: bool
 }
 
 /**
- * Download case data as ZIP file including images
+ * Download case data as ZIP file including images with forensic protection options
  */
 export async function downloadCaseAsZip(
   user: User,
   caseNumber: string,
   format: ExportFormat,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  options: ExportOptions = { protectForensicData: true }
 ): Promise<void> {
   try {
     onProgress?.(10);
@@ -706,11 +792,12 @@ export async function downloadCaseAsZip(
     const JSZip = (await import('jszip')).default;
     const zip = new JSZip();
     
-    // Add data file
+    // Add data file with forensic protection if enabled
     if (format === 'json') {
-      zip.file(`${caseNumber}_data.json`, JSON.stringify(exportData, null, 2));
+      const jsonContent = generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
+      zip.file(`${caseNumber}_data.json`, jsonContent);
     } else {
-      const csvContent = await generateCSVContentFromExportData(exportData);
+      const csvContent = generateCSVContent(exportData, options.protectForensicData);
       zip.file(`${caseNumber}_data.csv`, csvContent);
     }
     onProgress?.(50);
@@ -732,28 +819,89 @@ export async function downloadCaseAsZip(
       }
     }
     
-    // Add README
-    const readme = generateZipReadme(exportData);
+    // Add forensic metadata file if protection is enabled
+    if (options.protectForensicData) {
+      const forensicMetadata = {
+        exportTimestamp: new Date().toISOString(),
+        exportedBy: exportData.metadata.exportedBy || 'Unknown',
+        caseNumber: exportData.metadata.caseNumber,
+        contentChecksum: generateSimpleChecksum(format === 'json' ? 
+          generateJSONContent(exportData, options.includeUserInfo, false) : 
+          generateCSVContent(exportData, false)
+        ),
+        forensicWarning: 'This ZIP archive contains forensic evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
+        striaeVersion: exportData.metadata.striaeExportSchemaVersion,
+        archiveStructure: {
+          dataFile: `${caseNumber}_data.${format}`,
+          imagesFolder: 'images/',
+          totalFiles: exportData.metadata.totalFiles,
+          totalAnnotations: exportData.summary?.totalBoxAnnotations || 0
+        }
+      };
+      
+      zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
+      
+      // Add read-only instruction file
+      const instructionContent = `FORENSIC EVIDENCE ARCHIVE - READ ONLY
+
+This ZIP archive contains forensic evidence data exported from Striae.
+
+IMPORTANT WARNINGS:
+- This archive is intended for READ-ONLY access
+- Do not modify, rename, or delete any files in this archive
+- Any modifications may compromise evidence integrity
+- Maintain proper chain of custody procedures
+
+Archive Contents:
+- ${caseNumber}_data.${format}: Complete case data in ${format.toUpperCase()} format
+- images/: Original image files with annotations
+- FORENSIC_METADATA.json: Archive verification data
+- README.txt: General information about this export
+
+Case Information:
+- Case Number: ${exportData.metadata.caseNumber}
+- Export Date: ${new Date().toISOString()}
+- Exported By: ${exportData.metadata.exportedBy || 'Unknown'}
+- Total Files: ${exportData.metadata.totalFiles}
+- Total Annotations: ${exportData.summary?.totalBoxAnnotations || 0}
+
+For questions about this export, contact your Striae system administrator.
+`;
+      
+      zip.file('READ_ONLY_INSTRUCTIONS.txt', instructionContent);
+    }
+    
+    // Add README (standard or enhanced for forensic)
+    const readme = generateZipReadme(exportData, options.protectForensicData);
     zip.file('README.txt', readme);
     onProgress?.(85);
     
     // Generate ZIP blob
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const zipBlob = await zip.generateAsync({ 
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
     onProgress?.(95);
     
     // Download
     const url = URL.createObjectURL(zipBlob);
-    const exportFileName = `striae-case-${caseNumber}-export-${formatDateForFilename(new Date())}.zip`;
+    const protectionSuffix = options.protectForensicData ? '-protected' : '';
+    const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;
     
     const linkElement = document.createElement('a');
     linkElement.href = url;
     linkElement.setAttribute('download', exportFileName);
+    
+    if (options.protectForensicData) {
+      linkElement.setAttribute('data-forensic-protected', 'true');
+    }
+    
     linkElement.click();
     
     URL.revokeObjectURL(url);
     onProgress?.(100);
     
-    console.log('ZIP export download initiated:', exportFileName);
   } catch (error) {
     console.error('ZIP export failed:', error);
     throw new Error('Failed to export ZIP file');
@@ -779,157 +927,20 @@ async function fetchImageAsBlob(fileData: FileData): Promise<Blob | null> {
 }
 
 /**
- * Generate CSV content from export data (comprehensive format matching downloadCaseAsCSV)
+ * Generate README content for ZIP export with optional forensic protection
  */
-async function generateCSVContentFromExportData(exportData: CaseExportData): Promise<string> {
-  // Case metadata section (same as downloadCaseAsCSV)
-  const metadataRows = [
-    ['Case Export Report'],
-    [''],
-    ['Case Number', exportData.metadata.caseNumber],
-    ['Export Date', exportData.metadata.exportDate],
-    ['Exported By', exportData.metadata.exportedBy || 'N/A'],
-    ['Striae Export Schema Version', exportData.metadata.striaeExportSchemaVersion],
-    ['Total Files', exportData.metadata.totalFiles],
-    [''],
-    ['Summary'],
-    ['Files with Annotations', exportData.summary?.filesWithAnnotations || 0],
-    ['Files without Annotations', exportData.summary?.filesWithoutAnnotations || 0],
-    ['Total Box Annotations', exportData.summary?.totalBoxAnnotations || 0],
-    ['Last Modified', exportData.summary?.lastModified || 'N/A'],
-    [''],
-    ['File Details']
-  ];
-
-  // File details headers (updated for individual box annotations)
-  const fileHeaders = [
-    'File ID',
-    'Original Filename',
-    'Upload Date',
-    'Has Annotations',
-    'Left Case',
-    'Right Case',
-    'Left Item',
-    'Right Item',
-    'Case Font Color',
-    'Class Type',
-    'Custom Class',
-    'Class Note',
-    'Index Type',
-    'Index Number',
-    'Index Color',
-    'Support Level',
-    'Has Subclass',
-    'Include Confirmation',
-    'Total Box Annotations',
-    'Box ID',
-    'Box X',
-    'Box Y',
-    'Box Width',
-    'Box Height',
-    'Box Color',
-    'Box Timestamp',
-    'Additional Notes',
-    'Last Updated'
-  ];
-
-  // File data rows - file info only on first row, subsequent rows only have box data
-  const fileRows: string[][] = [];
-  
-  exportData.files.forEach(fileEntry => {
-    // Full file data for the first row (excluding Additional Notes and Last Updated)
-    const fullFileData = [
-      fileEntry.fileData.id,
-      fileEntry.fileData.originalFilename,
-      fileEntry.fileData.uploadedAt,
-      fileEntry.hasAnnotations ? 'Yes' : 'No',
-      fileEntry.annotations?.leftCase || '',
-      fileEntry.annotations?.rightCase || '',
-      fileEntry.annotations?.leftItem || '',
-      fileEntry.annotations?.rightItem || '',
-      fileEntry.annotations?.caseFontColor || '',
-      fileEntry.annotations?.classType || '',
-      fileEntry.annotations?.customClass || '',
-      fileEntry.annotations?.classNote || '',
-      fileEntry.annotations?.indexType || '',
-      fileEntry.annotations?.indexNumber || '',
-      fileEntry.annotations?.indexColor || '',
-      fileEntry.annotations?.supportLevel || '',
-      fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
-      fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
-      (fileEntry.annotations?.boxAnnotations?.length || 0).toString()
-    ];
-
-    // Additional Notes and Last Updated (at the end)
-    const additionalFileData = [
-      fileEntry.annotations?.additionalNotes || '',
-      fileEntry.annotations?.updatedAt || ''
-    ];
-
-    // Empty row template for subsequent box annotations (file info columns empty)
-    const emptyFileData = Array(FILE_DATA_COLUMN_COUNT).fill('');
-    const emptyAdditionalData = Array(ADDITIONAL_DATA_COLUMN_COUNT).fill('');
-
-    // If there are box annotations, create a row for each one
-    if (fileEntry.annotations?.boxAnnotations && fileEntry.annotations.boxAnnotations.length > 0) {
-      fileEntry.annotations.boxAnnotations.forEach((box, index) => {
-        const rowData = index === 0 ? fullFileData : emptyFileData;
-        const additionalData = index === 0 ? additionalFileData : emptyAdditionalData;
-        
-        fileRows.push([
-          ...rowData,
-          box.id,
-          box.x.toString(),
-          box.y.toString(),
-          box.width.toString(),
-          box.height.toString(),
-          box.color || '',
-          box.timestamp || '',
-          ...additionalData
-        ]);
-      });
-    } else {
-      // If no box annotations, still include one row with empty box data
-      fileRows.push([
-        ...fullFileData,
-        '', // Box ID
-        '', // Box X
-        '', // Box Y
-        '', // Box Width
-        '', // Box Height
-        '', // Box Color
-        '', // Box Timestamp
-        ...additionalFileData
-      ]);
-    }
-  });
-
-  // Combine all data (same as downloadCaseAsCSV)
-  const allRows = [
-    ...metadataRows,
-    fileHeaders,
-    ...fileRows
-  ];
-
-  return allRows.map(row => 
-    row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
-  ).join('\n');
-}
-
-/**
- * Generate README content for ZIP export
- */
-function generateZipReadme(exportData: CaseExportData): string {
+function generateZipReadme(exportData: CaseExportData, protectForensicData: boolean = true): string {
   const totalFiles = exportData.files?.length || 0;
   const filesWithAnnotations = exportData.files?.filter(f => f.annotations && Array.isArray(f.annotations.boxAnnotations) && f.annotations.boxAnnotations.length > 0).length || 0;
   const totalBoxAnnotations = exportData.files?.reduce((sum, f) => sum + (Array.isArray(f.annotations?.boxAnnotations) ? f.annotations.boxAnnotations.length : 0), 0) || 0;
   const totalAnnotations = filesWithAnnotations + totalBoxAnnotations;
 
-  return `Striae Case Export
+  const baseContent = `Striae Case Export
 ==================
 
 Case Number: ${exportData.metadata.caseNumber}
-Export Date: ${new Date().toISOString()}
+Export Date: ${exportData.metadata.exportDate}
+Exported By: ${exportData.metadata.exportedBy || 'N/A'}
 Striae Export Schema Version: ${exportData.metadata.striaeExportSchemaVersion}
 
 Summary:
@@ -942,9 +953,47 @@ Summary:
 Contents:
 - ${exportData.metadata.caseNumber}_data.json/.csv: Case data and annotations
 - images/: Original uploaded images
-- README.txt: This file
+- README.txt: This file`;
+
+  const forensicAddition = `
+- FORENSIC_METADATA.json: Archive verification data
+- READ_ONLY_INSTRUCTIONS.txt: Important forensic handling guidelines
+
+FORENSIC NOTICE:
+================
+This export contains forensic evidence data. Any modification may compromise 
+evidence integrity and chain of custody. Handle according to your organization's 
+forensic procedures and maintain proper documentation.`;
+
+  const footer = `
 
 Generated by Striae - A Firearms Examiner's Comparison Companion
-https://www.striae.org
-`;
+https://www.striae.org`;
+
+  return protectForensicData ? baseContent + forensicAddition + footer : baseContent + footer;
+}
+
+/**
+ * Generate JSON content for case export with forensic protection options
+ */
+function generateJSONContent(
+  exportData: CaseExportData, 
+  includeUserInfo: boolean = true, 
+  protectForensicData: boolean = true
+): string {
+  let jsonData = { ...exportData };
+  
+  // Remove sensitive user info if not included
+  if (!includeUserInfo && jsonData.metadata.exportedBy) {
+    jsonData.metadata.exportedBy = '[User Info Excluded]';
+  }
+  
+  const jsonString = JSON.stringify(jsonData, null, 2);
+  
+  // Add forensic protection warning if enabled
+  if (protectForensicData) {
+    return addForensicDataWarning(jsonString, 'json');
+  }
+  
+  return jsonString;
 }

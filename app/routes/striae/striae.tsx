@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { SidebarContainer } from '~/components/sidebar/sidebar-container';
 import { Toolbar } from '~/components/toolbar/toolbar';
 import { Canvas } from '~/components/canvas/canvas';
-import { BoxAnnotation } from '~/types';
 import { Toast } from '~/components/toast/toast';
 import { getImageUrl } from '~/components/actions/image-manage';
 import { getNotes, saveNotes } from '~/components/actions/notes-manage';
 import { generatePDF } from '~/components/actions/generate-pdf';
 import { getUserApiKey } from '~/utils/auth';
 import { AnnotationData, FileData } from '~/types';
+import { checkCaseIsReadOnly } from '~/components/actions/case-manage';
 import paths from '~/config/config.json';
 import styles from './striae.module.css';
 
@@ -35,6 +35,7 @@ export const Striae = ({ user }: StriaePage) => {
   const [caseNumber, setCaseNumber] = useState('');
   const [successAction, setSuccessAction] = useState<'loaded' | 'created' | 'deleted' | null>(null);
   const [showNotes, setShowNotes] = useState(false);
+  const [isReadOnlyCase, setIsReadOnlyCase] = useState(false);
 
   // Annotation states
   const [activeAnnotations, setActiveAnnotations] = useState<Set<string>>(new Set());
@@ -95,8 +96,34 @@ export const Striae = ({ user }: StriaePage) => {
     setImageId(undefined);    
   };
 
+  // Check if current case is read-only when case changes
+  useEffect(() => {
+    const checkReadOnlyStatus = async () => {
+      if (!currentCase || !user?.uid) {
+        setIsReadOnlyCase(false);
+        return;
+      }
+
+      try {
+        // Check if the case data itself has isReadOnly: true
+        const isReadOnly = await checkCaseIsReadOnly(user, currentCase);
+        setIsReadOnlyCase(isReadOnly);
+      } catch (error) {
+        console.error('Error checking read-only status:', error);
+        setIsReadOnlyCase(false);
+      }
+    };
+
+    checkReadOnlyStatus();
+  }, [currentCase, user?.uid]);
+
   // Handler for toolbar annotation selection
   const handleToolSelect = (toolId: string, active: boolean) => {
+    // Allow visibility toggles for read-only cases, but don't allow box annotation mode
+    if (isReadOnlyCase && toolId === 'box' && active) {
+      return;
+    }
+
     setActiveAnnotations(prev => {
       const next = new Set(prev);
       if (active) {
@@ -107,9 +134,9 @@ export const Striae = ({ user }: StriaePage) => {
       return next;
     });
 
-    // Handle box annotation mode
+    // Handle box annotation mode (only allow activation for non-read-only cases)
     if (toolId === 'box') {
-      setIsBoxAnnotationMode(active);
+      setIsBoxAnnotationMode(active && !isReadOnlyCase);
     }
   };
 
@@ -239,6 +266,11 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Automatic save handler for annotation updates
   const handleAnnotationUpdate = async (data: AnnotationData) => {
+    // Don't allow updates for read-only cases
+    if (isReadOnlyCase) {
+      return;
+    }
+
     // Update local state immediately
     setAnnotationData(data);
     
@@ -281,6 +313,7 @@ export const Striae = ({ user }: StriaePage) => {
         showNotes={showNotes}
         setShowNotes={setShowNotes}
         onAnnotationRefresh={refreshAnnotationData}
+        isReadOnly={isReadOnlyCase}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
@@ -292,6 +325,7 @@ export const Striae = ({ user }: StriaePage) => {
               isGeneratingPDF={isGeneratingPDF}
               onColorChange={handleColorChange}
               selectedColor={boxAnnotationColor}
+              isReadOnly={isReadOnlyCase}
             />
           </div>
           <Canvas 
@@ -305,6 +339,7 @@ export const Striae = ({ user }: StriaePage) => {
             isBoxAnnotationMode={isBoxAnnotationMode}
             boxAnnotationColor={boxAnnotationColor}
             onAnnotationUpdate={handleAnnotationUpdate}
+            isReadOnly={isReadOnlyCase}
           />
         </div>
       </main>

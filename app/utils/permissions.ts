@@ -99,7 +99,7 @@ export const canCreateCase = async (user: User): Promise<{ canCreate: boolean; r
     if (usage.currentCases >= limits.maxCases) {
       return {
         canCreate: false,
-        reason: `You have reached the maximum number of cases (${limits.maxCases}). Please contact support to upgrade your account.`
+        reason: `Read-Only Account: Case creation disabled`
       };
     }
 
@@ -125,7 +125,7 @@ export const canUploadFile = async (user: User, caseNumber: string, currentFileC
     if (currentFileCount >= limits.maxFilesPerCase) {
       return {
         canUpload: false,
-        reason: `You have reached the maximum number of files per case (${limits.maxFilesPerCase}). Please contact support to upgrade your account.`
+        reason: `Read-Only Account: File uploads disabled`
       };
     }
 
@@ -151,7 +151,7 @@ export const getLimitsDescription = async (user: User): Promise<string> => {
     if (userData.permitted) {
       return '';
     } else {
-      return `Demo account limits: ${limits.maxCases} case, ${limits.maxFilesPerCase} files per case`;
+      return `Read-Only Account: Case review only.`;
     }
   } catch (error) {
     console.error('Error getting limits description:', error);

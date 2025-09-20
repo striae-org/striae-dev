@@ -66,14 +66,7 @@ export default function Home() {
             </Link>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
-            </button>
-            <Link 
-              viewTransition
-              prefetch="intent"
-              to="/demo" 
-              className={styles.actionButton}>
-              Access Demo
-            </Link>
+            </button>            
           </div>
           <div className={styles.subtitle}>
             <p>Release Candidacy Begins October 1, 2025 @ 11:00 AM MST</p>

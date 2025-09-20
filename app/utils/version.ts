@@ -5,5 +5,5 @@ export const getAppVersion = () => {
 };
 
 export const logAppVersion = () => {
-  console.log(`App version: ${packageJson.version}`);
+  // Version logging removed for production
 };
