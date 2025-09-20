@@ -655,11 +655,11 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     // Set workbook protection if forensic protection is enabled
     if (protectForensicData && exportPassword) {
       workbook.Props = {
-        Title: 'Striae Forensic Export - Protected',
+        Title: 'Striae Case Export - Protected',
         Subject: 'Forensic Evidence Data Export',
-        Author: exportData.metadata.exportedBy || 'Striae System',
+        Author: exportData.metadata.exportedBy || 'Striae',
         Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected - Password: ${exportPassword}`,
-        Company: 'Striae Forensic System'
+        Company: 'Striae'
       };
     }
 
