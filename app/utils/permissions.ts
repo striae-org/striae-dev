@@ -4,8 +4,8 @@ import paths from '~/config/config.json';
 import { getUserApiKey } from './auth';
 
 const USER_WORKER_URL = paths.user_worker_url;
-const MAX_CASES_DEMO = paths.max_cases_demo;
-const MAX_FILES_PER_CASE_DEMO = paths.max_files_per_case_demo;
+const MAX_CASES_REVIEW = paths.max_cases_review;
+const MAX_FILES_PER_CASE_REVIEW = paths.max_files_per_case_review;
 
 export interface UserUsage {
   currentCases: number;
@@ -51,8 +51,8 @@ export const getUserLimits = (userData: UserData): UserLimits => {
     };
   } else {
     return {
-      maxCases: MAX_CASES_DEMO, // Use config value for demo users
-      maxFilesPerCase: MAX_FILES_PER_CASE_DEMO // Use config value for demo users
+      maxCases: MAX_CASES_REVIEW, // Use config value for review users
+      maxFilesPerCase: MAX_FILES_PER_CASE_REVIEW // Use config value for review users
     };
   }
 };
@@ -60,7 +60,7 @@ export const getUserLimits = (userData: UserData): UserLimits => {
 /**
  * Get current usage counts for a user
  */
-export const getUserUsage = async (user: User, caseNumber?: string): Promise<UserUsage> => {
+export const getUserUsage = async (user: User): Promise<UserUsage> => {
   try {
     const userData = await getUserData(user);
     if (!userData) {
@@ -113,7 +113,7 @@ export const canCreateCase = async (user: User): Promise<{ canCreate: boolean; r
 /**
  * Check if user can upload a file to a case
  */
-export const canUploadFile = async (user: User, caseNumber: string, currentFileCount: number): Promise<{ canUpload: boolean; reason?: string }> => {
+export const canUploadFile = async (user: User, currentFileCount: number): Promise<{ canUpload: boolean; reason?: string }> => {
   try {
     const userData = await getUserData(user);
     if (!userData) {
@@ -143,7 +143,7 @@ export const getLimitsDescription = async (user: User): Promise<string> => {
   try {
     const userData = await getUserData(user);
     if (!userData) {
-      return `Account limits: ${MAX_CASES_DEMO} case, ${MAX_FILES_PER_CASE_DEMO} files per case`;
+      return `Account limits: ${MAX_CASES_REVIEW} case, ${MAX_FILES_PER_CASE_REVIEW} files per case`;
     }
 
     const limits = getUserLimits(userData);

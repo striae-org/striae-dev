@@ -14,10 +14,9 @@ interface DeleteAccountProps {
     email: string | null;
   };
   company: string;
-  permitted: boolean;
 }
 
-export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: DeleteAccountProps) => {
+export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountProps) => {
   const [uidConfirmation, setUidConfirmation] = useState('');
   const [emailConfirmation, setEmailConfirmation] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -161,22 +160,16 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
           {/* Divider */}
           <div className={styles.divider}></div>
 
-          {/* Warning Message - Conditional based on account type */}
+          {/* Warning Message */}
           <div className={styles.warningSection}>
-            {permitted ? (
-              <p className={styles.warningText}>
-                {isDeleting 
-                  ? 'Deleting your account now. If you have a lot of data, this may take a while...'
-                  : <>
-                      Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
-                    </>
-                }
-              </p>
-            ) : (
-              <p className={styles.warningText}>
-                <strong>Demo Account Deletion Disabled:</strong> Demo accounts cannot be deleted. This restriction helps protect shared demo credentials and ensures demo functionality remains available for evaluation purposes.
-              </p>
-            )}
+            <p className={styles.warningText}>
+              {isDeleting 
+                ? 'Deleting your account now. If you have a lot of data, this may take a while...'
+                : <>
+                    Deleting your account is irreversible! All account information and data will be deleted from Striae. The email address associated with this account will be permanently disabled. <strong><em>Please be certain you want to take this action!</em></strong>
+                  </>
+              }
+            </p>
           </div>
 
           {/* Divider */}
@@ -211,7 +204,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
                 className={styles.confirmationInput}
                 placeholder="Enter your User ID"
                 autoComplete="off"
-                disabled={!permitted}
               />
             </div>
 
@@ -228,7 +220,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
                 className={styles.confirmationInput}
                 placeholder="Enter your email address"
                 autoComplete="off"
-                disabled={!permitted}
               />
             </div>
 
@@ -236,13 +227,9 @@ export const DeleteAccount = ({ isOpen, onClose, user, company, permitted }: Del
               type="button"
               onClick={handleDeleteAccount}
               className={styles.deleteButton}
-              disabled={!permitted || !isConfirmationValid || isDeleting}
+              disabled={!isConfirmationValid || isDeleting}
             >
-              {!permitted 
-                ? 'Demo Account Deletion Disabled' 
-                : isDeleting 
-                  ? 'Deleting Account...' 
-                  : 'Delete Striae Account'}
+              {isDeleting ? 'Deleting Account...' : 'Delete Striae Account'}
             </button>
           </form>
           )}

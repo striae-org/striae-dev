@@ -132,7 +132,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
           email: user.email
         }}
         company={company}
-        permitted={permitted}
       />
     );
   }

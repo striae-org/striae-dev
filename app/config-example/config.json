@@ -9,6 +9,6 @@
   "user_worker_url": "USER_WORKER_CUSTOM_DOMAIN",
   "pdf_worker_url": "PDF_WORKER_CUSTOM_DOMAIN",
   "keys_auth": "YOUR_KEYS_AUTH_TOKEN",
-  "max_cases_demo": 0,
-  "max_files_per_case_demo": 0
+  "max_cases_review": 0,
+  "max_files_per_case_review": 0
 }
