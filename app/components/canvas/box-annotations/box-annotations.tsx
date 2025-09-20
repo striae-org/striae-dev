@@ -205,6 +205,8 @@ export const BoxAnnotations = ({
         ? { ...annotation, label: label || undefined }
         : annotation
     );
+
+    // Update annotations first
     onAnnotationsChange(updatedAnnotations);
 
     // If this is a preset color and has a label, add to additional notes
@@ -216,15 +218,15 @@ export const BoxAnnotations = ({
       const labelEntry = `${presetColorName}: ${label}`;
       
       // Append to existing notes with proper formatting
-      const updatedNotes = existingNotes 
+      const updatedAdditionalNotes = existingNotes 
         ? `${existingNotes}\n${labelEntry}`
         : labelEntry;
       
-      console.log('Adding to additional notes:', labelEntry, 'Final notes:', updatedNotes);
+      console.log('Adding to additional notes:', labelEntry, 'Final notes:', updatedAdditionalNotes);
       
       onAnnotationDataChange({
         ...annotationData,
-        additionalNotes: updatedNotes
+        additionalNotes: updatedAdditionalNotes
       });
     }
     
@@ -280,33 +282,37 @@ export const BoxAnnotations = ({
     // Only show existing box annotations when in box annotation mode
     if (!isAnnotationMode) return null;
     
-    return annotations.map((annotation) => (
-      <div
-        key={annotation.id}
-        className={styles.savedAnnotationBox}
-        style={{
-          left: `${annotation.x}%`,
-          top: `${annotation.y}%`,
-          width: `${annotation.width}%`,
-          height: `${annotation.height}%`,
-          border: `2px solid ${annotation.color}`,
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto' // Always allow interactions with saved boxes
-        }}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          removeBoxAnnotation(annotation.id);
-        }}
-        onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
-        title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
-      >
-        {annotation.label && (
-          <div className={styles.annotationLabel}>
-            {annotation.label}
-          </div>
-        )}
-      </div>
-    ));
+    return annotations.map((annotation) => {
+      console.log('Rendering annotation:', annotation.id, 'Label:', annotation.label, 'Color:', annotation.color);
+      
+      return (
+        <div
+          key={annotation.id}
+          className={styles.savedAnnotationBox}
+          style={{
+            left: `${annotation.x}%`,
+            top: `${annotation.y}%`,
+            width: `${annotation.width}%`,
+            height: `${annotation.height}%`,
+            border: `2px solid ${annotation.color}`,
+            backgroundColor: 'transparent',
+            pointerEvents: 'auto' // Always allow interactions with saved boxes
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            removeBoxAnnotation(annotation.id);
+          }}
+          onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
+          title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
+        >
+          {annotation.label && (
+            <div className={styles.annotationLabel}>
+              {annotation.label}
+            </div>
+          )}
+        </div>
+      );
+    });
   };
 
   // Render label input dialog
