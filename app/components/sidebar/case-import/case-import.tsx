@@ -144,7 +144,7 @@ export const CaseImport = ({
       const result = await importCaseForReview(
         user,
         selectedFile,
-        { overwriteExisting: false },
+        { overwriteExisting: true },
         (stage: string, progress: number, details?: string) => {
           setImportProgress({ stage, progress, details });
         }
@@ -215,7 +215,7 @@ export const CaseImport = ({
                 <div className={styles.warningText}>
                   <strong>Existing Review Case:</strong> "{existingReadOnlyCase}"
                   <p className={styles.warningSubtext}>
-                    Only one case can be reviewed at a time. Clear the existing case to import a new one.
+                    Importing a new case will automatically replace the existing one.
                   </p>
                 </div>
                 <button
@@ -237,7 +237,7 @@ export const CaseImport = ({
                   id="zipFile"
                   accept=".zip"
                   onChange={handleFileSelect}
-                  disabled={isImporting || isClearing || !!existingReadOnlyCase}
+                  disabled={isImporting || isClearing}
                   className={styles.fileInput}
                 />
                 <label htmlFor="zipFile" className={styles.fileLabel}>
@@ -283,10 +283,20 @@ export const CaseImport = ({
               <button
                 className={styles.importButton}
                 onClick={handleImport}
-                disabled={!selectedFile || isImporting || isClearing || !!existingReadOnlyCase}
+                disabled={!selectedFile || isImporting || isClearing}
               >
                 {isImporting ? 'Importing...' : 'Import'}
               </button>
+              
+              {existingReadOnlyCase && (
+                <button
+                  className={styles.clearButton}
+                  onClick={clearExistingReadOnlyCase}
+                  disabled={isClearing || isImporting}
+                >
+                  {isClearing ? 'Clearing...' : 'Clear Current Case'}
+                </button>
+              )}
               
               <button
                 className={styles.cancelButton}
@@ -318,7 +328,7 @@ export const CaseImport = ({
                 <li>Select a ZIP file exported from Striae</li>
                 <li>Only one case can be reviewed at a time</li>
                 <li>Imported cases are read-only and cannot be modified</li>
-                <li>Clear existing review cases before importing new ones</li>
+                <li>Importing will automatically replace any existing review case</li>
               </ul>
             </div>
           </div>
