@@ -273,6 +273,9 @@ export const BoxAnnotations = ({
       >
         <div className={styles.labelDialogContent}>
           <div className={styles.labelDialogTitle}>Add Label (Optional)</div>
+          <div className={styles.labelDialogNote}>
+            Note: Labels are for organization only and will not appear in PDF reports.
+          </div>
           <input
             type="text"
             value={labelDialog.label}
