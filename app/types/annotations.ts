@@ -7,6 +7,7 @@ export interface BoxAnnotation {
   width: number;
   height: number;
   color: string;
+  label?: string;
   timestamp: string;
 }
 

@@ -2,6 +2,20 @@ import { useState, useCallback } from 'react';
 import { BoxAnnotation } from '~/types';
 import styles from './box-annotations.module.css';
 
+// Mapping of preset colors to their names for additional notes
+const PRESET_COLOR_NAMES: Record<string, string> = {
+  '#ff0000': 'Red',
+  '#ff8000': 'Orange', 
+  '#ffde21': 'Yellow',
+  '#00ff00': 'Green',
+  '#00ffff': 'Cyan',
+  '#0000ff': 'Blue',
+  '#8000ff': 'Purple',
+  '#ff00ff': 'Magenta',
+  '#000000': 'Black',
+  '#ffffff': 'White'
+};
+
 interface BoxAnnotationsProps {
   imageRef: React.RefObject<HTMLImageElement | null>;
   annotations: BoxAnnotation[];
@@ -9,6 +23,10 @@ interface BoxAnnotationsProps {
   isAnnotationMode: boolean;
   annotationColor: string;
   className?: string;
+  annotationData?: {
+    additionalNotes?: string;
+  };
+  onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
 }
 
 interface DrawingState {
@@ -19,13 +37,23 @@ interface DrawingState {
   currentY: number;
 }
 
+interface LabelDialogState {
+  isVisible: boolean;
+  annotationId: string | null;
+  x: number;
+  y: number;
+  label: string;
+}
+
 export const BoxAnnotations = ({
   imageRef,
   annotations,
   onAnnotationsChange,
   isAnnotationMode,
   annotationColor,
-  className
+  className,
+  annotationData,
+  onAnnotationDataChange
 }: BoxAnnotationsProps) => {
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
@@ -33,6 +61,14 @@ export const BoxAnnotations = ({
     startY: 0,
     currentX: 0,
     currentY: 0
+  });
+
+  const [labelDialog, setLabelDialog] = useState<LabelDialogState>({
+    isVisible: false,
+    annotationId: null,
+    x: 0,
+    y: 0,
+    label: ''
   });
 
   // Get relative coordinates from mouse event
@@ -108,7 +144,24 @@ export const BoxAnnotations = ({
         timestamp: new Date().toISOString()
       };
       
-      onAnnotationsChange([...annotations, newAnnotation]);
+      // Save the annotation immediately
+      const updatedAnnotations = [...annotations, newAnnotation];
+      onAnnotationsChange(updatedAnnotations);
+      
+      // Show label dialog positioned near the annotation
+      if (imageRef.current) {
+        const rect = imageRef.current.getBoundingClientRect();
+        const dialogX = rect.left + (x / 100) * rect.width;
+        const dialogY = rect.top + (y / 100) * rect.height;
+        
+        setLabelDialog({
+          isVisible: true,
+          annotationId: newAnnotation.id,
+          x: dialogX,
+          y: dialogY,
+          label: ''
+        });
+      }
     }
     
     setDrawingState({
@@ -118,7 +171,7 @@ export const BoxAnnotations = ({
       currentX: 0,
       currentY: 0
     });
-  }, [drawingState, isAnnotationMode, annotationColor, annotations, onAnnotationsChange]);
+  }, [drawingState, isAnnotationMode, annotationColor, annotations, onAnnotationsChange, imageRef]);
 
   // Remove a box annotation
   const removeBoxAnnotation = useCallback((annotationId: string) => {
@@ -131,6 +184,76 @@ export const BoxAnnotations = ({
     e.stopPropagation();
     removeBoxAnnotation(annotationId);
   }, [removeBoxAnnotation]);
+
+  // Handle label confirmation
+  const handleLabelConfirm = useCallback(() => {
+    if (!labelDialog.annotationId) return;
+    
+    // Find the annotation being labeled
+    const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
+    if (!targetAnnotation) {
+      // If annotation not found, just close dialog
+      setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+      return;
+    }
+
+    const label = labelDialog.label.trim();
+    
+    // Always update the box annotation with the label (even if empty)
+    const updatedAnnotations = annotations.map(annotation => 
+      annotation.id === labelDialog.annotationId 
+        ? { ...annotation, label: label || undefined }
+        : annotation
+    );
+
+    // If this is a preset color and has a label, prepare additional notes update
+    const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+    
+    let updatedAdditionalNotes = annotationData?.additionalNotes;
+    
+    if (label && presetColorName && annotationData) {
+      const existingNotes = annotationData.additionalNotes || '';
+      const labelEntry = `${presetColorName}: ${label}`;
+      
+      // Append to existing notes with proper formatting
+      updatedAdditionalNotes = existingNotes 
+        ? `${existingNotes}\n${labelEntry}`
+        : labelEntry;
+    }
+
+    // Make a single combined update with both annotations and additional notes
+    if (onAnnotationDataChange && annotationData) {
+      onAnnotationDataChange({
+        ...annotationData,
+        additionalNotes: updatedAdditionalNotes,
+        boxAnnotations: updatedAnnotations
+      });
+    } else {
+      // Fallback to just updating annotations if no combined callback
+      onAnnotationsChange(updatedAnnotations);
+    }
+    
+    setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+  }, [labelDialog, annotations, onAnnotationsChange, annotationData, onAnnotationDataChange]);
+
+  // Handle label cancellation
+  const handleLabelCancel = useCallback(() => {
+    setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
+  }, []);
+
+  // Handle label input change
+  const handleLabelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLabelDialog(prev => ({ ...prev, label: e.target.value }));
+  }, []);
+
+  // Handle Enter key in label input
+  const handleLabelKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLabelConfirm();
+    } else if (e.key === 'Escape') {
+      handleLabelCancel();
+    }
+  }, [handleLabelConfirm, handleLabelCancel]);
 
   // Render current drawing box (while dragging)
   const renderCurrentDrawingBox = () => {
@@ -162,43 +285,108 @@ export const BoxAnnotations = ({
     // Only show existing box annotations when in box annotation mode
     if (!isAnnotationMode) return null;
     
-    return annotations.map((annotation) => (
+    return annotations.map((annotation) => {
+      return (
+        <div
+          key={annotation.id}
+          className={styles.savedAnnotationBox}
+          style={{
+            left: `${annotation.x}%`,
+            top: `${annotation.y}%`,
+            width: `${annotation.width}%`,
+            height: `${annotation.height}%`,
+            border: `2px solid ${annotation.color}`,
+            backgroundColor: 'transparent',
+            pointerEvents: 'auto' // Always allow interactions with saved boxes
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            removeBoxAnnotation(annotation.id);
+          }}
+          onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
+          title={`${annotation.label ? `Label: ${annotation.label}\n` : ''}Double-click or right-click to remove`}
+        >
+          {annotation.label && (
+            <div className={styles.annotationLabel}>
+              {annotation.label}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  // Render label input dialog
+  const renderLabelDialog = () => {
+    if (!labelDialog.isVisible) return null;
+    
+    // Check if current annotation uses a preset color
+    const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
+    const isPresetColor = targetAnnotation && PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+    
+    return (
       <div
-        key={annotation.id}
-        className={styles.savedAnnotationBox}
+        className={styles.labelDialog}
         style={{
-          left: `${annotation.x}%`,
-          top: `${annotation.y}%`,
-          width: `${annotation.width}%`,
-          height: `${annotation.height}%`,
-          border: `2px solid ${annotation.color}`,
-          backgroundColor: 'transparent',
-          pointerEvents: 'auto' // Always allow interactions with saved boxes
+          position: 'fixed',
+          left: `${labelDialog.x}px`,
+          top: `${labelDialog.y}px`,
+          zIndex: 1000
         }}
-        onDoubleClick={(e) => {
-          e.stopPropagation();
-          removeBoxAnnotation(annotation.id);
-        }}
-        onContextMenu={(e) => handleAnnotationRightClick(e, annotation.id)}
-        title="Double-click or right-click to remove"
-      />
-    ));
+      >
+        <div className={styles.labelDialogContent}>
+          <div className={styles.labelDialogTitle}>Add Label (Optional)</div>
+          <div className={styles.labelDialogNote}>
+            {isPresetColor 
+              ? `Note: Labels for preset colors will appear in PDF reports under Additional Notes.`
+              : `Note: Labels for custom colors are for organization only and will not appear in PDF reports.`
+            }
+          </div>
+          <input
+            type="text"
+            value={labelDialog.label}
+            onChange={handleLabelChange}
+            onKeyDown={handleLabelKeyDown}
+            placeholder="Enter label..."
+            className={styles.labelInput}
+            autoFocus
+          />
+          <div className={styles.labelDialogButtons}>
+            <button
+              onClick={handleLabelConfirm}
+              className={styles.labelConfirmButton}
+            >
+              Confirm
+            </button>
+            <button
+              onClick={handleLabelCancel}
+              className={styles.labelCancelButton}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div 
-      className={`${styles.boxAnnotationsOverlay} ${className || ''}`}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={{ 
-        cursor: isAnnotationMode ? 'crosshair' : 'default',
-        pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
-      }}
-    >
-      {renderSavedAnnotations()}
-      {renderCurrentDrawingBox()}
-    </div>
+    <>
+      <div 
+        className={`${styles.boxAnnotationsOverlay} ${className || ''}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ 
+          cursor: isAnnotationMode ? 'crosshair' : 'default',
+          pointerEvents: isAnnotationMode ? 'auto' : 'none' // Only allow interactions in annotation mode
+        }}
+      >
+        {renderSavedAnnotations()}
+        {renderCurrentDrawingBox()}
+      </div>
+      {renderLabelDialog()}
+    </>
   );
 };
