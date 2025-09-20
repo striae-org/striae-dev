@@ -225,7 +225,6 @@ async function deleteSingleCase(env, userUid, caseNumber) {
     });
 
     if (!caseResponse.ok) {
-      console.warn(`Case ${caseNumber} not found in data worker`);
       return;
     }
 
@@ -249,7 +248,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
             headers: { 'X-Custom-Auth-Key': dataApiKey }
           });
         } catch (fileError) {
-          console.warn(`Failed to delete file ${file.id} for case ${caseNumber}:`, fileError);
+          // Continue with other files
         }
       }
     }
@@ -261,7 +260,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
     });
 
   } catch (error) {
-    console.warn(`Failed to delete case ${caseNumber}:`, error);
+    // Continue with user deletion even if case deletion fails
   }
 }
 
@@ -280,8 +279,6 @@ async function handleDeleteUser(env, userUid) {
     
     // Delete all user's cases using the same logic as case-manage.ts
     if (userObject.cases && userObject.cases.length > 0) {
-      console.log(`Deleting ${userObject.cases.length} cases for user ${userUid}`);
-      
       for (const caseItem of userObject.cases) {
         await deleteSingleCase(env, userUid, caseItem.caseNumber);
       }

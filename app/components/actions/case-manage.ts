@@ -81,7 +81,6 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
   try {
     const apiKey = await getDataApiKey();
     const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
-    console.log(`Checking case existence at: ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -91,27 +90,54 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
       }
     });
 
-    console.log(`Response status: ${response.status}`);
     if (!response.ok) {
-      console.log(`Case "${caseNumber}" not found (HTTP ${response.status})`);
       return null;
     }
 
-    const data = await response.json() as CaseData;
-    console.log(`Case data retrieved:`, data);
+    const data = await response.json() as CaseData & { isReadOnly?: boolean };
+    
+    // Check if this is a read-only case - if so, don't consider it as an existing regular case
+    if (data.isReadOnly) {
+      return null;
+    }
     
     // Verify the case number matches (extra safety check)
     if (data.caseNumber === caseNumber) {
-      console.log(`Case "${caseNumber}" validated successfully`);
       return data;
     }
     
-    console.log(`Case number mismatch: expected "${caseNumber}", got "${data.caseNumber}"`);
     return null;
 
   } catch (error) {
     console.error('Error checking existing case:', error);
     return null;
+  }
+};
+
+export const checkCaseIsReadOnly = async (user: User, caseNumber: string): Promise<boolean> => {
+  try {
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      // Case doesn't exist, so it's not read-only
+      return false;
+    }
+
+    const data = await response.json() as { isReadOnly?: boolean };
+    return !!data.isReadOnly;
+    
+  } catch (error) {
+    console.error('Error checking if case is read-only:', error);
+    return false;
   }
 };
 
@@ -241,7 +267,6 @@ export const renameCase = async (
           });
         }
       } catch (error) {
-        console.warn(`Failed to transfer notes for file ${file.id}:`, error);
         // Continue with other files even if one fails
       }
     }
@@ -296,7 +321,6 @@ export const renameCase = async (
           headers: { 'X-Custom-Auth-Key': dataApiKey }
         });
       } catch (error) {
-        console.warn(`Failed to delete old notes for file ${file.id}:`, error);
         // Continue with cleanup even if one fails
       }
     }

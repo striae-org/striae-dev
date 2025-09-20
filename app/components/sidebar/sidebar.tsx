@@ -5,7 +5,9 @@ import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './case-sidebar';
 import { NotesSidebar } from './notes-sidebar';
+import { CaseImport } from './case-import';
 import { FileData } from '~/types';
+import { ImportResult } from '../actions/case-review';
 
 interface SidebarProps {
   user: User;
@@ -27,6 +29,7 @@ interface SidebarProps {
   showNotes: boolean;
   setShowNotes: (show: boolean) => void;
   onAnnotationRefresh?: () => void;
+  isReadOnly?: boolean;
 }
 
 export const Sidebar = ({ 
@@ -48,9 +51,21 @@ export const Sidebar = ({
   setSuccessAction,
   showNotes,
   setShowNotes,
-  onAnnotationRefresh
+  onAnnotationRefresh,
+  isReadOnly = false
 }: SidebarProps) => {
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);  
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  const handleImportComplete = (result: ImportResult) => {
+    if (result.success) {
+      // Load the imported case automatically
+      onCaseChange(result.caseNumber);
+      setCurrentCase(result.caseNumber);
+      setCaseNumber(result.caseNumber);
+      setSuccessAction('loaded');
+    }
+  };  
 
   return (
     <div className={styles.sidebar}>
@@ -72,6 +87,11 @@ export const Sidebar = ({
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
       />
+      <CaseImport 
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportComplete={handleImportComplete}
+      />
       {showNotes ? (
         <NotesSidebar 
           currentCase={currentCase}
@@ -81,24 +101,35 @@ export const Sidebar = ({
           onAnnotationRefresh={onAnnotationRefresh}
         />
       ) : (
-        <CaseSidebar 
-          user={user} 
-          onImageSelect={onImageSelect}
-          onCaseChange={onCaseChange}
-          currentCase={currentCase}
-          setCurrentCase={setCurrentCase}
-          imageLoaded={imageLoaded}
-          setImageLoaded={setImageLoaded}
-          files={files}
-          setFiles={setFiles}
-          caseNumber={caseNumber}
-          setCaseNumber={setCaseNumber}
-          error={error}
-          setError={setError}
-          successAction={successAction}
-          setSuccessAction={setSuccessAction}
-          onNotesClick={() => setShowNotes(true)}
-        />
+        <>
+          <CaseSidebar 
+            user={user} 
+            onImageSelect={onImageSelect}
+            onCaseChange={onCaseChange}
+            currentCase={currentCase}
+            setCurrentCase={setCurrentCase}
+            imageLoaded={imageLoaded}
+            setImageLoaded={setImageLoaded}
+            files={files}
+            setFiles={setFiles}
+            caseNumber={caseNumber}
+            setCaseNumber={setCaseNumber}
+            error={error}
+            setError={setError}
+            successAction={successAction}
+            setSuccessAction={setSuccessAction}
+            onNotesClick={() => setShowNotes(true)}
+            isReadOnly={isReadOnly}
+          />
+          <div className={styles.importSection}>
+            <button 
+              onClick={() => setIsImportModalOpen(true)}
+              className={styles.importButton}
+            >
+              Import Case
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

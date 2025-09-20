@@ -166,11 +166,10 @@ export const Login = () => {
         return;
       }
       
-      console.log("Logged in user:", user.email);
+      console.log("User signed in:", user.email);
       setUser(user);
       setShowMfaEnrollment(false);      
     } else {
-      console.log("No user logged in");
       setUser(null);
       setShowMfaEnrollment(false);
       setIsCheckingUser(false);

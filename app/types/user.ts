@@ -11,6 +11,14 @@ export interface UserData {
     caseNumber: string;
     createdAt: string;
   }>;
+  readOnlyCases?: Array<{
+    caseNumber: string;
+    importedAt: string;
+    originalExportDate: string;
+    originalExportedBy: string;
+    sourceChecksum?: string;
+    isReadOnly: true;
+  }>;
   createdAt: string;
   updatedAt?: string;
 }

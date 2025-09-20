@@ -8,7 +8,7 @@ let asciiArt;
 try {  
     asciiArt = fs.readFileSync(asciiArtPath, 'utf8');  
 } catch (err) {  
-    cconsole.warn(`Warning: Unable to read ASCII art file at ${asciiArtPath}.\n${err.message}`);  
+    console.warn(`Warning: Unable to read ASCII art file at ${asciiArtPath}.\n${err.message}`);  
     asciiArt = "(ASCII art unavailable)\n";  
 } 
 

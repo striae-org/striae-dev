@@ -13,6 +13,7 @@ interface ToolbarProps {
   isGeneratingPDF?: boolean;
   onColorChange?: (color: string) => void;
   selectedColor?: string;
+  isReadOnly?: boolean;
 }
 
 export const Toolbar = ({ 
@@ -22,7 +23,8 @@ export const Toolbar = ({
   canGeneratePDF, 
   isGeneratingPDF = false,
   onColorChange,
-  selectedColor = '#ff0000'
+  selectedColor = '#ff0000',
+  isReadOnly = false
 }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
@@ -135,7 +137,7 @@ export const Toolbar = ({
         selectedColor={selectedColor}
         onColorConfirm={handleColorConfirm}
         onCancel={handleColorCancel}
-        isVisible={showColorSelector && isVisible}
+        isVisible={showColorSelector && isVisible && !isReadOnly}
       />
     </div>
   );

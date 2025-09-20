@@ -117,6 +117,7 @@ const dark = {
   primary: 'oklch(95% 0 0)',
   accent: 'oklch(89.7% 0.14 83.6)',
   error: 'oklch(65.91% 0.249 13.76)',
+  warning: 'oklch(70% 0.15 55)',
   text: 'var(--white)',
   textTitle: 'var(--text)',
   linkColor: 'var(--accent)',
@@ -132,6 +133,7 @@ const light = {
   success: 'oklch(70% 0.131 146.01)',
   error: 'oklch(63.17% 0.259 25.41)',
   errorLight: 'oklch(90% 0.259 25.41)',
+  warning: 'oklch(55% 0.15 55)',
   text: 'var(--black)',  
   textTitle: 'rgba(0, 0, 0, 0.9)', // Fallback for Firefox
   linkColor: 'var(--accent)',
