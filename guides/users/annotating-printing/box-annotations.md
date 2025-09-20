@@ -34,6 +34,26 @@ The Box Annotation system in Striae allows users to draw precise, color-coded re
 
 **If you want to change colors** for subsequent annotations, click the box tool twice to disable and re-enable it, which will bring up the color selector again. Choose a new color and continue annotating.
 
+### Box Color Labels
+
+**Preset Label Integration**: Striae includes an intelligent labeling system for box annotations that enhances documentation workflow:
+
+- **Automatic label addition**: When you use preset colors, descriptive labels are automatically added to the Additional Notes section
+- **Prerequisite requirement**: Labels are only added after you have initially saved notes for the current image
+- **Seamless documentation**: This feature streamlines the annotation process by allowing the user to provide consistent terminology
+
+**Custom Color Organization**:
+
+- **Custom labels**: When using custom colors from the color wheel, you can create your own color-coded organization or references
+- **Reference purposes**: Custom color labels can serve as personal reference tools for maintaining consistency across cases
+- **Workflow flexibility**: Allows laboratories to develop their own color-coding systems
+
+**Important Rendering Note**:
+
+- **Canvas-only display**: All box labels (both preset and custom) are visible only on the canvas interface
+- **PDF exclusion**: Labels do not appear in generated PDF reports - only the colored box annotations themselves are included in additional notes, if desired
+- **Clean documentation**: This ensures PDF reports maintain professional appearance while providing organizational benefits during analysis
+
 ### Managing Box Annotations
 
 **Removing Annotations**: You have two options to remove unwanted box annotations:
