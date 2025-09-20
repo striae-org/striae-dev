@@ -103,7 +103,7 @@ export const BoxAnnotations = ({
     } catch (error) {
       return { x: 0, y: 0 };
     }
-  }, []); // Remove imageRef dependency for stability
+  }, [imageRef]);
 
   // Helper function to generate unique annotation ID
   const generateAnnotationId = useCallback(() => {

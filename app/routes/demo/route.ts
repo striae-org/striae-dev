@@ -1,1 +1,0 @@
-export { Demo as default, meta, action } from './demo'
