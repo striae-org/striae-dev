@@ -269,7 +269,7 @@ export const CaseImport = ({
                 <label htmlFor="zipFile" className={styles.fileLabel}>
                   <span className={styles.fileLabelIcon}>📁</span>
                   <span className={styles.fileLabelText}>
-                    {selectedFile ? selectedFile.name : 'Select ZIP file (JSON Data File Only)...'}
+                    {selectedFile ? selectedFile.name : 'Select ZIP file (JSON data files only)...'}
                   </span>
                 </label>
               </div>
@@ -341,7 +341,7 @@ export const CaseImport = ({
             <div className={styles.instructions}>
               <h3 className={styles.instructionsTitle}>Instructions:</h3>
               <ul className={styles.instructionsList}>
-                <li>Only ZIP files (.zip) exported with the .JSON data format from Striae are accepted</li>
+                <li>Only ZIP files (.zip) exported with the JSON data format from Striae are accepted</li>
                 <li>Only one case can be reviewed at a time</li>
                 <li>Imported cases are read-only and cannot be modified</li>
                 <li>Importing will automatically replace any existing review case</li>
