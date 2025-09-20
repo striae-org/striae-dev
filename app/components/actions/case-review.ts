@@ -9,10 +9,10 @@ import {
   CaseExportData, 
   UserData, 
   FileData, 
-  AnnotationData,
   ImageUploadResponse 
 } from '~/types';
 import { validateCaseNumber, checkExistingCase } from './case-manage';
+import { deleteFile } from './image-manage';
 import { saveNotes } from './notes-manage';
 
 const USER_WORKER_URL = paths.user_worker_url;
@@ -403,6 +403,13 @@ export async function importCaseForReview(
     
     if (existingCase) {
       result.warnings?.push('Overwriting existing read-only case');
+      
+      // Step 2c: Clean up existing read-only case data before importing new data
+      onProgress?.('Cleaning up existing case', 25, 'Removing existing case data...');
+      const cleanupSuccess = await deleteReadOnlyCase(user, result.caseNumber);
+      if (!cleanupSuccess) {
+        result.warnings?.push('Some existing case data may not have been fully cleaned up');
+      }
     }
     
     onProgress?.('Uploading images', 30, 'Processing image files...');
@@ -563,6 +570,53 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
     
   } catch (error) {
     console.error('Error removing read-only case:', error);
+    return false;
+  }
+}
+
+/**
+ * Completely delete a read-only case including all associated data (R2, Images, user references)
+ */
+export async function deleteReadOnlyCase(user: User, caseNumber: string): Promise<boolean> {
+  try {
+    const dataApiKey = await getDataApiKey();
+    
+    // First get the case data to find all files that need to be deleted
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      headers: { 'X-Custom-Auth-Key': dataApiKey }
+    });
+
+    if (caseResponse.ok) {
+      const caseData = await caseResponse.json() as { files?: FileData[] };
+      
+      // Delete all files using image worker
+      if (caseData.files && caseData.files.length > 0) {
+        await Promise.all(
+          caseData.files.map(async (file: FileData) => {
+            try {
+              await deleteFile(user, caseNumber, file.id);
+            } catch (error) {
+              console.error(`Failed to delete file ${file.id}:`, error);
+              // Continue with cleanup even if one file fails
+            }
+          })
+        );
+      }
+
+      // Delete case data from R2 storage
+      await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'DELETE',
+        headers: { 'X-Custom-Auth-Key': dataApiKey }
+      });
+    }
+
+    // Remove from user's read-only case list
+    await removeReadOnlyCase(user, caseNumber);
+    
+    return true;
+    
+  } catch (error) {
+    console.error('Error deleting read-only case:', error);
     return false;
   }
 }
