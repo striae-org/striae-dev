@@ -50,6 +50,18 @@ export const Canvas = ({
     onAnnotationUpdate(updatedAnnotationData);
   };
 
+  // Handle annotation data changes (for additional notes updates)
+  const handleAnnotationDataChange = (data: { additionalNotes?: string }) => {
+    if (!onAnnotationUpdate || !annotationData) return;
+    
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      ...data
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+  };
+
   useEffect(() => {
     if (!imageUrl) {
       setLoadError(undefined);
@@ -184,6 +196,8 @@ export const Canvas = ({
             onAnnotationsChange={handleBoxAnnotationsChange}
             isAnnotationMode={isBoxAnnotationMode}
             annotationColor={boxAnnotationColor}
+            annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
+            onAnnotationDataChange={handleAnnotationDataChange}
           />
           
           {/* Annotations Overlay */}

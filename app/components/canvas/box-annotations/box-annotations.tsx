@@ -209,6 +209,8 @@ export const BoxAnnotations = ({
 
     // If this is a preset color and we have annotation data callback, add to additional notes
     const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+    console.log('Label confirmation - Color:', targetAnnotation.color, 'Preset name:', presetColorName, 'Has callback:', !!onAnnotationDataChange, 'Has data:', !!annotationData);
+    
     if (presetColorName && onAnnotationDataChange && annotationData) {
       const existingNotes = annotationData.additionalNotes || '';
       const labelEntry = `${presetColorName}: ${label}`;
@@ -217,6 +219,8 @@ export const BoxAnnotations = ({
       const updatedNotes = existingNotes 
         ? `${existingNotes}\n${labelEntry}`
         : labelEntry;
+      
+      console.log('Adding to additional notes:', labelEntry, 'Final notes:', updatedNotes);
       
       onAnnotationDataChange({
         ...annotationData,
@@ -328,7 +332,7 @@ export const BoxAnnotations = ({
           <div className={styles.labelDialogNote}>
             {isPresetColor 
               ? `Note: Labels for preset colors will appear in PDF reports under Additional Notes.`
-              : `Note: Labels are for organization only and will not appear in PDF reports.`
+              : `Note: Labels for custom colors are for organization only and will not appear in PDF reports.`
             }
           </div>
           <input
