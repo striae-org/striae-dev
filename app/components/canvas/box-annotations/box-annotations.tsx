@@ -191,27 +191,27 @@ export const BoxAnnotations = ({
     
     // Find the annotation being labeled
     const targetAnnotation = annotations.find(ann => ann.id === labelDialog.annotationId);
-    if (!targetAnnotation || !labelDialog.label.trim()) {
-      // If no label or annotation not found, just close dialog
+    if (!targetAnnotation) {
+      // If annotation not found, just close dialog
       setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
       return;
     }
 
     const label = labelDialog.label.trim();
     
-    // Update the box annotation with the label
+    // Always update the box annotation with the label (even if empty)
     const updatedAnnotations = annotations.map(annotation => 
       annotation.id === labelDialog.annotationId 
-        ? { ...annotation, label }
+        ? { ...annotation, label: label || undefined }
         : annotation
     );
     onAnnotationsChange(updatedAnnotations);
 
-    // If this is a preset color and we have annotation data callback, add to additional notes
+    // If this is a preset color and has a label, add to additional notes
     const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
-    console.log('Label confirmation - Color:', targetAnnotation.color, 'Preset name:', presetColorName, 'Has callback:', !!onAnnotationDataChange, 'Has data:', !!annotationData);
+    console.log('Label confirmation - Color:', targetAnnotation.color, 'Preset name:', presetColorName, 'Has callback:', !!onAnnotationDataChange, 'Has data:', !!annotationData, 'Label:', label);
     
-    if (presetColorName && onAnnotationDataChange && annotationData) {
+    if (label && presetColorName && onAnnotationDataChange && annotationData) {
       const existingNotes = annotationData.additionalNotes || '';
       const labelEntry = `${presetColorName}: ${label}`;
       
