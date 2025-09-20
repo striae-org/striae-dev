@@ -191,17 +191,19 @@ export const Canvas = ({
             draggable={false}
           />
           
-          {/* Box Annotations Component */}
-          <BoxAnnotations
-            imageRef={imageRef}
-            annotations={annotationData?.boxAnnotations || []}
-            onAnnotationsChange={handleBoxAnnotationsChange}
-            isAnnotationMode={isBoxAnnotationMode}
-            annotationColor={boxAnnotationColor}
-            annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
-            onAnnotationDataChange={handleAnnotationDataChange}
-            isReadOnly={isReadOnly}
-          />
+          {/* Box Annotations Component - Show when box tool is active for visibility */}
+          {activeAnnotations?.has('box') && (
+            <BoxAnnotations
+              imageRef={imageRef}
+              annotations={annotationData?.boxAnnotations || []}
+              onAnnotationsChange={handleBoxAnnotationsChange}
+              isAnnotationMode={isBoxAnnotationMode}
+              annotationColor={boxAnnotationColor}
+              annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
+              onAnnotationDataChange={handleAnnotationDataChange}
+              isReadOnly={isReadOnly}
+            />
+          )}
           
           {/* Annotations Overlay */}
           {activeAnnotations?.has('number') && annotationData && (

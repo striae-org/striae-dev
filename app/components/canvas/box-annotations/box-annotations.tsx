@@ -393,8 +393,8 @@ export const BoxAnnotations = ({
 
   // Memoized saved annotations to avoid unnecessary re-renders
   const savedAnnotations = useMemo(() => {
-    // Always show existing box annotations (for read-only viewing)
-    // But only allow interactions when not in read-only mode
+    // Always show existing box annotations (for viewing purposes)
+    // But only allow interactions when not in read-only mode and annotation mode is active
     
     return annotations.map((annotation) => (
       <div
@@ -431,7 +431,7 @@ export const BoxAnnotations = ({
         )}
       </div>
     ));
-  }, [annotations, isAnnotationMode, removeBoxAnnotation, handleAnnotationRightClick]);
+  }, [annotations, removeBoxAnnotation, handleAnnotationRightClick, isReadOnly]);
 
   // Memoized label dialog to avoid unnecessary re-renders
   const labelDialogElement = useMemo(() => {

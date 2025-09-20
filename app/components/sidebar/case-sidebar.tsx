@@ -137,7 +137,7 @@ export const CaseSidebar = ({
       try {
         // Use provided fileCount or fall back to current files.length
         const currentFileCount = fileCount !== undefined ? fileCount : files.length;
-        const permission = await canUploadFile(user, currentCase, currentFileCount);
+        const permission = await canUploadFile(user, currentFileCount);
         setCanUploadNewFile(permission.canUpload);
         setUploadFileError(permission.reason || '');
       } catch (error) {

@@ -17,6 +17,8 @@
   max-height: 90vh;
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -27,6 +29,7 @@
   padding: var(--spaceL);
   border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   color: var(--textTitle);
+  flex-shrink: 0;
 }
 
 .title {
@@ -58,7 +61,8 @@
 .content {
   padding: var(--spaceL);
   overflow-y: auto;
-  max-height: calc(90vh - var(--space3XL));
+  flex: 1;
+  min-height: 0;
 }
 
 .fieldGroup {
