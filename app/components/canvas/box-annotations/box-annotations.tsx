@@ -26,7 +26,7 @@ interface BoxAnnotationsProps {
   annotationData?: {
     additionalNotes?: string;
   };
-  onAnnotationDataChange?: (data: { additionalNotes?: string }) => void;
+  onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
 }
 
 interface DrawingState {
@@ -206,28 +206,31 @@ export const BoxAnnotations = ({
         : annotation
     );
 
-    // Update annotations first
-    onAnnotationsChange(updatedAnnotations);
-
-    // If this is a preset color and has a label, add to additional notes
+    // If this is a preset color and has a label, prepare additional notes update
     const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
-    console.log('Label confirmation - Color:', targetAnnotation.color, 'Preset name:', presetColorName, 'Has callback:', !!onAnnotationDataChange, 'Has data:', !!annotationData, 'Label:', label);
     
-    if (label && presetColorName && onAnnotationDataChange && annotationData) {
+    let updatedAdditionalNotes = annotationData?.additionalNotes;
+    
+    if (label && presetColorName && annotationData) {
       const existingNotes = annotationData.additionalNotes || '';
       const labelEntry = `${presetColorName}: ${label}`;
       
       // Append to existing notes with proper formatting
-      const updatedAdditionalNotes = existingNotes 
+      updatedAdditionalNotes = existingNotes 
         ? `${existingNotes}\n${labelEntry}`
         : labelEntry;
-      
-      console.log('Adding to additional notes:', labelEntry, 'Final notes:', updatedAdditionalNotes);
-      
+    }
+
+    // Make a single combined update with both annotations and additional notes
+    if (onAnnotationDataChange && annotationData) {
       onAnnotationDataChange({
         ...annotationData,
-        additionalNotes: updatedAdditionalNotes
+        additionalNotes: updatedAdditionalNotes,
+        boxAnnotations: updatedAnnotations
       });
+    } else {
+      // Fallback to just updating annotations if no combined callback
+      onAnnotationsChange(updatedAnnotations);
     }
     
     setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
@@ -283,8 +286,6 @@ export const BoxAnnotations = ({
     if (!isAnnotationMode) return null;
     
     return annotations.map((annotation) => {
-      console.log('Rendering annotation:', annotation.id, 'Label:', annotation.label, 'Color:', annotation.color);
-      
       return (
         <div
           key={annotation.id}

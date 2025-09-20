@@ -51,7 +51,7 @@ export const Canvas = ({
   };
 
   // Handle annotation data changes (for additional notes updates)
-  const handleAnnotationDataChange = (data: { additionalNotes?: string }) => {
+  const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
     if (!onAnnotationUpdate || !annotationData) return;
     
     const updatedAnnotationData: AnnotationData = {
