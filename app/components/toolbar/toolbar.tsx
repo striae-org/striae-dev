@@ -31,11 +31,6 @@ export const Toolbar = ({
   const [showColorSelector, setShowColorSelector] = useState(false);
 
   const handleToolClick = (toolId: ToolId) => {
-    // Only disable PDF generation for read-only cases, allow all other tools
-    if (isReadOnly && toolId === 'print') {
-      return;
-    }
-
     if (toolId === 'print') {
       if (onGeneratePDF && canGeneratePDF) {
         onGeneratePDF();
@@ -131,8 +126,8 @@ export const Toolbar = ({
         iconId="print"
         isActive={false}
         onClick={() => handleToolClick('print')}
-        ariaLabel={isGeneratingPDF ? "Generating PDF..." : isReadOnly ? "Cannot generate PDF for imported cases" : "Save/Print to PDF"}
-        disabled={!canGeneratePDF || isGeneratingPDF || isReadOnly}
+        ariaLabel={isGeneratingPDF ? "Generating PDF..." : "Save/Print to PDF"}
+        disabled={!canGeneratePDF || isGeneratingPDF}
         showSpinner={isGeneratingPDF}
       />
         </div>

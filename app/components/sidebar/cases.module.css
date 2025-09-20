@@ -472,6 +472,18 @@
   background-color: rgba(180, 0, 0, 0.9);
 }
 
+.caseActionsToggle:disabled {
+  background-color: var(--backgroundLight);
+  color: var(--textLight);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.caseActionsToggle:disabled:hover {
+  background-color: var(--backgroundLight);
+  transform: none;
+}
+
 .caseActionsToggle:active {
   transform: translateY(0);
 }
