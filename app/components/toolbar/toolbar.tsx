@@ -142,7 +142,7 @@ export const Toolbar = ({
         selectedColor={selectedColor}
         onColorConfirm={handleColorConfirm}
         onCancel={handleColorCancel}
-        isVisible={showColorSelector && isVisible}
+        isVisible={showColorSelector && isVisible && !isReadOnly}
       />
     </div>
   );
