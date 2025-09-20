@@ -306,6 +306,12 @@ export const CaseSidebar = ({
   };
 
   const handleRenameCase = async () => {
+  // Don't allow renaming read-only cases
+  if (isReadOnly) {
+    console.warn('Cannot rename read-only case');
+    return;
+  }
+
   if (!currentCase || !newCaseName) return;
   
   if (!validateCaseNumber(newCaseName)) {
@@ -331,6 +337,12 @@ export const CaseSidebar = ({
 };
 
   const handleDeleteCase = async () => {
+  // Don't allow deleting read-only cases
+  if (isReadOnly) {
+    console.warn('Cannot delete read-only case');
+    return;
+  }
+
   if (!currentCase) return;
   
   const confirmed = window.confirm(
@@ -579,11 +591,13 @@ return (
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
             className={styles.caseActionsToggle}
+            disabled={isReadOnly}
+            title={isReadOnly ? "Cannot modify read-only cases" : undefined}
           >
             {showCaseActions ? 'Hide' : 'Rename/Delete Case'}
           </button>
           
-          {showCaseActions && (
+          {showCaseActions && !isReadOnly && (
             <div className={styles.caseActionsContent}>
               <div className={`${styles.caseRename} mb-4`}>
                 <input
