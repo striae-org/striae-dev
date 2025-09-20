@@ -9,7 +9,8 @@ import {
   CaseExportData, 
   UserData, 
   FileData, 
-  ImageUploadResponse 
+  ImageUploadResponse,
+  CaseData
 } from '~/types';
 import { validateCaseNumber, checkExistingCase, deleteCase } from './case-manage';
 import { saveNotes } from './notes-manage';
@@ -158,11 +159,22 @@ export async function checkReadOnlyCaseExists(
 
     const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
     
+    console.log('Checking read-only case existence:', {
+      uid: user.uid,
+      caseNumber,
+      hasReadOnlyCases: !!userData.readOnlyCases,
+      readOnlyCasesCount: userData.readOnlyCases?.length || 0,
+      allCaseNumbers: userData.readOnlyCases?.map(c => c.caseNumber) || []
+    });
+    
     if (!userData.readOnlyCases) {
+      console.log('No readOnlyCases array found in user data');
       return null;
     }
 
-    return userData.readOnlyCases.find(c => c.caseNumber === caseNumber) || null;
+    const found = userData.readOnlyCases.find(c => c.caseNumber === caseNumber) || null;
+    console.log('Case search result:', found ? 'FOUND' : 'NOT FOUND');
+    return found;
     
   } catch (error) {
     console.error('Error checking read-only case existence:', error);
@@ -251,9 +263,17 @@ async function addReadOnlyCaseToUser(
 
     const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
     
+    console.log('Current user data before adding read-only case:', {
+      uid: user.uid,
+      hasReadOnlyCases: !!userData.readOnlyCases,
+      readOnlyCasesCount: userData.readOnlyCases?.length || 0,
+      caseToAdd: caseMetadata.caseNumber
+    });
+    
     // Initialize readOnlyCases array if it doesn't exist
     if (!userData.readOnlyCases) {
       userData.readOnlyCases = [];
+      console.log('Initialized empty readOnlyCases array');
     }
     
     // Check if case already exists (shouldn't happen if properly checked)
@@ -267,6 +287,12 @@ async function addReadOnlyCaseToUser(
     }
     
     // Update user data
+    console.log('Sending updated user data:', {
+      uid: user.uid,
+      readOnlyCasesCount: userData.readOnlyCases.length,
+      latestCase: userData.readOnlyCases[userData.readOnlyCases.length - 1]?.caseNumber
+    });
+    
     const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'PUT',
       headers: {
@@ -277,8 +303,12 @@ async function addReadOnlyCaseToUser(
     });
 
     if (!updateResponse.ok) {
-      throw new Error(`Failed to update user data: ${updateResponse.status}`);
+      const errorText = await updateResponse.text();
+      console.error('User data update failed:', updateResponse.status, errorText);
+      throw new Error(`Failed to update user data: ${updateResponse.status} - ${errorText}`);
     }
+    
+    console.log('Successfully updated user data with read-only case');
     
   } catch (error) {
     console.error('Error adding read-only case to user:', error);
@@ -578,11 +608,34 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
  */
 export async function deleteReadOnlyCase(user: User, caseNumber: string): Promise<boolean> {
   try {
-    // Use the standard deleteCase function which handles all cleanup properly
-    // This will delete images, annotations, and case data using the stored file IDs
-    await deleteCase(user, caseNumber);
+    const dataApiKey = await getDataApiKey();
     
-    // Remove from user's read-only case list
+    // Get case data first to get file IDs for deletion
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      headers: { 'X-Custom-Auth-Key': dataApiKey }
+    });
+
+    if (caseResponse.ok) {
+      const caseData = await caseResponse.json() as CaseData;
+
+      // Delete all files using data worker
+      if (caseData.files && caseData.files.length > 0) {
+        const { deleteFile } = await import('./image-manage');
+        await Promise.all(
+          caseData.files.map((file: FileData) => 
+            deleteFile(user, caseNumber, file.id)
+          )
+        );
+      }
+
+      // Delete case file using data worker
+      await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+        method: 'DELETE',
+        headers: { 'X-Custom-Auth-Key': dataApiKey }
+      });
+    }
+    
+    // Remove from user's read-only case list (separate from regular cases)
     await removeReadOnlyCase(user, caseNumber);
     
     console.log(`Successfully deleted read-only case: ${caseNumber}`);
