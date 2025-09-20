@@ -3,8 +3,8 @@
 
 1. [🔐 Login & Authentication](#-login--authentication)
 2. [📊 Case Management](#-case-management)  
-3. [� Case Import & Review System](#-case-import--review-system)
-4. [�📤 Case Data Export](#-case-data-export)
+3. [📥 Case Import & Review System](#-case-import--review-system)
+4. [📤 Case Data Export](#-case-data-export)
 5. [🎯 Image Annotation](#-image-annotation)
 6. [📄 PDF Generation](#-pdf-generation)
 7. [👤 Account Deletion](#-account-deletion)
@@ -44,7 +44,7 @@ A: Striae supports the most common and reliable image formats used in forensic d
 
 ***
 
-## � Case Import & Review System
+## 📥 Case Import & Review System
 
 **Q: How do I import a case that was shared with me?**
 
@@ -72,7 +72,7 @@ A: If case import fails, first verify that you're uploading a valid ZIP file exp
 
 ***
 
-## �📤 Case Data Export
+## 📤 Case Data Export
 
 **Q: How do I export my case data from Striae?**
 
@@ -172,7 +172,7 @@ A: There's no specific limit to the number of cases you can export simultaneousl
 
 **Q: Can I import case data?**
 
-A: No. Data import functionality is not permitted to ensure the integrity and security of forensic data stored with Striae. Imported data could introduce inconsistencies or compromise chain-of-custody, so Striae focuses solely on secure case creation, management, and annotation within the platform only.
+A: No. Data import functionality into regular cases is not permitted to ensure the integrity and security of forensic data stored with Striae. Imported data could introduce inconsistencies or compromise chain-of-custody, so Striae focuses solely on secure case creation, management, and annotation within the platform only. The only import functionality available is for read-only case review, as described in the [Case Import & Review System](https://help.striae.org/striae-users-guide/case-management/striae-case-management#case-import-and-review-system) section.
 
 ***
 
