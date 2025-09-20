@@ -101,7 +101,6 @@ export const BoxAnnotations = ({
         y: Math.max(0, Math.min(100, y))
       };
     } catch (error) {
-      console.warn('Error calculating relative coordinates:', error);
       return { x: 0, y: 0 };
     }
   }, []); // Remove imageRef dependency for stability

@@ -121,7 +121,6 @@ export const Striae = ({ user }: StriaePage) => {
   const handleToolSelect = (toolId: string, active: boolean) => {
     // Allow visibility toggles for read-only cases, but don't allow box annotation mode
     if (isReadOnlyCase && toolId === 'box' && active) {
-      console.warn('Cannot enable box annotation mode for read-only case');
       return;
     }
 
@@ -269,7 +268,6 @@ export const Striae = ({ user }: StriaePage) => {
   const handleAnnotationUpdate = async (data: AnnotationData) => {
     // Don't allow updates for read-only cases
     if (isReadOnlyCase) {
-      console.warn('Cannot update annotations for read-only case');
       return;
     }
 

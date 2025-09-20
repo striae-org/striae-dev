@@ -59,7 +59,6 @@ export const Sidebar = ({
 
   const handleImportComplete = (result: ImportResult) => {
     if (result.success) {
-      console.log(`Successfully imported case: ${result.caseNumber}`);
       // Load the imported case automatically
       onCaseChange(result.caseNumber);
       setCurrentCase(result.caseNumber);

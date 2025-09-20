@@ -81,7 +81,6 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
   try {
     const apiKey = await getDataApiKey();
     const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
-    console.log(`Checking case existence at: ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -91,28 +90,22 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
       }
     });
 
-    console.log(`Response status: ${response.status}`);
     if (!response.ok) {
-      console.log(`Case "${caseNumber}" not found (HTTP ${response.status})`);
       return null;
     }
 
     const data = await response.json() as CaseData & { isReadOnly?: boolean };
-    console.log(`Case data retrieved:`, data);
     
     // Check if this is a read-only case - if so, don't consider it as an existing regular case
     if (data.isReadOnly) {
-      console.log(`Case "${caseNumber}" is read-only, not considering as existing regular case`);
       return null;
     }
     
     // Verify the case number matches (extra safety check)
     if (data.caseNumber === caseNumber) {
-      console.log(`Case "${caseNumber}" validated successfully`);
       return data;
     }
     
-    console.log(`Case number mismatch: expected "${caseNumber}", got "${data.caseNumber}"`);
     return null;
 
   } catch (error) {
@@ -274,7 +267,6 @@ export const renameCase = async (
           });
         }
       } catch (error) {
-        console.warn(`Failed to transfer notes for file ${file.id}:`, error);
         // Continue with other files even if one fails
       }
     }
@@ -329,7 +321,6 @@ export const renameCase = async (
           headers: { 'X-Custom-Auth-Key': dataApiKey }
         });
       } catch (error) {
-        console.warn(`Failed to delete old notes for file ${file.id}:`, error);
         // Continue with cleanup even if one fails
       }
     }

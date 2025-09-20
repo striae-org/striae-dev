@@ -282,8 +282,6 @@ export async function exportAllCases(
     includeMetadata = true
   } = options;
 
-  console.log('Starting export of all cases...');
-
   try {
     // Get list of all cases for the user
     const caseNumbers = await listCases(user);
@@ -291,8 +289,6 @@ export async function exportAllCases(
     if (!caseNumbers || caseNumbers.length === 0) {
       throw new Error('No cases found for user');
     }
-
-    console.log(`Found ${caseNumbers.length} cases to export`);
 
     const exportedCases: CaseExportData[] = [];
     let totalFiles = 0;
@@ -312,8 +308,6 @@ export async function exportAllCases(
       }
 
       try {
-        console.log(`Exporting case ${i + 1}/${caseNumbers.length}: ${caseNumber}`);
-        
         const caseExport = await exportCaseData(user, caseNumber, options);
         exportedCases.push(caseExport);
 
@@ -341,7 +335,6 @@ export async function exportAllCases(
         }
 
       } catch (error) {
-        console.warn(`Failed to export case ${caseNumber}:`, error);
         // Create a placeholder entry for failed exports
         exportedCases.push({
           metadata: {
@@ -384,8 +377,6 @@ export async function exportAllCases(
       };
     }
 
-    console.log(`All cases export completed. ${exportedCases.length} cases processed.`);
-    
     // Report completion
     if (onProgress) {
       onProgress(caseNumbers.length, caseNumbers.length, 'Export completed!');
@@ -418,12 +409,10 @@ export async function exportCaseData(
   }
 
   // Check if case exists
-  console.log(`Checking if case "${caseNumber}" exists...`);
   const existingCase = await checkExistingCase(user, caseNumber);
   if (!existingCase) {
     throw new Error(`Case "${caseNumber}" does not exist`);
   }
-  console.log(`Case "${caseNumber}" found, proceeding with export...`);
 
   try {
     // Fetch all files for the case
@@ -467,7 +456,6 @@ export async function exportCaseData(
             }
           }
         } catch (error) {
-          console.warn(`Failed to load annotations for file ${file.id}:`, error);
           // Continue without annotations for this file
         }
       }
@@ -522,7 +510,6 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
     linkElement.setAttribute('download', exportFileName);
     linkElement.click();
     
-    console.log('All cases export download initiated:', exportFileName);
   } catch (error) {
     console.error('Download failed:', error);
     throw new Error('Failed to download all cases export file');
@@ -687,7 +674,6 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     window.URL.revokeObjectURL(url);
     
     const passwordInfo = protectForensicData && exportPassword ? ` (Password: ${exportPassword})` : '';
-    console.log(`Excel export${protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName + passwordInfo);
   } catch (error) {
     console.error('Excel export failed:', error);
     throw new Error('Failed to export Excel file');
@@ -718,7 +704,6 @@ export function downloadCaseAsJSON(
     
     linkElement.click();
     
-    console.log(`Case JSON export${options.protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName);
   } catch (error) {
     console.error('JSON export failed:', error);
     throw new Error('Failed to download JSON export file');
@@ -749,7 +734,6 @@ export function downloadCaseAsCSV(
     
     linkElement.click();
     
-    console.log(`Comprehensive CSV export${options.protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName);
   } catch (error) {
     console.error('CSV export failed:', error);
     throw new Error('Failed to export CSV file');
@@ -918,7 +902,6 @@ For questions about this export, contact your Striae system administrator.
     URL.revokeObjectURL(url);
     onProgress?.(100);
     
-    console.log(`ZIP export${options.protectForensicData ? ' with forensic protection' : ''} download initiated:`, exportFileName);
   } catch (error) {
     console.error('ZIP export failed:', error);
     throw new Error('Failed to export ZIP file');

@@ -231,7 +231,6 @@ export const CaseSidebar = ({
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // Don't allow file upload for read-only cases
     if (isReadOnly) {
-      console.warn('Cannot upload files for read-only case');
       return;
     }
 
@@ -283,7 +282,6 @@ export const CaseSidebar = ({
   const handleFileDelete = async (fileId: string) => {
     // Don't allow file deletion for read-only cases
     if (isReadOnly) {
-      console.warn('Cannot delete files for read-only case');
       return;
     }
 
@@ -308,7 +306,6 @@ export const CaseSidebar = ({
   const handleRenameCase = async () => {
   // Don't allow renaming read-only cases
   if (isReadOnly) {
-    console.warn('Cannot rename read-only case');
     return;
   }
 
@@ -339,7 +336,6 @@ export const CaseSidebar = ({
   const handleDeleteCase = async () => {
   // Don't allow deleting read-only cases
   if (isReadOnly) {
-    console.warn('Cannot delete read-only case');
     return;
   }
 
@@ -379,8 +375,6 @@ const handleImageSelect = (file: FileData) => {
 
   const handleExport = async (exportCaseNumber: string, format: ExportFormat, includeImages?: boolean) => {
     try {
-      console.log(`Starting export for case: "${exportCaseNumber}" in ${format.toUpperCase()} format${includeImages ? ' with images (ZIP)' : ''}`);
-      
       if (includeImages) {
         // ZIP export with images - only available for single case exports
         await downloadCaseAsZip(user, exportCaseNumber, format);
@@ -391,8 +385,6 @@ const handleImageSelect = (file: FileData) => {
           includeMetadata: true
         });
         
-        console.log('Export data generated successfully:', exportData);
-        
         // Download the exported data in the selected format
         if (format === 'json') {
           downloadCaseAsJSON(exportData);
@@ -401,7 +393,6 @@ const handleImageSelect = (file: FileData) => {
         }
       }
       
-      console.log(`Case export completed for: ${exportCaseNumber} in ${format.toUpperCase()} format${includeImages ? ' with images' : ''}`);
     } catch (error) {
       console.error('Export failed:', error);
       throw error; // Re-throw to be handled by the modal
@@ -410,15 +401,11 @@ const handleImageSelect = (file: FileData) => {
 
   const handleExportAll = async (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => {
     try {
-      console.log(`Starting export of all cases in ${format.toUpperCase()} format...`);
-      
       // Export all cases with progress callback
       const exportData = await exportAllCases(user, {
         includeAnnotations: true,
         includeMetadata: true
       }, onProgress);
-      
-      console.log('All cases export data generated successfully:', exportData);
       
       // Download the exported data in the selected format
       if (format === 'json') {
@@ -427,7 +414,6 @@ const handleImageSelect = (file: FileData) => {
         downloadAllCasesAsCSV(exportData);
       }
       
-      console.log(`All cases export completed in ${format.toUpperCase()} format`);
     } catch (error) {
       console.error('Export all failed:', error);
       throw error; // Re-throw to be handled by the modal

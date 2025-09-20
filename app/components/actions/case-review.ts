@@ -160,21 +160,11 @@ export async function checkReadOnlyCaseExists(
 
     const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
     
-    console.log('Checking read-only case existence:', {
-      uid: user.uid,
-      caseNumber,
-      hasReadOnlyCases: !!userData.readOnlyCases,
-      readOnlyCasesCount: userData.readOnlyCases?.length || 0,
-      allCaseNumbers: userData.readOnlyCases?.map(c => c.caseNumber) || []
-    });
-    
     if (!userData.readOnlyCases) {
-      console.log('No readOnlyCases array found in user data');
       return null;
     }
 
     const found = userData.readOnlyCases.find(c => c.caseNumber === caseNumber) || null;
-    console.log('Case search result:', found ? 'FOUND' : 'NOT FOUND');
     return found;
     
   } catch (error) {
@@ -264,17 +254,9 @@ async function addReadOnlyCaseToUser(
 
     const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
     
-    console.log('Current user data before adding read-only case:', {
-      uid: user.uid,
-      hasReadOnlyCases: !!userData.readOnlyCases,
-      readOnlyCasesCount: userData.readOnlyCases?.length || 0,
-      caseToAdd: caseMetadata.caseNumber
-    });
-    
     // Initialize readOnlyCases array if it doesn't exist
     if (!userData.readOnlyCases) {
       userData.readOnlyCases = [];
-      console.log('Initialized empty readOnlyCases array');
     }
     
     // Check if case already exists (shouldn't happen if properly checked)
@@ -288,12 +270,6 @@ async function addReadOnlyCaseToUser(
     }
     
     // Update user data
-    console.log('Sending updated user data:', {
-      uid: user.uid,
-      readOnlyCasesCount: userData.readOnlyCases.length,
-      latestCase: userData.readOnlyCases[userData.readOnlyCases.length - 1]?.caseNumber
-    });
-    
     const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
       method: 'PUT',
       headers: {
@@ -308,8 +284,6 @@ async function addReadOnlyCaseToUser(
       console.error('User data update failed:', updateResponse.status, errorText);
       throw new Error(`Failed to update user data: ${updateResponse.status} - ${errorText}`);
     }
-    
-    console.log('Successfully updated user data with read-only case');
     
   } catch (error) {
     console.error('Error adding read-only case to user:', error);
@@ -638,7 +612,6 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
     // Remove from user's read-only case list (separate from regular cases)
     await removeReadOnlyCase(user, caseNumber);
     
-    console.log(`Successfully deleted read-only case: ${caseNumber}`);
     return true;
     
   } catch (error) {
