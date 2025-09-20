@@ -100,34 +100,36 @@ export const Sidebar = ({
           onAnnotationRefresh={onAnnotationRefresh}
         />
       ) : (
-        <CaseSidebar 
-          user={user} 
-          onImageSelect={onImageSelect}
-          onCaseChange={onCaseChange}
-          currentCase={currentCase}
-          setCurrentCase={setCurrentCase}
-          imageLoaded={imageLoaded}
-          setImageLoaded={setImageLoaded}
-          files={files}
-          setFiles={setFiles}
-          caseNumber={caseNumber}
-          setCaseNumber={setCaseNumber}
-          error={error}
-          setError={setError}
-          successAction={successAction}
-          setSuccessAction={setSuccessAction}
-          onNotesClick={() => setShowNotes(true)}
-          isReadOnly={isReadOnly}
-        />
+        <>
+          <CaseSidebar 
+            user={user} 
+            onImageSelect={onImageSelect}
+            onCaseChange={onCaseChange}
+            currentCase={currentCase}
+            setCurrentCase={setCurrentCase}
+            imageLoaded={imageLoaded}
+            setImageLoaded={setImageLoaded}
+            files={files}
+            setFiles={setFiles}
+            caseNumber={caseNumber}
+            setCaseNumber={setCaseNumber}
+            error={error}
+            setError={setError}
+            successAction={successAction}
+            setSuccessAction={setSuccessAction}
+            onNotesClick={() => setShowNotes(true)}
+            isReadOnly={isReadOnly}
+          />
+          <div className={styles.importSection}>
+            <button 
+              onClick={() => setIsImportModalOpen(true)}
+              className={styles.importButton}
+            >
+              Import Case for Review
+            </button>
+          </div>
+        </>
       )}
-      <div className={styles.importSection}>
-        <button 
-          onClick={() => setIsImportModalOpen(true)}
-          className={styles.importButton}
-        >
-          Import Case for Review
-        </button>
-      </div>
     </div>
   );
 };

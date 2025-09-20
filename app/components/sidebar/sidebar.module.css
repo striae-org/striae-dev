@@ -268,11 +268,10 @@
 
 /* Import Section */
 .importSection {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  right: 1.5rem;
   margin-top: auto;
+  padding: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--divider);
 }
 
 .importButton {
