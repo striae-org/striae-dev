@@ -572,6 +572,7 @@
 .readOnlyBadge {
   font-size: 0.75rem;
   font-weight: 600;
+  text-align: center;
   color: #856404;
   margin-top: 0.25rem;
 }
