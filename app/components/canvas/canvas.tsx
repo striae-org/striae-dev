@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
 import { ConfirmationModal } from './confirmation/confirmation';
 import { AnnotationData, BoxAnnotation } from '~/types/annotations';
+import { AuthContext } from '~/contexts/auth.context';
+import { storeConfirmation } from '~/components/actions/confirm-export';
 import styles from './canvas.module.css';
 
 interface CanvasProps {
@@ -16,6 +18,9 @@ interface CanvasProps {
   isBoxAnnotationMode?: boolean;
   boxAnnotationColor?: string;
   isReadOnly?: boolean;
+  // Confirmation data for storing case-level confirmations
+  caseNumber?: string;
+  currentImageId?: string;
 }
 
 type ImageLoadError = {
@@ -33,9 +38,12 @@ export const Canvas = ({
   annotationData,
   onAnnotationUpdate,
   isBoxAnnotationMode = false,
-  boxAnnotationColor = '#ff0000',
-  isReadOnly = false
+  boxAnnotationColor = '#FF0000',
+  isReadOnly = false,
+  caseNumber,
+  currentImageId
 }: CanvasProps) => {
+  const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
@@ -67,7 +75,7 @@ export const Canvas = ({
   };
 
   // Handle confirmation
-  const handleConfirmation = (confirmationData: {
+  const handleConfirmation = async (confirmationData: {
     fullName: string;
     badgeId: string;
     timestamp: string;
@@ -75,13 +83,36 @@ export const Canvas = ({
   }) => {
     if (!onAnnotationUpdate || !annotationData) return;
     
+    // Store in annotation data (existing functionality)
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
       confirmationData
     };
     
     onAnnotationUpdate(updatedAnnotationData);
-    console.log('Confirmation data saved:', confirmationData);
+    console.log('Confirmation data saved to annotation:', confirmationData);
+
+    // Store at case level for original analyst tracking
+    if (user && caseNumber && currentImageId) {
+      const success = await storeConfirmation(
+        user,
+        caseNumber,
+        currentImageId,
+        confirmationData
+      );
+      
+      if (success) {
+        console.log('Confirmation stored at case level for original image tracking');
+      } else {
+        console.error('Failed to store confirmation at case level');
+      }
+    } else {
+      console.warn('Missing required data for case-level confirmation storage:', {
+        hasUser: !!user,
+        caseNumber,
+        currentImageId
+      });
+    }
   };
 
   useEffect(() => {
