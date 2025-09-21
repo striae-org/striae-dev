@@ -154,7 +154,10 @@ export const CaseImport = ({
         // Load case preview
         setIsLoadingPreview(true);
         try {
-          const preview = await previewCaseImport(file);
+          if (!user) {
+            throw new Error('User authentication required');
+          }
+          const preview = await previewCaseImport(file, user);
           setCasePreview(preview);
         } catch (error) {
           console.error('Error loading case preview:', error);
@@ -239,6 +242,22 @@ export const CaseImport = ({
 
   const handleCancelImport = () => {
     setShowConfirmation(false);
+    // Clear the import preview when user cancels
+    setCasePreview(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleModalCancel = () => {
+    // Clear the import preview when closing modal
+    setCasePreview(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onClose();
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -393,7 +412,7 @@ export const CaseImport = ({
               
               <button
                 className={styles.cancelButton}
-                onClick={onClose}
+                onClick={handleModalCancel}
                 disabled={isImporting || isClearing}
               >
                 Cancel
