@@ -6,7 +6,7 @@
 // Pre-computed CRC32 lookup table (IEEE 802.3 polynomial)
 // Calculated once at module load time for optimal performance
 const CRC32_TABLE = (() => {
-  const table = new Array(256);
+  const table: number[] = new Array(256);
   for (let i = 0; i < 256; i++) {
     let c = i;
     for (let j = 0; j < 8; j++) {
