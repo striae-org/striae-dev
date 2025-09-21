@@ -83,10 +83,11 @@ export interface CaseImportPreview {
 }
 
 /**
- * Calculate CRC32 checksum for ZIP file integrity validation
+ * Calculate CRC32 checksum for content integrity validation
  */
-function calculateCRC32(data: ArrayBuffer): string {
-  const bytes = new Uint8Array(data);
+function calculateCRC32(content: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(content);
   let crc = 0xFFFFFFFF;
   
   // CRC32 polynomial table (IEEE 802.3)
@@ -121,31 +122,6 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     let expectedChecksum: string | undefined = undefined;
     let actualChecksum: string | undefined = undefined;
     
-    const metadataFile = zip.file('FORENSIC_METADATA.json');
-    if (metadataFile) {
-      try {
-        const metadataContent = await metadataFile.async('text');
-        const metadata = JSON.parse(metadataContent);
-        
-        if (metadata.contentChecksum) {
-          expectedChecksum = metadata.contentChecksum;
-          
-          // Calculate actual checksum of ZIP file
-          const zipBuffer = await zipFile.arrayBuffer();
-          actualChecksum = calculateCRC32(zipBuffer);
-          
-          checksumValid = actualChecksum === expectedChecksum;
-          
-          if (!checksumValid) {
-            checksumError = `Checksum validation failed. Expected: ${expectedChecksum}, Got: ${actualChecksum}. The file may have been tampered with or corrupted.`;
-          }
-        }
-      } catch (error) {
-        checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
-        checksumValid = false;
-      }
-    }
-    
     // Find the main data file (JSON or CSV)
     const dataFiles = Object.keys(zip.files).filter(name => 
       name.endsWith('_data.json') || name.endsWith('_data.csv')
@@ -174,6 +150,32 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     
     // Handle forensic protection warnings in JSON
     const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+    
+    // Now validate checksum if forensic metadata exists
+    const metadataFile = zip.file('FORENSIC_METADATA.json');
+    if (metadataFile) {
+      try {
+        const metadataContent = await metadataFile.async('text');
+        const metadata = JSON.parse(metadataContent);
+        
+        if (metadata.contentChecksum) {
+          expectedChecksum = metadata.contentChecksum;
+          
+          // Calculate actual checksum of core content data (same as export calculation)
+          actualChecksum = calculateCRC32(cleanedContent);
+          
+          checksumValid = actualChecksum === expectedChecksum;
+          
+          if (!checksumValid) {
+            checksumError = `Checksum validation failed. Expected: ${expectedChecksum}, Got: ${actualChecksum}. The file may have been tampered with or corrupted.`;
+          }
+        }
+      } catch (error) {
+        checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        checksumValid = false;
+      }
+    }
+    
     const caseData: CaseExportData = JSON.parse(cleanedContent);
     
     // Validate case data structure
@@ -238,6 +240,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
   caseData: CaseExportData;
   imageFiles: { [filename: string]: Blob };
   metadata?: any;
+  cleanedContent?: string; // Add cleaned content for checksum validation
 }> {
   // Dynamic import of JSZip to avoid bundle size issues
   const JSZip = (await import('jszip')).default;
@@ -263,6 +266,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
     
     // Extract and parse case data
     let caseData: CaseExportData;
+    let cleanedContent: string = '';
     if (isJsonFormat) {
       const dataContent = await zip.file(dataFileName)?.async('text');
       if (!dataContent) {
@@ -270,7 +274,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       }
       
       // Handle forensic protection warnings in JSON
-      const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+      cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
       caseData = JSON.parse(cleanedContent);
     } else {
       throw new Error('CSV import not yet supported. Please use JSON format.');
@@ -327,7 +331,8 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
     return {
       caseData,
       imageFiles,
-      metadata
+      metadata,
+      cleanedContent
     };
     
   } catch (error) {
@@ -589,15 +594,14 @@ export async function importCaseForReview(
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
     
     // Step 1: Parse ZIP file
-    const { caseData, imageFiles, metadata } = await parseImportZip(zipFile, user);
+    const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
     
     // Step 1.5: Validate checksum if forensic metadata exists
-    if (metadata?.contentChecksum) {
+    if (metadata?.contentChecksum && cleanedContent) {
       onProgress?.('Validating file integrity', 15, 'Checking forensic checksum...');
       
-      const zipBuffer = await zipFile.arrayBuffer();
-      const actualChecksum = calculateCRC32(zipBuffer);
+      const actualChecksum = calculateCRC32(cleanedContent);
       
       if (actualChecksum !== metadata.contentChecksum) {
         throw new Error(

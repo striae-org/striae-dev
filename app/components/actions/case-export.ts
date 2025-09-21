@@ -93,11 +93,12 @@ function addForensicDataWarning(content: string, format: 'csv' | 'json'): string
 }
 
 /**
- * Calculate CRC32 checksum for ZIP file integrity validation
+ * Calculate CRC32 checksum for content integrity validation
  * This must match the algorithm used in case-review.ts
  */
-function calculateCRC32(data: ArrayBuffer): string {
-  const bytes = new Uint8Array(data);
+function calculateCRC32(content: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(content);
   let crc = 0xFFFFFFFF;
   
   // CRC32 polynomial table (IEEE 802.3)
@@ -923,7 +924,15 @@ export async function downloadCaseAsZip(
     
     // Add forensic metadata file if protection is enabled
     if (options.protectForensicData) {
-      // First, prepare the forensic metadata with placeholder checksum
+      // Get the content that will be used for checksum calculation
+      const contentForChecksum = format === 'json' 
+        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings
+        : generateCSVContent(exportData, false); // Raw content without warnings
+      
+      // Calculate checksum based on the core data content
+      const contentChecksum = calculateCRC32(contentForChecksum);
+      
+      // Prepare the forensic metadata with actual checksum
       const forensicMetadata = {
         exportTimestamp: new Date().toISOString(),
         exportedBy: exportData.metadata.exportedBy || 'Unknown',
@@ -931,7 +940,7 @@ export async function downloadCaseAsZip(
         exportedByName: exportData.metadata.exportedByName || 'Unknown',
         exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
         caseNumber: exportData.metadata.caseNumber,
-        contentChecksum: '00000000', // Placeholder - will be calculated after ZIP creation
+        contentChecksum: contentChecksum, // Checksum of the core data content
         forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
         striaeVersion: exportData.metadata.striaeExportSchemaVersion,
         archiveStructure: {
@@ -942,7 +951,7 @@ export async function downloadCaseAsZip(
         }
       };
       
-      // Add forensic metadata with placeholder checksum
+      // Add forensic metadata with actual checksum
       zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
       
       // Add read-only instruction file
@@ -974,63 +983,21 @@ For questions about this export, contact your Striae system administrator.
       
       zip.file('READ_ONLY_INSTRUCTIONS.txt', instructionContent);
       
-      // Generate the complete ZIP as ArrayBuffer
-      const zipBuffer = await zip.generateAsync({ 
-        type: 'arraybuffer',
-        compression: 'DEFLATE',
-        compressionOptions: { level: 6 }
-      });
-      
-      // Calculate the actual checksum of the complete ZIP
-      const actualChecksum = calculateCRC32(zipBuffer);
-      
-      // Update forensic metadata with correct checksum
-      forensicMetadata.contentChecksum = actualChecksum;
-      
-      // Create a new ZIP with the correct checksum
-      const finalZip = new JSZip();
-      
-      // Re-add all files to the final ZIP
-      if (format === 'json') {
-        const jsonContent = generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
-        finalZip.file(`${caseNumber}_data.json`, jsonContent);
-      } else {
-        const csvContent = generateCSVContent(exportData, options.protectForensicData);
-        finalZip.file(`${caseNumber}_data.csv`, csvContent);
-      }
-      
-      // Re-add images
-      const finalImageFolder = finalZip.folder('images');
-      if (finalImageFolder && exportData.files) {
-        for (const file of exportData.files) {
-          try {
-            const imageBlob = await fetchImageAsBlob(file.fileData);
-            if (imageBlob) {
-              finalImageFolder.file(file.fileData.originalFilename, imageBlob);
-            }
-          } catch (error) {
-            console.warn(`Failed to fetch image ${file.fileData.originalFilename}:`, error);
-          }
-        }
-      }
-      
-      // Add README and instructions to final ZIP
+      // Add README 
       const readme = generateZipReadme(exportData, options.protectForensicData);
-      finalZip.file('README.txt', readme);
-      finalZip.file('READ_ONLY_INSTRUCTIONS.txt', instructionContent);
+      zip.file('README.txt', readme);
+      onProgress?.(85);
       
-      // Add forensic metadata with correct checksum
-      finalZip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
-      
-      // Generate the final ZIP blob
-      const finalZipBlob = await finalZip.generateAsync({ 
+      // Generate ZIP blob
+      const zipBlob = await zip.generateAsync({ 
         type: 'blob',
         compression: 'DEFLATE',
         compressionOptions: { level: 6 }
       });
+      onProgress?.(95);
       
-      // Use the final ZIP for download
-      const url = URL.createObjectURL(finalZipBlob);
+      // Download
+      const url = URL.createObjectURL(zipBlob);
       const protectionSuffix = options.protectForensicData ? '-protected' : '';
       const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;
       
@@ -1042,16 +1009,10 @@ For questions about this export, contact your Striae system administrator.
         linkElement.setAttribute('title', 'Evidence archive with forensic protection enabled');
       }
       
-      document.body.appendChild(linkElement);
       linkElement.click();
-      document.body.removeChild(linkElement);
       
+      URL.revokeObjectURL(url);
       onProgress?.(100);
-      
-      // Clean up
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 100);
       
       return; // Exit early as we've handled the forensic case
     }
