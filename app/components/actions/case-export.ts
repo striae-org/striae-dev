@@ -4,6 +4,7 @@ import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
 import { getUserData } from '~/utils/permissions';
+import { calculateCRC32 } from '~/utils/CRC32';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -89,32 +90,6 @@ function addForensicDataWarning(content: string, format: 'csv' | 'json'): string
  */\n\n`;
   
   return warning + content;
-}
-
-/**
- * Calculate CRC32 checksum for content integrity validation
- * This must match the algorithm used in case-review.ts
- */
-function calculateCRC32(content: string): string {
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(content);
-  let crc = 0xFFFFFFFF;
-  
-  // CRC32 polynomial table (IEEE 802.3)
-  const crcTable = new Array(256);
-  for (let i = 0; i < 256; i++) {
-    let c = i;
-    for (let j = 0; j < 8; j++) {
-      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-    }
-    crcTable[i] = c;
-  }
-  
-  for (let i = 0; i < bytes.length; i++) {
-    crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
-  }
-  
-  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
