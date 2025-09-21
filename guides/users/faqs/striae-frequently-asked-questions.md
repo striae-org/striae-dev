@@ -68,7 +68,7 @@ A: Striae only accepts ZIP files for case import to ensure security and data int
 
 **Q: How does Striae detect if imported case data has been tampered with?**
 
-A: Striae includes advanced data checksum validation to ensure the integrity of imported case data. When a case is exported with forensic protection enabled, the system generates a unique CRC32 checksum based on the core case data content. During import, Striae automatically recalculates this checksum and compares it to the original value stored in the forensic metadata. If the checksums don't match, the import will be blocked with a clear error message indicating that the file may have been tampered with or corrupted. This validation protects the chain of custody by ensuring that any modifications to the case data since export are immediately detected, maintaining the integrity required for forensic evidence handling.
+A: Striae includes advanced data checksum validation to ensure the integrity of imported case data. When a case is exported, the system generates a calculated CRC32 checksum based on the core case data content. During import, Striae automatically recalculates this checksum and compares it to the original recorded value. If the checksums don't match, the import will be blocked with a clear error message indicating that the file may have been tampered with or corrupted. This validation protects the chain of custody by ensuring that any modifications to the case data since export are immediately detected, maintaining the integrity required for forensic evidence handling.
 
 **Q: What should I do if my case import fails?**
 
