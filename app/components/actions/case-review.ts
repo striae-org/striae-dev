@@ -13,7 +13,7 @@ import {
   CaseData
 } from '~/types';
 import { validateCaseNumber, checkExistingCase } from './case-manage';
-import { calculateCRC32 } from '~/utils/CRC32';
+import { calculateCRC32, validateCaseIntegrity as validateForensicIntegrity } from '~/utils/CRC32';
 import { saveNotes } from './notes-manage';
 import { deleteFile } from './image-manage';
 
@@ -81,6 +81,15 @@ export interface CaseImportPreview {
   checksumError?: string;
   expectedChecksum?: string;
   actualChecksum?: string;
+  // Enhanced validation details
+  validationDetails?: {
+    hasForensicManifest: boolean;
+    dataValid?: boolean;
+    imageValidation?: { [filename: string]: boolean };
+    manifestValid?: boolean;
+    validationSummary?: string;
+    integrityErrors?: string[];
+  };
 }
 
 /**
@@ -97,6 +106,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     let checksumError: string | undefined = undefined;
     let expectedChecksum: string | undefined = undefined;
     let actualChecksum: string | undefined = undefined;
+    let validationDetails: CaseImportPreview['validationDetails'];
     
     // Find the main data file (JSON or CSV)
     const dataFiles = Object.keys(zip.files).filter(name => 
@@ -134,22 +144,79 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
         const metadataContent = await metadataFile.async('text');
         const metadata = JSON.parse(metadataContent);
         
-        if (metadata.contentChecksum) {
-          expectedChecksum = metadata.contentChecksum;
+        if (metadata.forensicManifest) {
+          // Enhanced validation with forensic manifest (includes individual file checksums)
+          expectedChecksum = metadata.forensicManifest.manifestChecksum;
           
-          // Calculate actual checksum of core content data (same as export calculation)
-          actualChecksum = calculateCRC32(cleanedContent);
+          // Extract image files for comprehensive validation
+          const imageFiles: { [filename: string]: Blob } = {};
+          const imagesFolder = zip.folder('images');
+          if (imagesFolder) {
+            await Promise.all(Object.keys(imagesFolder.files).map(async (path) => {
+              if (path.startsWith('images/') && !path.endsWith('/')) {
+                const filename = path.replace('images/', '');
+                const file = zip.file(path);
+                if (file) {
+                  const blob = await file.async('blob');
+                  imageFiles[filename] = blob;
+                }
+              }
+            }));
+          }
           
-          checksumValid = actualChecksum === expectedChecksum;
+          // Perform comprehensive validation
+          const validation = await validateForensicIntegrity(
+            cleanedContent, 
+            imageFiles, 
+            metadata.forensicManifest
+          );
+          
+          checksumValid = validation.isValid;
+          actualChecksum = validation.manifestValid ? metadata.forensicManifest.manifestChecksum : 'validation_failed';
           
           if (!checksumValid) {
-            checksumError = `Checksum validation failed. Expected: ${expectedChecksum}, Got: ${actualChecksum}. The file may have been tampered with or corrupted.`;
+            checksumError = `Comprehensive validation failed: ${validation.summary}. Errors: ${validation.errors.join(', ')}`;
           }
+          
+          // Capture detailed validation information
+          validationDetails = {
+            hasForensicManifest: true,
+            dataValid: validation.dataValid,
+            imageValidation: validation.imageValidation,
+            manifestValid: validation.manifestValid,
+            validationSummary: validation.summary,
+            integrityErrors: validation.errors
+          };
+          
+        } else {
+          // No forensic manifest found - cannot validate
+          checksumValid = false;
+          checksumError = 'No forensic manifest found. This case export does not support comprehensive integrity validation.';
+          
+          validationDetails = {
+            hasForensicManifest: false,
+            dataValid: false,
+            validationSummary: 'No forensic manifest found - comprehensive validation not available',
+            integrityErrors: ['Export does not contain forensic manifest required for validation']
+          };
         }
       } catch (error) {
         checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
         checksumValid = false;
+        
+        validationDetails = {
+          hasForensicManifest: false,
+          validationSummary: 'Validation failed due to metadata parsing error',
+          integrityErrors: [checksumError]
+        };
       }
+    } else {
+      // No forensic metadata found
+      validationDetails = {
+        hasForensicManifest: false,
+        validationSummary: 'No forensic metadata found - integrity cannot be verified',
+        integrityErrors: []
+      };
     }
     
     const caseData: CaseExportData = JSON.parse(cleanedContent);
@@ -200,7 +267,8 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
       checksumValid,
       checksumError,
       expectedChecksum,
-      actualChecksum
+      actualChecksum,
+      validationDetails
     };
     
   } catch (error) {
@@ -574,21 +642,37 @@ export async function importCaseForReview(
     result.caseNumber = caseData.metadata.caseNumber;
     
     // Step 1.5: Validate checksum if forensic metadata exists
-    if (metadata?.contentChecksum && cleanedContent) {
-      onProgress?.('Validating file integrity', 15, 'Checking data checksum...');
+    if (metadata?.forensicManifest && cleanedContent) {
+      onProgress?.('Validating comprehensive integrity', 15, 'Checking all file checksums...');
       
-      const actualChecksum = calculateCRC32(cleanedContent);
+      // Extract image files for comprehensive validation
+      const imageBlobs: { [filename: string]: Blob } = {};
+      for (const [filename, blob] of Object.entries(imageFiles)) {
+        imageBlobs[filename] = blob;
+      }
       
-      if (actualChecksum !== metadata.contentChecksum) {
+      // Perform comprehensive validation
+      const validation = await validateForensicIntegrity(
+        cleanedContent, 
+        imageBlobs, 
+        metadata.forensicManifest
+      );
+      
+      if (!validation.isValid) {
         throw new Error(
-          `Data checksum validation failed. Expected: ${metadata.contentChecksum}, Got: ${actualChecksum}. ` +
-          `The file may have been tampered with or corrupted. Import cannot proceed.`
+          `Comprehensive integrity validation failed: ${validation.summary}. ` +
+          `Errors: ${validation.errors.join(', ')}. Import cannot proceed.`
         );
       }
       
-      onProgress?.('File integrity verified', 18, 'Checksum validation passed');
+      onProgress?.('Complete integrity verified', 18, validation.summary);
+      
     } else {
-      result.warnings?.push('No forensic metadata found - checksum validation skipped');
+      // No forensic manifest found - cannot import
+      throw new Error(
+        'No forensic manifest found in case export. This case export does not support comprehensive ' +
+        'integrity validation and cannot be imported. Please re-export the case with forensic protection enabled.'
+      );
     }
     
     onProgress?.('Validating case data', 20, `Case: ${result.caseNumber}`);
@@ -668,7 +752,7 @@ export async function importCaseForReview(
       importedAt: new Date().toISOString(),
       originalExportDate: caseData.metadata.exportDate,
       originalExportedBy: caseData.metadata.exportedBy || 'Unknown',
-      sourceChecksum: metadata?.contentChecksum,
+      sourceChecksum: metadata?.forensicManifest?.manifestChecksum,
       isReadOnly: true
     };
     
