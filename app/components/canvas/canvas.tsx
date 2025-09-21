@@ -339,6 +339,7 @@ export const Canvas = ({
         isOpen={isConfirmationModalOpen}
         onClose={() => setIsConfirmationModalOpen(false)}
         onConfirm={handleConfirmation}
+        company={company}
       />
     </div>    
   );

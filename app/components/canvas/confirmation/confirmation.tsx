@@ -11,6 +11,7 @@ interface ConfirmationModalProps {
     timestamp: string;
     confirmationId: string;
   }) => void;
+  company?: string;
 }
 
 // Generate a 10-character alphanumeric ID
@@ -37,13 +38,15 @@ const formatTimestamp = (): string => {
   });
 };
 
-export const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationModalProps) => {
+export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: ConfirmationModalProps) => {
   const { user } = useContext(AuthContext);
   const [badgeId, setBadgeId] = useState('');
   const [error, setError] = useState('');
   const [isConfirming, setIsConfirming] = useState(false);
   
   const fullName = user?.displayName || user?.email || 'Unknown User';
+  const userEmail = user?.email || 'No email available';
+  const labCompany = company || 'Not specified';
   const timestamp = formatTimestamp();
   const confirmationId = generateConfirmationId();
 
@@ -144,6 +147,16 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm }: ConfirmationMo
                 disabled={isConfirming}
                 autoFocus
               />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Email:</label>
+              <div className={styles.readOnlyValue}>{userEmail}</div>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Lab/Company:</label>
+              <div className={styles.readOnlyValue}>{labCompany}</div>
             </div>
 
             <div className={styles.field}>
