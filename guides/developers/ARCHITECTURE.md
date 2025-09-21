@@ -13,6 +13,7 @@
      - [4. Sidebar Management](#4-sidebar-management)
      - [5. PDF Generation](#5-pdf-generation)
      - [6. Case Export System](#6-case-export-system)
+     - [7. Case Import System](#7-case-import-system)
 4. [Backend Architecture (Cloudflare Workers)](#backend-architecture-cloudflare-workers)
    - [Worker Services Overview](#worker-services-overview)
    - [1. User Worker (`workers/user-worker/`)](#1-user-worker-workersuser-worker)
@@ -192,6 +193,45 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 5. Browser download initiated with proper file handling
 6. Progress callbacks update UI throughout operation
 
+#### 7. Case Import System
+
+- **Location**: `app/components/sidebar/case-import/` and `app/components/actions/case-review.ts`
+- **Purpose**: ZIP package import for read-only case review and collaboration
+- **Features**:
+  - **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
+  - **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
+  - **Duplicate Prevention**: Prevents import if user was the original case analyst
+  - **Progress Tracking**: Multi-stage progress reporting with detailed status updates
+  - **Image Integration**: Automatic upload and association of all case images
+  - **Metadata Preservation**: Complete preservation of original export metadata and timestamps
+  - **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
+
+**Architecture Components**:
+
+- **ZIP Parser**: JSZip-based archive extraction and validation system
+- **Import Engine**: Core import functionality with multi-stage processing
+- **Image Uploader**: Automatic image blob processing and upload to image worker
+- **Metadata Manager**: Original case metadata preservation and read-only case creation
+- **Progress System**: Real-time callback system for import operation updates
+- **Security Validator**: Prevents import conflicts and enforces read-only protections
+
+**Data Flow**:
+
+1. User selects ZIP file containing exported case data
+2. ZIP parser validates archive structure and extracts contents
+3. Security validator checks for conflicts (original analyst prevention)
+4. Image uploader processes and uploads all case images to image worker
+5. Import engine stores case data in R2 with read-only metadata
+6. User profile updated with read-only case reference
+7. Progress callbacks update UI throughout multi-stage operation
+
+**Read-Only Case Management**:
+
+- **Separate Storage**: Read-only cases stored with special metadata flags
+- **User Profile Integration**: ReadOnlyCases array in UserData interface
+- **Access Controls**: UI automatically enforces read-only restrictions
+- **Original Metadata**: Preserves original export date, analyst, and checksum data
+
 ## Backend Architecture (Cloudflare Workers)
 
 ### Worker Services Overview
@@ -368,6 +408,14 @@ interface UserData {
     caseNumber: string;
     createdAt: string;
   }>;
+  readOnlyCases?: Array<{
+    caseNumber: string;
+    importedAt: string;
+    originalExportDate: string;
+    originalExportedBy: string;
+    sourceChecksum?: string;
+    isReadOnly: true;
+  }>;
   createdAt: string;
   updatedAt?: string;
 }
@@ -376,6 +424,16 @@ interface UserData {
 interface CaseReference {
   caseNumber: string;
   createdAt: string;
+}
+
+// Read-Only Case Reference (nested in UserData)
+interface ReadOnlyCaseReference {
+  caseNumber: string;
+  importedAt: string;
+  originalExportDate: string;
+  originalExportedBy: string;
+  sourceChecksum?: string;
+  isReadOnly: true;
 }
 ```
 
@@ -432,6 +490,7 @@ interface BoxAnnotation {
   width: number;
   height: number;
   color: string;
+  label?: string;
   timestamp: string;
 }
 ```

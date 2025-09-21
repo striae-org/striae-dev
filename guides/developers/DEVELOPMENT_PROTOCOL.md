@@ -326,6 +326,8 @@ Related to #456
      width: number;  // Percentage 0-100
      height: number; // Percentage 0-100
      color: string;  // Hex color code
+     label?: string; // Optional label text
+     timestamp: string; // Creation timestamp
    }
    
    export interface AnnotationData {

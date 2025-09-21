@@ -61,11 +61,13 @@ striae/
 - **Canvas-based annotation system** for comparison image annotation with box annotations
 - **Case management** with file organization
 - **Comprehensive data export** with JSON, CSV, Excel, and ZIP formats including image packaging
+- **Case review import system** for collaborative case review with ZIP package import and read-only protection
 - **PDF report generation** with annotations
 - **Multi-factor authentication** for security
 - **Real-time image annotation** with various marking features including box tool
 - **Cloud-native architecture** for global accessibility and scalability
 - **ZIP export functionality** for complete case packaging with images and data files
+- **Read-only case protection** for secure peer review and collaboration workflows
 
 ## Development Philosophy
 
@@ -98,7 +100,7 @@ For new developers joining the project:
 
 ## Project Status
 
-Striae is currently in **Beta** (v0.9.18-beta) with active development featuring enhanced export capabilities including ZIP file packaging with images. The release candidate is expected to deploy on October 1, 2025. The project is actively maintained and welcomes contributions from the forensic technology community.
+Striae is currently in **Beta** (v0.9.20) with active development featuring enhanced export security and comprehensive case review import system. The case import functionality enables secure collaboration through ZIP package import with automatic read-only protection. The release candidate is expected to deploy on October 1, 2025. The project is actively maintained and welcomes contributions from the forensic technology community.
 
 ---
 
