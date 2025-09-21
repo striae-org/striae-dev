@@ -13,7 +13,7 @@
   background: var(--backgroundLight);
   border-radius: var(--spaceXS);
   width: 90%;
-  max-width: 480px;
+  max-width: 400px;
   max-height: 90vh;
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
@@ -21,17 +21,17 @@
 
 .header {
   display: flex;
-  font-size: var(--fontSizeBodyL);
+  font-size: var(--fontSizeBodyM);
   justify-content: space-between;
   align-items: center;
-  padding: var(--spaceL);
+  padding: var(--spaceM);
   border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   color: var(--textTitle);
 }
 
 .title {
   margin: 0;
-  font-size: var(--fontSizeBodyL);
+  font-size: var(--fontSizeBodyM);
   font-weight: 600;
   color: var(--textTitle);
 }
@@ -39,9 +39,9 @@
 .closeButton {
   background: none;
   border: none;
-  font-size: var(--fontSizeH5);
+  font-size: var(--fontSizeBodyL);
   cursor: pointer;
-  padding: var(--spaceS);
+  padding: var(--spaceXS);
   color: var(--textLight);
   transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
@@ -51,7 +51,7 @@
 }
 
 .content {
-  padding: var(--spaceL);
+  padding: var(--spaceM);
   overflow-y: auto;
   max-height: calc(90vh - var(--space3XL));
 }
@@ -59,17 +59,17 @@
 .fieldGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--spaceM);
+  gap: var(--spaceS);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--spaceS);
+  gap: var(--spaceXS);
 }
 
 .label {
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   font-weight: var(--fontWeightMedium);
   color: var(--textTitle);
   margin: 0;
@@ -77,10 +77,10 @@
 
 .input {
   width: 100%;
-  padding: var(--spaceM);
+  padding: var(--spaceS);
   border: 1px solid color-mix(in lab, var(--text) 20%, transparent);
   border-radius: var(--spaceXS);
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   color: var(--text);
   background: var(--background);
   transition: border-color var(--durationS) var(--bezierFastoutSlowin);
@@ -100,20 +100,20 @@
 }
 
 .readOnlyValue {
-  padding: var(--spaceM);
+  padding: var(--spaceS);
   background: color-mix(in lab, var(--background) 50%, var(--backgroundLight));
   border: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   border-radius: var(--spaceXS);
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   color: var(--text);
   font-family: 'Inter', monospace;
 }
 
 .error {
   color: var(--error);
-  font-size: var(--fontSizeBodyS);
-  margin-top: var(--spaceM);
-  padding: var(--spaceM);
+  font-size: var(--fontSizeBodyXS);
+  margin-top: var(--spaceS);
+  padding: var(--spaceS);
   background: color-mix(in lab, var(--error) 5%, transparent);
   border: 1px solid color-mix(in lab, var(--error) 20%, transparent);
   border-radius: var(--spaceXS);
@@ -122,23 +122,23 @@
 .footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spaceM);
-  padding: var(--spaceL);
+  gap: var(--spaceS);
+  padding: var(--spaceM);
   border-top: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   background: color-mix(in lab, var(--backgroundLight) 95%, var(--background));
 }
 
 .cancelButton {
-  padding: var(--spaceM) var(--spaceL);
+  padding: var(--spaceS) var(--spaceM);
   border: 1px solid color-mix(in lab, var(--text) 20%, transparent);
   border-radius: var(--spaceXS);
   background: var(--background);
   color: var(--text);
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   font-weight: var(--fontWeightMedium);
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  min-width: 80px;
+  min-width: 70px;
 }
 
 .cancelButton:hover:not(:disabled) {
@@ -152,16 +152,16 @@
 }
 
 .confirmButton {
-  padding: var(--spaceM) var(--spaceL);
+  padding: var(--spaceS) var(--spaceM);
   border: none;
   border-radius: var(--spaceXS);
   background: var(--success);
   color: white;
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   font-weight: var(--fontWeightMedium);
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  min-width: 80px;
+  min-width: 70px;
   box-shadow: 0 1px 3px color-mix(in lab, var(--success) 30%, transparent);
 }
 

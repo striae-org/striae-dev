@@ -115,7 +115,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Affirm Confirmation</h2>
+          <h2 className={styles.title}>Confirm Identification</h2>
           <button 
             className={styles.closeButton}
             onClick={onClose}
