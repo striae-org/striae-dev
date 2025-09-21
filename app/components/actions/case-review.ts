@@ -599,13 +599,13 @@ export async function importCaseForReview(
     
     // Step 1.5: Validate checksum if forensic metadata exists
     if (metadata?.contentChecksum && cleanedContent) {
-      onProgress?.('Validating file integrity', 15, 'Checking forensic checksum...');
+      onProgress?.('Validating file integrity', 15, 'Checking data checksum...');
       
       const actualChecksum = calculateCRC32(cleanedContent);
       
       if (actualChecksum !== metadata.contentChecksum) {
         throw new Error(
-          `Forensic checksum validation failed. Expected: ${metadata.contentChecksum}, Got: ${actualChecksum}. ` +
+          `Data checksum validation failed. Expected: ${metadata.contentChecksum}, Got: ${actualChecksum}. ` +
           `The file may have been tampered with or corrupted. Import cannot proceed.`
         );
       }

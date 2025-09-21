@@ -576,7 +576,7 @@ export const CaseImport = ({
             {/* Checksum validation warning */}
             {casePreview?.checksumValid === false && (
               <div className={styles.checksumWarning}>
-                <strong>⚠️ Import Blocked:</strong> Forensic checksum validation failed. 
+                <strong>⚠️ Import Blocked:</strong> Data checksum validation failed. 
                 This file may have been tampered with or corrupted and cannot be imported.
               </div>
             )}
