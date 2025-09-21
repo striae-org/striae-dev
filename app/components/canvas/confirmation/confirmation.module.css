@@ -175,3 +175,13 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+.existingConfirmationBanner {
+  background: color-mix(in lab, var(--success) 90%, white);
+  color: color-mix(in lab, var(--success) 20%, var(--black));
+  padding: var(--spaceS) var(--spaceM);
+  text-align: center;
+  font-size: var(--fontSizeBodyXS);
+  font-weight: var(--fontWeightMedium);
+  border-bottom: 1px solid color-mix(in lab, var(--success) 20%, transparent);
+}

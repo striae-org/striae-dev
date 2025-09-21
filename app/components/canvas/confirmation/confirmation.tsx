@@ -12,6 +12,12 @@ interface ConfirmationModalProps {
     confirmationId: string;
   }) => void;
   company?: string;
+  existingConfirmation?: {
+    fullName: string;
+    badgeId: string;
+    timestamp: string;
+    confirmationId: string;
+  } | null;
 }
 
 // Generate a 10-character alphanumeric ID
@@ -38,7 +44,7 @@ const formatTimestamp = (): string => {
   });
 };
 
-export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: ConfirmationModalProps) => {
+export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company, existingConfirmation }: ConfirmationModalProps) => {
   const { user } = useContext(AuthContext);
   const [badgeId, setBadgeId] = useState('');
   const [error, setError] = useState('');
@@ -49,6 +55,9 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
   const labCompany = company || 'Not specified';
   const timestamp = formatTimestamp();
   const confirmationId = generateConfirmationId();
+
+  // Check if this is an existing confirmation
+  const hasExistingConfirmation = !!existingConfirmation;
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -70,11 +79,15 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setBadgeId('');
+      if (existingConfirmation) {
+        setBadgeId(existingConfirmation.badgeId);
+      } else {
+        setBadgeId('');
+      }
       setError('');
       setIsConfirming(false);
     }
-  }, [isOpen]);
+  }, [isOpen, existingConfirmation]);
 
   if (!isOpen) return null;
 
@@ -115,7 +128,9 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Confirm Identification</h2>
+          <h2 className={styles.title}>
+            {hasExistingConfirmation ? 'Confirmation Details' : 'Confirm Identification'}
+          </h2>
           <button 
             className={styles.closeButton}
             onClick={onClose}
@@ -125,11 +140,19 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
           </button>
         </div>
         
+        {hasExistingConfirmation && (
+          <div className={styles.existingConfirmationBanner}>
+            ✓ This image has already been confirmed
+          </div>
+        )}
+        
         <div className={styles.content}>
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
               <label className={styles.label}>Name:</label>
-              <div className={styles.readOnlyValue}>{fullName}</div>
+              <div className={styles.readOnlyValue}>
+                {hasExistingConfirmation ? existingConfirmation.fullName : fullName}
+              </div>
             </div>
 
             <div className={styles.field}>
@@ -144,8 +167,8 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
                   if (error) setError('');
                 }}
                 placeholder="Enter your badge or ID number"
-                disabled={isConfirming}
-                autoFocus
+                disabled={isConfirming || hasExistingConfirmation}
+                autoFocus={!hasExistingConfirmation}
               />
             </div>
 
@@ -161,12 +184,16 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
 
             <div className={styles.field}>
               <label className={styles.label}>Timestamp:</label>
-              <div className={styles.readOnlyValue}>{timestamp}</div>
+              <div className={styles.readOnlyValue}>
+                {hasExistingConfirmation ? existingConfirmation.timestamp : timestamp}
+              </div>
             </div>
 
             <div className={styles.field}>
               <label className={styles.label}>Confirmation ID:</label>
-              <div className={styles.readOnlyValue}>{confirmationId}</div>
+              <div className={styles.readOnlyValue}>
+                {hasExistingConfirmation ? existingConfirmation.confirmationId : confirmationId}
+              </div>
             </div>
           </div>
 
@@ -179,15 +206,17 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company }: Confi
             onClick={onClose}
             disabled={isConfirming}
           >
-            Cancel
+            {hasExistingConfirmation ? 'Close' : 'Cancel'}
           </button>
-          <button
-            className={styles.confirmButton}
-            onClick={handleConfirm}
-            disabled={isConfirming || !badgeId.trim()}
-          >
-            {isConfirming ? 'Confirming...' : 'Confirm'}
-          </button>
+          {!hasExistingConfirmation && (
+            <button
+              className={styles.confirmButton}
+              onClick={handleConfirm}
+              disabled={isConfirming || !badgeId.trim()}
+            >
+              {isConfirming ? 'Confirming...' : 'Confirm'}
+            </button>
+          )}
         </div>
       </div>
     </div>

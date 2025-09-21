@@ -371,6 +371,7 @@ export const Canvas = ({
         onClose={() => setIsConfirmationModalOpen(false)}
         onConfirm={handleConfirmation}
         company={company}
+        existingConfirmation={annotationData?.confirmationData || null}
       />
     </div>    
   );
