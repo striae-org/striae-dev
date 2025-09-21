@@ -279,9 +279,9 @@
 }
 
 .cancelButton {
-  background: var(--backgroundLight);
-  color: var(--textBody);
-  border: 1px solid color-mix(in lab, var(--text) 15%, transparent);
+  background: color-mix(in lab, var(--error) 70%, white);
+  color: white;
+  border: 1px solid color-mix(in lab, var(--error) 50%, transparent);
   border-radius: var(--spaceXS);
   padding: var(--spaceM) var(--spaceL);
   font-size: var(--fontSizeBodyS);
@@ -289,11 +289,13 @@
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   flex: 1;
+  box-shadow: 0 1px 3px color-mix(in lab, var(--error) 30%, transparent);
 }
 
-.cancelButton:hover:not(:disabled) {
-  background: color-mix(in lab, var(--text) 5%, transparent);
-  border-color: color-mix(in lab, var(--text) 25%, transparent);
+.cancelButton:hover:not(:disabled) {  
+  background: color-mix(in lab, var(--error) 80%, white);
+  border-color: color-mix(in lab, var(--error) 60%, transparent);
+  box-shadow: 0 2px 6px color-mix(in lab, var(--error) 40%, transparent);
 }
 
 .cancelButton:disabled {
