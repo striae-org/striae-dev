@@ -517,6 +517,8 @@ return (
         onClose={() => setIsFilesModalOpen(false)}
         onFileSelect={handleImageSelect}
         currentCase={currentCase}
+        files={files}
+        setFiles={setFiles}
       />
       
         <div className={styles.filesSection}>

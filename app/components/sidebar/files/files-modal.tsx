@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { User } from 'firebase/auth';
+import React, { useState, useContext } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
-import { fetchFiles, deleteFile } from '~/components/actions/image-manage';
+import { deleteFile } from '~/components/actions/image-manage';
 import { FileData } from '~/types';
 import styles from './files-modal.module.css';
 
@@ -10,14 +9,14 @@ interface FilesModalProps {
   onClose: () => void;
   onFileSelect?: (file: FileData) => void;
   currentCase: string | null;
+  files: FileData[];
+  setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
 }
 
 const FILES_PER_PAGE = 10;
 
-export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase }: FilesModalProps) => {
+export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles }: FilesModalProps) => {
   const { user } = useContext(AuthContext);
-  const [files, setFiles] = useState<FileData[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
@@ -26,29 +25,6 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase }: Files
   const startIndex = currentPage * FILES_PER_PAGE;
   const endIndex = startIndex + FILES_PER_PAGE;
   const currentFiles = files.slice(startIndex, endIndex);
-
-  useEffect(() => {
-    if (isOpen && user && currentCase) {
-      loadFiles();
-    }
-  }, [isOpen, user, currentCase]);
-
-  const loadFiles = async () => {
-    if (!user || !currentCase) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const loadedFiles = await fetchFiles(user, currentCase);
-      setFiles(loadedFiles);
-    } catch (err) {
-      console.error('Error loading files:', err);
-      setError('Failed to load files');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleFileSelect = (file: FileData) => {
     onFileSelect?.(file);
@@ -128,9 +104,7 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase }: Files
         </div>
         
         <div className={styles.modalContent}>
-          {loading ? (
-            <div className={styles.loadingState}>Loading files…</div>
-          ) : error ? (
+          {error ? (
             <div className={styles.errorState}>{error}</div>
           ) : files.length === 0 ? (
             <div className={styles.emptyState}>No files in this case</div>

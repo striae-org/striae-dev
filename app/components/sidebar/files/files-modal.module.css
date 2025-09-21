@@ -119,7 +119,6 @@
   cursor: not-allowed;
 }
 
-.loadingState,
 .errorState,
 .emptyState {
   text-align: center;
