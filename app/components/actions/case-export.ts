@@ -911,35 +911,6 @@ export async function downloadCaseAsZip(
       // Generate comprehensive forensic manifest with individual file checksums
       const forensicManifest = await generateForensicManifest(contentForChecksum, imageFiles);
       
-      // Prepare the enhanced forensic metadata
-      const forensicMetadata = {
-        exportTimestamp: new Date().toISOString(),
-        exportedBy: exportData.metadata.exportedBy || 'Unknown',
-        exportedByUid: exportData.metadata.exportedByUid || 'Unknown',
-        exportedByName: exportData.metadata.exportedByName || 'Unknown',
-        exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
-        caseNumber: exportData.metadata.caseNumber,
-        forensicManifest: forensicManifest, // Complete manifest with all file checksums
-        forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
-        striaeVersion: exportData.metadata.striaeExportSchemaVersion,
-        archiveStructure: {
-          dataFile: `${caseNumber}_data.${format}`,
-          imagesFolder: 'images/',
-          totalFiles: exportData.metadata.totalFiles,
-          totalAnnotations: exportData.summary?.totalBoxAnnotations || 0,
-          integrityValidation: {
-            method: 'CRC32_IEEE_802_3',
-            dataFileChecksum: forensicManifest.dataChecksum,
-            imageFileCount: Object.keys(forensicManifest.imageChecksums).length,
-            manifestChecksum: forensicManifest.manifestChecksum,
-            validationTimestamp: forensicManifest.createdAt
-          }
-        }
-      };
-      
-      // Add forensic metadata with actual checksum
-      zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
-      
       // Add dedicated forensic manifest file for validation
       zip.file('FORENSIC_MANIFEST.json', JSON.stringify(forensicManifest, null, 2));
       
@@ -957,7 +928,6 @@ IMPORTANT WARNINGS:
 Archive Contents:
 - ${caseNumber}_data.${format}: Complete case data in ${format.toUpperCase()} format
 - images/: Original image files with annotations
-- FORENSIC_METADATA.json: Archive verification data
 - FORENSIC_MANIFEST.json: File integrity validation manifest
 - README.txt: General information about this export
 
@@ -1096,7 +1066,6 @@ Contents:
 - README.txt: This file`;
 
   const forensicAddition = `
-- FORENSIC_METADATA.json: Archive verification data  
 - FORENSIC_MANIFEST.json: File integrity validation manifest
 - READ_ONLY_INSTRUCTIONS.txt: Important evidence handling guidelines
 

@@ -137,24 +137,16 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     // Handle forensic protection warnings in JSON
     const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
     
-    // Now validate checksum if forensic metadata exists
-    const metadataFile = zip.file('FORENSIC_METADATA.json');
+    // Validate forensic manifest integrity
     const manifestFile = zip.file('FORENSIC_MANIFEST.json');
     
-    if (metadataFile || manifestFile) {
+    if (manifestFile) {
       try {
         let forensicManifest: any = null;
         
-        // Try to get forensic manifest from dedicated file first (preferred)
-        if (manifestFile) {
-          const manifestContent = await manifestFile.async('text');
-          forensicManifest = JSON.parse(manifestContent);
-        } else if (metadataFile) {
-          // Fallback to embedded manifest in metadata (legacy)
-          const metadataContent = await metadataFile.async('text');
-          const metadata = JSON.parse(metadataContent);
-          forensicManifest = metadata.forensicManifest;
-        }
+        // Get forensic manifest from dedicated file
+        const manifestContent = await manifestFile.async('text');
+        forensicManifest = JSON.parse(manifestContent);
         
         if (forensicManifest) {
           // Enhanced validation with forensic manifest (includes individual file checksums)
@@ -223,10 +215,10 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
         };
       }
     } else {
-      // No forensic metadata found
+      // No forensic manifest found
       validationDetails = {
         hasForensicManifest: false,
-        validationSummary: 'No forensic metadata found - integrity cannot be verified',
+        validationSummary: 'No forensic manifest found - integrity cannot be verified',
         integrityErrors: []
       };
     }
@@ -376,20 +368,13 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       }
     }
     
-    // Extract forensic metadata and manifest if present
+    // Extract forensic manifest if present
     let metadata: any = undefined;
-    const metadataFile = zip.file('FORENSIC_METADATA.json');
     const manifestFile = zip.file('FORENSIC_MANIFEST.json');
     
-    if (metadataFile) {
-      const metadataContent = await metadataFile.async('text');
-      metadata = JSON.parse(metadataContent);
-    }
-    
-    // If there's a dedicated manifest file, include it in metadata
-    if (manifestFile && metadata) {
+    if (manifestFile) {
       const manifestContent = await manifestFile.async('text');
-      metadata.forensicManifest = JSON.parse(manifestContent);
+      metadata = { forensicManifest: JSON.parse(manifestContent) };
     }
     
     return {
@@ -568,10 +553,15 @@ async function storeCaseDataInR2(
   user: User,
   caseNumber: string,
   caseData: CaseExportData,
-  importedFiles: FileData[]
+  importedFiles: FileData[],
+  originalImageIdMapping?: Map<string, string>
 ): Promise<void> {
   try {
     const apiKey = await getDataApiKey();
+    
+    // Convert the mapping to a plain object for JSON serialization
+    const originalImageIds = originalImageIdMapping ? 
+      Object.fromEntries(originalImageIdMapping) : undefined;
     
     // Create the case data structure that matches normal cases
     const r2CaseData = {
@@ -582,7 +572,9 @@ async function storeCaseDataInR2(
       isReadOnly: true,
       importedAt: new Date().toISOString(),
       originalMetadata: caseData.metadata,
-      originalSummary: caseData.summary
+      originalSummary: caseData.summary,
+      // Add original image ID mapping for confirmation linking
+      originalImageIds: originalImageIds
     };
     
     // Store in R2
@@ -724,6 +716,7 @@ export async function importCaseForReview(
     
     // Step 3: Upload all image files and create file mapping
     const fileMapping = new Map<string, string>(); // originalFilename -> newFileId
+    const originalImageIdMapping = new Map<string, string>(); // originalImageId -> newImageId
     const importedFiles: FileData[] = [];
     
     let uploadedCount = 0;
@@ -731,12 +724,22 @@ export async function importCaseForReview(
     
     for (const [filename, blob] of Object.entries(imageFiles)) {
       try {
+        // Find the original image ID from the case data
+        const originalFileEntry = caseData.files.find(f => f.fileData.originalFilename === filename);
+        const originalImageId = originalFileEntry?.fileData.id;
+        
         const fileData = await uploadImageBlob(blob, filename, (fname, progress) => {
           const overallProgress = 30 + (uploadedCount / totalImages) * 40 + (progress / totalImages) * 0.4;
           onProgress?.('Uploading images', overallProgress, `Uploading ${fname}...`);
         });
         
         fileMapping.set(filename, fileData.id);
+        
+        // Map original image ID to new image ID
+        if (originalImageId) {
+          originalImageIdMapping.set(originalImageId, fileData.id);
+        }
+        
         importedFiles.push(fileData);
         uploadedCount++;
         
@@ -757,7 +760,7 @@ export async function importCaseForReview(
     onProgress?.('Storing case data', 75, 'Creating case structure...');
     
     // Step 4: Store case data in R2
-    await storeCaseDataInR2(user, result.caseNumber, caseData, importedFiles);
+    await storeCaseDataInR2(user, result.caseNumber, caseData, importedFiles, originalImageIdMapping);
     
     onProgress?.('Importing annotations', 85, 'Processing annotations...');
     
