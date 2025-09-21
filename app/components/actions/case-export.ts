@@ -41,7 +41,6 @@ const CSV_HEADERS = [
 ];
 
 export interface ExportOptions {
-  includeAnnotations?: boolean;
   format?: 'json' | 'csv';
   includeMetadata?: boolean;
   includeUserInfo?: boolean;
@@ -278,7 +277,6 @@ export async function exportAllCases(
   onProgress?: (current: number, total: number, caseName: string) => void
 ): Promise<AllCasesExportData> {
   const {
-    includeAnnotations = true,
     includeMetadata = true
   } = options;
 
@@ -399,7 +397,6 @@ export async function exportCaseData(
   options: ExportOptions = {}
 ): Promise<CaseExportData> {
   const {
-    includeAnnotations = true,
     includeMetadata = true
   } = options;
 
@@ -432,37 +429,35 @@ export async function exportCaseData(
       let annotations: AnnotationData | undefined;
       let hasAnnotations = false;
 
-      if (includeAnnotations) {
-        try {
-          annotations = await getNotes(user, caseNumber, file.id) || undefined;
-          hasAnnotations = !!(annotations && (
-            annotations.additionalNotes ||
-            annotations.classNote ||
-            annotations.customClass ||
-            (annotations.boxAnnotations && annotations.boxAnnotations.length > 0)
-          ));
+      try {
+        annotations = await getNotes(user, caseNumber, file.id) || undefined;
+        hasAnnotations = !!(annotations && (
+          annotations.additionalNotes ||
+          annotations.classNote ||
+          annotations.customClass ||
+          (annotations.boxAnnotations && annotations.boxAnnotations.length > 0)
+        ));
 
-          if (hasAnnotations) {
-            filesWithAnnotationsCount++;
-            if (annotations?.boxAnnotations) {
-              totalBoxAnnotations += annotations.boxAnnotations.length;
-            }
-            
-            // Track last modified
-            if (annotations?.updatedAt) {
-              if (!lastModified || annotations.updatedAt > lastModified) {
-                lastModified = annotations.updatedAt;
-              }
+        if (hasAnnotations) {
+          filesWithAnnotationsCount++;
+          if (annotations?.boxAnnotations) {
+            totalBoxAnnotations += annotations.boxAnnotations.length;
+          }
+          
+          // Track last modified
+          if (annotations?.updatedAt) {
+            if (!lastModified || annotations.updatedAt > lastModified) {
+              lastModified = annotations.updatedAt;
             }
           }
-        } catch (error) {
-          // Continue without annotations for this file
         }
+      } catch (error) {
+        // Continue without annotations for this file
       }
 
       filesWithAnnotations.push({
         fileData: file,
-        annotations: includeAnnotations ? annotations : undefined,
+        annotations,
         hasAnnotations
       });
     }

@@ -400,7 +400,6 @@ const handleImageSelect = (file: FileData) => {
       } else {
         // Standard data-only export
         const exportData = await exportCaseData(user, exportCaseNumber, {
-          includeAnnotations: true,
           includeMetadata: true
         });
         
@@ -422,7 +421,6 @@ const handleImageSelect = (file: FileData) => {
     try {
       // Export all cases with progress callback
       const exportData = await exportAllCases(user, {
-        includeAnnotations: true,
         includeMetadata: true
       }, onProgress);
       
