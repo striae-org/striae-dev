@@ -482,14 +482,6 @@ return (
             List All Cases
           </button>
     </div>
-    <div className={styles.caseInput}>            
-      <button 
-            onClick={() => setIsExportModalOpen(true)}
-            className={styles.exportButton}
-          >
-            Export Case Data
-          </button>
-    </div>
     {error && <p className={styles.error}>{error}</p>}
     {successAction && (
       <p className={styles.success}>
@@ -669,6 +661,19 @@ return (
           )}
         </div>
       )}
+      
+      {/* Export Case Data Button - moved to bottom */}
+      {currentCase && (
+        <div className={styles.exportSection}>
+          <button 
+            onClick={() => setIsExportModalOpen(true)}
+            className={styles.exportButton}
+          >
+            Export Case Data
+          </button>
+        </div>
+      )}
+      
       </div>
     </div>
   );
