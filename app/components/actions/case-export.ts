@@ -171,6 +171,7 @@ function generateMetadataRows(exportData: CaseExportData): string[][] {
     ['Case Export Report'],
     [''],
     ['Case Number', exportData.metadata.caseNumber],
+    ['Case Created Date', exportData.metadata.caseCreatedDate],
     ['Export Date', exportData.metadata.exportDate],
     ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
     ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
@@ -367,10 +368,22 @@ export async function exportAllCases(
         }
 
       } catch (error) {
+        // Get case creation date even for failed exports
+        let caseCreatedDate = new Date().toISOString(); // fallback
+        try {
+          const existingCase = await checkExistingCase(user, caseNumber);
+          if (existingCase?.createdAt) {
+            caseCreatedDate = existingCase.createdAt;
+          }
+        } catch {
+          // Use fallback date if case lookup fails
+        }
+
         // Create a placeholder entry for failed exports
         exportedCases.push({
           metadata: {
             caseNumber,
+            caseCreatedDate,
             exportDate: new Date().toISOString(),
             ...userMetadata,
             striaeExportSchemaVersion: '1.0',
@@ -503,6 +516,7 @@ export async function exportCaseData(
     const exportData: CaseExportData = {
       metadata: {
         caseNumber,
+        caseCreatedDate: existingCase.createdAt,
         exportDate: new Date().toISOString(),
         ...userMetadata,
         striaeExportSchemaVersion: '1.0',
@@ -576,6 +590,7 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       ['Case Details'],
       [
         'Case Number', 
+        'Case Created Date',
         'Export Status', 
         'Export Date', 
         'Exported By (Email)', 
@@ -592,6 +607,7 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       ],
       ...exportData.cases.map(caseData => [
         caseData.metadata.caseNumber,
+        caseData.metadata.caseCreatedDate,
         caseData.summary?.exportError ? 'Failed' : 'Success',
         caseData.metadata.exportDate,
         caseData.metadata.exportedBy || 'N/A',
@@ -983,6 +999,7 @@ function generateZipReadme(exportData: CaseExportData, protectForensicData: bool
 ==================
 
 Case Number: ${exportData.metadata.caseNumber}
+Case Created Date: ${exportData.metadata.caseCreatedDate}
 Export Date: ${exportData.metadata.exportDate}
 Exported By (Email): ${exportData.metadata.exportedBy || 'N/A'}
 Exported By (UID): ${exportData.metadata.exportedByUid || 'N/A'}

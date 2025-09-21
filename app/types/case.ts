@@ -18,6 +18,7 @@ export interface CasesToDelete {
 export interface CaseExportData {
   metadata: {
     caseNumber: string;
+    caseCreatedDate: string;
     exportDate: string;
     exportedBy: string | null;
     exportedByUid: string;
