@@ -440,8 +440,12 @@ return (
           <div className={`${styles.caseLoad} mb-4`}>
           <button
         onClick={handleCase}
-        disabled={isLoading || !caseNumber || permissionChecking}
-        title={!canCreateNewCase ? createCaseError : undefined}
+        disabled={isLoading || !caseNumber || permissionChecking || (isReadOnly && !!currentCase)}
+        title={
+          (isReadOnly && currentCase)
+            ? "Cannot load/create cases while reviewing a read-only case. Clear the current case first." 
+            : (!canCreateNewCase ? createCaseError : undefined)
+        }
       >
             {isLoading ? 'Loading...' : permissionChecking ? 'Checking permissions...' : 'Load/Create Case'}
       </button>      
