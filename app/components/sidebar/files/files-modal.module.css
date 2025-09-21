@@ -1,0 +1,141 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: color-mix(in lab, var(--background) 50%, transparent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--zIndex5);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.modal {
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
+  width: 90%;
+  max-width: var(--maxWidthL);
+  max-height: 80vh;
+  box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.modalHeader {
+  display: flex;
+  font-size: var(--fontSizeBodyL);
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spaceL);
+  border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  color: var(--textTitle);
+}
+
+.modalContent {
+  padding: var(--spaceL);
+  overflow-y: auto;
+  max-height: calc(80vh - var(--space3XL));
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: var(--fontSizeH5);
+  cursor: pointer;
+  padding: var(--spaceS);
+  color: var(--textLight);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.closeButton:hover {
+  color: var(--text);
+}
+
+.filesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spaceM);
+}
+
+.fileItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spaceM) var(--spaceL);
+  border: 1px solid #e9ecef;
+  border-radius: var(--spaceXS);
+  background: var(--backgroundLight);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.fileItem:hover {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+}
+
+.fileInfo {
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.fileName {
+  font-weight: var(--fontWeightMedium);
+  color: var(--textBody);
+  margin-bottom: var(--spaceXS);
+  word-break: break-word;
+}
+
+.fileDate {
+  font-size: var(--fontSizeBodyS);
+  color: var(--textLight);
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--spaceXS);
+  margin-left: var(--spaceM);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.deleteButton:hover:not(:disabled) {
+  color: #bd2130;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loadingState,
+.errorState,
+.emptyState {
+  text-align: center;
+  padding: var(--space2XL);
+  color: var(--textLight);
+}
+
+.errorState {
+  color: var(--red);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spaceL) 0 0;
+  margin-top: var(--spaceL);
+  border-top: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+}
