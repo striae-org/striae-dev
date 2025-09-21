@@ -28,10 +28,6 @@ const CSV_HEADERS = [
   'Support Level',
   'Has Subclass',
   'Include Confirmation',
-  'Confirmation Full Name',
-  'Confirmation Badge ID',
-  'Confirmation Timestamp',
-  'Confirmation ID',
   'Total Box Annotations',
   'Box ID',
   'Box X',
@@ -206,10 +202,6 @@ function processFileDataForTabular(fileEntry: CaseExportData['files'][0]): strin
     fileEntry.annotations?.supportLevel || '',
     fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
     fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
-    fileEntry.annotations?.confirmationData?.fullName || '',
-    fileEntry.annotations?.confirmationData?.badgeId || '',
-    fileEntry.annotations?.confirmationData?.timestamp || '',
-    fileEntry.annotations?.confirmationData?.confirmationId || '',
     (fileEntry.annotations?.boxAnnotations?.length || 0).toString()
   ];
 

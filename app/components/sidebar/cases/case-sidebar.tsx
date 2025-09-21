@@ -611,19 +611,6 @@ return (
         </>
       )}
     </div>
-    
-    {/* Export Case Data Button - positioned after file list, before case actions */}
-    {currentCase && (
-      <div className={styles.exportSection}>
-        <button 
-          onClick={() => setIsExportModalOpen(true)}
-          className={styles.exportButton}
-        >
-          Export Case Data
-        </button>
-      </div>
-    )}
-    
     <div className={`${styles.sidebarToggle} mb-4`}>
     <button
           onClick={onNotesClick}
@@ -672,6 +659,18 @@ return (
               </div>
             </div>
           )}
+        </div>
+      )}
+      
+      {/* Export Case Data Button - moved to bottom */}
+      {currentCase && (
+        <div className={styles.exportSection}>
+          <button 
+            onClick={() => setIsExportModalOpen(true)}
+            className={styles.exportButton}
+          >
+            Export Case Data
+          </button>
         </div>
       )}
       
