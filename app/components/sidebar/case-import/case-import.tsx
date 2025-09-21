@@ -3,9 +3,10 @@ import { AuthContext } from '~/contexts/auth.context';
 import { 
   importCaseForReview, 
   listReadOnlyCases, 
-  removeReadOnlyCase,
   deleteReadOnlyCase,
-  ImportResult 
+  previewCaseImport,
+  ImportResult,
+  CaseImportPreview
 } from '~/components/actions/case-review';
 import styles from './case-import.module.css';
 
@@ -32,6 +33,9 @@ export const CaseImport = ({
     progress: number;
     details?: string;
   } | null>(null);
+  const [casePreview, setCasePreview] = useState<CaseImportPreview | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -134,7 +138,7 @@ export const CaseImport = ({
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Strict validation: only allow .zip files
@@ -145,9 +149,27 @@ export const CaseImport = ({
       if (isZipFile) {
         setSelectedFile(file);
         setError('');
+        setCasePreview(null);
+        
+        // Load case preview
+        setIsLoadingPreview(true);
+        try {
+          const preview = await previewCaseImport(file);
+          setCasePreview(preview);
+        } catch (error) {
+          console.error('Error loading case preview:', error);
+          setError(`Failed to read case information: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setSelectedFile(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        } finally {
+          setIsLoadingPreview(false);
+        }
       } else {
         setError('Only ZIP files are allowed. Please select a valid .zip file.');
         setSelectedFile(null);
+        setCasePreview(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -155,9 +177,17 @@ export const CaseImport = ({
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = () => {
+    if (!user || !selectedFile || !casePreview) return;
+    
+    // Show confirmation dialog
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmImport = async () => {
     if (!user || !selectedFile) return;
     
+    setShowConfirmation(false);
     setIsImporting(true);
     setError('');
     setSuccess('');
@@ -176,6 +206,7 @@ export const CaseImport = ({
       if (result.success) {
         setSuccess(`Successfully imported case "${result.caseNumber}" for review`);
         setSelectedFile(null);
+        setCasePreview(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -206,6 +237,10 @@ export const CaseImport = ({
     }
   };
 
+  const handleCancelImport = () => {
+    setShowConfirmation(false);
+  };
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !isImporting && !isClearing) {
       onClose();
@@ -215,7 +250,8 @@ export const CaseImport = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay} onClick={handleOverlayClick}>
+    <>
+      <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
           <h2 className={styles.title}>Import Case for Review</h2>
@@ -283,6 +319,47 @@ export const CaseImport = ({
               )}
             </div>
 
+            {/* Case preview */}
+            {isLoadingPreview && (
+              <div className={styles.previewSection}>
+                <div className={styles.previewLoading}>
+                  Loading case information...
+                </div>
+              </div>
+            )}
+
+            {casePreview && !isLoadingPreview && (
+              <div className={styles.previewSection}>
+                <h3 className={styles.previewTitle}>Case Information</h3>
+                <div className={styles.previewGrid}>
+                  <div className={styles.previewItem}>
+                    <span className={styles.previewLabel}>Case Number:</span>
+                    <span className={styles.previewValue}>{casePreview.caseNumber}</span>
+                  </div>
+                  <div className={styles.previewItem}>
+                    <span className={styles.previewLabel}>Exported by:</span>
+                    <span className={styles.previewValue}>
+                      {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
+                    </span>
+                  </div>
+                  <div className={styles.previewItem}>
+                    <span className={styles.previewLabel}>Lab/Company:</span>
+                    <span className={styles.previewValue}>{casePreview.exportedByCompany || 'N/A'}</span>
+                  </div>
+                  <div className={styles.previewItem}>
+                    <span className={styles.previewLabel}>Export Date:</span>
+                    <span className={styles.previewValue}>
+                      {new Date(casePreview.exportDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className={styles.previewItem}>
+                    <span className={styles.previewLabel}>Total Images:</span>
+                    <span className={styles.previewValue}>{casePreview.totalFiles}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Import progress */}
             {importProgress && (
               <div className={styles.progressSection}>
@@ -309,7 +386,7 @@ export const CaseImport = ({
               <button
                 className={styles.importButton}
                 onClick={handleImport}
-                disabled={!selectedFile || isImporting || isClearing}
+                disabled={!selectedFile || !casePreview || isImporting || isClearing || isLoadingPreview}
               >
                 {isImporting ? 'Importing...' : 'Import'}
               </button>
@@ -351,5 +428,53 @@ export const CaseImport = ({
         </div>
       </div>
     </div>
+
+    {/* Confirmation Dialog */}
+    {showConfirmation && casePreview && (
+      <div className={styles.confirmationOverlay} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.confirmationModal}>
+          <div className={styles.confirmationContent}>
+            <h3 className={styles.confirmationTitle}>Confirm Case Import</h3>
+            <p className={styles.confirmationText}>
+              Are you sure you want to import this case for review?
+            </p>
+            
+            <div className={styles.confirmationDetails}>
+              <div className={styles.confirmationItem}>
+                <strong>Case Number:</strong> {casePreview.caseNumber}
+              </div>
+              <div className={styles.confirmationItem}>
+                <strong>Exported by:</strong> {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
+              </div>
+              <div className={styles.confirmationItem}>
+                <strong>Lab/Company:</strong> {casePreview.exportedByCompany || 'N/A'}
+              </div>
+              <div className={styles.confirmationItem}>
+                <strong>Export Date:</strong> {new Date(casePreview.exportDate).toLocaleDateString()}
+              </div>
+              <div className={styles.confirmationItem}>
+                <strong>Total Images:</strong> {casePreview.totalFiles}
+              </div>
+            </div>
+
+            <div className={styles.confirmationButtons}>
+              <button
+                className={styles.confirmButton}
+                onClick={handleConfirmImport}
+              >
+                Confirm Import
+              </button>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCancelImport}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
