@@ -621,7 +621,13 @@ return (
         </button>
         </div>
           {currentCase && (
-        <div className={styles.caseActionsSection}>
+        <div className={styles.caseActionsSection}>           
+            <button 
+              onClick={() => setIsExportModalOpen(true)}
+              className={styles.exportButton}
+            >
+              Export Case Data
+            </button>
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
             className={styles.caseActionsToggle}
@@ -660,20 +666,7 @@ return (
             </div>
           )}
         </div>
-      )}
-      
-      {/* Export Case Data Button - moved to bottom */}
-      {currentCase && (
-        <div className={styles.exportSection}>
-          <button 
-            onClick={() => setIsExportModalOpen(true)}
-            className={styles.exportButton}
-          >
-            Export Case Data
-          </button>
-        </div>
-      )}
-      
+      )}     
       </div>
     </div>
   );
