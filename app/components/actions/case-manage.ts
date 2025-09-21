@@ -7,7 +7,7 @@ import {
   getUserApiKey
 } from '~/utils/auth';
 import { canCreateCase } from '~/utils/permissions';
-import { CaseData, UserData, FileData, CasesToDelete } from '~/types';
+import { CaseData, UserData, CasesToDelete } from '~/types';
 
 const USER_WORKER_URL = paths.user_worker_url;
 const DATA_WORKER_URL = paths.data_worker_url;

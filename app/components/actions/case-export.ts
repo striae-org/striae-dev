@@ -1,8 +1,9 @@
 import { User } from 'firebase/auth';
-import { FileData, AnnotationData, CaseExportData, AllCasesExportData } from '~/types';
+import { FileData, AnnotationData, CaseExportData, AllCasesExportData, UserData } from '~/types';
 import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
+import { getUserData } from '~/utils/permissions';
 import * as XLSX from 'xlsx';
 
 export type ExportFormat = 'json' | 'csv';
@@ -40,6 +41,33 @@ const CSV_HEADERS = [
   'Last Updated'
 ];
 
+/**
+ * Helper function to get user export metadata
+ */
+async function getUserExportMetadata(user: User) {
+  try {
+    const userData = await getUserData(user);
+    if (userData) {
+      return {
+        exportedBy: user.email,
+        exportedByUid: userData.uid,
+        exportedByName: `${userData.firstName} ${userData.lastName}`.trim(),
+        exportedByCompany: userData.company
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to fetch user data for export metadata:', error);
+  }
+  
+  // Fallback to basic user data if getUserData fails
+  return {
+    exportedBy: user.email,
+    exportedByUid: user.uid,
+    exportedByName: user.displayName || 'N/A',
+    exportedByCompany: 'N/A'
+  };
+}
+
 export interface ExportOptions {
   format?: 'json' | 'csv';
   includeMetadata?: boolean;
@@ -48,12 +76,12 @@ export interface ExportOptions {
 }
 
 /**
- * Add forensic data protection warning to content
+ * Add data protection warning to content
  */
 function addForensicDataWarning(content: string, format: 'csv' | 'json'): string {
   const warning = format === 'csv' 
-    ? `"FORENSIC DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n`
-    : `/* FORENSIC DATA WARNING
+    ? `"CASE DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n`
+    : `/* CASE DATA WARNING
  * This file contains evidence data for forensic examination.
  * Any modification may compromise the integrity of the evidence.
  * Handle according to your organization's chain of custody procedures.
@@ -144,7 +172,10 @@ function generateMetadataRows(exportData: CaseExportData): string[][] {
     [''],
     ['Case Number', exportData.metadata.caseNumber],
     ['Export Date', exportData.metadata.exportDate],
-    ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+    ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
+    ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
+    ['Exported By (Name)', exportData.metadata.exportedByName || 'N/A'],
+    ['Exported By (Company)', exportData.metadata.exportedByCompany || 'N/A'],
     ['Striae Export Schema Version', exportData.metadata.striaeExportSchemaVersion],
     ['Total Files', exportData.metadata.totalFiles.toString()],
     [''],
@@ -281,6 +312,9 @@ export async function exportAllCases(
   } = options;
 
   try {
+    // Get user export metadata
+    const userMetadata = await getUserExportMetadata(user);
+    
     // Get list of all cases for the user
     const caseNumbers = await listCases(user);
     
@@ -338,7 +372,7 @@ export async function exportAllCases(
           metadata: {
             caseNumber,
             exportDate: new Date().toISOString(),
-            exportedBy: user.email,
+            ...userMetadata,
             striaeExportSchemaVersion: '1.0',
             totalFiles: 0
           },
@@ -357,7 +391,7 @@ export async function exportAllCases(
     const allCasesExport: AllCasesExportData = {
       metadata: {
         exportDate: new Date().toISOString(),
-        exportedBy: user.email,
+        ...userMetadata,
         striaeExportSchemaVersion: '1.0',
         totalCases: caseNumbers.length,
         totalFiles,
@@ -399,6 +433,9 @@ export async function exportCaseData(
   const {
     includeMetadata = true
   } = options;
+
+  // Get user export metadata
+  const userMetadata = await getUserExportMetadata(user);
 
   // Validate case number format
   if (!validateCaseNumber(caseNumber)) {
@@ -467,7 +504,7 @@ export async function exportCaseData(
       metadata: {
         caseNumber,
         exportDate: new Date().toISOString(),
-        exportedBy: user.email,
+        ...userMetadata,
         striaeExportSchemaVersion: '1.0',
         totalFiles: files.length
       },
@@ -521,11 +558,14 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
 
     // Create summary worksheet
     const summaryData = [
-      protectForensicData ? ['FORENSIC DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
-      protectForensicData ? ['WARNING: This workbook contains forensic evidence data and is protected from editing.'] : [''],
+      protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
+      protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
       [''],
       ['Export Date', new Date().toISOString()],
-      ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+      ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
+      ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
+      ['Exported By (Name)', exportData.metadata.exportedByName || 'N/A'],
+      ['Exported By (Company)', exportData.metadata.exportedByCompany || 'N/A'],
       ['Striae Export Schema Version', '1.0'],
       ['Total Cases', exportData.cases.length],
       ['Successful Exports', exportData.cases.filter(c => !c.summary?.exportError).length],
@@ -538,7 +578,10 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         'Case Number', 
         'Export Status', 
         'Export Date', 
-        'Exported By', 
+        'Exported By (Email)', 
+        'Exported By (UID)',
+        'Exported By (Name)',
+        'Exported By (Company)',
         'Schema Version',
         'Total Files', 
         'Files with Annotations', 
@@ -552,6 +595,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         caseData.summary?.exportError ? 'Failed' : 'Success',
         caseData.metadata.exportDate,
         caseData.metadata.exportedBy || 'N/A',
+        caseData.metadata.exportedByUid || 'N/A',
+        caseData.metadata.exportedByName || 'N/A',
+        caseData.metadata.exportedByCompany || 'N/A',
         caseData.metadata.striaeExportSchemaVersion,
         caseData.metadata.totalFiles,
         caseData.summary?.filesWithAnnotations || 0,
@@ -598,9 +644,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       // Create case details with headers
       const caseDetailsData = [
         protectForensicData 
-          ? [`FORENSIC DATA - Case ${caseData.metadata.caseNumber} - PROTECTED`]
+          ? [`CASE DATA - ${caseData.metadata.caseNumber} - PROTECTED`]
           : [`Case ${caseData.metadata.caseNumber} - Detailed Export`],
-        protectForensicData ? ['WARNING: This worksheet is protected to maintain forensic data integrity.'] : [''],
+        protectForensicData ? ['WARNING: This worksheet is protected to maintain data integrity.'] : [''],
         [''],
         ...metadataRows.slice(2, -1), // Skip title and "File Details" header
         [''],
@@ -638,9 +684,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     if (protectForensicData && exportPassword) {
       workbook.Props = {
         Title: 'Striae Case Export - Protected',
-        Subject: 'Forensic Evidence Data Export',
+        Subject: 'Case Data Export',
         Author: exportData.metadata.exportedBy || 'Striae',
-        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected.`,
+        Comments: `This workbook contains protected case data. Modification may compromise evidence integrity. Worksheets are password protected.`,
         Company: 'Striae'
       };
     }
@@ -819,12 +865,15 @@ export async function downloadCaseAsZip(
       const forensicMetadata = {
         exportTimestamp: new Date().toISOString(),
         exportedBy: exportData.metadata.exportedBy || 'Unknown',
+        exportedByUid: exportData.metadata.exportedByUid || 'Unknown',
+        exportedByName: exportData.metadata.exportedByName || 'Unknown',
+        exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
         caseNumber: exportData.metadata.caseNumber,
         contentChecksum: generateSimpleChecksum(format === 'json' ? 
           generateJSONContent(exportData, options.includeUserInfo, false) : 
           generateCSVContent(exportData, false)
         ),
-        forensicWarning: 'This ZIP archive contains forensic evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
+        forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
         striaeVersion: exportData.metadata.striaeExportSchemaVersion,
         archiveStructure: {
           dataFile: `${caseNumber}_data.${format}`,
@@ -837,9 +886,9 @@ export async function downloadCaseAsZip(
       zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
       
       // Add read-only instruction file
-      const instructionContent = `FORENSIC EVIDENCE ARCHIVE - READ ONLY
+      const instructionContent = `EVIDENCE ARCHIVE - READ ONLY
 
-This ZIP archive contains forensic evidence data exported from Striae.
+This ZIP archive contains evidence data exported from Striae.
 
 IMPORTANT WARNINGS:
 - This archive is intended for READ-ONLY access
@@ -935,7 +984,10 @@ function generateZipReadme(exportData: CaseExportData, protectForensicData: bool
 
 Case Number: ${exportData.metadata.caseNumber}
 Export Date: ${exportData.metadata.exportDate}
-Exported By: ${exportData.metadata.exportedBy || 'N/A'}
+Exported By (Email): ${exportData.metadata.exportedBy || 'N/A'}
+Exported By (UID): ${exportData.metadata.exportedByUid || 'N/A'}
+Exported By (Name): ${exportData.metadata.exportedByName || 'N/A'}
+Exported By (Company): ${exportData.metadata.exportedByCompany || 'N/A'}
 Striae Export Schema Version: ${exportData.metadata.striaeExportSchemaVersion}
 
 Summary:
@@ -952,11 +1004,11 @@ Contents:
 
   const forensicAddition = `
 - FORENSIC_METADATA.json: Archive verification data
-- READ_ONLY_INSTRUCTIONS.txt: Important forensic handling guidelines
+- READ_ONLY_INSTRUCTIONS.txt: Important evidence handling guidelines
 
-FORENSIC NOTICE:
+EVIDENCE NOTICE:
 ================
-This export contains forensic evidence data. Any modification may compromise 
+This export contains evidence data. Any modification may compromise 
 evidence integrity and chain of custody. Handle according to your organization's 
 forensic procedures and maintain proper documentation.`;
 
@@ -979,8 +1031,19 @@ function generateJSONContent(
   let jsonData = { ...exportData };
   
   // Remove sensitive user info if not included
-  if (!includeUserInfo && jsonData.metadata.exportedBy) {
-    jsonData.metadata.exportedBy = '[User Info Excluded]';
+  if (!includeUserInfo) {
+    if (jsonData.metadata.exportedBy) {
+      jsonData.metadata.exportedBy = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByUid) {
+      jsonData.metadata.exportedByUid = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByName) {
+      jsonData.metadata.exportedByName = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByCompany) {
+      jsonData.metadata.exportedByCompany = '[User Info Excluded]';
+    }
   }
   
   const jsonString = JSON.stringify(jsonData, null, 2);

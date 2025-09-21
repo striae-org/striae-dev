@@ -20,6 +20,9 @@ export interface CaseExportData {
     caseNumber: string;
     exportDate: string;
     exportedBy: string | null;
+    exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
     striaeExportSchemaVersion: string;
     totalFiles: number;
   };
@@ -41,6 +44,9 @@ export interface AllCasesExportData {
   metadata: {
     exportDate: string;
     exportedBy: string | null;
+    exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
     striaeExportSchemaVersion: string;
     totalCases: number;
     totalFiles: number;
