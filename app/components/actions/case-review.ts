@@ -13,6 +13,7 @@ import {
   CaseData
 } from '~/types';
 import { validateCaseNumber, checkExistingCase } from './case-manage';
+import { calculateCRC32 } from '~/utils/CRC32';
 import { saveNotes } from './notes-manage';
 import { deleteFile } from './image-manage';
 
@@ -80,31 +81,6 @@ export interface CaseImportPreview {
   checksumError?: string;
   expectedChecksum?: string;
   actualChecksum?: string;
-}
-
-/**
- * Calculate CRC32 checksum for content integrity validation
- */
-function calculateCRC32(content: string): string {
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(content);
-  let crc = 0xFFFFFFFF;
-  
-  // CRC32 polynomial table (IEEE 802.3)
-  const crcTable = new Array(256);
-  for (let i = 0; i < 256; i++) {
-    let c = i;
-    for (let j = 0; j < 8; j++) {
-      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-    }
-    crcTable[i] = c;
-  }
-  
-  for (let i = 0; i < bytes.length; i++) {
-    crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
-  }
-  
-  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
