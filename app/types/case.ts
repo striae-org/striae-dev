@@ -37,6 +37,8 @@ export interface CaseExportData {
     filesWithoutAnnotations: number;
     totalBoxAnnotations: number;
     lastModified?: string;
+    earliestAnnotationDate?: string;
+    latestAnnotationDate?: string;
     exportError?: string;
   };
 }
@@ -59,5 +61,7 @@ export interface AllCasesExportData {
     casesWithAnnotations: number;
     casesWithoutFiles: number;
     lastModified?: string;
+    earliestAnnotationDate?: string;
+    latestAnnotationDate?: string;
   };
 }

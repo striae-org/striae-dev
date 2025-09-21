@@ -185,6 +185,8 @@ function generateMetadataRows(exportData: CaseExportData): string[][] {
     ['Files without Annotations', (exportData.summary?.filesWithoutAnnotations || 0).toString()],
     ['Total Box Annotations', (exportData.summary?.totalBoxAnnotations || 0).toString()],
     ['Last Modified', exportData.summary?.lastModified || 'N/A'],
+    ['Earliest Annotation Date', exportData.summary?.earliestAnnotationDate || 'N/A'],
+    ['Latest Annotation Date', exportData.summary?.latestAnnotationDate || 'N/A'],
     [''],
     ['File Details']
   ];
@@ -330,6 +332,8 @@ export async function exportAllCases(
     let casesWithAnnotations = 0;
     let casesWithoutFiles = 0;
     let lastModified: string | undefined;
+    let earliestAnnotationDate: string | undefined;
+    let latestAnnotationDate: string | undefined;
 
     // Export each case
     for (let i = 0; i < caseNumbers.length; i++) {
@@ -364,6 +368,18 @@ export async function exportAllCases(
         if (caseExport.summary?.lastModified) {
           if (!lastModified || caseExport.summary.lastModified > lastModified) {
             lastModified = caseExport.summary.lastModified;
+          }
+        }
+
+        // Track annotation date range across all cases
+        if (caseExport.summary?.earliestAnnotationDate) {
+          if (!earliestAnnotationDate || caseExport.summary.earliestAnnotationDate < earliestAnnotationDate) {
+            earliestAnnotationDate = caseExport.summary.earliestAnnotationDate;
+          }
+        }
+        if (caseExport.summary?.latestAnnotationDate) {
+          if (!latestAnnotationDate || caseExport.summary.latestAnnotationDate > latestAnnotationDate) {
+            latestAnnotationDate = caseExport.summary.latestAnnotationDate;
           }
         }
 
@@ -418,7 +434,9 @@ export async function exportAllCases(
         casesWithFiles,
         casesWithAnnotations,
         casesWithoutFiles,
-        lastModified
+        lastModified,
+        earliestAnnotationDate,
+        latestAnnotationDate
       };
     }
 
@@ -474,6 +492,8 @@ export async function exportCaseData(
     let filesWithAnnotationsCount = 0;
     let totalBoxAnnotations = 0;
     let lastModified: string | undefined;
+    let earliestAnnotationDate: string | undefined;
+    let latestAnnotationDate: string | undefined;
 
     for (const file of files) {
       let annotations: AnnotationData | undefined;
@@ -498,6 +518,14 @@ export async function exportCaseData(
           if (annotations?.updatedAt) {
             if (!lastModified || annotations.updatedAt > lastModified) {
               lastModified = annotations.updatedAt;
+            }
+            
+            // Track annotation date range
+            if (!earliestAnnotationDate || annotations.updatedAt < earliestAnnotationDate) {
+              earliestAnnotationDate = annotations.updatedAt;
+            }
+            if (!latestAnnotationDate || annotations.updatedAt > latestAnnotationDate) {
+              latestAnnotationDate = annotations.updatedAt;
             }
           }
         }
@@ -528,7 +556,9 @@ export async function exportCaseData(
           filesWithAnnotations: filesWithAnnotationsCount,
           filesWithoutAnnotations: files.length - filesWithAnnotationsCount,
           totalBoxAnnotations,
-          lastModified
+          lastModified,
+          earliestAnnotationDate,
+          latestAnnotationDate
         }
       })
     };
@@ -602,7 +632,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         'Files with Annotations', 
         'Files without Annotations', 
         'Total Box Annotations', 
-        'Last Modified', 
+        'Last Modified',
+        'Earliest Annotation Date',
+        'Latest Annotation Date', 
         'Export Error'
       ],
       ...exportData.cases.map(caseData => [
@@ -620,6 +652,8 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
         caseData.summary?.filesWithoutAnnotations || 0,
         caseData.summary?.totalBoxAnnotations || 0,
         caseData.summary?.lastModified || '',
+        caseData.summary?.earliestAnnotationDate || '',
+        caseData.summary?.latestAnnotationDate || '',
         caseData.summary?.exportError || ''
       ])
     ];
@@ -1013,6 +1047,8 @@ Summary:
 - Files without Annotations: ${totalFiles - filesWithAnnotations}
 - Total Box Annotations: ${totalBoxAnnotations}
 - Total Annotations: ${totalAnnotations}
+- Earliest Annotation Date: ${exportData.summary?.earliestAnnotationDate || 'N/A'}
+- Latest Annotation Date: ${exportData.summary?.latestAnnotationDate || 'N/A'}
 
 Contents:
 - ${exportData.metadata.caseNumber}_data.json/.csv: Case data and annotations
