@@ -127,7 +127,7 @@
 }
 
 .errorState {
-  color: var(--red);
+  color: var(--error);
 }
 
 .pagination {

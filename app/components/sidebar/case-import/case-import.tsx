@@ -98,54 +98,54 @@ const CasePreviewSection = ({ casePreview, isLoadingPreview }: {
   if (!casePreview) return null;
 
   return (
-    <div className={styles.previewSection}>
-      <h3 className={styles.previewTitle}>Case Information</h3>
-      
-      {/* Checksum validation status */}
-      {casePreview.checksumValid !== undefined && (
-        <div className={`${styles.checksumStatus} ${casePreview.checksumValid ? styles.checksumValid : styles.checksumInvalid}`}>
-          <div className={styles.checksumLabel}>
-            <strong>Data Integrity:</strong>
+    <>
+      {/* Case Information - Always Blue */}
+      <div className={styles.previewSection}>
+        <h3 className={styles.previewTitle}>Case Information</h3>
+        <div className={styles.previewGrid}>
+          <div className={styles.previewItem}>
+            <span className={styles.previewLabel}>Case Number:</span>
+            <span className={styles.previewValue}>{casePreview.caseNumber}</span>
           </div>
-          <div className={styles.checksumValue}>
-            {casePreview.checksumValid ? (
-              <span className={styles.checksumSuccess}>✓ Verified (Checksum: {casePreview.expectedChecksum})</span>
-            ) : (
-              <span className={styles.checksumError}>
-                ✗ FAILED - {casePreview.checksumError}
-              </span>
-            )}
+          <div className={styles.previewItem}>
+            <span className={styles.previewLabel}>Exported by:</span>
+            <span className={styles.previewValue}>
+              {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
+            </span>
+          </div>
+          <div className={styles.previewItem}>
+            <span className={styles.previewLabel}>Lab/Company:</span>
+            <span className={styles.previewValue}>{casePreview.exportedByCompany || 'N/A'}</span>
+          </div>
+          <div className={styles.previewItem}>
+            <span className={styles.previewLabel}>Export Date:</span>
+            <span className={styles.previewValue}>
+              {new Date(casePreview.exportDate).toLocaleDateString()}
+            </span>
+          </div>
+          <div className={styles.previewItem}>
+            <span className={styles.previewLabel}>Total Images:</span>
+            <span className={styles.previewValue}>{casePreview.totalFiles}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Integrity Checks - Green/Red Based on Validation */}
+      {casePreview.checksumValid !== undefined && (
+        <div className={`${styles.validationSection} ${casePreview.checksumValid ? styles.validationSectionValid : styles.validationSectionInvalid}`}>
+          <h3 className={styles.validationTitle}>Data Integrity Validation</h3>
+          <div className={styles.validationItem}>            
+            <span className={`${styles.validationValue} ${casePreview.checksumValid ? styles.validationSuccess : styles.validationError}`}>
+              {casePreview.checksumValid ? (
+                <>✓ Verified (Checksum: {casePreview.expectedChecksum})</>
+              ) : (
+                <>✗ FAILED - {casePreview.checksumError}</>
+              )}
+            </span>
           </div>
         </div>
       )}
-      
-      <div className={styles.previewGrid}>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Case Number:</span>
-          <span className={styles.previewValue}>{casePreview.caseNumber}</span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Exported by:</span>
-          <span className={styles.previewValue}>
-            {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
-          </span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Lab/Company:</span>
-          <span className={styles.previewValue}>{casePreview.exportedByCompany || 'N/A'}</span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Export Date:</span>
-          <span className={styles.previewValue}>
-            {new Date(casePreview.exportDate).toLocaleDateString()}
-          </span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Total Images:</span>
-          <span className={styles.previewValue}>{casePreview.totalFiles}</span>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
@@ -212,11 +212,11 @@ const ConfirmationDialog = ({
               <strong>Total Images:</strong> {casePreview.totalFiles}
             </div>
             {casePreview.checksumValid !== undefined && (
-              <div className={styles.confirmationItem}>
-                <strong>Data Integrity:</strong> {casePreview.checksumValid ? 
-                  <span style={{ color: 'green' }}>✓ Verified</span> : 
-                  <span style={{ color: 'red' }}>✗ Failed</span>
-                }
+              <div className={`${styles.confirmationItem} ${casePreview.checksumValid ? styles.confirmationItemValid : styles.confirmationItemInvalid}`}>
+                <strong>Data Integrity:</strong> 
+                <span className={casePreview.checksumValid ? styles.confirmationSuccess : styles.confirmationError}>
+                  {casePreview.checksumValid ? '✓ Verified' : '✗ Failed'}
+                </span>
               </div>
             )}
           </div>
@@ -547,6 +547,28 @@ export const CaseImport = ({
             {/* Import progress */}
             <ProgressSection importProgress={importProgress} />
 
+            {/* Checksum validation warning */}
+            {casePreview?.checksumValid === false && (
+              <div className={styles.checksumWarning}>
+                <strong>⚠️ Import Blocked:</strong> Data checksum validation failed. 
+                This file may have been tampered with or corrupted and cannot be imported.
+              </div>
+            )}
+
+            {/* Success message */}
+            {messages.success && (
+              <div className={styles.success}>
+                {messages.success}
+              </div>
+            )}
+
+            {/* Error message */}
+            {messages.error && (
+              <div className={styles.error}>
+                {messages.error}
+              </div>
+            )}
+
             {/* Action buttons */}
             <div className={styles.buttonGroup}>
               <button
@@ -572,28 +594,6 @@ export const CaseImport = ({
                 Cancel
               </button>
             </div>
-
-            {/* Checksum validation warning */}
-            {casePreview?.checksumValid === false && (
-              <div className={styles.checksumWarning}>
-                <strong>⚠️ Import Blocked:</strong> Data checksum validation failed. 
-                This file may have been tampered with or corrupted and cannot be imported.
-              </div>
-            )}
-
-            {/* Success message */}
-            {messages.success && (
-              <div className={styles.success}>
-                {messages.success}
-              </div>
-            )}
-
-            {/* Error message */}
-            {messages.error && (
-              <div className={styles.error}>
-                {messages.error}
-              </div>
-            )}
 
             {/* Instructions */}
             <div className={styles.instructions}>

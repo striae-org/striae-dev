@@ -127,6 +127,10 @@ export default function App() {
 
 ### CSS Architecture
 - **Design System First**: Always use CSS custom properties from design system
+- **Theme Token Verification**: ALWAYS verify color tokens exist in `app/components/theme-provider/theme.ts` before using them
+  - ✅ Available: `--primary`, `--accent`, `--success`, `--error`, `--errorLight`, `--warning`, `--background`, `--backgroundLight`, `--text`, `--textTitle`, `--textBody`, `--textLight`
+  - ❌ DO NOT USE: `--green`, `--red`, `--blue`, `--yellow`, `--orange`, `--purple`, `--gray` (these don't exist)
+  - Check both `light` and `dark` theme objects to ensure token exists in both
 - **Color Mixing**: Use `color-mix(in lab, ...)` for dynamic color variations
 - **Hover States**: Global button effects + component-specific color/background changes only
 - **Responsive Patterns**: `@media (max-width: 1024px)` for mobile/tablet detection
