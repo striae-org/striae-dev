@@ -259,7 +259,7 @@ export async function validateCaseIntegrity(
   summary += `manifest ${manifestValid ? 'valid' : 'invalid'}`;
   
   if (errors.length > 0) {
-    summary += `. ${errors.length} error(s) detected.`;
+    summary += `. ${errors.length} error(s) detected`;
   }
   
   return {

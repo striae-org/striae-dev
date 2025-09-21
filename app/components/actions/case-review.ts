@@ -139,14 +139,26 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     
     // Now validate checksum if forensic metadata exists
     const metadataFile = zip.file('FORENSIC_METADATA.json');
-    if (metadataFile) {
+    const manifestFile = zip.file('FORENSIC_MANIFEST.json');
+    
+    if (metadataFile || manifestFile) {
       try {
-        const metadataContent = await metadataFile.async('text');
-        const metadata = JSON.parse(metadataContent);
+        let forensicManifest: any = null;
         
-        if (metadata.forensicManifest) {
+        // Try to get forensic manifest from dedicated file first (preferred)
+        if (manifestFile) {
+          const manifestContent = await manifestFile.async('text');
+          forensicManifest = JSON.parse(manifestContent);
+        } else if (metadataFile) {
+          // Fallback to embedded manifest in metadata (legacy)
+          const metadataContent = await metadataFile.async('text');
+          const metadata = JSON.parse(metadataContent);
+          forensicManifest = metadata.forensicManifest;
+        }
+        
+        if (forensicManifest) {
           // Enhanced validation with forensic manifest (includes individual file checksums)
-          expectedChecksum = metadata.forensicManifest.manifestChecksum;
+          expectedChecksum = forensicManifest.manifestChecksum;
           
           // Extract image files for comprehensive validation
           const imageFiles: { [filename: string]: Blob } = {};
@@ -168,11 +180,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           const validation = await validateForensicIntegrity(
             cleanedContent, 
             imageFiles, 
-            metadata.forensicManifest
+            forensicManifest
           );
           
           checksumValid = validation.isValid;
-          actualChecksum = validation.manifestValid ? metadata.forensicManifest.manifestChecksum : 'validation_failed';
+          actualChecksum = validation.manifestValid ? forensicManifest.manifestChecksum : 'validation_failed';
           
           if (!checksumValid) {
             checksumError = `Comprehensive validation failed: ${validation.summary}. Errors: ${validation.errors.join(', ')}`;
@@ -364,12 +376,20 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       }
     }
     
-    // Extract forensic metadata if present
+    // Extract forensic metadata and manifest if present
     let metadata: any = undefined;
     const metadataFile = zip.file('FORENSIC_METADATA.json');
+    const manifestFile = zip.file('FORENSIC_MANIFEST.json');
+    
     if (metadataFile) {
       const metadataContent = await metadataFile.async('text');
       metadata = JSON.parse(metadataContent);
+    }
+    
+    // If there's a dedicated manifest file, include it in metadata
+    if (manifestFile && metadata) {
+      const manifestContent = await manifestFile.async('text');
+      metadata.forensicManifest = JSON.parse(manifestContent);
     }
     
     return {

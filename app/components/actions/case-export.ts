@@ -940,6 +940,9 @@ export async function downloadCaseAsZip(
       // Add forensic metadata with actual checksum
       zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
       
+      // Add dedicated forensic manifest file for validation
+      zip.file('FORENSIC_MANIFEST.json', JSON.stringify(forensicManifest, null, 2));
+      
       // Add read-only instruction file
       const instructionContent = `EVIDENCE ARCHIVE - READ ONLY
 
@@ -955,6 +958,7 @@ Archive Contents:
 - ${caseNumber}_data.${format}: Complete case data in ${format.toUpperCase()} format
 - images/: Original image files with annotations
 - FORENSIC_METADATA.json: Archive verification data
+- FORENSIC_MANIFEST.json: File integrity validation manifest
 - README.txt: General information about this export
 
 Case Information:
@@ -1092,7 +1096,8 @@ Contents:
 - README.txt: This file`;
 
   const forensicAddition = `
-- FORENSIC_METADATA.json: Archive verification data
+- FORENSIC_METADATA.json: Archive verification data  
+- FORENSIC_MANIFEST.json: File integrity validation manifest
 - READ_ONLY_INSTRUCTIONS.txt: Important evidence handling guidelines
 
 EVIDENCE NOTICE:
