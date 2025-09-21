@@ -4,7 +4,6 @@ import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
 import { getUserData } from '~/utils/permissions';
-import * as XLSX from 'xlsx';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -607,8 +606,11 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 /**
  * Download all cases data as Excel file with multiple worksheets
  */
-export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): void {
+export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): Promise<void> {
   try {
+    // Dynamic import of XLSX to avoid bundle size issues
+    const XLSX = await import('xlsx');
+    
     const workbook = XLSX.utils.book_new();
     let exportPassword: string | undefined;
 

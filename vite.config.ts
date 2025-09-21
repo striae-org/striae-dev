@@ -15,6 +15,10 @@ export default defineConfig({
   server: {
     port: 7777,
   },
+  build: {
+    // Set chunk size warning limit higher since we're using dynamic imports for large libs
+    chunkSizeWarningLimit: 600
+  },
   plugins: [
     remixCloudflareDevProxy(),
     remix({      

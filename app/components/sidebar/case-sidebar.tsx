@@ -428,7 +428,7 @@ const handleImageSelect = (file: FileData) => {
       if (format === 'json') {
         downloadAllCasesAsJSON(exportData);
       } else {
-        downloadAllCasesAsCSV(exportData);
+        await downloadAllCasesAsCSV(exportData);
       }
       
     } catch (error) {
