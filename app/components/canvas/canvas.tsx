@@ -143,7 +143,7 @@ export const Canvas = ({
           File: {filename}
           {annotationData?.includeConfirmation && (
             <div className={styles.confirmationIncluded}>
-              Confirmation Field Included
+              {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
             </div>
           )}
         </div>
