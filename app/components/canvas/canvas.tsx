@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
+import { ConfirmationModal } from './confirmation/confirmation';
 import { AnnotationData, BoxAnnotation } from '~/types/annotations';
 import styles from './canvas.module.css';
 
@@ -38,6 +39,7 @@ export const Canvas = ({
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   // Handle box annotation changes
@@ -62,6 +64,24 @@ export const Canvas = ({
     };
     
     onAnnotationUpdate(updatedAnnotationData);
+  };
+
+  // Handle confirmation
+  const handleConfirmation = (confirmationData: {
+    fullName: string;
+    badgeId: string;
+    timestamp: string;
+    confirmationId: string;
+  }) => {
+    if (!onAnnotationUpdate || !annotationData) return;
+    
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      confirmationData
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+    console.log('Confirmation data saved:', confirmationData);
   };
 
   useEffect(() => {
@@ -147,7 +167,10 @@ export const Canvas = ({
                 {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
               </div>
               {isReadOnly && (
-                <button className={styles.confirmButton}>
+                <button 
+                  className={styles.confirmButton}
+                  onClick={() => setIsConfirmationModalOpen(true)}
+                >
                   Confirm
                 </button>
               )}
@@ -310,6 +333,13 @@ export const Canvas = ({
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={handleConfirmation}
+      />
     </div>    
   );
 };
