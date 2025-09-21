@@ -13,11 +13,35 @@ import {
   CaseData
 } from '~/types';
 import { validateCaseNumber, checkExistingCase } from './case-manage';
+import { calculateCRC32 } from '~/utils/CRC32';
 import { saveNotes } from './notes-manage';
 import { deleteFile } from './image-manage';
 
 const USER_WORKER_URL = paths.user_worker_url;
 const DATA_WORKER_URL = paths.data_worker_url;
+
+/**
+ * Validate that a user exists in the database by UID and is not the current user
+ */
+async function validateExporterUid(exporterUid: string, currentUser: User): Promise<{ exists: boolean; isSelf: boolean }> {
+  try {
+    const apiKey = await getUserApiKey();
+    const response = await fetch(`${USER_WORKER_URL}/${exporterUid}`, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+    
+    const exists = response.status === 200;
+    const isSelf = exporterUid === currentUser.uid;
+    
+    return { exists, isSelf };
+  } catch (error) {
+    console.error('Error validating exporter UID:', error);
+    return { exists: false, isSelf: false };
+  }
+}
 const IMAGE_WORKER_URL = paths.image_worker_url;
 
 export interface ImportOptions {
@@ -45,13 +69,154 @@ export interface ReadOnlyCaseMetadata {
   isReadOnly: true;
 }
 
+export interface CaseImportPreview {
+  caseNumber: string;
+  exportedBy: string | null;
+  exportedByName: string | null;
+  exportedByCompany: string | null;
+  exportDate: string;
+  totalFiles: number;
+  caseCreatedDate?: string;
+  checksumValid?: boolean;
+  checksumError?: string;
+  expectedChecksum?: string;
+  actualChecksum?: string;
+}
+
+/**
+ * Preview case information from ZIP file without importing
+ */
+export async function previewCaseImport(zipFile: File, currentUser: User): Promise<CaseImportPreview> {
+  const JSZip = (await import('jszip')).default;
+  
+  try {
+    const zip = await JSZip.loadAsync(zipFile);
+    
+    // First, validate checksum if forensic metadata exists
+    let checksumValid: boolean | undefined = undefined;
+    let checksumError: string | undefined = undefined;
+    let expectedChecksum: string | undefined = undefined;
+    let actualChecksum: string | undefined = undefined;
+    
+    // Find the main data file (JSON or CSV)
+    const dataFiles = Object.keys(zip.files).filter(name => 
+      name.endsWith('_data.json') || name.endsWith('_data.csv')
+    );
+    
+    if (dataFiles.length === 0) {
+      throw new Error('No valid data file found in ZIP archive');
+    }
+    
+    if (dataFiles.length > 1) {
+      throw new Error('Multiple data files found in ZIP archive');
+    }
+    
+    const dataFileName = dataFiles[0];
+    const isJsonFormat = dataFileName.endsWith('.json');
+    
+    if (!isJsonFormat) {
+      throw new Error('CSV import not yet supported. Please use JSON format.');
+    }
+    
+    // Extract and parse case data
+    const dataContent = await zip.file(dataFileName)?.async('text');
+    if (!dataContent) {
+      throw new Error('Failed to read data file from ZIP');
+    }
+    
+    // Handle forensic protection warnings in JSON
+    const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+    
+    // Now validate checksum if forensic metadata exists
+    const metadataFile = zip.file('FORENSIC_METADATA.json');
+    if (metadataFile) {
+      try {
+        const metadataContent = await metadataFile.async('text');
+        const metadata = JSON.parse(metadataContent);
+        
+        if (metadata.contentChecksum) {
+          expectedChecksum = metadata.contentChecksum;
+          
+          // Calculate actual checksum of core content data (same as export calculation)
+          actualChecksum = calculateCRC32(cleanedContent);
+          
+          checksumValid = actualChecksum === expectedChecksum;
+          
+          if (!checksumValid) {
+            checksumError = `Checksum validation failed. Expected: ${expectedChecksum}, Got: ${actualChecksum}. The file may have been tampered with or corrupted.`;
+          }
+        }
+      } catch (error) {
+        checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        checksumValid = false;
+      }
+    }
+    
+    const caseData: CaseExportData = JSON.parse(cleanedContent);
+    
+    // Validate case data structure
+    if (!caseData.metadata?.caseNumber) {
+      throw new Error('Invalid case data: missing case number');
+    }
+    
+    if (!validateCaseNumber(caseData.metadata.caseNumber)) {
+      throw new Error(`Invalid case number format: ${caseData.metadata.caseNumber}`);
+    }
+    
+    // Validate exporter UID exists in user database and is not current user
+    if (caseData.metadata.exportedByUid) {
+      const validation = await validateExporterUid(caseData.metadata.exportedByUid, currentUser);
+      
+      if (!validation.exists) {
+        throw new Error(`The original exporter is not a valid Striae user. This case cannot be imported.`);
+      }
+      
+      if (validation.isSelf) {
+        throw new Error(`You cannot import a case that you originally exported. Original analysts cannot review their own cases.`);
+      }
+    } else {
+      throw new Error('Case export missing exporter UID information. This case cannot be imported.');
+    }
+    
+    // Count image files
+    let totalFiles = 0;
+    const imagesFolder = zip.folder('images');
+    if (imagesFolder) {
+      for (const [, file] of Object.entries(imagesFolder.files)) {
+        if (!file.dir && file.name.includes('/')) {
+          totalFiles++;
+        }
+      }
+    }
+    
+    return {
+      caseNumber: caseData.metadata.caseNumber,
+      exportedBy: caseData.metadata.exportedBy || null,
+      exportedByName: caseData.metadata.exportedByName || null,
+      exportedByCompany: caseData.metadata.exportedByCompany || null,
+      exportDate: caseData.metadata.exportDate,
+      totalFiles,
+      caseCreatedDate: caseData.metadata.caseCreatedDate,
+      checksumValid,
+      checksumError,
+      expectedChecksum,
+      actualChecksum
+    };
+    
+  } catch (error) {
+    console.error('Error previewing case import:', error);
+    throw new Error(`Failed to preview case: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
 /**
  * Parse and validate ZIP file contents for case import
  */
-export async function parseImportZip(zipFile: File): Promise<{
+export async function parseImportZip(zipFile: File, currentUser: User): Promise<{
   caseData: CaseExportData;
   imageFiles: { [filename: string]: Blob };
   metadata?: any;
+  cleanedContent?: string; // Add cleaned content for checksum validation
 }> {
   // Dynamic import of JSZip to avoid bundle size issues
   const JSZip = (await import('jszip')).default;
@@ -77,6 +242,7 @@ export async function parseImportZip(zipFile: File): Promise<{
     
     // Extract and parse case data
     let caseData: CaseExportData;
+    let cleanedContent: string = '';
     if (isJsonFormat) {
       const dataContent = await zip.file(dataFileName)?.async('text');
       if (!dataContent) {
@@ -84,7 +250,7 @@ export async function parseImportZip(zipFile: File): Promise<{
       }
       
       // Handle forensic protection warnings in JSON
-      const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+      cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
       caseData = JSON.parse(cleanedContent);
     } else {
       throw new Error('CSV import not yet supported. Please use JSON format.');
@@ -99,12 +265,27 @@ export async function parseImportZip(zipFile: File): Promise<{
       throw new Error(`Invalid case number format: ${caseData.metadata.caseNumber}`);
     }
     
+    // Validate exporter UID exists in user database and is not current user
+    if (caseData.metadata.exportedByUid) {
+      const validation = await validateExporterUid(caseData.metadata.exportedByUid, currentUser);
+      
+      if (!validation.exists) {
+        throw new Error(`The original exporter is not a valid Striae user. This case cannot be imported.`);
+      }
+      
+      if (validation.isSelf) {
+        throw new Error(`You cannot import a case that you originally exported. Original analysts cannot review their own cases.`);
+      }
+    } else {
+      throw new Error('Case export missing exporter UID information. This case cannot be imported.');
+    }
+    
     // Extract image files
     const imageFiles: { [filename: string]: Blob } = {};
     const imagesFolder = zip.folder('images');
     
     if (imagesFolder) {
-      for (const [relativePath, file] of Object.entries(imagesFolder.files)) {
+      for (const [, file] of Object.entries(imagesFolder.files)) {
         if (!file.dir && file.name.includes('/')) {
           const filename = file.name.split('/').pop();
           if (filename) {
@@ -126,7 +307,8 @@ export async function parseImportZip(zipFile: File): Promise<{
     return {
       caseData,
       imageFiles,
-      metadata
+      metadata,
+      cleanedContent
     };
     
   } catch (error) {
@@ -388,8 +570,26 @@ export async function importCaseForReview(
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
     
     // Step 1: Parse ZIP file
-    const { caseData, imageFiles, metadata } = await parseImportZip(zipFile);
+    const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
+    
+    // Step 1.5: Validate checksum if forensic metadata exists
+    if (metadata?.contentChecksum && cleanedContent) {
+      onProgress?.('Validating file integrity', 15, 'Checking data checksum...');
+      
+      const actualChecksum = calculateCRC32(cleanedContent);
+      
+      if (actualChecksum !== metadata.contentChecksum) {
+        throw new Error(
+          `Data checksum validation failed. Expected: ${metadata.contentChecksum}, Got: ${actualChecksum}. ` +
+          `The file may have been tampered with or corrupted. Import cannot proceed.`
+        );
+      }
+      
+      onProgress?.('File integrity verified', 18, 'Checksum validation passed');
+    } else {
+      result.warnings?.push('No forensic metadata found - checksum validation skipped');
+    }
     
     onProgress?.('Validating case data', 20, `Case: ${result.caseNumber}`);
     

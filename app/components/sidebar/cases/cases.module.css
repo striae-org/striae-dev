@@ -120,22 +120,56 @@
   background-color: #5c636a;
 }
 
+.exportSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
 .exportButton {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 6px;  
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(13, 110, 253, 0.3);
+}
+
+.exportButton:hover {
+  background-color: #0b5ed7;
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.4);
+}
+
+.filesModalSection {
+  margin: 1rem 0;
+}
+
+.filesModalButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #17a2b8;
   color: white;
   border: none;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 0.5rem;
   box-sizing: border-box;
 }
 
-.exportButton:hover {
-  background-color: #0b5ed7;
+.filesModalButton:hover:not(:disabled) {
+  background-color: #138496;
+}
+
+.filesModalButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* Status Messages */

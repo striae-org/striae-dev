@@ -1,9 +1,10 @@
 import { User } from 'firebase/auth';
-import { FileData, AnnotationData, CaseExportData, AllCasesExportData } from '~/types';
+import { FileData, AnnotationData, CaseExportData, AllCasesExportData, UserData } from '~/types';
 import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
-import * as XLSX from 'xlsx';
+import { getUserData } from '~/utils/permissions';
+import { calculateCRC32 } from '~/utils/CRC32';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -40,8 +41,34 @@ const CSV_HEADERS = [
   'Last Updated'
 ];
 
+/**
+ * Helper function to get user export metadata
+ */
+async function getUserExportMetadata(user: User) {
+  try {
+    const userData = await getUserData(user);
+    if (userData) {
+      return {
+        exportedBy: user.email,
+        exportedByUid: userData.uid,
+        exportedByName: `${userData.firstName} ${userData.lastName}`.trim(),
+        exportedByCompany: userData.company
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to fetch user data for export metadata:', error);
+  }
+  
+  // Fallback to basic user data if getUserData fails
+  return {
+    exportedBy: user.email,
+    exportedByUid: user.uid,
+    exportedByName: user.displayName || 'N/A',
+    exportedByCompany: 'N/A'
+  };
+}
+
 export interface ExportOptions {
-  includeAnnotations?: boolean;
   format?: 'json' | 'csv';
   includeMetadata?: boolean;
   includeUserInfo?: boolean;
@@ -49,34 +76,20 @@ export interface ExportOptions {
 }
 
 /**
- * Add forensic data protection warning to content
+ * Add data protection warning to content
  */
 function addForensicDataWarning(content: string, format: 'csv' | 'json'): string {
   const warning = format === 'csv' 
-    ? `"FORENSIC DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n`
-    : `/* FORENSIC DATA WARNING
+    ? `"CASE DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n`
+    : `/* CASE DATA WARNING
  * This file contains evidence data for forensic examination.
  * Any modification may compromise the integrity of the evidence.
  * Handle according to your organization's chain of custody procedures.
  * 
  * File generated: ${new Date().toISOString()}
- * Checksum: ${generateSimpleChecksum(content)}
  */\n\n`;
   
   return warning + content;
-}
-
-/**
- * Generate simple checksum for content verification
- */
-function generateSimpleChecksum(content: string): string {
-  let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    const char = content.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash | 0;
-  }
-  return Math.abs(hash).toString(16);
 }
 
 /**
@@ -144,8 +157,12 @@ function generateMetadataRows(exportData: CaseExportData): string[][] {
     ['Case Export Report'],
     [''],
     ['Case Number', exportData.metadata.caseNumber],
+    ['Case Created Date', exportData.metadata.caseCreatedDate],
     ['Export Date', exportData.metadata.exportDate],
-    ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+    ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
+    ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
+    ['Exported By (Name)', exportData.metadata.exportedByName || 'N/A'],
+    ['Exported By (Company)', exportData.metadata.exportedByCompany || 'N/A'],
     ['Striae Export Schema Version', exportData.metadata.striaeExportSchemaVersion],
     ['Total Files', exportData.metadata.totalFiles.toString()],
     [''],
@@ -154,6 +171,8 @@ function generateMetadataRows(exportData: CaseExportData): string[][] {
     ['Files without Annotations', (exportData.summary?.filesWithoutAnnotations || 0).toString()],
     ['Total Box Annotations', (exportData.summary?.totalBoxAnnotations || 0).toString()],
     ['Last Modified', exportData.summary?.lastModified || 'N/A'],
+    ['Earliest Annotation Date', exportData.summary?.earliestAnnotationDate || 'N/A'],
+    ['Latest Annotation Date', exportData.summary?.latestAnnotationDate || 'N/A'],
     [''],
     ['File Details']
   ];
@@ -278,11 +297,13 @@ export async function exportAllCases(
   onProgress?: (current: number, total: number, caseName: string) => void
 ): Promise<AllCasesExportData> {
   const {
-    includeAnnotations = true,
     includeMetadata = true
   } = options;
 
   try {
+    // Get user export metadata
+    const userMetadata = await getUserExportMetadata(user);
+    
     // Get list of all cases for the user
     const caseNumbers = await listCases(user);
     
@@ -297,6 +318,8 @@ export async function exportAllCases(
     let casesWithAnnotations = 0;
     let casesWithoutFiles = 0;
     let lastModified: string | undefined;
+    let earliestAnnotationDate: string | undefined;
+    let latestAnnotationDate: string | undefined;
 
     // Export each case
     for (let i = 0; i < caseNumbers.length; i++) {
@@ -334,13 +357,37 @@ export async function exportAllCases(
           }
         }
 
+        // Track annotation date range across all cases
+        if (caseExport.summary?.earliestAnnotationDate) {
+          if (!earliestAnnotationDate || caseExport.summary.earliestAnnotationDate < earliestAnnotationDate) {
+            earliestAnnotationDate = caseExport.summary.earliestAnnotationDate;
+          }
+        }
+        if (caseExport.summary?.latestAnnotationDate) {
+          if (!latestAnnotationDate || caseExport.summary.latestAnnotationDate > latestAnnotationDate) {
+            latestAnnotationDate = caseExport.summary.latestAnnotationDate;
+          }
+        }
+
       } catch (error) {
+        // Get case creation date even for failed exports
+        let caseCreatedDate = new Date().toISOString(); // fallback
+        try {
+          const existingCase = await checkExistingCase(user, caseNumber);
+          if (existingCase?.createdAt) {
+            caseCreatedDate = existingCase.createdAt;
+          }
+        } catch {
+          // Use fallback date if case lookup fails
+        }
+
         // Create a placeholder entry for failed exports
         exportedCases.push({
           metadata: {
             caseNumber,
+            caseCreatedDate,
             exportDate: new Date().toISOString(),
-            exportedBy: user.email,
+            ...userMetadata,
             striaeExportSchemaVersion: '1.0',
             totalFiles: 0
           },
@@ -359,7 +406,7 @@ export async function exportAllCases(
     const allCasesExport: AllCasesExportData = {
       metadata: {
         exportDate: new Date().toISOString(),
-        exportedBy: user.email,
+        ...userMetadata,
         striaeExportSchemaVersion: '1.0',
         totalCases: caseNumbers.length,
         totalFiles,
@@ -373,7 +420,9 @@ export async function exportAllCases(
         casesWithFiles,
         casesWithAnnotations,
         casesWithoutFiles,
-        lastModified
+        lastModified,
+        earliestAnnotationDate,
+        latestAnnotationDate
       };
     }
 
@@ -399,9 +448,11 @@ export async function exportCaseData(
   options: ExportOptions = {}
 ): Promise<CaseExportData> {
   const {
-    includeAnnotations = true,
     includeMetadata = true
   } = options;
+
+  // Get user export metadata
+  const userMetadata = await getUserExportMetadata(user);
 
   // Validate case number format
   if (!validateCaseNumber(caseNumber)) {
@@ -427,42 +478,50 @@ export async function exportCaseData(
     let filesWithAnnotationsCount = 0;
     let totalBoxAnnotations = 0;
     let lastModified: string | undefined;
+    let earliestAnnotationDate: string | undefined;
+    let latestAnnotationDate: string | undefined;
 
     for (const file of files) {
       let annotations: AnnotationData | undefined;
       let hasAnnotations = false;
 
-      if (includeAnnotations) {
-        try {
-          annotations = await getNotes(user, caseNumber, file.id) || undefined;
-          hasAnnotations = !!(annotations && (
-            annotations.additionalNotes ||
-            annotations.classNote ||
-            annotations.customClass ||
-            (annotations.boxAnnotations && annotations.boxAnnotations.length > 0)
-          ));
+      try {
+        annotations = await getNotes(user, caseNumber, file.id) || undefined;
+        hasAnnotations = !!(annotations && (
+          annotations.additionalNotes ||
+          annotations.classNote ||
+          annotations.customClass ||
+          (annotations.boxAnnotations && annotations.boxAnnotations.length > 0)
+        ));
 
-          if (hasAnnotations) {
-            filesWithAnnotationsCount++;
-            if (annotations?.boxAnnotations) {
-              totalBoxAnnotations += annotations.boxAnnotations.length;
+        if (hasAnnotations) {
+          filesWithAnnotationsCount++;
+          if (annotations?.boxAnnotations) {
+            totalBoxAnnotations += annotations.boxAnnotations.length;
+          }
+          
+          // Track last modified
+          if (annotations?.updatedAt) {
+            if (!lastModified || annotations.updatedAt > lastModified) {
+              lastModified = annotations.updatedAt;
             }
             
-            // Track last modified
-            if (annotations?.updatedAt) {
-              if (!lastModified || annotations.updatedAt > lastModified) {
-                lastModified = annotations.updatedAt;
-              }
+            // Track annotation date range
+            if (!earliestAnnotationDate || annotations.updatedAt < earliestAnnotationDate) {
+              earliestAnnotationDate = annotations.updatedAt;
+            }
+            if (!latestAnnotationDate || annotations.updatedAt > latestAnnotationDate) {
+              latestAnnotationDate = annotations.updatedAt;
             }
           }
-        } catch (error) {
-          // Continue without annotations for this file
         }
+      } catch (error) {
+        // Continue without annotations for this file
       }
 
       filesWithAnnotations.push({
         fileData: file,
-        annotations: includeAnnotations ? annotations : undefined,
+        annotations,
         hasAnnotations
       });
     }
@@ -471,8 +530,9 @@ export async function exportCaseData(
     const exportData: CaseExportData = {
       metadata: {
         caseNumber,
+        caseCreatedDate: existingCase.createdAt,
         exportDate: new Date().toISOString(),
-        exportedBy: user.email,
+        ...userMetadata,
         striaeExportSchemaVersion: '1.0',
         totalFiles: files.length
       },
@@ -482,7 +542,9 @@ export async function exportCaseData(
           filesWithAnnotations: filesWithAnnotationsCount,
           filesWithoutAnnotations: files.length - filesWithAnnotationsCount,
           totalBoxAnnotations,
-          lastModified
+          lastModified,
+          earliestAnnotationDate,
+          latestAnnotationDate
         }
       })
     };
@@ -519,18 +581,24 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 /**
  * Download all cases data as Excel file with multiple worksheets
  */
-export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): void {
+export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): Promise<void> {
   try {
+    // Dynamic import of XLSX to avoid bundle size issues
+    const XLSX = await import('xlsx');
+    
     const workbook = XLSX.utils.book_new();
     let exportPassword: string | undefined;
 
     // Create summary worksheet
     const summaryData = [
-      protectForensicData ? ['FORENSIC DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
-      protectForensicData ? ['WARNING: This workbook contains forensic evidence data and is protected from editing.'] : [''],
+      protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
+      protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
       [''],
       ['Export Date', new Date().toISOString()],
-      ['Exported By', exportData.metadata.exportedBy || 'N/A'],
+      ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
+      ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
+      ['Exported By (Name)', exportData.metadata.exportedByName || 'N/A'],
+      ['Exported By (Company)', exportData.metadata.exportedByCompany || 'N/A'],
       ['Striae Export Schema Version', '1.0'],
       ['Total Cases', exportData.cases.length],
       ['Successful Exports', exportData.cases.filter(c => !c.summary?.exportError).length],
@@ -541,28 +609,40 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       ['Case Details'],
       [
         'Case Number', 
+        'Case Created Date',
         'Export Status', 
         'Export Date', 
-        'Exported By', 
+        'Exported By (Email)', 
+        'Exported By (UID)',
+        'Exported By (Name)',
+        'Exported By (Company)',
         'Schema Version',
         'Total Files', 
         'Files with Annotations', 
         'Files without Annotations', 
         'Total Box Annotations', 
-        'Last Modified', 
+        'Last Modified',
+        'Earliest Annotation Date',
+        'Latest Annotation Date', 
         'Export Error'
       ],
       ...exportData.cases.map(caseData => [
         caseData.metadata.caseNumber,
+        caseData.metadata.caseCreatedDate,
         caseData.summary?.exportError ? 'Failed' : 'Success',
         caseData.metadata.exportDate,
         caseData.metadata.exportedBy || 'N/A',
+        caseData.metadata.exportedByUid || 'N/A',
+        caseData.metadata.exportedByName || 'N/A',
+        caseData.metadata.exportedByCompany || 'N/A',
         caseData.metadata.striaeExportSchemaVersion,
         caseData.metadata.totalFiles,
         caseData.summary?.filesWithAnnotations || 0,
         caseData.summary?.filesWithoutAnnotations || 0,
         caseData.summary?.totalBoxAnnotations || 0,
         caseData.summary?.lastModified || '',
+        caseData.summary?.earliestAnnotationDate || '',
+        caseData.summary?.latestAnnotationDate || '',
         caseData.summary?.exportError || ''
       ])
     ];
@@ -603,9 +683,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
       // Create case details with headers
       const caseDetailsData = [
         protectForensicData 
-          ? [`FORENSIC DATA - Case ${caseData.metadata.caseNumber} - PROTECTED`]
+          ? [`CASE DATA - ${caseData.metadata.caseNumber} - PROTECTED`]
           : [`Case ${caseData.metadata.caseNumber} - Detailed Export`],
-        protectForensicData ? ['WARNING: This worksheet is protected to maintain forensic data integrity.'] : [''],
+        protectForensicData ? ['WARNING: This worksheet is protected to maintain data integrity.'] : [''],
         [''],
         ...metadataRows.slice(2, -1), // Skip title and "File Details" header
         [''],
@@ -643,9 +723,9 @@ export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectFor
     if (protectForensicData && exportPassword) {
       workbook.Props = {
         Title: 'Striae Case Export - Protected',
-        Subject: 'Forensic Evidence Data Export',
+        Subject: 'Case Data Export',
         Author: exportData.metadata.exportedBy || 'Striae',
-        Comments: `This workbook contains protected forensic evidence data. Modification may compromise evidence integrity. Worksheets are password protected.`,
+        Comments: `This workbook contains protected case data. Modification may compromise evidence integrity. Worksheets are password protected.`,
         Company: 'Striae'
       };
     }
@@ -821,15 +901,24 @@ export async function downloadCaseAsZip(
     
     // Add forensic metadata file if protection is enabled
     if (options.protectForensicData) {
+      // Get the content that will be used for checksum calculation
+      const contentForChecksum = format === 'json' 
+        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings
+        : generateCSVContent(exportData, false); // Raw content without warnings
+      
+      // Calculate checksum based on the core data content
+      const contentChecksum = calculateCRC32(contentForChecksum);
+      
+      // Prepare the forensic metadata with actual checksum
       const forensicMetadata = {
         exportTimestamp: new Date().toISOString(),
         exportedBy: exportData.metadata.exportedBy || 'Unknown',
+        exportedByUid: exportData.metadata.exportedByUid || 'Unknown',
+        exportedByName: exportData.metadata.exportedByName || 'Unknown',
+        exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
         caseNumber: exportData.metadata.caseNumber,
-        contentChecksum: generateSimpleChecksum(format === 'json' ? 
-          generateJSONContent(exportData, options.includeUserInfo, false) : 
-          generateCSVContent(exportData, false)
-        ),
-        forensicWarning: 'This ZIP archive contains forensic evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
+        contentChecksum: contentChecksum, // Checksum of the core data content
+        forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
         striaeVersion: exportData.metadata.striaeExportSchemaVersion,
         archiveStructure: {
           dataFile: `${caseNumber}_data.${format}`,
@@ -839,12 +928,13 @@ export async function downloadCaseAsZip(
         }
       };
       
+      // Add forensic metadata with actual checksum
       zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
       
       // Add read-only instruction file
-      const instructionContent = `FORENSIC EVIDENCE ARCHIVE - READ ONLY
+      const instructionContent = `EVIDENCE ARCHIVE - READ ONLY
 
-This ZIP archive contains forensic evidence data exported from Striae.
+This ZIP archive contains evidence data exported from Striae.
 
 IMPORTANT WARNINGS:
 - This archive is intended for READ-ONLY access
@@ -869,22 +959,53 @@ For questions about this export, contact your Striae system administrator.
 `;
       
       zip.file('READ_ONLY_INSTRUCTIONS.txt', instructionContent);
+      
+      // Add README 
+      const readme = generateZipReadme(exportData, options.protectForensicData);
+      zip.file('README.txt', readme);
+      onProgress?.(85);
+      
+      // Generate ZIP blob
+      const zipBlob = await zip.generateAsync({ 
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+      onProgress?.(95);
+      
+      // Download
+      const url = URL.createObjectURL(zipBlob);
+      const protectionSuffix = options.protectForensicData ? '-protected' : '';
+      const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.href = url;
+      linkElement.setAttribute('download', exportFileName);
+      
+      if (options.protectForensicData) {
+        linkElement.setAttribute('title', 'Evidence archive with forensic protection enabled');
+      }
+      
+      linkElement.click();
+      
+      URL.revokeObjectURL(url);
+      onProgress?.(100);
+      
+      return; // Exit early as we've handled the forensic case
     }
-    
+
     // Add README (standard or enhanced for forensic)
     const readme = generateZipReadme(exportData, options.protectForensicData);
     zip.file('README.txt', readme);
     onProgress?.(85);
     
-    // Generate ZIP blob
+    // Generate ZIP blob for non-forensic case
     const zipBlob = await zip.generateAsync({ 
       type: 'blob',
       compression: 'DEFLATE',
       compressionOptions: { level: 6 }
     });
-    onProgress?.(95);
-    
-    // Download
+    onProgress?.(95);    // Download
     const url = URL.createObjectURL(zipBlob);
     const protectionSuffix = options.protectForensicData ? '-protected' : '';
     const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;
@@ -939,8 +1060,12 @@ function generateZipReadme(exportData: CaseExportData, protectForensicData: bool
 ==================
 
 Case Number: ${exportData.metadata.caseNumber}
+Case Created Date: ${exportData.metadata.caseCreatedDate}
 Export Date: ${exportData.metadata.exportDate}
-Exported By: ${exportData.metadata.exportedBy || 'N/A'}
+Exported By (Email): ${exportData.metadata.exportedBy || 'N/A'}
+Exported By (UID): ${exportData.metadata.exportedByUid || 'N/A'}
+Exported By (Name): ${exportData.metadata.exportedByName || 'N/A'}
+Exported By (Company): ${exportData.metadata.exportedByCompany || 'N/A'}
 Striae Export Schema Version: ${exportData.metadata.striaeExportSchemaVersion}
 
 Summary:
@@ -949,6 +1074,8 @@ Summary:
 - Files without Annotations: ${totalFiles - filesWithAnnotations}
 - Total Box Annotations: ${totalBoxAnnotations}
 - Total Annotations: ${totalAnnotations}
+- Earliest Annotation Date: ${exportData.summary?.earliestAnnotationDate || 'N/A'}
+- Latest Annotation Date: ${exportData.summary?.latestAnnotationDate || 'N/A'}
 
 Contents:
 - ${exportData.metadata.caseNumber}_data.json/.csv: Case data and annotations
@@ -957,11 +1084,11 @@ Contents:
 
   const forensicAddition = `
 - FORENSIC_METADATA.json: Archive verification data
-- READ_ONLY_INSTRUCTIONS.txt: Important forensic handling guidelines
+- READ_ONLY_INSTRUCTIONS.txt: Important evidence handling guidelines
 
-FORENSIC NOTICE:
+EVIDENCE NOTICE:
 ================
-This export contains forensic evidence data. Any modification may compromise 
+This export contains evidence data. Any modification may compromise 
 evidence integrity and chain of custody. Handle according to your organization's 
 forensic procedures and maintain proper documentation.`;
 
@@ -984,8 +1111,19 @@ function generateJSONContent(
   let jsonData = { ...exportData };
   
   // Remove sensitive user info if not included
-  if (!includeUserInfo && jsonData.metadata.exportedBy) {
-    jsonData.metadata.exportedBy = '[User Info Excluded]';
+  if (!includeUserInfo) {
+    if (jsonData.metadata.exportedBy) {
+      jsonData.metadata.exportedBy = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByUid) {
+      jsonData.metadata.exportedByUid = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByName) {
+      jsonData.metadata.exportedByName = '[User Info Excluded]';
+    }
+    if (jsonData.metadata.exportedByCompany) {
+      jsonData.metadata.exportedByCompany = '[User Info Excluded]';
+    }
   }
   
   const jsonString = JSON.stringify(jsonData, null, 2);

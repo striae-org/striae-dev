@@ -7,26 +7,27 @@ import {
   downloadAllCasesAsJSON,
   downloadAllCasesAsCSV,
   downloadCaseAsZip
-} from '../actions/case-export';
+} from '../../actions/case-export';
 import { useState, useEffect, useRef } from 'react';
 import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
-import { CaseExport, ExportFormat } from './case-export/case-export';
+import { FilesModal } from '../files/files-modal';
+import { CaseExport, ExportFormat } from '../case-export/case-export';
 import {
   validateCaseNumber,
   checkExistingCase,
   createNewCase,
   renameCase,
   deleteCase,
-} from '../actions/case-manage';
+} from '../../actions/case-manage';
 import {
   fetchFiles,
   uploadFile,
   deleteFile,
-} from '../actions/image-manage';
+} from '../../actions/image-manage';
 import { 
   checkReadOnlyCaseExists 
-} from '../actions/case-review';
+} from '../../actions/case-review';
 import { 
   canCreateCase, 
   canUploadFile, 
@@ -93,6 +94,8 @@ export const CaseSidebar = ({
   const [limitsDescription, setLimitsDescription] = useState('');
   const [permissionChecking, setPermissionChecking] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
 
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -299,6 +302,8 @@ export const CaseSidebar = ({
     if (!currentCase) return;
     
     setFileError('');
+    setDeletingFileId(fileId);
+    
     try {
       await deleteFile(user, currentCase, fileId);
       const updatedFiles = files.filter(f => f.id !== fileId);
@@ -311,6 +316,8 @@ export const CaseSidebar = ({
       await checkFileUploadPermissions(updatedFiles.length);
     } catch (err) {
       setFileError(err instanceof Error ? err.message : 'Delete failed');
+    } finally {
+      setDeletingFileId(null);
     }
   };
 
@@ -400,7 +407,6 @@ const handleImageSelect = (file: FileData) => {
       } else {
         // Standard data-only export
         const exportData = await exportCaseData(user, exportCaseNumber, {
-          includeAnnotations: true,
           includeMetadata: true
         });
         
@@ -422,7 +428,6 @@ const handleImageSelect = (file: FileData) => {
     try {
       // Export all cases with progress callback
       const exportData = await exportAllCases(user, {
-        includeAnnotations: true,
         includeMetadata: true
       }, onProgress);
       
@@ -430,7 +435,7 @@ const handleImageSelect = (file: FileData) => {
       if (format === 'json') {
         downloadAllCasesAsJSON(exportData);
       } else {
-        downloadAllCasesAsCSV(exportData);
+        await downloadAllCasesAsCSV(exportData);
       }
       
     } catch (error) {
@@ -477,14 +482,6 @@ return (
             List All Cases
           </button>
     </div>
-    <div className={styles.caseInput}>            
-      <button 
-            onClick={() => setIsExportModalOpen(true)}
-            className={styles.exportButton}
-          >
-            Export Case Data
-          </button>
-    </div>
     {error && <p className={styles.error}>{error}</p>}
     {successAction && (
       <p className={styles.success}>
@@ -506,6 +503,16 @@ return (
         onExportAll={handleExportAll}
         currentCaseNumber={currentCase || ''}
       />
+      
+      <FilesModal
+        isOpen={isFilesModalOpen}
+        onClose={() => setIsFilesModalOpen(false)}
+        onFileSelect={handleImageSelect}
+        currentCase={currentCase}
+        files={files}
+        setFiles={setFiles}
+      />
+      
         <div className={styles.filesSection}>
       <div className={isReadOnly && currentCase ? styles.readOnlyContainer : styles.caseHeader}>
         <h4 className={styles.caseNumber}>
@@ -548,6 +555,21 @@ return (
       )}
     </div>
       )}
+      
+      {/* Files Modal Button - positioned between upload and file list */}
+      {currentCase && (
+        <div className={styles.filesModalSection}>
+          <button
+            className={styles.filesModalButton}
+            onClick={() => setIsFilesModalOpen(true)}
+            disabled={files.length === 0}
+            title={files.length === 0 ? "No files to view" : "View all files in modal"}
+          >
+            View All Files ({files.length})
+          </button>
+        </div>
+      )}
+      
       {!currentCase ? (
         <p className={styles.emptyState}>Create or select a case to view files</p>
       ) : files.length === 0 ? (
@@ -578,10 +600,10 @@ return (
                   }}
                   className={styles.deleteButton}
                   aria-label="Delete file"
-                  disabled={isReadOnly}
+                  disabled={isReadOnly || deletingFileId === file.id}
                   style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                 >
-                  ×
+                  {deletingFileId === file.id ? '⏳' : '×'}
                 </button>
               </li>
             ))}
@@ -639,6 +661,19 @@ return (
           )}
         </div>
       )}
+      
+      {/* Export Case Data Button - moved to bottom */}
+      {currentCase && (
+        <div className={styles.exportSection}>
+          <button 
+            onClick={() => setIsExportModalOpen(true)}
+            className={styles.exportButton}
+          >
+            Export Case Data
+          </button>
+        </div>
+      )}
+      
       </div>
     </div>
   );

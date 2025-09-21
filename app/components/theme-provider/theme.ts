@@ -116,6 +116,7 @@ const dark = {
   backgroundLight: 'oklch(20% 0 0)',
   primary: 'oklch(95% 0 0)',
   accent: 'oklch(89.7% 0.14 83.6)',
+  success: 'oklch(70% 0.131 146.01)',
   error: 'oklch(65.91% 0.249 13.76)',
   warning: 'oklch(70% 0.15 55)',
   text: 'var(--white)',

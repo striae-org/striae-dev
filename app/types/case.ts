@@ -18,8 +18,12 @@ export interface CasesToDelete {
 export interface CaseExportData {
   metadata: {
     caseNumber: string;
+    caseCreatedDate: string;
     exportDate: string;
     exportedBy: string | null;
+    exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
     striaeExportSchemaVersion: string;
     totalFiles: number;
   };
@@ -33,6 +37,8 @@ export interface CaseExportData {
     filesWithoutAnnotations: number;
     totalBoxAnnotations: number;
     lastModified?: string;
+    earliestAnnotationDate?: string;
+    latestAnnotationDate?: string;
     exportError?: string;
   };
 }
@@ -41,6 +47,9 @@ export interface AllCasesExportData {
   metadata: {
     exportDate: string;
     exportedBy: string | null;
+    exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
     striaeExportSchemaVersion: string;
     totalCases: number;
     totalFiles: number;
@@ -52,5 +61,7 @@ export interface AllCasesExportData {
     casesWithAnnotations: number;
     casesWithoutFiles: number;
     lastModified?: string;
+    earliestAnnotationDate?: string;
+    latestAnnotationDate?: string;
   };
 }
