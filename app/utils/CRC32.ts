@@ -12,7 +12,7 @@ const CRC32_TABLE = (() => {
     for (let j = 0; j < 8; j++) {
       c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
     }
-    table[i] = c;
+    table[i] = c >>> 0; // Ensure unsigned 32-bit
   }
   return table;
 })();
@@ -73,7 +73,7 @@ export async function calculateCRC32Binary(data: Uint8Array | ArrayBuffer | Blob
  */
 export function verifyCRC32(content: string, expectedChecksum: string): boolean {
   const actualChecksum = calculateCRC32(content);
-  return actualChecksum.toLowerCase() === expectedChecksum.toLowerCase();
+  return actualChecksum === expectedChecksum.toLowerCase();
 }
 
 /**
@@ -91,12 +91,13 @@ export function validateCRC32(content: string, expectedChecksum: string): {
 } {
   try {
     const actualChecksum = calculateCRC32(content);
-    const isValid = actualChecksum.toLowerCase() === expectedChecksum.toLowerCase();
+    const normalizedExpected = expectedChecksum.toLowerCase();
+    const isValid = actualChecksum === normalizedExpected;
     
     return {
       isValid,
       actualChecksum,
-      expectedChecksum: expectedChecksum.toLowerCase(),
+      expectedChecksum: normalizedExpected,
       error: isValid ? undefined : 'Checksum validation failed - content may have been modified'
     };
   } catch (error) {
@@ -156,6 +157,8 @@ export async function generateForensicManifest(
 
 /**
  * Validate complete case integrity including data and images
+ * This function recreates the manifest using the same logic as generation to ensure
+ * tamper detection and consistent validation results.
  * 
  * @param dataContent - JSON data content
  * @param imageFiles - Map of filename to image blob
@@ -179,55 +182,85 @@ export async function validateCaseIntegrity(
   summary: string;
 }> {
   const errors: string[] = [];
+  const imageValidation: { [filename: string]: boolean } = {};
   
-  // Validate data checksum
+  // 1. Validate data content checksum
   const actualDataChecksum = calculateCRC32(dataContent);
-  const dataValid = actualDataChecksum.toLowerCase() === expectedManifest.dataChecksum.toLowerCase();
+  const dataValid = actualDataChecksum === expectedManifest.dataChecksum.toLowerCase();
   if (!dataValid) {
-    errors.push(`Data file checksum mismatch: expected ${expectedManifest.dataChecksum}, got ${actualDataChecksum}`);
+    errors.push(`Data checksum mismatch: expected ${expectedManifest.dataChecksum}, got ${actualDataChecksum}`);
   }
   
-  // Validate image checksums
-  const imageValidation: { [filename: string]: boolean } = {};
-  for (const [filename, blob] of Object.entries(imageFiles)) {
-    const actualImageChecksum = await calculateCRC32Binary(blob);
-    const expectedImageChecksum = expectedManifest.imageChecksums[filename];
-    
-    if (!expectedImageChecksum) {
-      imageValidation[filename] = false;
-      errors.push(`No expected checksum found for image: ${filename}`);
-    } else {
-      const isValid = actualImageChecksum.toLowerCase() === expectedImageChecksum.toLowerCase();
+  // 2. Validate each image file checksum using the actual files provided
+  // SECURITY FIX: Use the actual image files to determine validation scope,
+  // not the potentially tampered manifest keys
+  const actualImageFiles = Object.keys(imageFiles).sort();
+  const expectedImageFiles = Object.keys(expectedManifest.imageChecksums).sort();
+  
+  // Check for missing or extra files
+  const missingFiles = expectedImageFiles.filter(f => !actualImageFiles.includes(f));
+  const extraFiles = actualImageFiles.filter(f => !expectedImageFiles.includes(f));
+  
+  if (missingFiles.length > 0) {
+    errors.push(`Missing image files: ${missingFiles.join(', ')}`);
+  }
+  if (extraFiles.length > 0) {
+    errors.push(`Extra image files not in manifest: ${extraFiles.join(', ')}`);
+  }
+  
+  // Validate checksums for files that exist in both
+  for (const filename of actualImageFiles) {
+    if (expectedManifest.imageChecksums[filename]) {
+      const actualChecksum = await calculateCRC32Binary(imageFiles[filename]);
+      const isValid = actualChecksum === expectedManifest.imageChecksums[filename].toLowerCase();
       imageValidation[filename] = isValid;
+      
       if (!isValid) {
-        errors.push(`Image checksum mismatch for ${filename}: expected ${expectedImageChecksum}, got ${actualImageChecksum}`);
+        errors.push(`Image checksum mismatch for ${filename}: expected ${expectedManifest.imageChecksums[filename]}, got ${actualChecksum}`);
+      }
+    } else {
+      imageValidation[filename] = false;
+    }
+  }
+  
+  // 3. SECURITY FIX: Recreate the manifest using the same generation logic
+  // This ensures we detect any tampering with the manifest structure or ordering
+  const recreatedManifest = await generateForensicManifest(dataContent, imageFiles);
+  
+  // Compare the recreated manifest checksum with the expected one
+  const manifestValid = recreatedManifest.manifestChecksum === expectedManifest.manifestChecksum.toLowerCase();
+  if (!manifestValid) {
+    errors.push(`Manifest checksum mismatch: expected ${expectedManifest.manifestChecksum}, got ${recreatedManifest.manifestChecksum}`);
+    
+    // Additional forensic detail: check what specifically differs
+    if (recreatedManifest.dataChecksum !== expectedManifest.dataChecksum.toLowerCase()) {
+      errors.push(`Manifest data checksum field differs from actual data`);
+    }
+    
+    // Check if image checksum entries differ
+    for (const filename of Object.keys(imageFiles).sort()) {
+      if (recreatedManifest.imageChecksums[filename] && 
+          recreatedManifest.imageChecksums[filename] !== expectedManifest.imageChecksums[filename]?.toLowerCase()) {
+        errors.push(`Manifest image checksum entry for ${filename} differs from actual file`);
       }
     }
   }
   
-  // Check for missing images
-  for (const expectedFilename of Object.keys(expectedManifest.imageChecksums)) {
-    if (!imageFiles[expectedFilename]) {
-      imageValidation[expectedFilename] = false;
-      errors.push(`Missing expected image file: ${expectedFilename}`);
-    }
-  }
+  const allImageFilesValid = Object.values(imageValidation).every(valid => valid);
+  const isValid = dataValid && allImageFilesValid && manifestValid && errors.length === 0;
   
-  // Validate manifest checksum
-  const recreatedManifest = JSON.stringify({
-    dataChecksum: expectedManifest.dataChecksum,
-    imageChecksums: expectedManifest.imageChecksums,
-    fileOrder: Object.keys(expectedManifest.imageChecksums).sort()
-  });
-  const actualManifestChecksum = calculateCRC32(recreatedManifest);
-  const manifestValid = actualManifestChecksum.toLowerCase() === expectedManifest.manifestChecksum.toLowerCase();
-  if (!manifestValid) {
-    errors.push(`Manifest checksum mismatch: expected ${expectedManifest.manifestChecksum}, got ${actualManifestChecksum}`);
-  }
+  // Generate forensic summary
+  const totalFiles = Object.keys(imageFiles).length;
+  const validFiles = Object.values(imageValidation).filter(valid => valid).length;
   
-  const isValid = dataValid && Object.values(imageValidation).every(v => v === true) && manifestValid;
-  const totalFiles = Object.keys(imageFiles).length + 1;
-  const validFiles = (dataValid ? 1 : 0) + Object.values(imageValidation).filter(v => v === true).length;
+  let summary = `Validation ${isValid ? 'PASSED' : 'FAILED'}: `;
+  summary += `Data ${dataValid ? 'valid' : 'invalid'}, `;
+  summary += `${validFiles}/${totalFiles} images valid, `;
+  summary += `manifest ${manifestValid ? 'valid' : 'invalid'}`;
+  
+  if (errors.length > 0) {
+    summary += `. ${errors.length} error(s) detected.`;
+  }
   
   return {
     isValid,
@@ -235,8 +268,6 @@ export async function validateCaseIntegrity(
     imageValidation,
     manifestValid,
     errors,
-    summary: isValid 
-      ? `All ${totalFiles} files validated successfully`
-      : `${validFiles}/${totalFiles} files valid, ${errors.length} integrity issues found`
+    summary
   };
 }
