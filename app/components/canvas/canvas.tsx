@@ -152,7 +152,7 @@ export const Canvas = ({
       {/* Company Display - Upper Right */}
       {company && (
         <div className={styles.companyDisplay}>
-          {company}
+          {isReadOnly ? 'CASE REVIEW ONLY' : company}
         </div>
       )}
       
