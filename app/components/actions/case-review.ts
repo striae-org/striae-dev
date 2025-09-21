@@ -76,6 +76,34 @@ export interface CaseImportPreview {
   exportDate: string;
   totalFiles: number;
   caseCreatedDate?: string;
+  checksumValid?: boolean;
+  checksumError?: string;
+  expectedChecksum?: string;
+  actualChecksum?: string;
+}
+
+/**
+ * Calculate CRC32 checksum for ZIP file integrity validation
+ */
+function calculateCRC32(data: ArrayBuffer): string {
+  const bytes = new Uint8Array(data);
+  let crc = 0xFFFFFFFF;
+  
+  // CRC32 polynomial table (IEEE 802.3)
+  const crcTable = new Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    crcTable[i] = c;
+  }
+  
+  for (let i = 0; i < bytes.length; i++) {
+    crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  }
+  
+  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
@@ -86,6 +114,37 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
   
   try {
     const zip = await JSZip.loadAsync(zipFile);
+    
+    // First, validate checksum if forensic metadata exists
+    let checksumValid: boolean | undefined = undefined;
+    let checksumError: string | undefined = undefined;
+    let expectedChecksum: string | undefined = undefined;
+    let actualChecksum: string | undefined = undefined;
+    
+    const metadataFile = zip.file('FORENSIC_METADATA.json');
+    if (metadataFile) {
+      try {
+        const metadataContent = await metadataFile.async('text');
+        const metadata = JSON.parse(metadataContent);
+        
+        if (metadata.contentChecksum) {
+          expectedChecksum = metadata.contentChecksum;
+          
+          // Calculate actual checksum of ZIP file
+          const zipBuffer = await zipFile.arrayBuffer();
+          actualChecksum = calculateCRC32(zipBuffer);
+          
+          checksumValid = actualChecksum === expectedChecksum;
+          
+          if (!checksumValid) {
+            checksumError = `Checksum validation failed. Expected: ${expectedChecksum}, Got: ${actualChecksum}. The file may have been tampered with or corrupted.`;
+          }
+        }
+      } catch (error) {
+        checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        checksumValid = false;
+      }
+    }
     
     // Find the main data file (JSON or CSV)
     const dataFiles = Object.keys(zip.files).filter(name => 
@@ -159,7 +218,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
       exportedByCompany: caseData.metadata.exportedByCompany || null,
       exportDate: caseData.metadata.exportDate,
       totalFiles,
-      caseCreatedDate: caseData.metadata.caseCreatedDate
+      caseCreatedDate: caseData.metadata.caseCreatedDate,
+      checksumValid,
+      checksumError,
+      expectedChecksum,
+      actualChecksum
     };
     
   } catch (error) {
@@ -528,6 +591,25 @@ export async function importCaseForReview(
     // Step 1: Parse ZIP file
     const { caseData, imageFiles, metadata } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
+    
+    // Step 1.5: Validate checksum if forensic metadata exists
+    if (metadata?.contentChecksum) {
+      onProgress?.('Validating file integrity', 15, 'Checking forensic checksum...');
+      
+      const zipBuffer = await zipFile.arrayBuffer();
+      const actualChecksum = calculateCRC32(zipBuffer);
+      
+      if (actualChecksum !== metadata.contentChecksum) {
+        throw new Error(
+          `Forensic checksum validation failed. Expected: ${metadata.contentChecksum}, Got: ${actualChecksum}. ` +
+          `The file may have been tampered with or corrupted. Import cannot proceed.`
+        );
+      }
+      
+      onProgress?.('File integrity verified', 18, 'Checksum validation passed');
+    } else {
+      result.warnings?.push('No forensic metadata found - checksum validation skipped');
+    }
     
     onProgress?.('Validating case data', 20, `Case: ${result.caseNumber}`);
     
