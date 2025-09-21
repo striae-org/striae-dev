@@ -511,6 +511,7 @@ return (
         currentCase={currentCase}
         files={files}
         setFiles={setFiles}
+        isReadOnly={isReadOnly}
       />
       
         <div className={styles.filesSection}>
