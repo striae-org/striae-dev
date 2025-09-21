@@ -105,7 +105,7 @@ const CasePreviewSection = ({ casePreview, isLoadingPreview }: {
       {casePreview.checksumValid !== undefined && (
         <div className={`${styles.checksumStatus} ${casePreview.checksumValid ? styles.checksumValid : styles.checksumInvalid}`}>
           <div className={styles.checksumLabel}>
-            <strong>Forensic Integrity:</strong>
+            <strong>Data Integrity:</strong>
           </div>
           <div className={styles.checksumValue}>
             {casePreview.checksumValid ? (
@@ -213,7 +213,7 @@ const ConfirmationDialog = ({
             </div>
             {casePreview.checksumValid !== undefined && (
               <div className={styles.confirmationItem}>
-                <strong>Forensic Integrity:</strong> {casePreview.checksumValid ? 
+                <strong>Data Integrity:</strong> {casePreview.checksumValid ? 
                   <span style={{ color: 'green' }}>✓ Verified</span> : 
                   <span style={{ color: 'red' }}>✗ Failed</span>
                 }

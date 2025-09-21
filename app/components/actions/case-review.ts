@@ -192,7 +192,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
       const validation = await validateExporterUid(caseData.metadata.exportedByUid, currentUser);
       
       if (!validation.exists) {
-        throw new Error(`The exporter (UID: ${caseData.metadata.exportedByUid}) is not a valid Striae user. This case cannot be imported.`);
+        throw new Error(`The original exporter is not a valid Striae user. This case cannot be imported.`);
       }
       
       if (validation.isSelf) {
@@ -294,7 +294,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       const validation = await validateExporterUid(caseData.metadata.exportedByUid, currentUser);
       
       if (!validation.exists) {
-        throw new Error(`The exporter (UID: ${caseData.metadata.exportedByUid}) is not a valid Striae user. This case cannot be imported.`);
+        throw new Error(`The original exporter is not a valid Striae user. This case cannot be imported.`);
       }
       
       if (validation.isSelf) {
