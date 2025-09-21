@@ -143,6 +143,11 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Generate PDF function
   const handleGeneratePDF = async () => {
+    // Prevent PDF generation for read-only cases
+    if (isReadOnlyCase) {
+      return;
+    }
+    
     await generatePDF({
       selectedImage,
       selectedFilename,

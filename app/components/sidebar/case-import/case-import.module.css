@@ -279,9 +279,9 @@
 }
 
 .cancelButton {
-  background: var(--backgroundLight);
-  color: var(--textBody);
-  border: 1px solid color-mix(in lab, var(--text) 15%, transparent);
+  background: color-mix(in lab, var(--error) 70%, white);
+  color: white;
+  border: 1px solid color-mix(in lab, var(--error) 50%, transparent);
   border-radius: var(--spaceXS);
   padding: var(--spaceM) var(--spaceL);
   font-size: var(--fontSizeBodyS);
@@ -289,11 +289,13 @@
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   flex: 1;
+  box-shadow: 0 1px 3px color-mix(in lab, var(--error) 30%, transparent);
 }
 
-.cancelButton:hover:not(:disabled) {
-  background: color-mix(in lab, var(--text) 5%, transparent);
-  border-color: color-mix(in lab, var(--text) 25%, transparent);
+.cancelButton:hover:not(:disabled) {  
+  background: color-mix(in lab, var(--error) 80%, white);
+  border-color: color-mix(in lab, var(--error) 60%, transparent);
+  box-shadow: 0 2px 6px color-mix(in lab, var(--error) 40%, transparent);
 }
 
 .cancelButton:disabled {
@@ -354,4 +356,131 @@
 
 .instructionsList li:last-child {
   margin-bottom: 0;
+}
+
+/* Preview Section */
+.previewSection {
+  background: color-mix(in lab, var(--primary) 5%, transparent);
+  border: 1px solid color-mix(in lab, var(--primary) 20%, transparent);
+  border-radius: var(--spaceXS);
+  padding: var(--spaceM);
+  margin: var(--spaceM) 0;
+}
+
+.previewTitle {
+  margin: 0 0 var(--spaceM) 0;
+  font-size: var(--fontSizeBodyM);
+  font-weight: var(--fontWeightMedium);
+  color: var(--textTitle);
+}
+
+.previewLoading {
+  text-align: center;
+  color: var(--textLight);
+  font-style: italic;
+  padding: var(--spaceM);
+}
+
+.previewGrid {
+  display: grid;
+  gap: var(--spaceS);
+}
+
+.previewItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spaceXS) 0;
+}
+
+.previewLabel {
+  font-weight: var(--fontWeightMedium);
+  color: var(--textBody);
+  font-size: var(--fontSizeBodyS);
+}
+
+.previewValue {
+  color: var(--textTitle);
+  font-size: var(--fontSizeBodyS);
+  text-align: right;
+  font-weight: var(--fontWeightMedium);
+}
+
+/* Confirmation Dialog */
+.confirmationOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: color-mix(in lab, var(--black) 60%, transparent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.confirmationModal {
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 var(--spaceM) var(--spaceXL) color-mix(in lab, var(--black) 20%, transparent);
+}
+
+.confirmationContent {
+  padding: var(--spaceL);
+}
+
+.confirmationTitle {
+  margin: 0 0 var(--spaceM) 0;
+  font-size: var(--fontSizeBodyL);
+  font-weight: var(--fontWeightMedium);
+  color: var(--textTitle);
+}
+
+.confirmationText {
+  margin: 0 0 var(--spaceL) 0;
+  color: var(--textBody);
+  font-size: var(--fontSizeBodyS);
+}
+
+.confirmationDetails {
+  background: color-mix(in lab, var(--background) 50%, transparent);
+  border: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  border-radius: var(--spaceXS);
+  padding: var(--spaceM);
+  margin: 0 0 var(--spaceL) 0;
+}
+
+.confirmationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spaceXS) 0;
+  font-size: var(--fontSizeBodyS);
+}
+
+.confirmationItem:not(:last-child) {
+  border-bottom: 1px solid color-mix(in lab, var(--text) 5%, transparent);
+}
+
+.confirmationButtons {
+  display: flex;
+  gap: var(--spaceM);
+  justify-content: flex-end;
+}
+
+.confirmButton {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--spaceXS);
+  padding: var(--spaceS) var(--spaceL);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.confirmButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px color-mix(in lab, var(--primary) 30%, transparent);
 }

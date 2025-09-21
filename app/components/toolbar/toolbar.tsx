@@ -127,7 +127,7 @@ export const Toolbar = ({
         isActive={false}
         onClick={() => handleToolClick('print')}
         ariaLabel={isGeneratingPDF ? "Generating PDF..." : "Save/Print to PDF"}
-        disabled={!canGeneratePDF || isGeneratingPDF}
+        disabled={!canGeneratePDF || isGeneratingPDF || isReadOnly}
         showSpinner={isGeneratingPDF}
       />
         </div>
