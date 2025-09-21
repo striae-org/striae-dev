@@ -34,7 +34,7 @@ export const uploadFile = async (
   const currentFiles = await fetchFiles(user, caseNumber);
   
   // Check if user can upload another file
-  const permission = await canUploadFile(user, caseNumber, currentFiles.length);
+  const permission = await canUploadFile(user, currentFiles.length);
   if (!permission.canUpload) {
     throw new Error(permission.reason || 'You cannot upload more files to this case.');
   }

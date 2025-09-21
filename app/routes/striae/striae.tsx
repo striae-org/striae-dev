@@ -119,11 +119,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Handler for toolbar annotation selection
   const handleToolSelect = (toolId: string, active: boolean) => {
-    // Allow visibility toggles for read-only cases, but don't allow box annotation mode
-    if (isReadOnlyCase && toolId === 'box' && active) {
-      return;
-    }
-
+    // Always allow visibility toggles (including for read-only cases)
     setActiveAnnotations(prev => {
       const next = new Set(prev);
       if (active) {
@@ -134,7 +130,7 @@ export const Striae = ({ user }: StriaePage) => {
       return next;
     });
 
-    // Handle box annotation mode (only allow activation for non-read-only cases)
+    // Handle box annotation mode (only allow interaction for non-read-only cases)
     if (toolId === 'box') {
       setIsBoxAnnotationMode(active && !isReadOnlyCase);
     }
