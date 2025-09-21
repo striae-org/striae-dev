@@ -3,8 +3,8 @@ import { useState } from 'react';
 import styles from './sidebar.module.css';
 import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
-import { CaseSidebar } from './case-sidebar';
-import { NotesSidebar } from './notes-sidebar';
+import { CaseSidebar } from './cases/case-sidebar';
+import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import';
 import { FileData } from '~/types';
 import { ImportResult } from '../actions/case-review';
@@ -126,7 +126,7 @@ export const Sidebar = ({
               onClick={() => setIsImportModalOpen(true)}
               className={styles.importButton}
             >
-              Import Case
+              Import/Clear Case
             </button>
           </div>
         </>

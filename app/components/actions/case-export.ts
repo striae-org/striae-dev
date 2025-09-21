@@ -4,7 +4,6 @@ import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
 import { getUserData } from '~/utils/permissions';
-import * as XLSX from 'xlsx';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -87,23 +86,35 @@ function addForensicDataWarning(content: string, format: 'csv' | 'json'): string
  * Handle according to your organization's chain of custody procedures.
  * 
  * File generated: ${new Date().toISOString()}
- * Checksum: ${generateSimpleChecksum(content)}
  */\n\n`;
   
   return warning + content;
 }
 
 /**
- * Generate simple checksum for content verification
+ * Calculate CRC32 checksum for content integrity validation
+ * This must match the algorithm used in case-review.ts
  */
-function generateSimpleChecksum(content: string): string {
-  let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    const char = content.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash | 0;
+function calculateCRC32(content: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(content);
+  let crc = 0xFFFFFFFF;
+  
+  // CRC32 polynomial table (IEEE 802.3)
+  const crcTable = new Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    crcTable[i] = c;
   }
-  return Math.abs(hash).toString(16);
+  
+  for (let i = 0; i < bytes.length; i++) {
+    crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  }
+  
+  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
@@ -595,8 +606,11 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 /**
  * Download all cases data as Excel file with multiple worksheets
  */
-export function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): void {
+export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): Promise<void> {
   try {
+    // Dynamic import of XLSX to avoid bundle size issues
+    const XLSX = await import('xlsx');
+    
     const workbook = XLSX.utils.book_new();
     let exportPassword: string | undefined;
 
@@ -912,6 +926,15 @@ export async function downloadCaseAsZip(
     
     // Add forensic metadata file if protection is enabled
     if (options.protectForensicData) {
+      // Get the content that will be used for checksum calculation
+      const contentForChecksum = format === 'json' 
+        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings
+        : generateCSVContent(exportData, false); // Raw content without warnings
+      
+      // Calculate checksum based on the core data content
+      const contentChecksum = calculateCRC32(contentForChecksum);
+      
+      // Prepare the forensic metadata with actual checksum
       const forensicMetadata = {
         exportTimestamp: new Date().toISOString(),
         exportedBy: exportData.metadata.exportedBy || 'Unknown',
@@ -919,10 +942,7 @@ export async function downloadCaseAsZip(
         exportedByName: exportData.metadata.exportedByName || 'Unknown',
         exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
         caseNumber: exportData.metadata.caseNumber,
-        contentChecksum: generateSimpleChecksum(format === 'json' ? 
-          generateJSONContent(exportData, options.includeUserInfo, false) : 
-          generateCSVContent(exportData, false)
-        ),
+        contentChecksum: contentChecksum, // Checksum of the core data content
         forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
         striaeVersion: exportData.metadata.striaeExportSchemaVersion,
         archiveStructure: {
@@ -933,6 +953,7 @@ export async function downloadCaseAsZip(
         }
       };
       
+      // Add forensic metadata with actual checksum
       zip.file('FORENSIC_METADATA.json', JSON.stringify(forensicMetadata, null, 2));
       
       // Add read-only instruction file
@@ -963,22 +984,53 @@ For questions about this export, contact your Striae system administrator.
 `;
       
       zip.file('READ_ONLY_INSTRUCTIONS.txt', instructionContent);
+      
+      // Add README 
+      const readme = generateZipReadme(exportData, options.protectForensicData);
+      zip.file('README.txt', readme);
+      onProgress?.(85);
+      
+      // Generate ZIP blob
+      const zipBlob = await zip.generateAsync({ 
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+      onProgress?.(95);
+      
+      // Download
+      const url = URL.createObjectURL(zipBlob);
+      const protectionSuffix = options.protectForensicData ? '-protected' : '';
+      const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.href = url;
+      linkElement.setAttribute('download', exportFileName);
+      
+      if (options.protectForensicData) {
+        linkElement.setAttribute('title', 'Evidence archive with forensic protection enabled');
+      }
+      
+      linkElement.click();
+      
+      URL.revokeObjectURL(url);
+      onProgress?.(100);
+      
+      return; // Exit early as we've handled the forensic case
     }
-    
+
     // Add README (standard or enhanced for forensic)
     const readme = generateZipReadme(exportData, options.protectForensicData);
     zip.file('README.txt', readme);
     onProgress?.(85);
     
-    // Generate ZIP blob
+    // Generate ZIP blob for non-forensic case
     const zipBlob = await zip.generateAsync({ 
       type: 'blob',
       compression: 'DEFLATE',
       compressionOptions: { level: 6 }
     });
-    onProgress?.(95);
-    
-    // Download
+    onProgress?.(95);    // Download
     const url = URL.createObjectURL(zipBlob);
     const protectionSuffix = options.protectForensicData ? '-protected' : '';
     const exportFileName = `striae-case-${caseNumber}-export${protectionSuffix}-${formatDateForFilename(new Date())}.zip`;

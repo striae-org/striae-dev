@@ -137,13 +137,14 @@ export const CaseExport = ({
             
             {/* 2. Format choice */}
             <div className={styles.formatSelector}>
-              <span className={styles.formatLabel}>Format:</span>
+              <span className={styles.formatLabel}>Data Format:</span>
               <div className={styles.formatToggle}>
                 <button
                   type="button"
                   className={`${styles.formatOption} ${selectedFormat === 'json' ? styles.formatOptionActive : ''}`}
                   onClick={() => setSelectedFormat('json')}
                   disabled={isExporting || isExportingAll}
+                  title="JSON for case imports"
                 >
                   JSON
                 </button>
@@ -172,7 +173,7 @@ export const CaseExport = ({
                 <div className={styles.checkboxText}>
                   <span>Include Images (ZIP)</span>
                   <p className={styles.checkboxTooltip}>
-                    Available for single case exports only. Downloads a ZIP file containing data and all associated image files.
+                    Available for single case exports only. Downloads a ZIP file containing data and all associated image files. Case imports support only JSON data format.
                   </p>
                 </div>
               </label>
