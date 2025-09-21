@@ -4,7 +4,7 @@ import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
 import { getUserData } from '~/utils/permissions';
-import { calculateCRC32 } from '~/utils/CRC32';
+import { generateForensicManifest } from '~/utils/CRC32';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -882,8 +882,9 @@ export async function downloadCaseAsZip(
     }
     onProgress?.(50);
     
-    // Add images
+    // Add images and collect them for manifest generation
     const imageFolder = zip.folder('images');
+    const imageFiles: { [filename: string]: Blob } = {};
     if (imageFolder && exportData.files) {
       for (let i = 0; i < exportData.files.length; i++) {
         const file = exportData.files[i];
@@ -891,6 +892,7 @@ export async function downloadCaseAsZip(
           const imageBlob = await fetchImageAsBlob(file.fileData);
           if (imageBlob) {
             imageFolder.file(file.fileData.originalFilename, imageBlob);
+            imageFiles[file.fileData.originalFilename] = imageBlob;
           }
         } catch (error) {
           console.warn(`Failed to fetch image ${file.fileData.originalFilename}:`, error);
@@ -906,10 +908,10 @@ export async function downloadCaseAsZip(
         ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings
         : generateCSVContent(exportData, false); // Raw content without warnings
       
-      // Calculate checksum based on the core data content
-      const contentChecksum = calculateCRC32(contentForChecksum);
+      // Generate comprehensive forensic manifest with individual file checksums
+      const forensicManifest = await generateForensicManifest(contentForChecksum, imageFiles);
       
-      // Prepare the forensic metadata with actual checksum
+      // Prepare the enhanced forensic metadata
       const forensicMetadata = {
         exportTimestamp: new Date().toISOString(),
         exportedBy: exportData.metadata.exportedBy || 'Unknown',
@@ -917,14 +919,21 @@ export async function downloadCaseAsZip(
         exportedByName: exportData.metadata.exportedByName || 'Unknown',
         exportedByCompany: exportData.metadata.exportedByCompany || 'Unknown',
         caseNumber: exportData.metadata.caseNumber,
-        contentChecksum: contentChecksum, // Checksum of the core data content
+        forensicManifest: forensicManifest, // Complete manifest with all file checksums
         forensicWarning: 'This ZIP archive contains evidence data. Modification of any files may compromise evidence integrity and chain of custody.',
         striaeVersion: exportData.metadata.striaeExportSchemaVersion,
         archiveStructure: {
           dataFile: `${caseNumber}_data.${format}`,
           imagesFolder: 'images/',
           totalFiles: exportData.metadata.totalFiles,
-          totalAnnotations: exportData.summary?.totalBoxAnnotations || 0
+          totalAnnotations: exportData.summary?.totalBoxAnnotations || 0,
+          integrityValidation: {
+            method: 'CRC32_IEEE_802_3',
+            dataFileChecksum: forensicManifest.dataChecksum,
+            imageFileCount: Object.keys(forensicManifest.imageChecksums).length,
+            manifestChecksum: forensicManifest.manifestChecksum,
+            validationTimestamp: forensicManifest.createdAt
+          }
         }
       };
       
