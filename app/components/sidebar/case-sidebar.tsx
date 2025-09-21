@@ -25,6 +25,9 @@ import {
   deleteFile,
 } from '../actions/image-manage';
 import { 
+  checkReadOnlyCaseExists 
+} from '../actions/case-review';
+import { 
   canCreateCase, 
   canUploadFile, 
   getLimitsDescription,
@@ -201,6 +204,14 @@ export const CaseSidebar = ({
         return;
       }
 
+      // Check if a read-only case with this number exists
+      const existingReadOnlyCase = await checkReadOnlyCaseExists(user, caseNumber);
+      if (existingReadOnlyCase) {
+        setError(`Case "${caseNumber}" already exists as a read-only review case. You cannot create a case with the same number.`);
+        setIsLoading(false);
+        return;
+      }
+
       // Creating new case - check permissions
       if (!canCreateNewCase) {
         setError(createCaseError || 'You cannot create more cases.');
@@ -320,6 +331,14 @@ export const CaseSidebar = ({
   setError('');
   
   try {
+    // Check if a read-only case with the new name exists
+    const existingReadOnlyCase = await checkReadOnlyCaseExists(user, newCaseName);
+    if (existingReadOnlyCase) {
+      setError(`Case "${newCaseName}" already exists as a read-only review case. You cannot rename to this case number.`);
+      setIsRenaming(false);
+      return;
+    }
+
     await renameCase(user, currentCase, newCaseName);
     setCurrentCase(newCaseName);
     onCaseChange(newCaseName);
