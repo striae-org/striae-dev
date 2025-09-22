@@ -123,28 +123,29 @@ export async function importConfirmationData(
         continue;
       }
 
-      // Validate confirmation timestamp against annotation modification time
+      // Validate that annotations haven't been modified after original export
       const importedConfirmationData = confirmations.length > 0 ? confirmations[0] : null;
-      if (importedConfirmationData && (annotationData as any).updatedAt) {
-        const confirmationTimestamp = new Date(importedConfirmationData.confirmedAt);
+      if (importedConfirmationData && confirmationData.metadata.originalExportCreatedAt && (annotationData as any).updatedAt) {
+        const originalExportDate = new Date(confirmationData.metadata.originalExportCreatedAt);
         const annotationUpdatedAt = new Date((annotationData as any).updatedAt);
         
-        console.log('Confirmation timestamp validation:', {
-          imageId: currentImageId,
-          confirmationTimestamp: importedConfirmationData.confirmedAt,
-          annotationUpdatedAt: (annotationData as any).updatedAt,
-          isValid: confirmationTimestamp >= annotationUpdatedAt
-        });
-
-        if (confirmationTimestamp < annotationUpdatedAt) {
-          throw new Error(
-            `Confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}) ` +
-            `was created at ${importedConfirmationData.confirmedAt} but the annotations were ` +
-            `last modified at ${(annotationData as any).updatedAt}. ` +
-            `Confirmations must be based on the original annotations and cannot be imported ` +
-            `for images that were modified after the confirmation was created.`
+        if (annotationUpdatedAt > originalExportDate) {
+          result.errors?.push(
+            `Cannot import confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}). ` +
+            `The annotations were last modified at ${(annotationData as any).updatedAt} which is after ` +
+            `the original case export date of ${confirmationData.metadata.originalExportCreatedAt}. ` +
+            `Confirmations can only be imported for images that haven't been modified since the original export.`
           );
+          continue; // Skip this image and continue with others
         }
+      } else if (importedConfirmationData && !confirmationData.metadata.originalExportCreatedAt) {
+        // Block legacy confirmation data without forensic linking
+        result.errors?.push(
+          `Cannot import confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}). ` +
+          `This confirmation data lacks forensic timestamp linking and cannot be validated. ` +
+          `Only confirmation exports with complete forensic metadata are accepted.`
+        );
+        continue; // Skip this image and continue with others
       }
 
       // Set confirmationData from the imported confirmations (use the first/most recent one)
