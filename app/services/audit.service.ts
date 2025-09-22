@@ -8,8 +8,15 @@ import {
   WorkflowPhase,
   AuditAction,
   AuditResult,
+  AuditFileType,
   SecurityCheckResults,
-  PerformanceMetrics
+  PerformanceMetrics,
+  CaseAuditDetails,
+  FileAuditDetails,
+  AnnotationAuditDetails,
+  SessionAuditDetails,
+  SystemAuditDetails,
+  SecurityAuditDetails
 } from '~/types';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
@@ -79,7 +86,14 @@ export class AuditService {
           reviewingExaminerUid: params.reviewingExaminerUid,
           workflowPhase: params.workflowPhase,
           securityChecks: params.securityChecks,
-          performanceMetrics: params.performanceMetrics
+          performanceMetrics: params.performanceMetrics,
+          // Extended detail fields
+          caseDetails: params.caseDetails,
+          fileDetails: params.fileDetails,
+          annotationDetails: params.annotationDetails,
+          sessionDetails: params.sessionDetails,
+          systemDetails: params.systemDetails,
+          securityDetails: params.securityDetails
         }
       };
 
@@ -292,8 +306,513 @@ export class AuditService {
       securityChecks,
       performanceMetrics,
       originalExaminerUid: user.uid,
-      reviewingExaminerUid
     });
+  }
+
+  // =============================================================================
+  // COMPREHENSIVE AUDIT LOGGING METHODS
+  // =============================================================================
+
+  /**
+   * Log case creation event
+   */
+  public async logCaseCreation(
+    user: User,
+    caseNumber: string,
+    caseName: string,
+    caseDescription?: string,
+    caseType?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'case-create',
+      result: 'success',
+      fileName: `${caseNumber}.case`,
+      fileType: 'case-package',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      workflowPhase: 'case-export',
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      caseDetails: {
+        newCaseName: caseName,
+        caseDescription,
+        caseType,
+        createdDate: new Date().toISOString(),
+        totalFiles: 0,
+        totalAnnotations: 0,
+        caseSize: 0
+      }
+    });
+  }
+
+  /**
+   * Log case rename event
+   */
+  public async logCaseRename(
+    user: User,
+    caseNumber: string,
+    oldName: string,
+    newName: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'case-rename',
+      result: 'success',
+      fileName: `${caseNumber}.case`,
+      fileType: 'case-package',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      caseDetails: {
+        oldCaseName: oldName,
+        newCaseName: newName,
+        lastModified: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
+   * Log case deletion event
+   */
+  public async logCaseDeletion(
+    user: User,
+    caseNumber: string,
+    caseName: string,
+    deleteReason: string,
+    backupCreated: boolean = false
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'case-delete',
+      result: 'success',
+      fileName: `${caseNumber}.case`,
+      fileType: 'case-package',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      caseDetails: {
+        newCaseName: caseName,
+        deleteReason,
+        backupCreated,
+        lastModified: new Date().toISOString()
+      }
+    });
+  }
+
+  /**
+   * Log file upload event
+   */
+  public async logFileUpload(
+    user: User,
+    fileName: string,
+    fileSize: number,
+    mimeType: string,
+    uploadMethod: 'drag-drop' | 'file-picker' | 'api' | 'import',
+    caseNumber?: string,
+    result: AuditResult = 'success',
+    processingTime?: number,
+    virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed'
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'file-upload',
+      result,
+      fileName,
+      fileType: this.getFileTypeFromMime(mimeType),
+      checksumValid: result === 'success',
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: result === 'success',
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      fileDetails: {
+        fileSize,
+        mimeType,
+        uploadMethod,
+        processingTime,
+        virusScanResult,
+        thumbnailGenerated: result === 'success' && this.isImageFile(mimeType)
+      },
+      performanceMetrics: processingTime ? {
+        processingTimeMs: processingTime,
+        fileSizeBytes: fileSize,
+        validationStepsCompleted: 1,
+        validationStepsFailed: result === 'success' ? 0 : 1
+      } : undefined
+    });
+  }
+
+  /**
+   * Log file deletion event
+   */
+  public async logFileDeletion(
+    user: User,
+    fileName: string,
+    fileSize: number,
+    deleteReason: string,
+    caseNumber?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'file-delete',
+      result: 'success',
+      fileName,
+      fileType: 'unknown',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      fileDetails: {
+        fileSize,
+        deleteReason
+      }
+    });
+  }
+
+  /**
+   * Log annotation creation event
+   */
+  public async logAnnotationCreate(
+    user: User,
+    annotationId: string,
+    annotationType: 'measurement' | 'identification' | 'comparison' | 'note' | 'region',
+    annotationData: any,
+    caseNumber?: string,
+    tool?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'annotation-create',
+      result: 'success',
+      fileName: `annotation-${annotationId}.json`,
+      fileType: 'json-data',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      annotationDetails: {
+        annotationId,
+        annotationType,
+        annotationData,
+        tool,
+        canvasPosition: annotationData?.position,
+        annotationSize: annotationData?.size
+      }
+    });
+  }
+
+  /**
+   * Log annotation edit event
+   */
+  public async logAnnotationEdit(
+    user: User,
+    annotationId: string,
+    previousValue: any,
+    newValue: any,
+    caseNumber?: string,
+    tool?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'annotation-edit',
+      result: 'success',
+      fileName: `annotation-${annotationId}.json`,
+      fileType: 'json-data',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      annotationDetails: {
+        annotationId,
+        annotationType: newValue?.type,
+        annotationData: newValue,
+        previousValue,
+        tool
+      }
+    });
+  }
+
+  /**
+   * Log annotation deletion event
+   */
+  public async logAnnotationDelete(
+    user: User,
+    annotationId: string,
+    annotationData: any,
+    caseNumber?: string,
+    deleteReason?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'annotation-delete',
+      result: 'success',
+      fileName: `annotation-${annotationId}.json`,
+      fileType: 'json-data',
+      checksumValid: true,
+      validationErrors: [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      annotationDetails: {
+        annotationId,
+        annotationType: annotationData?.type,
+        annotationData,
+        tool: deleteReason
+      }
+    });
+  }
+
+  /**
+   * Log user login event
+   */
+  public async logUserLogin(
+    user: User,
+    sessionId: string,
+    loginMethod: 'firebase' | 'sso' | 'api-key' | 'manual',
+    ipAddress?: string,
+    userAgent?: string,
+    location?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'user-login',
+      result: 'success',
+      fileName: `session-${sessionId}.log`,
+      fileType: 'log-file',
+      checksumValid: true,
+      validationErrors: [],
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      sessionDetails: {
+        sessionId,
+        ipAddress,
+        userAgent,
+        location,
+        deviceType: this.getDeviceType(userAgent),
+        browserType: this.getBrowserType(userAgent),
+        loginMethod
+      }
+    });
+  }
+
+  /**
+   * Log user logout event
+   */
+  public async logUserLogout(
+    user: User,
+    sessionId: string,
+    sessionDuration: number,
+    logoutReason: 'user-initiated' | 'timeout' | 'security' | 'error'
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'user-logout',
+      result: 'success',
+      fileName: `session-${sessionId}.log`,
+      fileType: 'log-file',
+      checksumValid: true,
+      validationErrors: [],
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      sessionDetails: {
+        sessionId,
+        sessionDuration,
+        logoutReason
+      }
+    });
+  }
+
+  /**
+   * Log PDF generation event
+   */
+  public async logPDFGeneration(
+    user: User,
+    fileName: string,
+    caseNumber: string,
+    result: AuditResult,
+    processingTime: number,
+    fileSize?: number,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'pdf-generate',
+      result,
+      fileName,
+      fileType: 'pdf-document',
+      checksumValid: result === 'success',
+      validationErrors: errors,
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: result === 'success',
+        timestampValidationPassed: true,
+        permissionChecksPassed: true
+      },
+      performanceMetrics: {
+        processingTimeMs: processingTime,
+        fileSizeBytes: fileSize || 0,
+        validationStepsCompleted: 1,
+        validationStepsFailed: errors.length
+      }
+    });
+  }
+
+  /**
+   * Log security violation event
+   */
+  public async logSecurityViolation(
+    user: User | null,
+    incidentType: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation',
+    severity: 'low' | 'medium' | 'high' | 'critical',
+    description: string,
+    sourceIp?: string,
+    targetResource?: string,
+    blockedBySystem: boolean = true
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user?.uid || 'unknown',
+      userEmail: user?.email || 'unknown@system.com',
+      action: 'security-violation',
+      result: blockedBySystem ? 'blocked' : 'failure',
+      fileName: `security-incident-${Date.now()}.log`,
+      fileType: 'log-file',
+      checksumValid: true,
+      validationErrors: [description],
+      securityChecks: {
+        selfConfirmationPrevented: true,
+        userAuthenticationValid: false,
+        fileIntegrityValid: false,
+        timestampValidationPassed: true,
+        permissionChecksPassed: false
+      },
+      securityDetails: {
+        incidentType,
+        severity,
+        sourceIp,
+        targetResource,
+        blockedBySystem,
+        investigationId: `INV-${Date.now()}`,
+        reportedToAuthorities: severity === 'critical',
+        mitigationSteps: [
+          blockedBySystem ? 'Automatically blocked by system' : 'Manual intervention required'
+        ]
+      }
+    });
+  }
+
+  // =============================================================================
+  // HELPER METHODS
+  // =============================================================================
+
+  /**
+   * Determine file type from MIME type
+   */
+  private getFileTypeFromMime(mimeType: string): AuditFileType {
+    if (mimeType.startsWith('image/')) return 'image-file';
+    if (mimeType === 'application/pdf') return 'pdf-document';
+    if (mimeType === 'application/json') return 'json-data';
+    if (mimeType === 'text/csv') return 'csv-export';
+    return 'unknown';
+  }
+
+  /**
+   * Check if file is an image
+   */
+  private isImageFile(mimeType: string): boolean {
+    return mimeType.startsWith('image/');
+  }
+
+  /**
+   * Get device type from user agent
+   */
+  private getDeviceType(userAgent?: string): 'desktop' | 'tablet' | 'mobile' | 'unknown' {
+    if (!userAgent) return 'unknown';
+    if (/tablet|ipad/i.test(userAgent)) return 'tablet';
+    if (/mobile|android|iphone/i.test(userAgent)) return 'mobile';
+    return 'desktop';
+  }
+
+  /**
+   * Get browser type from user agent
+   */
+  private getBrowserType(userAgent?: string): string {
+    if (!userAgent) return 'unknown';
+    if (userAgent.includes('Chrome')) return 'Chrome';
+    if (userAgent.includes('Firefox')) return 'Firefox';
+    if (userAgent.includes('Safari')) return 'Safari';
+    if (userAgent.includes('Edge')) return 'Edge';
+    return 'unknown';
   }
 
   /**

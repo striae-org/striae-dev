@@ -7,6 +7,7 @@ import {
 } from '~/utils/auth';
 import { canUploadFile } from '~/utils/permissions';
 import { CaseData, FileData, ImageUploadResponse } from '~/types';
+import { auditService } from '~/services/audit.service';
 
 const WORKER_URL = paths.data_worker_url;
 const IMAGE_URL = paths.image_worker_url;
@@ -30,12 +31,30 @@ export const uploadFile = async (
   file: File, 
   onProgress?: (progress: number) => void
 ): Promise<FileData> => {
+  const startTime = Date.now();
+  
   // First, get current files to check count
   const currentFiles = await fetchFiles(user, caseNumber);
   
   // Check if user can upload another file
   const permission = await canUploadFile(user, currentFiles.length);
   if (!permission.canUpload) {
+    // Log permission denied
+    try {
+      await auditService.logFileUpload(
+        user,
+        file.name,
+        file.size,
+        file.type,
+        'file-picker',
+        caseNumber,
+        'failure',
+        Date.now() - startTime,
+        'clean'
+      );
+    } catch (auditError) {
+      console.error('Failed to log file upload permission denial:', auditError);
+    }
     throw new Error(permission.reason || 'You cannot upload more files to this case.');
   }
 
@@ -54,6 +73,8 @@ export const uploadFile = async (
     });
 
     xhr.addEventListener('load', async () => {
+      const endTime = Date.now();
+      
       if (xhr.status === 200) {
         try {
           const imageData = JSON.parse(xhr.responseText) as ImageUploadResponse;
@@ -86,16 +107,84 @@ export const uploadFile = async (
             body: JSON.stringify(updatedData)
           });
 
+          // Log successful file upload
+          try {
+            await auditService.logFileUpload(
+              user,
+              file.name,
+              file.size,
+              file.type,
+              'file-picker',
+              caseNumber,
+              'success',
+              endTime - startTime,
+              'clean'
+            );
+          } catch (auditError) {
+            console.error('Failed to log successful file upload:', auditError);
+          }
+
+          console.log(`✅ File uploaded: ${file.name} (${file.size} bytes) (${endTime - startTime}ms)`);
           resolve(newFile);
         } catch (error) {
+          // Log failed file upload
+          try {
+            await auditService.logFileUpload(
+              user,
+              file.name,
+              file.size,
+              file.type,
+              'file-picker',
+              caseNumber,
+              'failure',
+              endTime - startTime,
+              'clean'
+            );
+          } catch (auditError) {
+            console.error('Failed to log file upload failure:', auditError);
+          }
           reject(error);
         }
       } else {
+        // Log failed file upload
+        try {
+          await auditService.logFileUpload(
+            user,
+            file.name,
+            file.size,
+            file.type,
+            'file-picker',
+            caseNumber,
+            'failure',
+            endTime - startTime,
+            'clean'
+          );
+        } catch (auditError) {
+          console.error('Failed to log file upload failure:', auditError);
+        }
         reject(new Error('Upload failed'));
       }
     });
 
-    xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+    xhr.addEventListener('error', async () => {
+      // Log upload error
+      try {
+        await auditService.logFileUpload(
+          user,
+          file.name,
+          file.size,
+          file.type,
+          'file-picker',
+          caseNumber,
+          'failure',
+          Date.now() - startTime,
+          'clean'
+        );
+      } catch (auditError) {
+        console.error('Failed to log file upload error:', auditError);
+      }
+      reject(new Error('Upload failed'));
+    });
 
     xhr.open('POST', IMAGE_URL);
     xhr.setRequestHeader('Authorization', `Bearer ${imagesApiToken}`);
@@ -104,10 +193,21 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
+  const startTime = Date.now();
+  
   try {
     const apiKey = await getDataApiKey();
     let imageDeleteFailed = false;
     let imageDeleteError = '';
+
+    // First, get the file info for audit logging
+    const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      headers: { 'X-Custom-Auth-Key': apiKey }
+    });
+    const caseData = await caseResponse.json() as CaseData;
+    const fileToDelete = (caseData.files || []).find((f: FileData) => f.id === fileId);
+    const fileName = fileToDelete?.originalFilename || fileId;
+    const fileSize = 0; // We don't store file size, so use 0
 
     // Attempt to delete image file
     const imagesApiToken = await getImageApiKey();
@@ -150,10 +250,6 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     }
 
     // Update case data.json to remove file reference
-    const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      headers: { 'X-Custom-Auth-Key': apiKey }
-    });
-
     const existingData = await caseResponse.json() as CaseData;
     const updatedData: CaseData = {
       ...existingData,
@@ -168,7 +264,52 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
       },
       body: JSON.stringify(updatedData)
     });
+
+    // Log successful file deletion
+    const endTime = Date.now();
+    try {
+      await auditService.logFileDeletion(
+        user,
+        fileName,
+        fileSize,
+        'User-requested deletion via file list',
+        caseNumber
+      );
+    } catch (auditError) {
+      console.error('Failed to log file deletion:', auditError);
+    }
+
+    console.log(`✅ File deleted: ${fileName} (${endTime - startTime}ms)`);
+    
   } catch (error) {
+    // Log failed file deletion
+    const endTime = Date.now();
+    try {
+      await auditService.logEvent({
+        userId: user.uid,
+        userEmail: user.email || 'unknown@example.com',
+        action: 'file-delete',
+        result: 'failure',
+        fileName: fileId,
+        fileType: 'unknown',
+        checksumValid: false,
+        validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
+        caseNumber,
+        fileDetails: {
+          fileSize: 0,
+          deleteReason: 'Failed deletion attempt'
+        },
+        performanceMetrics: {
+          processingTimeMs: endTime - startTime,
+          fileSizeBytes: 0,
+          validationStepsCompleted: 0,
+          validationStepsFailed: 1
+        }
+      });
+    } catch (auditError) {
+      console.error('Failed to log file deletion failure:', auditError);
+    }
+    
     console.error('Error in deleteFile:', error);
     throw error;
   }

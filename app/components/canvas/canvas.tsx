@@ -4,6 +4,7 @@ import { ConfirmationModal } from './confirmation/confirmation';
 import { AnnotationData, BoxAnnotation, ConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
 import { storeConfirmation } from '~/components/actions/confirm-export';
+import { auditService } from '~/services/audit.service';
 import styles from './canvas.module.css';
 
 interface CanvasProps {

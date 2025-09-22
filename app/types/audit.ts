@@ -1,9 +1,31 @@
-// Audit trail types for validation and security framework
-// Used to track all validation events throughout the confirmation workflow
+// Audit trail types for comprehensive forensic accountability framework
+// Tracks all user actions and system events throughout the application
 
-export type AuditAction = 'import' | 'export' | 'confirm' | 'validate';
-export type AuditResult = 'success' | 'failure' | 'warning';
-export type AuditFileType = 'case-package' | 'confirmation-data';
+export type AuditAction = 
+  // Case Management Actions
+  | 'case-create' | 'case-rename' | 'case-delete' | 'case-open' | 'case-close'
+  // Confirmation Workflow Actions  
+  | 'case-export' | 'case-import' | 'confirmation-create' | 'confirmation-export' | 'confirmation-import'
+  // File Operations
+  | 'file-upload' | 'file-delete' | 'file-download' | 'file-process'
+  // Annotation Operations
+  | 'annotation-create' | 'annotation-edit' | 'annotation-save' | 'annotation-delete' | 'annotation-batch-operation'
+  // User & Session Management
+  | 'user-login' | 'user-logout' | 'session-timeout' | 'permission-change'
+  // Document Generation
+  | 'pdf-generate' | 'pdf-download' | 'report-generate' | 'report-export'
+  // System Operations
+  | 'settings-change' | 'theme-change' | 'backup-create' | 'backup-restore'
+  // Security & Monitoring
+  | 'security-violation' | 'access-denied' | 'suspicious-activity' | 'data-breach-attempt'
+  // Legacy actions (for backward compatibility)
+  | 'import' | 'export' | 'confirm' | 'validate';
+
+export type AuditResult = 'success' | 'failure' | 'warning' | 'blocked' | 'pending';
+
+export type AuditFileType = 
+  | 'case-package' | 'confirmation-data' | 'image-file' | 'pdf-document' 
+  | 'json-data' | 'csv-export' | 'backup-file' | 'log-file' | 'unknown';
 
 /**
  * Core audit entry structure for all validation events
@@ -20,20 +42,45 @@ export interface ValidationAuditEntry {
 
 /**
  * Detailed information for each audit entry
+ * Contains action-specific data and metadata
  */
 export interface AuditDetails {
-  fileName: string;
-  fileType: AuditFileType;
-  checksumValid: boolean;
-  validationErrors: string[];
+  // Core identification
+  fileName?: string;
+  fileType?: AuditFileType;
   caseNumber?: string;
   confirmationId?: string;
-  // Additional context fields
+  
+  // Validation & Security
+  checksumValid?: boolean;
+  validationErrors: string[];
+  securityChecks?: SecurityCheckResults;
+  
+  // Context & Workflow
   originalExaminerUid?: string;
   reviewingExaminerUid?: string;
   workflowPhase?: WorkflowPhase;
-  securityChecks?: SecurityCheckResults;
+  
+  // Performance & Metrics
   performanceMetrics?: PerformanceMetrics;
+  
+  // Case Management Details
+  caseDetails?: CaseAuditDetails;
+  
+  // File Operation Details
+  fileDetails?: FileAuditDetails;
+  
+  // Annotation Details
+  annotationDetails?: AnnotationAuditDetails;
+  
+  // User Session Details
+  sessionDetails?: SessionAuditDetails;
+  
+  // System Operation Details
+  systemDetails?: SystemAuditDetails;
+  
+  // Security Incident Details
+  securityDetails?: SecurityAuditDetails;
 }
 
 /**
@@ -104,9 +151,9 @@ export interface CreateAuditEntryParams {
   userEmail: string;
   action: AuditAction;
   result: AuditResult;
-  fileName: string;
-  fileType: AuditFileType;
-  checksumValid: boolean;
+  fileName?: string;
+  fileType?: AuditFileType;
+  checksumValid?: boolean;
   validationErrors?: string[];
   caseNumber?: string;
   confirmationId?: string;
@@ -115,6 +162,13 @@ export interface CreateAuditEntryParams {
   performanceMetrics?: PerformanceMetrics;
   originalExaminerUid?: string;
   reviewingExaminerUid?: string;
+  // Extended detail fields
+  caseDetails?: CaseAuditDetails;
+  fileDetails?: FileAuditDetails;
+  annotationDetails?: AnnotationAuditDetails;
+  sessionDetails?: SessionAuditDetails;
+  systemDetails?: SystemAuditDetails;
+  securityDetails?: SecurityAuditDetails;
 }
 
 /**
@@ -153,4 +207,106 @@ export interface AuditEventSubscription {
   userId?: string;
   caseNumber?: string;
   callback: (entry: ValidationAuditEntry) => void;
+}
+
+// =============================================================================
+// SPECIALIZED AUDIT DETAIL INTERFACES
+// =============================================================================
+
+/**
+ * Case management specific audit details
+ */
+export interface CaseAuditDetails {
+  oldCaseName?: string;
+  newCaseName?: string;
+  caseDescription?: string;
+  caseType?: string;
+  totalFiles?: number;
+  totalAnnotations?: number;
+  createdDate?: string;
+  lastModified?: string;
+  caseSize?: number; // in bytes
+  deleteReason?: string;
+  backupCreated?: boolean;
+}
+
+/**
+ * File operation specific audit details
+ */
+export interface FileAuditDetails {
+  originalFileName?: string;
+  fileSize: number;
+  mimeType?: string;
+  uploadMethod?: 'drag-drop' | 'file-picker' | 'api' | 'import';
+  processingTime?: number;
+  compressionApplied?: boolean;
+  thumbnailGenerated?: boolean;
+  virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed';
+  deleteReason?: string;
+  sourceLocation?: string;
+  destinationPath?: string;
+}
+
+/**
+ * Annotation operation specific audit details
+ */
+export interface AnnotationAuditDetails {
+  annotationId?: string;
+  annotationType?: 'measurement' | 'identification' | 'comparison' | 'note' | 'region';
+  annotationData?: any; // The actual annotation data structure
+  canvasPosition?: { x: number; y: number };
+  annotationSize?: { width: number; height: number };
+  previousValue?: any; // For edit operations
+  batchSize?: number; // For batch operations
+  tool?: string; // Which tool was used to create/edit
+  confidence?: number; // AI confidence level if applicable
+}
+
+/**
+ * User session specific audit details
+ */
+export interface SessionAuditDetails {
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  location?: string;
+  deviceType?: 'desktop' | 'tablet' | 'mobile' | 'unknown';
+  browserType?: string;
+  sessionDuration?: number;
+  loginMethod?: 'firebase' | 'sso' | 'api-key' | 'manual';
+  logoutReason?: 'user-initiated' | 'timeout' | 'security' | 'error';
+  failedAttempts?: number;
+  permissionLevel?: string;
+}
+
+/**
+ * System operation specific audit details
+ */
+export interface SystemAuditDetails {
+  operationType?: 'backup' | 'restore' | 'maintenance' | 'update' | 'configuration';
+  systemVersion?: string;
+  configurationChanges?: Record<string, { from: any; to: any }>;
+  backupSize?: number;
+  backupLocation?: string;
+  maintenanceType?: string;
+  affectedComponents?: string[];
+  downtimeMinutes?: number;
+  rollbackAvailable?: boolean;
+}
+
+/**
+ * Security incident specific audit details
+ */
+export interface SecurityAuditDetails {
+  incidentType?: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation';
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  attackVector?: string;
+  sourceIp?: string;
+  targetResource?: string;
+  blockedBySystem?: boolean;
+  investigationId?: string;
+  reportedToAuthorities?: boolean;
+  mitigationSteps?: string[];
+  falsePositive?: boolean;
+  relatedIncidents?: string[];
 }

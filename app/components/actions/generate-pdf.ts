@@ -1,7 +1,10 @@
 import paths from '~/config/config.json';
 import { AnnotationData } from '~/types/annotations';
+import { auditService } from '~/services/audit.service';
+import { User } from 'firebase/auth';
 
 interface GeneratePDFParams {
+  user: User;
   selectedImage: string | undefined;
   selectedFilename: string | undefined;
   userCompany: string;
@@ -17,6 +20,7 @@ interface GeneratePDFParams {
 }
 
 export const generatePDF = async ({
+  user,
   selectedImage,
   selectedFilename,
   userCompany,
@@ -31,6 +35,9 @@ export const generatePDF = async ({
   setToastDuration
 }: GeneratePDFParams) => {
   setIsGeneratingPDF(true);
+  
+  // Track processing time for audit logging
+  const startTime = Date.now();
   
   // Show generating toast immediately with duration 0 (stays until manually closed or completion)
   setToastType('success');
@@ -114,6 +121,22 @@ export const generatePDF = async ({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
+      // Log successful PDF generation audit
+      try {
+        const processingTime = Date.now() - startTime;
+        await auditService.logPDFGeneration(
+          user,
+          filename,
+          currentCase || 'unknown-case',
+          'success',
+          processingTime,
+          blob.size
+        );
+      } catch (auditError) {
+        console.error('Failed to log PDF generation audit:', auditError);
+        // Continue with success flow even if audit logging fails
+      }
+      
       // Show success toast
       setToastType('success');
       setToastMessage('PDF generated successfully!');
@@ -122,6 +145,24 @@ export const generatePDF = async ({
     } else {
       const errorText = await response.text();
       console.error('PDF generation failed:', errorText);
+      
+      // Log failed PDF generation audit
+      try {
+        const processingTime = Date.now() - startTime;
+        await auditService.logPDFGeneration(
+          user,
+          `failed-pdf-${Date.now()}.pdf`,
+          currentCase || 'unknown-case',
+          'failure',
+          processingTime,
+          0, // No file size for failed generation
+          [errorText || 'PDF generation failed']
+        );
+      } catch (auditError) {
+        console.error('Failed to log PDF generation failure audit:', auditError);
+        // Continue with error flow even if audit logging fails
+      }
+      
       setToastType('error');
       setToastMessage('Failed to generate PDF report');
       if (setToastDuration) setToastDuration(4000); // Reset to default duration for error message
@@ -129,6 +170,24 @@ export const generatePDF = async ({
     }
   } catch (error) {
     console.error('Error generating PDF:', error);
+    
+    // Log error PDF generation audit
+    try {
+      const processingTime = Date.now() - startTime;
+      await auditService.logPDFGeneration(
+        user,
+        `error-pdf-${Date.now()}.pdf`,
+        currentCase || 'unknown-case',
+        'failure',
+        processingTime,
+        0, // No file size for failed generation
+        [error instanceof Error ? error.message : 'Unknown error generating PDF']
+      );
+    } catch (auditError) {
+      console.error('Failed to log PDF generation error audit:', auditError);
+      // Continue with error flow even if audit logging fails
+    }
+    
     setToastType('error');
     setToastMessage('Error generating PDF report');
     if (setToastDuration) setToastDuration(4000); // Reset to default duration for error message
