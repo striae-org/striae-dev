@@ -36,6 +36,8 @@ export interface CaseExportData {
     filesWithAnnotations: number;
     filesWithoutAnnotations: number;
     totalBoxAnnotations: number;
+    filesWithConfirmations?: number;
+    filesWithConfirmationsRequested?: number;
     lastModified?: string;
     earliestAnnotationDate?: string;
     latestAnnotationDate?: string;
@@ -54,6 +56,8 @@ export interface AllCasesExportData {
     totalCases: number;
     totalFiles: number;
     totalAnnotations: number;
+    totalConfirmations: number;
+    totalConfirmationsRequested: number;
   };
   cases: CaseExportData[];
   summary?: {

@@ -23,6 +23,8 @@ export function generateMetadataRows(exportData: CaseExportData): string[][] {
     ['Files with Annotations', (exportData.summary?.filesWithAnnotations || 0).toString()],
     ['Files without Annotations', (exportData.summary?.filesWithoutAnnotations || 0).toString()],
     ['Total Box Annotations', (exportData.summary?.totalBoxAnnotations || 0).toString()],
+    ['Files with Confirmations', (exportData.summary?.filesWithConfirmations || 0).toString()],
+    ['Files with Confirmations Requested', (exportData.summary?.filesWithConfirmationsRequested || 0).toString()],
     ['Last Modified', exportData.summary?.lastModified || 'N/A'],
     ['Earliest Annotation Date', exportData.summary?.earliestAnnotationDate || 'N/A'],
     ['Latest Annotation Date', exportData.summary?.latestAnnotationDate || 'N/A'],
@@ -55,6 +57,14 @@ export function processFileDataForTabular(fileEntry: CaseExportData['files'][0])
     fileEntry.annotations?.supportLevel || '',
     fileEntry.annotations?.hasSubclass ? 'Yes' : 'No',
     fileEntry.annotations?.includeConfirmation ? 'Yes' : 'No',
+    fileEntry.annotations?.confirmationData ? 'Confirmed' : (fileEntry.annotations?.includeConfirmation ? 'Requested' : 'Not Requested'),
+    fileEntry.annotations?.confirmationData?.fullName || '',
+    fileEntry.annotations?.confirmationData?.badgeId || '',
+    fileEntry.annotations?.confirmationData?.confirmedByEmail || '',
+    fileEntry.annotations?.confirmationData?.confirmedByCompany || '',
+    fileEntry.annotations?.confirmationData?.confirmationId || '',
+    fileEntry.annotations?.confirmationData?.timestamp || '',
+    fileEntry.annotations?.confirmationData?.confirmedAt || '',
     (fileEntry.annotations?.boxAnnotations?.length || 0).toString()
   ];
 

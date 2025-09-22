@@ -55,6 +55,8 @@ export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, prot
       ['Failed Exports', exportData.cases.filter(c => c.summary?.exportError).length],
       ['Total Files (All Cases)', exportData.metadata.totalFiles],
       ['Total Annotations (All Cases)', exportData.metadata.totalAnnotations],
+      ['Total Confirmations (All Cases)', exportData.metadata.totalConfirmations || 0],
+      ['Total Confirmations Requested (All Cases)', exportData.metadata.totalConfirmationsRequested || 0],
       [''],
       ['Case Details'],
       [
@@ -70,7 +72,9 @@ export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, prot
         'Total Files', 
         'Files with Annotations', 
         'Files without Annotations', 
-        'Total Box Annotations', 
+        'Total Box Annotations',
+        'Files with Confirmations',
+        'Files with Confirmations Requested',
         'Last Modified',
         'Earliest Annotation Date',
         'Latest Annotation Date', 
@@ -90,6 +94,8 @@ export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, prot
         caseData.summary?.filesWithAnnotations || 0,
         caseData.summary?.filesWithoutAnnotations || 0,
         caseData.summary?.totalBoxAnnotations || 0,
+        caseData.summary?.filesWithConfirmations || 0,
+        caseData.summary?.filesWithConfirmationsRequested || 0,
         caseData.summary?.lastModified || '',
         caseData.summary?.earliestAnnotationDate || '',
         caseData.summary?.latestAnnotationDate || '',
@@ -356,6 +362,8 @@ Case Information:
 - Exported By: ${exportData.metadata.exportedBy || 'Unknown'}
 - Total Files: ${exportData.metadata.totalFiles}
 - Total Annotations: ${exportData.summary?.totalBoxAnnotations || 0}
+- Total Confirmations: ${exportData.summary?.filesWithConfirmations || 0}
+- Confirmations Requested: ${exportData.summary?.filesWithConfirmationsRequested || 0}
 
 For questions about this export, contact your Striae system administrator.
 `;
@@ -457,6 +465,8 @@ function generateZipReadme(exportData: CaseExportData, protectForensicData: bool
   const filesWithAnnotations = exportData.files?.filter(f => f.annotations && Array.isArray(f.annotations.boxAnnotations) && f.annotations.boxAnnotations.length > 0).length || 0;
   const totalBoxAnnotations = exportData.files?.reduce((sum, f) => sum + (Array.isArray(f.annotations?.boxAnnotations) ? f.annotations.boxAnnotations.length : 0), 0) || 0;
   const totalAnnotations = filesWithAnnotations + totalBoxAnnotations;
+  const filesWithConfirmations = exportData.summary?.filesWithConfirmations || 0;
+  const filesWithConfirmationsRequested = exportData.summary?.filesWithConfirmationsRequested || 0;
 
   const baseContent = `Striae Case Export
 ==================
@@ -476,6 +486,8 @@ Summary:
 - Files without Annotations: ${totalFiles - filesWithAnnotations}
 - Total Box Annotations: ${totalBoxAnnotations}
 - Total Annotations: ${totalAnnotations}
+- Files with Confirmations: ${filesWithConfirmations}
+- Files with Confirmations Requested: ${filesWithConfirmationsRequested}
 - Earliest Annotation Date: ${exportData.summary?.earliestAnnotationDate || 'N/A'}
 - Latest Annotation Date: ${exportData.summary?.latestAnnotationDate || 'N/A'}
 

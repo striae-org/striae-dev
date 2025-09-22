@@ -31,6 +31,8 @@ export async function exportAllCases(
     const exportedCases: CaseExportData[] = [];
     let totalFiles = 0;
     let totalAnnotations = 0;
+    let totalConfirmations = 0;
+    let totalConfirmationsRequested = 0;
     let casesWithFiles = 0;
     let casesWithAnnotations = 0;
     let casesWithoutFiles = 0;
@@ -60,11 +62,19 @@ export async function exportAllCases(
           casesWithoutFiles++;
         }
 
-        // Count annotations
+        // Count annotations and confirmations
         const caseAnnotations = caseExport.files.filter(f => f.hasAnnotations).length;
         if (caseAnnotations > 0) {
           casesWithAnnotations++;
           totalAnnotations += caseAnnotations;
+        }
+
+        // Count confirmations
+        if (caseExport.summary?.filesWithConfirmations) {
+          totalConfirmations += caseExport.summary.filesWithConfirmations;
+        }
+        if (caseExport.summary?.filesWithConfirmationsRequested) {
+          totalConfirmationsRequested += caseExport.summary.filesWithConfirmationsRequested;
         }
 
         // Track latest modification
@@ -127,7 +137,9 @@ export async function exportAllCases(
         striaeExportSchemaVersion: '1.0',
         totalCases: caseNumbers.length,
         totalFiles,
-        totalAnnotations
+        totalAnnotations,
+        totalConfirmations,
+        totalConfirmationsRequested
       },
       cases: exportedCases
     };
@@ -194,6 +206,8 @@ export async function exportCaseData(
     const filesWithAnnotations: CaseExportData['files'] = [];
     let filesWithAnnotationsCount = 0;
     let totalBoxAnnotations = 0;
+    let filesWithConfirmationsCount = 0;
+    let filesWithConfirmationsRequestedCount = 0;
     let lastModified: string | undefined;
     let earliestAnnotationDate: string | undefined;
     let latestAnnotationDate: string | undefined;
@@ -215,6 +229,13 @@ export async function exportCaseData(
           filesWithAnnotationsCount++;
           if (annotations?.boxAnnotations) {
             totalBoxAnnotations += annotations.boxAnnotations.length;
+          }
+          
+          // Track confirmation data
+          if (annotations?.confirmationData) {
+            filesWithConfirmationsCount++;
+          } else if (annotations?.includeConfirmation) {
+            filesWithConfirmationsRequestedCount++;
           }
           
           // Track last modified
@@ -259,6 +280,8 @@ export async function exportCaseData(
           filesWithAnnotations: filesWithAnnotationsCount,
           filesWithoutAnnotations: files.length - filesWithAnnotationsCount,
           totalBoxAnnotations,
+          filesWithConfirmations: filesWithConfirmationsCount,
+          filesWithConfirmationsRequested: filesWithConfirmationsRequestedCount,
           lastModified,
           earliestAnnotationDate,
           latestAnnotationDate
