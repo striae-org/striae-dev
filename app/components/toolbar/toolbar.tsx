@@ -57,8 +57,8 @@ export const Toolbar = ({
         }
       } else {
         next.add(toolId);
-        // Show color selector when box tool is activated (but not for confirmed images)
-        if (toolId === 'box' && !isConfirmed) {
+        // Show color selector when box tool is activated (but not for confirmed images or read-only mode)
+        if (toolId === 'box' && !isConfirmed && !isReadOnly) {
           setShowColorSelector(true);
         }
       }
@@ -117,7 +117,6 @@ export const Toolbar = ({
         isActive={activeTools.has('box')}
         onClick={() => handleToolClick('box')}
         ariaLabel="Box Annotations"
-        disabled={isReadOnly}
       />
       <Button
         iconId="notes"

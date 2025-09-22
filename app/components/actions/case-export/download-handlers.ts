@@ -328,9 +328,11 @@ export async function downloadCaseAsZip(
     
     // Add forensic metadata file if protection is enabled
     if (options.protectForensicData) {
-      // Get the content that will be used for checksum calculation
+      // CRITICAL: Get the content that will be used for checksum calculation
+      // This MUST match exactly what gets saved in the actual data file
+      // So we use the same includeUserInfo setting for both
       const contentForChecksum = format === 'json' 
-        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings
+        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : generateCSVContent(exportData, false); // Raw content without warnings
       
       // Generate comprehensive forensic manifest with individual file checksums
