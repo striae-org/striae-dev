@@ -625,48 +625,57 @@ return (
         </button>
         </div>
           {currentCase && (
-        <div className={styles.caseActionsSection}>           
-            <button 
-              onClick={() => setIsExportModalOpen(true)}
-              className={styles.exportButton}
-            >
-              Export Case Data
-            </button>
+        <div className={styles.caseActionsSection}>
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
-            className={styles.caseActionsToggle}
+            className={styles.caseActionsButton}
             disabled={isReadOnly}
-            title={isReadOnly ? "Cannot modify read-only cases" : undefined}
+            title={isReadOnly ? "Cannot access case actions for read-only cases" : undefined}
           >
-            {showCaseActions ? 'Hide' : 'Rename/Delete Case'}
+            {showCaseActions ? 'Hide Case Actions' : 'Case Actions'}
           </button>
           
-          {showCaseActions && !isReadOnly && (
+          {showCaseActions && (
             <div className={styles.caseActionsContent}>
-              <div className={`${styles.caseRename} mb-4`}>
-                <input
-                  type="text"
-                  value={newCaseName}
-                  onChange={(e) => setNewCaseName(e.target.value)}
-                  placeholder="New Case Number"            
-                />
-                <button
-                  onClick={handleRenameCase}
-                  disabled={isRenaming || !newCaseName}            
+              {/* Export Case Data Section */}
+              <div className={styles.exportSection}>
+                <button 
+                  onClick={() => setIsExportModalOpen(true)}
+                  className={styles.exportButton}
                 >
-                  {isRenaming ? 'Renaming...' : 'Rename Case'}
+                  Export Case Data
                 </button>
               </div>
               
-              <div className={styles.deleteCaseSection}>
-                <button
-                  onClick={handleDeleteCase}
-                  disabled={isDeletingCase}
-                  className={styles.deleteWarningButton}
-                >
-                    {isDeletingCase ? 'Deleting...' : 'Delete Case'}
-                  </button>
-              </div>
+              {/* Rename/Delete Section */}
+              {!isReadOnly && (
+                <div className={styles.renameDeleteSection}>
+                  <div className={`${styles.caseRename} mb-4`}>
+                    <input
+                      type="text"
+                      value={newCaseName}
+                      onChange={(e) => setNewCaseName(e.target.value)}
+                      placeholder="New Case Number"            
+                    />
+                    <button
+                      onClick={handleRenameCase}
+                      disabled={isRenaming || !newCaseName}            
+                    >
+                      {isRenaming ? 'Renaming...' : 'Rename Case'}
+                    </button>
+                  </div>
+                  
+                  <div className={styles.deleteCaseSection}>
+                    <button
+                      onClick={handleDeleteCase}
+                      disabled={isDeletingCase}
+                      className={styles.deleteWarningButton}
+                    >
+                        {isDeletingCase ? 'Deleting...' : 'Delete Case'}
+                      </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
