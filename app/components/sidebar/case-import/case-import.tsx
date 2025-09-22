@@ -42,6 +42,15 @@ interface ProgressState {
   details?: string;
 }
 
+// Confirmation preview interface
+interface ConfirmationPreview {
+  caseNumber: string;
+  fullName: string;
+  exportDate: string;
+  totalConfirmations: number;
+  confirmationIds: string[];
+}
+
 // Helper functions
 const isValidZipFile = (file: File): boolean => {
   return file.type === 'application/zip' || 
@@ -164,6 +173,65 @@ const CasePreviewSection = ({ casePreview, isLoadingPreview }: {
   );
 };
 
+const ConfirmationPreviewSection = ({ confirmationPreview, isLoadingPreview }: {
+  confirmationPreview: ConfirmationPreview | null;
+  isLoadingPreview: boolean;
+}) => {
+  if (isLoadingPreview) {
+    return (
+      <div className={styles.previewSection}>
+        <div className={styles.previewLoading}>
+          Loading confirmation information...
+        </div>
+      </div>
+    );
+  }
+
+  if (!confirmationPreview) return null;
+
+  return (
+    <div className={styles.previewSection}>
+      <h3 className={styles.previewTitle}>Confirmation Data Information</h3>
+      <div className={styles.previewGrid}>
+        <div className={styles.previewItem}>
+          <span className={styles.previewLabel}>Case Number:</span>
+          <span className={styles.previewValue}>{confirmationPreview.caseNumber}</span>
+        </div>
+        <div className={styles.previewItem}>
+          <span className={styles.previewLabel}>Exported by:</span>
+          <span className={styles.previewValue}>{confirmationPreview.fullName}</span>
+        </div>
+        <div className={styles.previewItem}>
+          <span className={styles.previewLabel}>Export Date:</span>
+          <span className={styles.previewValue}>
+            {new Date(confirmationPreview.exportDate).toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZoneName: 'short'
+            })}
+          </span>
+        </div>
+        <div className={styles.previewItem}>
+          <span className={styles.previewLabel}>Total Confirmations:</span>
+          <span className={styles.previewValue}>{confirmationPreview.totalConfirmations}</span>
+        </div>
+        <div className={styles.previewItem}>
+          <span className={styles.previewLabel}>Confirmation IDs:</span>
+          <span className={styles.previewValue}>
+            {confirmationPreview.confirmationIds.length > 0 
+              ? confirmationPreview.confirmationIds.join(', ')
+              : 'None'
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProgressSection = ({ importProgress }: { importProgress: ProgressState | null }) => {
   if (!importProgress) return null;
 
@@ -281,6 +349,7 @@ export const CaseImport = ({
   const [existingReadOnlyCase, setExistingReadOnlyCase] = useState<string | null>(null);
   const [importProgress, setImportProgress] = useState<ProgressState | null>(null);
   const [casePreview, setCasePreview] = useState<CaseImportPreview | null>(null);
+  const [confirmationPreview, setConfirmationPreview] = useState<ConfirmationPreview | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -292,6 +361,7 @@ export const CaseImport = ({
   const clearImportData = useCallback(() => {
     setImportState(prev => ({ ...prev, selectedFile: null }));
     setCasePreview(null);
+    setConfirmationPreview(null);
     resetFileInput(fileInputRef);
   }, []);
 
@@ -401,6 +471,52 @@ export const CaseImport = ({
     }
   }, [user, clearImportData]);
 
+  const loadConfirmationPreview = useCallback(async (file: File) => {
+    if (!user) {
+      setMessages({ error: 'User authentication required', success: '' });
+      return;
+    }
+
+    setImportState(prev => ({ ...prev, isLoadingPreview: true }));
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      // Extract confirmation IDs from the confirmations object
+      const confirmationIds: string[] = [];
+      if (data.confirmations) {
+        Object.values(data.confirmations).forEach((imageConfirmations: any) => {
+          if (Array.isArray(imageConfirmations)) {
+            imageConfirmations.forEach((confirmation: any) => {
+              if (confirmation.confirmationId) {
+                confirmationIds.push(confirmation.confirmationId);
+              }
+            });
+          }
+        });
+      }
+
+      const preview: ConfirmationPreview = {
+        caseNumber: data.metadata?.caseNumber || 'Unknown',
+        fullName: data.metadata?.exportedByName || 'Unknown',
+        exportDate: data.metadata?.exportDate || new Date().toISOString(),
+        totalConfirmations: data.metadata?.totalConfirmations || confirmationIds.length,
+        confirmationIds
+      };
+      
+      setConfirmationPreview(preview);
+    } catch (error) {
+      console.error('Error loading confirmation preview:', error);
+      setMessages({ 
+        error: `Failed to read confirmation data: ${error instanceof Error ? error.message : 'Invalid JSON format'}`, 
+        success: '' 
+      });
+      clearImportData();
+    } finally {
+      setImportState(prev => ({ ...prev, isLoadingPreview: false }));
+    }
+  }, [user, clearImportData]);
+
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -426,15 +542,16 @@ export const CaseImport = ({
     }));
     clearMessages();
     setCasePreview(null);
+    setConfirmationPreview(null);
     
     // Load preview based on import type
     if (importType === 'case') {
       await loadCasePreview(file);
     } else {
-      // For confirmation imports, we'll show different UI (no preview needed)
-      // The validation will happen during import
+      // Load confirmation preview
+      await loadConfirmationPreview(file);
     }
-  }, [clearImportData, clearMessages, loadCasePreview]);
+  }, [clearImportData, clearMessages, loadCasePreview, loadConfirmationPreview]);
 
   const handleConfirmImport = useCallback(async () => {
     if (!user || !importState.selectedFile || !importState.importType) return;
@@ -623,12 +740,10 @@ export const CaseImport = ({
                 )}
                 
                 {importState.importType === 'confirmation' && (
-                  <div className={styles.confirmationInfo}>
-                    <p>Ready to import confirmation data. Validation will occur during import.</p>
-                    <div className={styles.confirmationFileInfo}>
-                      <span>📋 Confirmation data file selected</span>
-                    </div>
-                  </div>
+                  <ConfirmationPreviewSection 
+                    confirmationPreview={confirmationPreview} 
+                    isLoadingPreview={importState.isLoadingPreview} 
+                  />
                 )}
               </div>
             )}

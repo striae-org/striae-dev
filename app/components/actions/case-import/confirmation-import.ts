@@ -45,7 +45,7 @@ export async function importConfirmationData(
     const validation = await validateExporterUid(confirmationData.metadata.exportedByUid, user);
     
     if (!validation.exists) {
-      throw new Error(`Exporter UID ${confirmationData.metadata.exportedByUid} does not exist in the user database.`);
+      throw new Error(`Reviewer does not exist in the user database.`);
     }
     
     if (validation.isSelf) {
