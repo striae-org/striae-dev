@@ -21,10 +21,13 @@ const NoticeText = () => {
             <strong>Streamlined Note-Taking:</strong> Keep comprehensive and organized notes directly linked to your comparison images. Add or modify your notes at any time, and easily print them or save as a PDF for your casefile.
         </li>
         <li>
-            <strong>Optimized Tech Review and Confirmations: </strong> Easily revisit and refine your analysis with clear, accessible records. Help your tech reviewer understand your findings and conclusions, and provide a clear record for confirmations.
+            <strong>Case Export/Import:</strong> Seamlessly transfer cases between systems or share with colleagues through secure ZIP export functionality. Export complete cases with images, annotations, and metadata for archival or collaboration, and import cases for review with full data integrity validation.
         </li>
         <li>
-            <strong>Convert to PDF to Save or Print: </strong> Generate professional-quality PDF outputs for documentation and reporting.
+            <strong>Case Review and Authenticated Confirmations:</strong> Enable secure peer review and confirmation workflows with authenticated access to read-only case data. Technical reviewers can examine findings and provide confirmations while maintaining complete audit trails for quality assurance and laboratory standards.
+        </li>        
+        <li>
+            <strong>Convert to PDF to Save or Print: </strong> Generate professional-quality PDF outputs for documentation and reporting. Include authenticated digital confirmation records or traditional confirmation remarks in your final reports for comprehensive case documentation.
         </li>
       </ul>
       <p><strong>Security Features of Striae</strong></p>
