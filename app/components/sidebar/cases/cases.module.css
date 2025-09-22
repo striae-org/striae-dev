@@ -643,6 +643,34 @@
   cursor: not-allowed;
 }
 
+.auditTrailSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.auditTrailButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auditTrailButton:hover:not(:disabled) {
+  background-color: #5a359a;
+}
+
+.auditTrailButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
 /* Case Header Container */
 .caseHeader {
   /* Normal case header styling (no background) */

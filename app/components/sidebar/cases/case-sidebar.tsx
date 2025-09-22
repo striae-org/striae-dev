@@ -13,6 +13,7 @@ import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
 import { FilesModal } from '../files/files-modal';
 import { CaseExport, ExportFormat } from '../case-export/case-export';
+import { AuditTrailViewer } from '~/components/audit/audit-trail-viewer';
 import {
   validateCaseNumber,
   checkExistingCase,
@@ -98,6 +99,7 @@ export const CaseSidebar = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
 
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -674,12 +676,29 @@ return (
                         {isDeletingCase ? 'Deleting...' : 'Delete Case'}
                       </button>
                   </div>
+                  
+                  <div className={styles.auditTrailSection}>
+                    <button
+                      onClick={() => setIsAuditTrailOpen(true)}
+                      className={styles.auditTrailButton}
+                    >
+                      Audit Trail
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           )}
         </div>
-      )}     
+      )}
+      
+      {/* Audit Trail Viewer */}
+      <AuditTrailViewer 
+        caseNumber={currentCase || ''}
+        isOpen={isAuditTrailOpen}
+        onClose={() => setIsAuditTrailOpen(false)}
+      />
+      
       </div>
     </div>
   );
