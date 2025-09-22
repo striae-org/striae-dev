@@ -105,7 +105,11 @@ export const uploadFile = async (
 
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
   try {
-    // Delete image file
+    const apiKey = await getDataApiKey();
+    let imageDeleteFailed = false;
+    let imageDeleteError = '';
+
+    // Attempt to delete image file
     const imagesApiToken = await getImageApiKey();
     const imageResponse = await fetch(`${IMAGE_URL}/${fileId}`, {
       method: 'DELETE',
@@ -114,12 +118,25 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
       }
     });
 
+    // Handle image deletion response
     if (!imageResponse.ok) {
-      throw new Error(`Failed to delete image: ${imageResponse.statusText}`);
+      if (imageResponse.status === 404) {
+        // Image already doesn't exist - proceed with data cleanup
+        console.warn(`Image ${fileId} not found (404) - proceeding with data cleanup`);
+      } else {
+        // Other errors should still fail the operation
+        imageDeleteFailed = true;
+        imageDeleteError = `Failed to delete image: ${imageResponse.statusText}`;
+      }
     }
 
+    // If image deletion failed with non-404 error, don't proceed with data cleanup
+    if (imageDeleteFailed) {
+      throw new Error(imageDeleteError);
+    }
+
+    // Clean up data files regardless of image deletion success/404
     // Try to delete notes file - ignore 404
-    const apiKey = await getDataApiKey();
     const notesResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`, {
       method: 'DELETE',
       headers: {
@@ -132,7 +149,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
       throw new Error(`Failed to delete notes: ${notesResponse.statusText}`);
     }
 
-    // Update case data.json
+    // Update case data.json to remove file reference
     const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
       headers: { 'X-Custom-Auth-Key': apiKey }
     });
