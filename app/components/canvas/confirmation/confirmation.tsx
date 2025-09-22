@@ -1,19 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
-import { BasicConfirmationData } from '~/types/annotations';
+import { ConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
 import styles from './confirmation.module.css';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm?: (confirmationData: {
-    fullName: string;
-    badgeId: string;
-    timestamp: string;
-    confirmationId: string;
-  }) => void;
+  onConfirm?: (confirmationData: ConfirmationData) => void;
   company?: string;
-  existingConfirmation?: BasicConfirmationData | null;
+  existingConfirmation?: ConfirmationData | null;
 }
 
 // Generate a 10-character alphanumeric ID
@@ -97,11 +92,15 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company, existin
     setError('');
 
     try {
-      const confirmationData = {
+      const confirmationData: ConfirmationData = {
         fullName,
         badgeId: badgeId.trim(),
         timestamp,
-        confirmationId
+        confirmationId,
+        confirmedBy: user?.uid || '',
+        confirmedByEmail: user?.email || '',
+        confirmedByCompany: labCompany,
+        confirmedAt: new Date().toISOString()
       };
 
       onConfirm?.(confirmationData);
@@ -170,12 +169,16 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, company, existin
 
             <div className={styles.field}>
               <label className={styles.label}>Email:</label>
-              <div className={styles.readOnlyValue}>{userEmail}</div>
+              <div className={styles.readOnlyValue}>
+                {hasExistingConfirmation ? existingConfirmation.confirmedByEmail : userEmail}
+              </div>
             </div>
 
             <div className={styles.field}>
               <label className={styles.label}>Lab/Company:</label>
-              <div className={styles.readOnlyValue}>{labCompany}</div>
+              <div className={styles.readOnlyValue}>
+                {hasExistingConfirmation ? existingConfirmation.confirmedByCompany : labCompany}
+              </div>
             </div>
 
             <div className={styles.field}>

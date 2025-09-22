@@ -210,6 +210,7 @@ export const Striae = ({ user }: StriaePage) => {
             supportLevel: notes.supportLevel || 'Inconclusive',
             hasSubclass: notes.hasSubclass,
             includeConfirmation: notes.includeConfirmation ?? false, // Required
+            confirmationData: notes.confirmationData, // Add imported confirmation data
             additionalNotes: notes.additionalNotes, // Optional - pass as-is
             boxAnnotations: notes.boxAnnotations || [],
             updatedAt: notes.updatedAt || new Date().toISOString()

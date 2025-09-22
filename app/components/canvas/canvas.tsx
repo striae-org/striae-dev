@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useContext } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
 import { ConfirmationModal } from './confirmation/confirmation';
-import { AnnotationData, BoxAnnotation, BasicConfirmationData } from '~/types/annotations';
+import { AnnotationData, BoxAnnotation, ConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
 import { storeConfirmation } from '~/components/actions/confirm-export';
 import styles from './canvas.module.css';
@@ -75,10 +75,10 @@ export const Canvas = ({
   };
 
   // Handle confirmation
-  const handleConfirmation = async (confirmationData: BasicConfirmationData) => {
+  const handleConfirmation = async (confirmationData: ConfirmationData) => {
     if (!onAnnotationUpdate || !annotationData) return;
     
-    // Store in annotation data (existing functionality)
+    // Store in annotation data
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
       confirmationData
@@ -89,19 +89,11 @@ export const Canvas = ({
 
     // Store at case level for original analyst tracking
     if (user && caseNumber && currentImageId) {
-      // Create enhanced confirmation data for case-level storage
-      const enhancedConfirmationData = {
-        ...confirmationData,
-        confirmedBy: user.uid,
-        confirmedByEmail: user.email || '',
-        confirmedAt: new Date().toISOString()
-      };
-
       const success = await storeConfirmation(
         user,
         caseNumber,
         currentImageId,
-        enhancedConfirmationData
+        confirmationData
       );
       
       if (success) {
@@ -197,16 +189,33 @@ export const Canvas = ({
           File: {filename}
           {annotationData?.includeConfirmation && (
             <>
-              <div className={styles.confirmationIncluded}>
-                {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
-              </div>
-              {isReadOnly && (
-                <button 
-                  className={styles.confirmButton}
-                  onClick={() => setIsConfirmationModalOpen(true)}
-                >
-                  Confirm
-                </button>
+              {/* Show confirmation status based on whether confirmation data exists */}
+              {annotationData?.confirmationData ? (
+                <>
+                  <div className={styles.confirmationConfirmed}>
+                    Identification Confirmed
+                  </div>
+                  <button 
+                    className={styles.viewConfirmationButton}
+                    onClick={() => setIsConfirmationModalOpen(true)}
+                  >
+                    View Confirmation Data
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className={styles.confirmationIncluded}>
+                    {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
+                  </div>
+                  {isReadOnly && (
+                    <button 
+                      className={styles.confirmButton}
+                      onClick={() => setIsConfirmationModalOpen(true)}
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </>
               )}
             </>
           )}

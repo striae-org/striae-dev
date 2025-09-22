@@ -49,14 +49,6 @@ export async function storeConfirmation(
       throw new Error('Could not find original image ID for current image');
     }
 
-    // Create enhanced confirmation data
-    const enhancedConfirmation: ConfirmationData = {
-      ...confirmationData,
-      confirmedBy: user.uid,
-      confirmedByEmail: user.email || 'Unknown',
-      confirmedAt: new Date().toISOString()
-    };
-
     // Initialize confirmations object if it doesn't exist
     if (!caseData.confirmations) {
       caseData.confirmations = {};
@@ -67,8 +59,8 @@ export async function storeConfirmation(
       caseData.confirmations[originalImageId] = [];
     }
 
-    // Add the new confirmation
-    caseData.confirmations[originalImageId].push(enhancedConfirmation);
+    // Add the confirmation data directly (already complete from modal)
+    caseData.confirmations[originalImageId].push(confirmationData);
 
     // Store the updated case data
     const updateResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
@@ -84,7 +76,7 @@ export async function storeConfirmation(
       throw new Error(`Failed to update case data: ${updateResponse.status}`);
     }
 
-    console.log(`Confirmation stored for original image ${originalImageId}:`, enhancedConfirmation);
+    console.log(`Confirmation stored for original image ${originalImageId}:`, confirmationData);
     return true;
 
   } catch (error) {
