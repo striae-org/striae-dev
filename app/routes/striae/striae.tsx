@@ -91,6 +91,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
+    setCaseNumber(caseNumber);
     setAnnotationData(null);
     setSelectedFilename(undefined);
     setImageId(undefined);    
@@ -343,7 +344,7 @@ export const Striae = ({ user }: StriaePage) => {
             boxAnnotationColor={boxAnnotationColor}
             onAnnotationUpdate={handleAnnotationUpdate}
             isReadOnly={isReadOnlyCase}
-            caseNumber={caseNumber}
+            caseNumber={currentCase}
             currentImageId={imageId}
           />
         </div>
