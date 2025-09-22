@@ -2,6 +2,7 @@ import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
 import { calculateCRC32 } from '~/utils/CRC32';
+import { getUserData } from '~/utils/permissions';
 import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
 
 const DATA_WORKER_URL = paths.data_worker_url;
@@ -157,7 +158,6 @@ export async function exportConfirmationData(
     };
 
     try {
-      const { getUserData } = await import('~/utils/permissions');
       const userData = await getUserData(user);
       if (userData) {
         userMetadata = {
