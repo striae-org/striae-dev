@@ -165,16 +165,28 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 
 #### 6. Case Export System
 
-- **Location**: `app/components/sidebar/case-export/` and `app/components/actions/case-export.ts`
-- **Purpose**: Comprehensive data export with multiple format support
-- **Features**:
-  - **Multi-Format Support**: JSON, CSV/Excel, and ZIP file generation
-  - **ZIP Export with Images**: Complete case packaging including all associated images
-  - **JSZip Integration**: Browser-based ZIP file creation with automatic image downloading
-  - **Split Box Annotation Format**: Box annotations split into separate rows for improved data analysis
-  - **Progress Tracking**: Real-time progress updates during export operations
-  - **Error Recovery**: Graceful handling of failed exports with detailed error reporting
-  - **Excel Multi-Worksheet**: Bulk exports create Excel files with summary and individual case worksheets
+- **Location**: `app/components/sidebar/case-export/` (UI) and `app/components/actions/case-export/` (business logic)
+- **Purpose**: Comprehensive data export with multiple format support using modular architecture
+- **Architecture**: Separated UI components and modular business logic for maintainability
+
+**Business Logic Modules** (`app/components/actions/case-export/`):
+
+- **Core Export**: Main export orchestration (`core-export.ts`)
+- **Data Processing**: CSV generation and tabular formatting (`data-processing.ts`)
+- **Download Handlers**: Browser download utilities (`download-handlers.ts`)
+- **Metadata Helpers**: Forensic protection and Excel formatting (`metadata-helpers.ts`)
+- **Types & Constants**: Shared definitions and CSV headers (`types-constants.ts`)
+- **Validation**: Export prerequisites validation (`validation-utils.ts`)
+
+**Features**:
+
+- **Multi-Format Support**: JSON, CSV/Excel, and ZIP file generation
+- **ZIP Export with Images**: Complete case packaging including all associated images
+- **JSZip Integration**: Browser-based ZIP file creation with automatic image downloading
+- **Split Box Annotation Format**: Box annotations split into separate rows for improved data analysis
+- **Progress Tracking**: Real-time progress updates during export operations
+- **Error Recovery**: Graceful handling of failed exports with detailed error reporting
+- **Excel Multi-Worksheet**: Bulk exports create Excel files with summary and individual case worksheets
 
 **Architecture Components**:
 
@@ -186,44 +198,72 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 
 **Data Flow**:
 
-1. User selects export format and options
-2. Export engine collects case data from R2 storage
-3. Format-specific processor transforms data (JSON/CSV/ZIP)
-4. For ZIP exports: Images downloaded and packaged with data files
-5. Browser download initiated with proper file handling
-6. Progress callbacks update UI throughout operation
+1. User selects export format and options via sidebar UI
+2. UI components call modular action functions from `case-export/`
+3. Export engine collects case data from R2 storage
+4. Format-specific processor transforms data (JSON/CSV/ZIP)
+5. For ZIP exports: Images downloaded and packaged with data files
+6. Browser download initiated with proper file handling
+7. Progress callbacks update UI throughout operation
 
 #### 7. Case Import System
 
-- **Location**: `app/components/sidebar/case-import/` and `app/components/actions/case-review.ts`
-- **Purpose**: ZIP package import for read-only case review and collaboration
-- **Features**:
-  - **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
-  - **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
-  - **Duplicate Prevention**: Prevents import if user was the original case analyst
-  - **Progress Tracking**: Multi-stage progress reporting with detailed status updates
-  - **Image Integration**: Automatic upload and association of all case images
-  - **Metadata Preservation**: Complete preservation of original export metadata and timestamps
-  - **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
+- **Location**: `app/components/sidebar/case-import/` (UI) and `app/components/actions/case-import/` (business logic)
+- **Purpose**: ZIP package import for read-only case review and collaboration using component composition pattern
+- **Architecture**: Separated UI components and modular business logic for maintainable, testable code
 
-**Architecture Components**:
+**UI Architecture** (`app/components/sidebar/case-import/`):
 
-- **ZIP Parser**: JSZip-based archive extraction and validation system
-- **Import Engine**: Core import functionality with multi-stage processing
-- **Image Uploader**: Automatic image blob processing and upload to image worker
-- **Metadata Manager**: Original case metadata preservation and read-only case creation
-- **Progress System**: Real-time callback system for import operation updates
-- **Security Validator**: Prevents import conflicts and enforces read-only protections
+- **Main Orchestrator**: `case-import.tsx` - Coordinates sub-components and hooks
+- **UI Components**: Specialized components in `components/` directory for single responsibilities
+- **Business Logic**: Custom hooks in `hooks/` directory for state management and processing
+- **Utilities**: Pure functions in `utils/` directory for validation and file operations
+- **Barrel Exports**: Centralized exports through `index.ts` for clean imports
+
+**Business Logic Modules** (`app/components/actions/case-import/`):
+
+- **Orchestrator**: Main import workflow coordination (`orchestrator.ts`)
+- **Validation**: Security checks and integrity validation (`validation.ts`)
+- **ZIP Processing**: Archive parsing and preview generation (`zip-processing.ts`)
+- **Storage Operations**: R2 storage and case management (`storage-operations.ts`)
+- **Image Operations**: Image upload and processing (`image-operations.ts`)
+- **Annotation Import**: Annotation data mapping (`annotation-import.ts`)
+- **Confirmation Import**: Confirmation data processing (`confirmation-import.ts`)
+
+**Features**:
+
+- **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
+- **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
+- **Duplicate Prevention**: Prevents import if user was the original case analyst
+- **Progress Tracking**: Multi-stage progress reporting with detailed status updates
+- **Image Integration**: Automatic upload and association of all case images
+- **Metadata Preservation**: Complete preservation of original export metadata and timestamps
+- **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
+
+**Architectural Components**:
+
+- **FileSelector Component**: File browser interface with drag-and-drop support
+- **CasePreviewSection Component**: Case metadata preview and validation display
+- **ProgressSection Component**: Real-time progress visualization with stage indicators
+- **ExistingCaseSection Component**: Existing case detection and management interface
+- **ConfirmationDialog Component**: Final import confirmation with security warnings
+- **useImportState Hook**: Centralized state management for import workflow
+- **useFilePreview Hook**: ZIP parsing, validation, and preview generation logic
+- **useImportExecution Hook**: Import process orchestration with progress callbacks
+- **File Validation Utils**: Pure functions for ZIP structure and content validation
 
 **Data Flow**:
 
-1. User selects ZIP file containing exported case data
-2. ZIP parser validates archive structure and extracts contents
-3. Security validator checks for conflicts (original analyst prevention)
-4. Image uploader processes and uploads all case images to image worker
-5. Import engine stores case data in R2 with read-only metadata
-6. User profile updated with read-only case reference
-7. Progress callbacks update UI throughout multi-stage operation
+1. User selects ZIP file via FileSelector component
+2. useFilePreview hook validates archive structure and extracts contents
+3. CasePreviewSection displays case metadata and validation results
+4. Security validator checks for conflicts (original analyst prevention)
+5. ConfirmationDialog component presents final confirmation with security warnings
+6. useImportExecution hook orchestrates the import process:
+   - Image uploader processes and uploads all case images to image worker
+   - Import engine stores case data in R2 with read-only metadata
+   - User profile updated with read-only case reference
+7. ProgressSection component updates UI throughout multi-stage operation
 
 **Read-Only Case Management**:
 

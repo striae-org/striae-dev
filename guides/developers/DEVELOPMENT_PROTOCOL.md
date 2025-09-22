@@ -277,14 +277,76 @@ Related to #456
 ### Component Architecture
 
 1. **Directory Structure**: Follow established patterns
-   ```
+
+   ```typescript
    app/components/[feature]/
    ├── component.tsx        # Main component file
    ├── component.module.css # Component-specific styles
-   └── index.ts            # Export file (if needed)
+   ├── components/          # Sub-components (for complex features)
+   ├── hooks/              # Custom hooks for business logic
+   ├── utils/              # Pure utility functions
+   └── index.ts            # Barrel export file
    ```
 
-2. **Component Interface Design**:
+2. **Component Composition Pattern**: For complex features, use modular architecture
+
+   ```typescript
+   // Main orchestrator component
+   export const ComplexFeature = ({ ...props }: FeatureProps) => {
+     // Use custom hooks for business logic
+     const state = useFeatureState();
+     const actions = useFeatureActions();
+     
+     return (
+       <div>
+         <SubComponent1 {...state} {...actions} />
+         <SubComponent2 {...state} {...actions} />
+         <SubComponent3 {...state} {...actions} />
+       </div>
+     );
+   };
+   
+   // Sub-components handle specific UI concerns
+   const SubComponent1 = ({ data, onAction }: SubComponentProps) => {
+     // Single responsibility UI logic
+     return <div>{/* Specific UI */}</div>;
+   };
+   ```
+
+3. **Custom Hooks for Business Logic**: Encapsulate complex logic in reusable hooks
+
+   ```typescript
+   // State management hook
+   const useFeatureState = () => {
+     const [isLoading, setIsLoading] = useState(false);
+     const [data, setData] = useState(null);
+     const [error, setError] = useState(null);
+     
+     return { isLoading, data, error, setIsLoading, setData, setError };
+   };
+   
+   // Actions hook
+   const useFeatureActions = () => {
+     const processData = useCallback(async (input) => {
+       // Business logic here
+     }, []);
+     
+     return { processData };
+   };
+   ```
+
+4. **Barrel Exports**: Use index.ts files for clean imports
+
+   ```typescript
+   // components/feature/index.ts
+   export { MainComponent } from './main-component';
+   export { SubComponent1, SubComponent2 } from './components';
+   export { useFeatureState, useFeatureActions } from './hooks';
+   export type { FeatureProps, SubComponentProps } from './types';
+   ```
+
+5. **Component Interface Design**:
+
    ```typescript
    // Always define props interface
    interface ComponentProps {
@@ -302,13 +364,14 @@ Related to #456
    };
    ```
 
-3. **State Management Patterns**:
+6. **State Management Patterns**:
    - Use `useState` for local component state
    - Use `useContext` for shared state (e.g., AuthContext)
    - Implement custom hooks for reusable logic
    - Follow "Props Down, Events Up" pattern
+   - Separate business logic from UI components using custom hooks
 
-4. **Integration Requirements**:
+7. **Integration Requirements**:
    - Canvas components must integrate with existing annotation system
    - Toolbar components must connect to toolbar state management
    - PDF workers must receive consistent data structures

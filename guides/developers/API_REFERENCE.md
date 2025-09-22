@@ -50,9 +50,11 @@
       - [ExportFormat Type](#exportformat-type)
       - [ExportOptions Interface](#exportoptions-interface)
     - [Case Import Types](#case-import-types)
+      - [CaseImportProps Interface](#caseimportprops-interface)
       - [ImportOptions Interface](#importoptions-interface)
       - [ImportResult Interface](#importresult-interface)
       - [ReadOnlyCaseMetadata Interface](#readonlycasemetadata-interface)
+      - [CaseImportPreview Interface](#caseimportpreview-interface)
     - [File Management Types](#file-management-types)
       - [FileData Interface](#filedata-interface)
       - [FileUploadResponse Interface](#fileuploadresponse-interface)
@@ -892,6 +894,18 @@ interface ExportOptions {
 
 ### Case Import Types
 
+#### CaseImportProps Interface
+
+Props interface for the main case import component:
+
+```typescript
+interface CaseImportProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onImportComplete: (caseNumber: string, success: boolean) => void;
+}
+```
+
 #### ImportOptions Interface
 
 Configuration options for case import operations:
@@ -932,6 +946,23 @@ interface ReadOnlyCaseMetadata {
   originalExportedBy: string;
   sourceChecksum?: string;
   isReadOnly: true;
+}
+```
+
+#### CaseImportPreview Interface
+
+Preview information generated during ZIP parsing before import:
+
+```typescript
+interface CaseImportPreview {
+  caseNumber: string;
+  fileCount: number;
+  annotationCount: number;
+  exportDate: string;
+  exportedBy: string;
+  hasImages: boolean;
+  canImport: boolean;
+  warnings: string[];
 }
 ```
 
