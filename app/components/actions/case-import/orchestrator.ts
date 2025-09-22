@@ -1,16 +1,96 @@
 import { User } from 'firebase/auth';
-import { ImportOptions, ImportResult, ReadOnlyCaseMetadata } from '~/types';
+import { ImportOptions, ImportResult, ReadOnlyCaseMetadata, FileData } from '~/types';
 import { checkExistingCase } from '../case-manage';
 import { validateCaseIntegrity as validateForensicIntegrity } from '~/utils/CRC32';
+import { deleteFile } from '../image-manage';
 import { parseImportZip } from './zip-processing';
 import { 
   checkReadOnlyCaseExists, 
   deleteReadOnlyCase, 
   storeCaseDataInR2, 
-  addReadOnlyCaseToUser 
+  addReadOnlyCaseToUser,
+  removeReadOnlyCase
 } from './storage-operations';
 import { uploadImageBlob } from './image-operations';
 import { importAnnotations } from './annotation-import';
+
+/**
+ * Track the state of an import operation for cleanup purposes
+ */
+interface ImportState {
+  uploadedFiles: FileData[];
+  caseDataStored: boolean;
+  userProfileUpdated: boolean;
+  caseNumber: string;
+}
+
+/**
+ * Clean up partially imported data when an import fails
+ */
+async function cleanupPartialImport(
+  user: User, 
+  state: ImportState,
+  onProgress?: (stage: string, progress: number, details?: string) => void
+): Promise<string[]> {
+  const cleanupWarnings: string[] = [];
+  
+  try {
+    onProgress?.('Cleaning up partial import', 0, 'Starting cleanup...');
+    
+    // Step 1: Remove user profile entry if it was added
+    if (state.userProfileUpdated) {
+      try {
+        onProgress?.('Cleaning up partial import', 25, 'Removing user profile entry...');
+        const removeSuccess = await removeReadOnlyCase(user, state.caseNumber);
+        if (!removeSuccess) {
+          cleanupWarnings.push('Failed to remove case from user profile during cleanup');
+        }
+      } catch (error) {
+        cleanupWarnings.push(`Error removing user profile entry: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+    
+    // Step 2: Delete case data from R2 if it was stored
+    if (state.caseDataStored) {
+      try {
+        onProgress?.('Cleaning up partial import', 50, 'Removing case data...');
+        // Use the full deleteReadOnlyCase function to remove all R2 data
+        const deleteSuccess = await deleteReadOnlyCase(user, state.caseNumber);
+        if (!deleteSuccess) {
+          cleanupWarnings.push('Failed to remove case data during cleanup');
+        }
+      } catch (error) {
+        cleanupWarnings.push(`Error removing case data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+    
+    // Step 3: Delete uploaded images
+    if (state.uploadedFiles.length > 0) {
+      onProgress?.('Cleaning up partial import', 75, `Deleting ${state.uploadedFiles.length} uploaded images...`);
+      
+      const deletePromises = state.uploadedFiles.map(async (file, index) => {
+        try {
+          await deleteFile(user, state.caseNumber, file.id);
+        } catch (error) {
+          cleanupWarnings.push(`Failed to delete image ${file.originalFilename}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+        
+        // Update progress for image deletion
+        const progress = 75 + (index / state.uploadedFiles.length) * 25;
+        onProgress?.('Cleaning up partial import', progress, `Deleted ${index + 1}/${state.uploadedFiles.length} images`);
+      });
+      
+      await Promise.all(deletePromises);
+    }
+    
+    onProgress?.('Cleaning up partial import', 100, 'Cleanup completed');
+    
+  } catch (error) {
+    cleanupWarnings.push(`Cleanup process failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+  
+  return cleanupWarnings;
+}
 
 /**
  * Main function to import a case for read-only viewing
@@ -31,12 +111,21 @@ export async function importCaseForReview(
     warnings: []
   };
   
+  // Track import state for cleanup purposes
+  const importState: ImportState = {
+    uploadedFiles: [],
+    caseDataStored: false,
+    userProfileUpdated: false,
+    caseNumber: ''
+  };
+  
   try {
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
     
     // Step 1: Parse ZIP file
     const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
+    importState.caseNumber = result.caseNumber;
     
     // Step 1.5: Validate checksum if forensic metadata exists
     if (metadata?.forensicManifest && cleanedContent) {
@@ -126,6 +215,7 @@ export async function importCaseForReview(
         }
         
         importedFiles.push(fileData);
+        importState.uploadedFiles.push(fileData);
         uploadedCount++;
         
         const overallProgress = 30 + (uploadedCount / totalImages) * 40;
@@ -146,6 +236,7 @@ export async function importCaseForReview(
     
     // Step 4: Store case data in R2
     await storeCaseDataInR2(user, result.caseNumber, caseData, importedFiles, originalImageIdMapping);
+    importState.caseDataStored = true;
     
     onProgress?.('Importing annotations', 85, 'Processing annotations...');
     
@@ -165,6 +256,7 @@ export async function importCaseForReview(
     };
     
     await addReadOnlyCaseToUser(user, caseMetadata);
+    importState.userProfileUpdated = true;
     
     onProgress?.('Import complete', 100, 'Case successfully imported for review');
     
@@ -177,8 +269,23 @@ export async function importCaseForReview(
     result.success = false;
     result.errors?.push(error instanceof Error ? error.message : 'Unknown error occurred during import');
     
-    // TODO: Cleanup any partially imported data
-    // This would involve deleting uploaded images and removing case data
+    // Cleanup any partially imported data
+    if (importState.uploadedFiles.length > 0 || importState.caseDataStored || importState.userProfileUpdated) {
+      console.log('Import failed, cleaning up partial data...');
+      try {
+        const cleanupWarnings = await cleanupPartialImport(user, importState, onProgress);
+        if (cleanupWarnings.length > 0) {
+          result.warnings?.push(...cleanupWarnings);
+          console.warn('Cleanup completed with warnings:', cleanupWarnings);
+        } else {
+          console.log('Cleanup completed successfully');
+        }
+      } catch (cleanupError) {
+        const cleanupErrorMsg = `Cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : 'Unknown cleanup error'}`;
+        result.warnings?.push(cleanupErrorMsg);
+        console.error('Cleanup failed:', cleanupError);
+      }
+    }
     
     return result;
   }
