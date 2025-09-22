@@ -128,7 +128,8 @@ export async function storeCaseDataInR2(
   caseNumber: string,
   caseData: CaseExportData,
   importedFiles: FileData[],
-  originalImageIdMapping?: Map<string, string>
+  originalImageIdMapping?: Map<string, string>,
+  forensicManifestCreatedAt?: string
 ): Promise<void> {
   try {
     const apiKey = await getDataApiKey();
@@ -146,7 +147,9 @@ export async function storeCaseDataInR2(
       isReadOnly: true,
       importedAt: new Date().toISOString(),
       // Add original image ID mapping for confirmation linking
-      originalImageIds: originalImageIds
+      originalImageIds: originalImageIds,
+      // Add forensic manifest timestamp if available for confirmation exports
+      ...(forensicManifestCreatedAt && { forensicManifestCreatedAt })
     };
     
     // Store in R2

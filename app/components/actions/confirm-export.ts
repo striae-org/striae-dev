@@ -118,6 +118,41 @@ export async function getCaseConfirmations(
 }
 
 /**
+ * Get case data with forensic manifest information if available
+ */
+export async function getCaseDataWithManifest(
+  user: User,
+  caseNumber: string
+): Promise<{ confirmations: CaseConfirmations | null; forensicManifestCreatedAt?: string }> {
+  try {
+    const apiKey = await getDataApiKey();
+    
+    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch case data: ${response.status}`);
+      return { confirmations: null };
+    }
+
+    const caseData: CaseDataWithConfirmations & { forensicManifestCreatedAt?: string } = await response.json();
+    
+    return {
+      confirmations: caseData.confirmations || null,
+      forensicManifestCreatedAt: caseData.forensicManifestCreatedAt
+    };
+
+  } catch (error) {
+    console.error('Failed to get case data with manifest:', error);
+    return { confirmations: null };
+  }
+}
+
+/**
  * Get confirmations for a specific original image ID
  */
 export async function getImageConfirmations(
@@ -142,8 +177,8 @@ export async function exportConfirmationData(
   caseNumber: string
 ): Promise<void> {
   try {
-    // Get all confirmation data for the case
-    const caseConfirmations = await getCaseConfirmations(user, caseNumber);
+    // Get all confirmation data and forensic manifest info for the case
+    const { confirmations: caseConfirmations, forensicManifestCreatedAt } = await getCaseDataWithManifest(user, caseNumber);
     
     if (!caseConfirmations || Object.keys(caseConfirmations).length === 0) {
       throw new Error('No confirmation data found for this case');
@@ -171,6 +206,13 @@ export async function exportConfirmationData(
       console.warn('Failed to fetch user data for confirmation export metadata:', error);
     }
 
+    // Try to get the forensic manifest createdAt timestamp from the original case export
+    let originalExportCreatedAt: string | undefined = forensicManifestCreatedAt;
+    
+    if (!originalExportCreatedAt) {
+      console.warn('No forensic manifest timestamp found for this case');
+    }
+
     // Create export data with metadata
     const exportData = {
       metadata: {
@@ -178,7 +220,8 @@ export async function exportConfirmationData(
         exportDate: new Date().toISOString(),
         ...userMetadata,
         totalConfirmations: Object.keys(caseConfirmations).length,
-        version: '1.0'
+        version: '1.0',
+        ...(originalExportCreatedAt && { originalExportCreatedAt })
       },
       confirmations: caseConfirmations
     };
