@@ -43,6 +43,19 @@ export const FileSelector = ({
             }
           </span>
         </label>
+        
+        {/* Clear button positioned in upper right corner */}
+        {selectedFile && onClear && (
+          <button 
+            type="button"
+            onClick={handleClear}
+            className={styles.clearFileButton}
+            disabled={isDisabled}
+            title="Clear selected file"
+          >
+            ×
+          </button>
+        )}
       </div>
       
       {selectedFile && (
@@ -50,16 +63,6 @@ export const FileSelector = ({
           <span className={styles.fileSize}>
             {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
           </span>
-          {onClear && (
-            <button 
-              type="button"
-              onClick={handleClear}
-              className={styles.clearFileButton}
-              disabled={isDisabled}
-            >
-              ×
-            </button>
-          )}
         </div>
       )}
     </div>

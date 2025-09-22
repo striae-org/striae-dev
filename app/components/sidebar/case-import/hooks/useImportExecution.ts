@@ -82,12 +82,16 @@ export const useImportExecution = ({
         const result = await importConfirmationData(user, selectedFile);
         
         if (result.success) {
-          setSuccess(`Successfully imported ${result.confirmationsImported} confirmation(s) for case "${result.caseNumber}"`);
+          let message = `Successfully imported ${result.confirmationsImported} confirmation(s) for case "${result.caseNumber}"`;
           
-          // Auto-close after success
-          setTimeout(() => {
-            onClose();
-          }, 2000);
+          // If there were blocked confirmations, include that information
+          if (result.errors && result.errors.length > 0) {
+            message += `\n\n${result.errors.length} confirmation(s) were blocked:\n\n${result.errors.join('\n\n')}`;
+          }
+          
+          setSuccess(message);
+          
+          // No auto-close for confirmation imports - let user read the details and close manually
           
         } else {
           setError(result.errors?.join(', ') || 'Confirmation import failed');

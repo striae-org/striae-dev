@@ -104,6 +104,10 @@ export async function importConfirmationData(
         continue;
       }
 
+      // Get the original filename for user-friendly messages
+      const currentFile = caseData.files.find((file: any) => file.id === currentImageId);
+      const displayFilename = currentFile?.originalFilename || currentImageId;
+
       // Get current annotation data for this image
       const annotationResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
         method: 'GET',
@@ -119,7 +123,7 @@ export async function importConfirmationData(
 
       // Check if confirmation data already exists
       if ((annotationData as any).confirmationData) {
-        result.warnings?.push(`Image ${currentImageId} already has confirmation data - skipping`);
+        result.warnings?.push(`Image ${displayFilename} already has confirmation data - skipping`);
         continue;
       }
 
@@ -130,10 +134,14 @@ export async function importConfirmationData(
         const annotationUpdatedAt = new Date((annotationData as any).updatedAt);
         
         if (annotationUpdatedAt > originalExportDate) {
+          // Format timestamps in user's timezone
+          const formattedExportDate = originalExportDate.toLocaleString();
+          const formattedUpdatedDate = annotationUpdatedAt.toLocaleString();
+          
           result.errors?.push(
-            `Cannot import confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}). ` +
-            `The annotations were last modified at ${(annotationData as any).updatedAt} which is after ` +
-            `the original case export date of ${confirmationData.metadata.originalExportCreatedAt}. ` +
+            `Cannot import confirmation for image "${displayFilename}" (${importedConfirmationData.confirmationId}). ` +
+            `The annotations were last modified at ${formattedUpdatedDate} which is after ` +
+            `the original case export date of ${formattedExportDate}. ` +
             `Confirmations can only be imported for images that haven't been modified since the original export.`
           );
           continue; // Skip this image and continue with others
@@ -141,7 +149,7 @@ export async function importConfirmationData(
       } else if (importedConfirmationData && !confirmationData.metadata.originalExportCreatedAt) {
         // Block legacy confirmation data without forensic linking
         result.errors?.push(
-          `Cannot import confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}). ` +
+          `Cannot import confirmation for image "${displayFilename}" (${importedConfirmationData.confirmationId}). ` +
           `This confirmation data lacks forensic timestamp linking and cannot be validated. ` +
           `Only confirmation exports with complete forensic metadata are accepted.`
         );
@@ -171,7 +179,7 @@ export async function importConfirmationData(
         result.imagesUpdated++;
         result.confirmationsImported += confirmations.length;
       } else {
-        result.warnings?.push(`Failed to update image ${currentImageId}: ${saveResponse.status}`);
+        result.warnings?.push(`Failed to update image ${displayFilename}: ${saveResponse.status}`);
       }
 
       processedCount++;
@@ -179,9 +187,20 @@ export async function importConfirmationData(
       onProgress?.('Processing confirmations', progress, `Updated ${result.imagesUpdated} images...`);
     }
 
-    onProgress?.('Import complete', 100, `Successfully imported ${result.confirmationsImported} confirmations`);
+    const blockedCount = (result.errors?.length || 0);
+    const successMessage = blockedCount > 0 
+      ? `Imported ${result.confirmationsImported} confirmations, ${blockedCount} blocked`
+      : `Successfully imported ${result.confirmationsImported} confirmations`;
+    
+    onProgress?.('Import complete', 100, successMessage);
 
-    result.success = true;
+    // If there were errors (blocked confirmations), include that in the result message
+    if (result.errors && result.errors.length > 0) {
+      result.success = result.confirmationsImported > 0; // Success if at least one confirmation was imported
+    } else {
+      result.success = true;
+    }
+    
     return result;
 
   } catch (error) {

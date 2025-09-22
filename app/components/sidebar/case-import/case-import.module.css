@@ -135,6 +135,41 @@
   position: relative;
 }
 
+.clearFileButton {
+  position: absolute;
+  top: var(--spaceS);
+  right: var(--spaceS);
+  background: color-mix(in lab, var(--error) 90%, var(--white));
+  color: var(--error);
+  border: 1px solid color-mix(in lab, var(--error) 30%, transparent);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  z-index: 1;
+}
+
+.clearFileButton:hover:not(:disabled) {
+  background: var(--error);
+  color: var(--white);
+  box-shadow: 0 2px 6px color-mix(in lab, var(--error) 30%, transparent);
+}
+
+.clearFileButton:disabled {
+  background: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
+  border-color: color-mix(in lab, var(--text) 15%, transparent);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .fileInput {
   position: absolute;
   opacity: 0;
@@ -191,7 +226,7 @@
 
 .fileInfo {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 0 var(--spaceS);
 }
 
@@ -313,6 +348,7 @@
   color: var(--success);
   font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);
+  white-space: pre-wrap;
 }
 
 .error {
@@ -324,6 +360,7 @@
   color: var(--error);
   font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);
+  white-space: pre-wrap;
 }
 
 /* Instructions section */
