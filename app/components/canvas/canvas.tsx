@@ -181,6 +181,70 @@ export const Canvas = ({
     return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
   };
 
+  const isBlueColor = (color: string) => {
+    const lowerColor = color.toLowerCase();
+    return lowerColor === '#0000ff' || lowerColor === 'blue' || lowerColor === '#00f' || 
+           lowerColor === '#0066cc' || lowerColor === '#0080ff' || lowerColor === '#007fff';
+  };
+
+  // Programmatically determine if a color is dark and needs a light background
+  const needsLightBackground = (color: string) => {
+    if (!color) return false;
+    
+    // Handle named colors
+    const namedColors: { [key: string]: string } = {
+      'black': '#000000',
+      'white': '#ffffff',
+      'red': '#ff0000',
+      'green': '#008000',
+      'blue': '#0000ff',
+      'yellow': '#ffff00',
+      'cyan': '#00ffff',
+      'magenta': '#ff00ff',
+      'silver': '#c0c0c0',
+      'gray': '#808080',
+      'maroon': '#800000',
+      'olive': '#808000',
+      'lime': '#00ff00',
+      'aqua': '#00ffff',
+      'teal': '#008080',
+      'navy': '#000080',
+      'fuchsia': '#ff00ff',
+      'purple': '#800080'
+    };
+    
+    let hexColor = color.toLowerCase().trim();
+    
+    // Convert named color to hex
+    if (namedColors[hexColor]) {
+      hexColor = namedColors[hexColor];
+    }
+    
+    // Remove # if present
+    hexColor = hexColor.replace('#', '');
+    
+    // Handle 3-digit hex codes
+    if (hexColor.length === 3) {
+      hexColor = hexColor.split('').map(char => char + char).join('');
+    }
+    
+    // Validate hex color
+    if (!/^[0-9a-f]{6}$/i.test(hexColor)) {
+      return false; // Invalid color, don't apply background
+    }
+    
+    // Convert to RGB
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+    
+    // Calculate relative luminance using WCAG formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Colors with luminance < 0.5 are considered dark
+    return luminance < 0.5;
+  };
+
   return (    
     <div className={styles.canvasContainer}>
       {/* Filename & Connfirmation Field Display - Upper Left */}
@@ -286,7 +350,7 @@ export const Canvas = ({
                 className={styles.leftAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
@@ -301,7 +365,7 @@ export const Canvas = ({
                 className={styles.rightAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
@@ -320,7 +384,7 @@ export const Canvas = ({
                 className={styles.indexAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
