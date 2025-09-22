@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
+import { calculateCRC32 } from '~/utils/CRC32';
 
 const DATA_WORKER_URL = paths.data_worker_url;
 
@@ -167,5 +168,70 @@ export async function getImageConfirmations(
   } catch (error) {
     console.error('Failed to get image confirmations:', error);
     return [];
+  }
+}
+
+/**
+ * Exports confirmation data as a JSON file with CRC32 checksum for forensic integrity
+ */
+export async function exportConfirmationData(
+  user: User, 
+  caseNumber: string
+): Promise<void> {
+  try {
+    // Get all confirmation data for the case
+    const caseConfirmations = await getCaseConfirmations(user, caseNumber);
+    
+    if (!caseConfirmations || Object.keys(caseConfirmations).length === 0) {
+      throw new Error('No confirmation data found for this case');
+    }
+
+    // Create export data with metadata
+    const exportData = {
+      metadata: {
+        caseNumber,
+        exportDate: new Date().toISOString(),
+        exportedBy: user.email || 'Unknown User',
+        exportedByUid: user.uid,
+        totalConfirmations: Object.keys(caseConfirmations).length,
+        version: '1.0'
+      },
+      confirmations: caseConfirmations
+    };
+
+    // Convert to JSON string for checksum calculation
+    const jsonString = JSON.stringify(exportData, null, 2);
+    
+    // Calculate CRC32 checksum for data integrity
+    const checksum = calculateCRC32(jsonString);
+    
+    // Add checksum to final export data
+    const finalExportData = {
+      ...exportData,
+      metadata: {
+        ...exportData.metadata,
+        checksum: checksum.toUpperCase()
+      }
+    };
+
+    // Convert final data to JSON blob
+    const finalJsonString = JSON.stringify(finalExportData, null, 2);
+    const blob = new Blob([finalJsonString], { type: 'application/json' });
+    
+    // Create download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `confirmation-data-${caseNumber}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log(`Confirmation data exported for case ${caseNumber} with checksum ${checksum.toUpperCase()}`);
+    
+  } catch (error) {
+    console.error('Failed to export confirmation data:', error);
+    throw error;
   }
 }

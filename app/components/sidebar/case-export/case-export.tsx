@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import styles from './case-export.module.css';
+import { AuthContext } from '~/contexts/auth.context';
+import { getCaseConfirmations, exportConfirmationData } from '../../actions/confirm-export';
 
 export type ExportFormat = 'json' | 'csv';
 
@@ -9,6 +11,7 @@ interface CaseExportProps {
   onExport: (caseNumber: string, format: ExportFormat, includeImages?: boolean) => void;
   onExportAll: (onProgress: (current: number, total: number, caseName: string) => void, format: ExportFormat) => void;
   currentCaseNumber?: string;
+  isReadOnly?: boolean;
 }
 
 export const CaseExport = ({ 
@@ -16,15 +19,19 @@ export const CaseExport = ({
   onClose, 
   onExport, 
   onExportAll,
-  currentCaseNumber = '' 
+  currentCaseNumber = '',
+  isReadOnly = false
 }: CaseExportProps) => {
+  const { user } = useContext(AuthContext);
   const [caseNumber, setCaseNumber] = useState(currentCaseNumber);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingAll, setIsExportingAll] = useState(false);
+  const [isExportingConfirmations, setIsExportingConfirmations] = useState(false);
   const [error, setError] = useState<string>('');
   const [exportProgress, setExportProgress] = useState<{ current: number; total: number; caseName: string } | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('json');
   const [includeImages, setIncludeImages] = useState(false);
+  const [hasConfirmationData, setHasConfirmationData] = useState(false);
 
   // Update caseNumber when currentCaseNumber prop changes
   useEffect(() => {
@@ -37,6 +44,33 @@ export const CaseExport = ({
       setIncludeImages(false);
     }
   }, [isExportingAll, caseNumber, includeImages]);
+
+  // Check for confirmation data when case changes (for read-only cases)
+  useEffect(() => {
+    const checkConfirmationData = async () => {
+      if (isReadOnly && user && caseNumber.trim()) {
+        try {
+          const confirmations = await getCaseConfirmations(user, caseNumber.trim());
+          setHasConfirmationData(!!confirmations && Object.keys(confirmations).length > 0);
+        } catch (error) {
+          console.error('Failed to check confirmation data:', error);
+          setHasConfirmationData(false);
+        }
+      } else {
+        setHasConfirmationData(false);
+      }
+    };
+
+    checkConfirmationData();
+  }, [isReadOnly, user, caseNumber]);
+
+  // Force JSON format and disable images for read-only cases
+  useEffect(() => {
+    if (isReadOnly) {
+      setSelectedFormat('json');
+      setIncludeImages(false);
+    }
+  }, [isReadOnly]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -97,6 +131,26 @@ export const CaseExport = ({
     }
   };
 
+  const handleExportConfirmations = async () => {
+    if (!caseNumber.trim() || !user) {
+      setError('Unable to export confirmation data');
+      return;
+    }
+    
+    setIsExportingConfirmations(true);
+    setError('');
+    
+    try {
+      await exportConfirmationData(user, caseNumber.trim());
+      onClose();
+    } catch (error) {
+      console.error('Confirmation export failed:', error);
+      setError(error instanceof Error ? error.message : 'Confirmation export failed. Please try again.');
+    } finally {
+      setIsExportingConfirmations(false);
+    }
+  };
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -135,7 +189,7 @@ export const CaseExport = ({
               />
             </div>
             
-            {/* 2. Format choice */}
+            {/* 2. Format choice - disabled for read-only cases */}
             <div className={styles.formatSelector}>
               <span className={styles.formatLabel}>Data Format:</span>
               <div className={styles.formatToggle}>
@@ -143,7 +197,7 @@ export const CaseExport = ({
                   type="button"
                   className={`${styles.formatOption} ${selectedFormat === 'json' ? styles.formatOptionActive : ''}`}
                   onClick={() => setSelectedFormat('json')}
-                  disabled={isExporting || isExportingAll}
+                  disabled={isExporting || isExportingAll || isReadOnly}
                   title="JSON for case imports"
                 >
                   JSON
@@ -152,7 +206,7 @@ export const CaseExport = ({
                   type="button"
                   className={`${styles.formatOption} ${selectedFormat === 'csv' ? styles.formatOptionActive : ''}`}
                   onClick={() => setSelectedFormat('csv')}
-                  disabled={isExporting || isExportingAll}
+                  disabled={isExporting || isExportingAll || isReadOnly}
                   title="CSV for single case, Excel (.xlsx) with multiple worksheets for all cases"
                 >
                   CSV/Excel
@@ -160,7 +214,7 @@ export const CaseExport = ({
               </div>
             </div>
 
-            {/* 3. Image inclusion option */}
+            {/* 3. Image inclusion option - disabled for read-only cases */}
             <div className={styles.imageOption}>
               <label className={styles.checkboxLabel}>
                 <input
@@ -168,7 +222,7 @@ export const CaseExport = ({
                   className={styles.checkbox}
                   checked={includeImages}
                   onChange={(e) => setIncludeImages(e.target.checked)}
-                  disabled={!caseNumber.trim() || isExporting || isExportingAll}
+                  disabled={!caseNumber.trim() || isExporting || isExportingAll || isReadOnly}
                 />
                 <div className={styles.checkboxText}>
                   <span>Include Images (ZIP)</span>
@@ -182,27 +236,33 @@ export const CaseExport = ({
             {/* 4. Export buttons (case OR all cases) */}
             <div className={styles.inputGroup}>
               <button
-                className={styles.exportButton}
-                onClick={handleExport}
-                disabled={!caseNumber.trim() || isExporting || isExportingAll}
+                className={isReadOnly ? styles.confirmationExportButton : styles.exportButton}
+                onClick={isReadOnly ? handleExportConfirmations : handleExport}
+                disabled={!caseNumber.trim() || isExporting || isExportingAll || isExportingConfirmations || (isReadOnly && !hasConfirmationData)}
               >
-                {isExporting ? 'Exporting...' : 'Export Case Data'}
+                {isExporting || isExportingConfirmations ? 'Exporting...' : 
+                 isReadOnly ? 'Export Confirmation Data' : 'Export Case Data'}
               </button>
             </div>
             
-            <div className={styles.divider}>
-              <span>OR</span>
-            </div>
-            
-            <div className={styles.exportAllSection}>
-              <button
-                className={styles.exportAllButton}
-                onClick={handleExportAll}
-                disabled={isExporting || isExportingAll}
-              >
-                {isExportingAll ? 'Exporting All Cases...' : 'Export All Cases'}
-              </button>              
-            </div>
+            {/* Hide "Export All Cases" for read-only cases */}
+            {!isReadOnly && (
+              <>
+                <div className={styles.divider}>
+                  <span>OR</span>
+                </div>
+                
+                <div className={styles.exportAllSection}>
+                  <button
+                    className={styles.exportAllButton}
+                    onClick={handleExportAll}
+                    disabled={isExporting || isExportingAll}
+                  >
+                    {isExportingAll ? 'Exporting All Cases...' : 'Export All Cases'}
+                  </button>              
+                </div>
+              </>
+            )}
             
             {exportProgress && exportProgress.total > 0 && (
               <div className={styles.progressSection}>

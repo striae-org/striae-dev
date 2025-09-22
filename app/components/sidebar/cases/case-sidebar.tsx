@@ -502,6 +502,7 @@ return (
         onExport={handleExport}
         onExportAll={handleExportAll}
         currentCaseNumber={currentCase || ''}
+        isReadOnly={isReadOnly}
       />
       
       <FilesModal
