@@ -54,6 +54,7 @@ interface CaseSidebarProps {
   successAction: CaseActionType;
   setSuccessAction: (action: CaseActionType) => void;
   isReadOnly?: boolean;
+  isConfirmed?: boolean;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -75,7 +76,8 @@ export const CaseSidebar = ({
   setError,
   successAction,
   setSuccessAction,
-  isReadOnly = false
+  isReadOnly = false,
+  isConfirmed = false
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -616,8 +618,8 @@ return (
     <div className={`${styles.sidebarToggle} mb-4`}>
     <button
           onClick={onNotesClick}
-          disabled={!imageLoaded || isReadOnly}
-          title={isReadOnly ? "Cannot edit notes for read-only cases" : !imageLoaded ? "Select an image first" : undefined}
+          disabled={!imageLoaded || isReadOnly || isConfirmed}
+          title={isConfirmed ? "Cannot edit notes for confirmed images" : isReadOnly ? "Cannot edit notes for read-only cases" : !imageLoaded ? "Select an image first" : undefined}
         >
           Image Notes
         </button>

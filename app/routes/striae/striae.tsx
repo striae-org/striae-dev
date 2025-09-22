@@ -131,9 +131,9 @@ export const Striae = ({ user }: StriaePage) => {
       return next;
     });
 
-    // Handle box annotation mode (only allow interaction for non-read-only cases)
+    // Handle box annotation mode (only allow interaction for non-read-only and non-confirmed cases)
     if (toolId === 'box') {
-      setIsBoxAnnotationMode(active && !isReadOnlyCase);
+      setIsBoxAnnotationMode(active && !isReadOnlyCase && !annotationData?.confirmationData);
     }
   };
 
@@ -318,6 +318,7 @@ export const Striae = ({ user }: StriaePage) => {
         setShowNotes={setShowNotes}
         onAnnotationRefresh={refreshAnnotationData}
         isReadOnly={isReadOnlyCase}
+        isConfirmed={!!annotationData?.confirmationData}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
@@ -330,6 +331,7 @@ export const Striae = ({ user }: StriaePage) => {
               onColorChange={handleColorChange}
               selectedColor={boxAnnotationColor}
               isReadOnly={isReadOnlyCase}
+              isConfirmed={!!annotationData?.confirmationData}
             />
           </div>
           <Canvas 

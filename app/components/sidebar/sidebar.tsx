@@ -30,6 +30,7 @@ interface SidebarProps {
   setShowNotes: (show: boolean) => void;
   onAnnotationRefresh?: () => void;
   isReadOnly?: boolean;
+  isConfirmed?: boolean;
 }
 
 export const Sidebar = ({ 
@@ -52,7 +53,8 @@ export const Sidebar = ({
   showNotes,
   setShowNotes,
   onAnnotationRefresh,
-  isReadOnly = false
+  isReadOnly = false,
+  isConfirmed = false
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -124,6 +126,7 @@ export const Sidebar = ({
             setSuccessAction={setSuccessAction}
             onNotesClick={() => setShowNotes(true)}
             isReadOnly={isReadOnly}
+            isConfirmed={isConfirmed}
           />
           <div className={styles.importSection}>
             <button 

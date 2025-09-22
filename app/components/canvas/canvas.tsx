@@ -52,7 +52,7 @@ export const Canvas = ({
 
   // Handle box annotation changes
   const handleBoxAnnotationsChange = (boxAnnotations: BoxAnnotation[]) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -64,7 +64,7 @@ export const Canvas = ({
 
   // Handle annotation data changes (for additional notes updates)
   const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -270,11 +270,11 @@ export const Canvas = ({
               imageRef={imageRef}
               annotations={annotationData?.boxAnnotations || []}
               onAnnotationsChange={handleBoxAnnotationsChange}
-              isAnnotationMode={isBoxAnnotationMode}
+              isAnnotationMode={isBoxAnnotationMode && !annotationData?.confirmationData}
               annotationColor={boxAnnotationColor}
               annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
-              isReadOnly={isReadOnly}
+              isReadOnly={isReadOnly || !!annotationData?.confirmationData}
             />
           )}
           
