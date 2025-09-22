@@ -206,7 +206,15 @@ export async function exportConfirmationData(
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `confirmation-data-${caseNumber}-${new Date().toISOString().split('T')[0]}.json`;
+    
+    // Use local timezone for filename date
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    
+    a.download = `confirmation-data-${caseNumber}-${dateString}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
