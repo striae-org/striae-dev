@@ -1,7 +1,7 @@
 import puppeteer from "@cloudflare/puppeteer";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://www.striae.org',
+  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
@@ -9,17 +9,6 @@ const corsHeaders = {
 const generateDocument = (data) => {
   const { imageUrl, caseNumber, annotationData, activeAnnotations, currentDate, notesUpdatedFormatted, userCompany } = data;
   const annotationsSet = new Set(activeAnnotations);
-  
-  // Helper functions for color detection
-  const isBlackColor = (color) => {
-    return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
-  };
-
-  const isBlueColor = (color) => {
-    const lowerColor = color.toLowerCase();
-    return lowerColor === '#0000ff' || lowerColor === 'blue' || lowerColor === '#00f' || 
-           lowerColor === '#0066cc' || lowerColor === '#0080ff' || lowerColor === '#007fff';
-  };
 
   // Programmatically determine if a color is dark and needs a light background
   const needsLightBackground = (color) => {

@@ -1,6 +1,6 @@
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://dev.striae.org',
-  'Access-Control-Allow-Methods': 'GET, PUT, DELETE, HEAD, OPTIONS',
+  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
+  'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
@@ -41,18 +41,6 @@ export default {
           }
           const data = JSON.parse(await file.text());
           return createResponse(data);
-        }
-
-        case "HEAD": {
-          const file = await bucket.head(filename);
-          if (!file) {
-            return createResponse({ error: 'File not found' }, 404);
-          }
-          return createResponse({
-            lastModified: file.uploaded.toISOString(),
-            size: file.size,
-            etag: file.etag
-          });
         }
 
         case "PUT": {

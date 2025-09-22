@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
-import { ConfirmationImportResult, ConfirmationImportData, R2ObjectMetadata } from '~/types';
+import { ConfirmationImportResult, ConfirmationImportData } from '~/types';
 import { checkExistingCase } from '../case-manage';
 import { validateExporterUid, validateConfirmationChecksum } from './validation';
 
@@ -125,32 +125,26 @@ export async function importConfirmationData(
 
       // Validate confirmation timestamp against annotation modification time
       const importedConfirmationData = confirmations.length > 0 ? confirmations[0] : null;
-      if (importedConfirmationData) {
+      if (importedConfirmationData && (annotationData as any).updatedAt) {
         const confirmationTimestamp = new Date(importedConfirmationData.confirmedAt);
+        const annotationUpdatedAt = new Date((annotationData as any).updatedAt);
         
-        // Get the actual last modified timestamp from R2 using HEAD request
-        const metadataResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
-          method: 'HEAD',
-          headers: {
-            'X-Custom-Auth-Key': apiKey
-          }
+        console.log('Confirmation timestamp validation:', {
+          imageId: currentImageId,
+          confirmationTimestamp: importedConfirmationData.confirmedAt,
+          annotationUpdatedAt: (annotationData as any).updatedAt,
+          isValid: confirmationTimestamp >= annotationUpdatedAt
         });
 
-        if (metadataResponse.ok) {
-          const metadata = await metadataResponse.json() as R2ObjectMetadata;
-          const r2LastModified = new Date(metadata.lastModified);
-
-          if (confirmationTimestamp < r2LastModified) {
-            throw new Error(
-              `Confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}) ` +
-              `was created at ${importedConfirmationData.confirmedAt} but the annotations were ` +
-              `last modified in R2 at ${metadata.lastModified}. ` +
-              `Confirmations must be based on the original annotations and cannot be imported ` +
-              `for images that were modified after the confirmation was created.`
-            );
-          }
+        if (confirmationTimestamp < annotationUpdatedAt) {
+          throw new Error(
+            `Confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}) ` +
+            `was created at ${importedConfirmationData.confirmedAt} but the annotations were ` +
+            `last modified at ${(annotationData as any).updatedAt}. ` +
+            `Confirmations must be based on the original annotations and cannot be imported ` +
+            `for images that were modified after the confirmation was created.`
+          );
         }
-        // If HEAD request fails, we'll skip the timestamp validation (backwards compatibility)
       }
 
       // Set confirmationData from the imported confirmations (use the first/most recent one)
