@@ -20,11 +20,11 @@
      - [Cases Modal](#cases-modal-appcomponentssidebarcases-modaltsx)
      - [Notes Modal](#notes-modal-appcomponentssidebarnotes-modaltsx)
      - [Case Export](#case-export-appcomponentssidebarcase-exportcase-exporttsx)
-     - [Case Import](#case-import-appcomponentssidebarcase-importcase-importtsx)
+     - [Case Import](#case-import-appcomponentssidebarcase-import)
    - [4. Action Components](#4-action-components)
      - [Case Management](#case-management-appcomponentsactionscase-managets)
-     - [Case Export](#case-export-appcomponentsactionscase-exportts)
-     - [Case Review](#case-review-appcomponentsactionscase-reviewts)
+     - [Case Export](#case-export-appcomponentsactionscase-export)
+     - [Case Import](#case-import-appcomponentsactionscase-import)
      - [Image Management](#image-management-appcomponentsactionsimage-managets)
      - [PDF Generation](#pdf-generation-appcomponentsactionsgenerate-pdfts)
      - [Notes Management](#notes-management-appcomponentsactionsnotes-managets)
@@ -50,6 +50,11 @@
      - [AuthContext](#authcontext-appcontextsauthcontextts)
    - [Custom Hooks](#custom-hooks)
      - [useInactivityTimeout](#useinactivitytimeout-apphooksuseinactivitytimeoutts)
+     - [Business Logic Hooks Pattern](#business-logic-hooks-pattern)
+     - [useImportState](#useimportstate-appcomponentssidebarcase-importhooksuseimportstatets)
+     - [useFilePreview](#usefilepreview-appcomponentssidebarcase-importhooksusefilepreviewts)
+     - [useImportExecution](#useimportexecution-appcomponentssidebarcase-importhooksuseimportexecutionts)
+     - [Custom Hooks Best Practices](#custom-hooks-best-practices)
 5. [Component Communication Patterns](#component-communication-patterns)
    - [Props Down, Events Up](#props-down-events-up)
    - [Event Handling](#event-handling)
@@ -457,25 +462,42 @@ export type ExportFormat = 'json' | 'csv';
 - **Performance Optimization**: Optional annotation inclusion for faster exports when only metadata is needed
 - **Disabled State Management**: UI components properly synchronized during export operations
 
-#### Case Import (`app/components/sidebar/case-import/case-import.tsx`)
+#### Case Import (`app/components/sidebar/case-import/`)
 
-**Purpose**: ZIP package import modal for reviewing complete case data in read-only mode
+**Purpose**: Modular ZIP package import system for reviewing complete case data in read-only mode
 
-**Features**:
+**Architecture**: Component composition pattern with custom hooks for business logic separation
 
-- **ZIP File Selection**: File browser interface for ZIP package import
-- **Read-Only Case Review**: Imported cases are automatically protected from modification
-- **Progress Tracking**: Real-time import progress with stage-by-stage updates
-- **Existing Case Detection**: Automatic detection and management of existing read-only cases
-- **Image Integration**: Automatic import and association of all case image data and annotations
-- **Metadata Preservation**: Complete preservation of original case metadata and timestamps
-- **Clear Management**: Option to remove imported cases from review bin
-- **Error Handling**: Comprehensive error reporting with detailed failure messages
-- **Security Validation**: Prevents import of cases where user was original analyst
+**Directory Structure**:
 
-**Type Definition**: Uses component-specific `CaseImportProps` interface
+```typescript
+case-import/
+├── case-import.tsx          # Main orchestrator component
+├── components/              # UI sub-components
+│   ├── FileSelector.tsx     # File selection interface
+│   ├── CasePreviewSection.tsx   # Case metadata preview
+│   ├── ConfirmationPreviewSection.tsx  # Import confirmation details
+│   ├── ProgressSection.tsx      # Real-time progress display
+│   ├── ExistingCaseSection.tsx  # Existing case management
+│   └── ConfirmationDialog.tsx   # Final confirmation modal
+├── hooks/                   # Custom business logic hooks
+│   ├── useImportState.ts    # State management hook
+│   ├── useFilePreview.ts    # File processing hook
+│   └── useImportExecution.ts # Import execution hook
+├── utils/                   # Pure utility functions
+│   └── file-validation.ts   # File type validation
+└── index.ts                # Barrel export
+```
 
-**Props**:
+**Component Architecture Features**:
+
+- **Single Responsibility**: Each component handles one specific aspect of the import process
+- **Custom Hooks Pattern**: Business logic encapsulated in reusable hooks
+- **Component Composition**: Main component orchestrates sub-components without complex logic
+- **Barrel Exports**: Clean import structure through centralized index.ts
+- **Type Safety**: Comprehensive TypeScript interfaces for all component interactions
+
+**Main Component Props**:
 
 ```typescript
 interface CaseImportProps {
@@ -485,8 +507,23 @@ interface CaseImportProps {
 }
 ```
 
+**Custom Hooks**:
+
+- **useImportState**: Manages import progress, file selection, and UI state
+- **useFilePreview**: Handles ZIP parsing, validation, and preview generation
+- **useImportExecution**: Orchestrates the complete import process with progress callbacks
+
 **Import Process Features**:
 
+- **ZIP File Selection**: Modular file browser interface with validation
+- **Read-Only Case Review**: Imported cases automatically protected from modification
+- **Progress Tracking**: Real-time import progress with stage-by-stage updates
+- **Existing Case Detection**: Automatic detection and management of existing read-only cases
+- **Image Integration**: Automatic import and association of all case image data and annotations
+- **Metadata Preservation**: Complete preservation of original case metadata and timestamps
+- **Clear Management**: Option to remove imported cases from review bin
+- **Error Handling**: Comprehensive error reporting with detailed failure messages
+- **Security Validation**: Prevents import of cases where user was original analyst
 - **ZIP Validation**: Comprehensive validation of ZIP package structure and contents
 - **Case Data Parsing**: Support for JSON format with forensic protection warnings
 - **Duplicate Prevention**: Prevents import if user was original case analyst
@@ -534,13 +571,38 @@ export const listCases = async (user: User): Promise<string[]>
 - Case renaming functionality
 - User case list management
 
-#### Case Export (`app/components/actions/case-export.ts`)
+#### Case Export (`app/components/actions/case-export/`)
 
-**Purpose**: Comprehensive case data export functionality with multi-format support including ZIP packages
+**Purpose**: Modular case data export system with multi-format support including ZIP packages
+
+**Architecture**: Organized into specialized modules for maintainability and testability
+
+**Directory Structure**:
+
+```typescript
+case-export/
+├── core-export.ts          # Main export orchestration functions
+├── data-processing.ts      # Data transformation and CSV generation
+├── download-handlers.ts    # Browser download utilities
+├── metadata-helpers.ts     # Forensic protection and metadata functions
+├── types-constants.ts      # Type definitions and CSV headers
+├── validation-utils.ts     # Export validation functions
+└── index.ts               # Barrel export
+```
+
+**Modular Components**:
+
+- **Core Export**: Main export functions (`exportCaseData`, `exportAllCases`)
+- **Data Processing**: CSV generation, tabular formatting, metadata rows
+- **Download Handlers**: Browser-compatible download functions with proper MIME types
+- **Metadata Helpers**: Forensic warnings, password protection, Excel worksheet protection
+- **Types & Constants**: Shared type definitions and CSV header configurations
+- **Validation Utilities**: Case number validation and export prerequisites
 
 **Key Functions**:
 
 ```typescript
+// Core export functions
 export const exportCaseData = async (
   user: User,
   caseNumber: string,
@@ -553,11 +615,23 @@ export const exportAllCases = async (
   onProgress?: (current: number, total: number, caseName: string) => void
 ): Promise<AllCasesExportData>
 
+// Download handlers  
 export const downloadCaseAsJSON = (exportData: CaseExportData): void
 export const downloadCaseAsCSV = (exportData: CaseExportData): void
 export const downloadCaseAsZip = async (exportData: CaseExportData, includeImages: boolean): Promise<void>
 export const downloadAllCasesAsJSON = (exportData: AllCasesExportData): void
 export const downloadAllCasesAsCSV = (exportData: AllCasesExportData): void
+
+// Validation and metadata
+export const validateCaseNumberForExport = (caseNumber: string): boolean
+export const getUserExportMetadata = (user: User): ExportMetadata
+export const addForensicDataWarning = (content: string): string
+```
+
+**Export Type System**:
+
+```typescript
+export type ExportFormat = 'json' | 'csv';
 
 export interface ExportOptions {
   includeAnnotations?: boolean;
@@ -610,13 +684,40 @@ export interface ExportOptions {
 - **Error Sheets**: Dedicated worksheets for failed case exports with error details
 - **Split Annotation Format**: Box annotations displayed in separate rows for better analysis
 
-#### Case Review (`app/components/actions/case-review.ts`)
+#### Case Import (`app/components/actions/case-import/`)
 
-**Purpose**: ZIP package import system for read-only case review and collaboration
+**Purpose**: Modular ZIP package import system for read-only case review and collaboration
+
+**Architecture**: Organized into specialized modules for complex import operations
+
+**Directory Structure**:
+
+```typescript
+case-import/
+├── orchestrator.ts         # Main import orchestration function
+├── validation.ts           # Import validation and security checks
+├── zip-processing.ts       # ZIP file parsing and preview generation
+├── storage-operations.ts   # R2 storage and case management operations
+├── image-operations.ts     # Image upload and processing
+├── annotation-import.ts    # Annotation data import and mapping
+├── confirmation-import.ts  # Confirmation data import processing
+└── index.ts               # Barrel export
+```
+
+**Modular Components**:
+
+- **Orchestrator**: Main import workflow coordination (`importCaseForReview`)
+- **Validation**: Security checks, exporter UID validation, checksum verification
+- **ZIP Processing**: Archive parsing, case data extraction, preview generation
+- **Storage Operations**: R2 case storage, read-only case management, user profile updates
+- **Image Operations**: Blob processing and upload to image worker
+- **Annotation Import**: Complete annotation data mapping and storage
+- **Confirmation Import**: Confirmation data processing with integrity validation
 
 **Key Functions**:
 
 ```typescript
+// Main orchestrator
 export const importCaseForReview = async (
   user: User,
   zipFile: File,
@@ -624,28 +725,29 @@ export const importCaseForReview = async (
   onProgress?: (stage: string, progress: number, details?: string) => void
 ): Promise<ImportResult>
 
-export const listReadOnlyCases = async (user: User): Promise<ReadOnlyCaseMetadata[]>
+// Validation functions
+export const validateExporterUid = async (exporterUid: string, currentUser: User): Promise<{ exists: boolean; isSelf: boolean }>
+export const validateConfirmationChecksum = (jsonContent: string, expectedChecksum: string): boolean
+export const validateCaseIntegrity = (caseData: CaseExportData, imageFiles: { [filename: string]: Blob }): { isValid: boolean; issues: string[] }
 
+// ZIP processing
+export const previewCaseImport = async (zipFile: File): Promise<CaseImportPreview>
+export const parseImportZip = async (zipFile: File): Promise<{ caseData: CaseExportData; imageFiles: { [filename: string]: Blob }; metadata?: any }>
+
+// Storage operations  
+export const checkReadOnlyCaseExists = async (user: User, caseNumber: string): Promise<boolean>
+export const addReadOnlyCaseToUser = async (user: User, metadata: ReadOnlyCaseMetadata): Promise<boolean>
+export const storeCaseDataInR2 = async (user: User, caseNumber: string, caseData: CaseExportData): Promise<boolean>
+export const listReadOnlyCases = async (user: User): Promise<ReadOnlyCaseMetadata[]>
 export const deleteReadOnlyCase = async (user: User, caseNumber: string): Promise<boolean>
 
-export const parseImportZip = async (zipFile: File): Promise<{
-  caseData: CaseExportData;
-  imageFiles: { [filename: string]: Blob };
-  metadata?: any;
-}>
+// Import operations
+export const uploadImageBlob = async (blob: Blob, filename: string, user: User): Promise<string>
+export const importAnnotations = async (user: User, caseNumber: string, fileAnnotations: any): Promise<boolean>
+export const importConfirmationData = async (user: User, confirmationData: ConfirmationImportData): Promise<ConfirmationImportResult>
 ```
 
-**Core Import Features**:
-
-- **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
-- **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
-- **Duplicate Prevention**: Prevents import if user was the original case analyst
-- **Progress Tracking**: Multi-stage progress reporting with detailed status updates
-- **Image Integration**: Automatic upload and association of all case images
-- **Metadata Preservation**: Complete preservation of original export metadata and timestamps
-- **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
-
-**Type Definitions**:
+**Import Type System**:
 
 ```typescript
 export interface ImportOptions {
@@ -672,16 +774,30 @@ export interface ReadOnlyCaseMetadata {
   sourceChecksum?: string;
   isReadOnly: true;
 }
+
+export interface CaseImportPreview {
+  caseNumber: string;
+  fileCount: number;
+  annotationCount: number;
+  exportDate: string;
+  exportedBy: string;
+  hasImages: boolean;
+  canImport: boolean;
+  warnings: string[];
+}
 ```
 
-**Import Process**:
+**Core Import Features**:
 
-- **ZIP Validation**: Comprehensive structure and content validation
-- **Case Data Parsing**: JSON format support with forensic protection warning handling
-- **Image Processing**: Blob extraction and upload to image worker
-- **Annotation Import**: Complete annotation data mapping and storage
-- **User Profile Integration**: Automatic addition to user's read-only case bin
-- **Cleanup Operations**: Automatic removal of existing case data when overwriting
+- **Complete ZIP Package Import**: Full case data and image import from exported ZIP packages
+- **Read-Only Protection**: Imported cases are automatically set to read-only mode for secure review
+- **Duplicate Prevention**: Prevents import if user was the original case analyst
+- **Progress Tracking**: Multi-stage progress reporting with detailed status updates
+- **Image Integration**: Automatic upload and association of all case images
+- **Metadata Preservation**: Complete preservation of original export metadata and timestamps
+- **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
+- **Forensic Warning Handling**: Proper removal of forensic warnings for checksum validation
+- **Confirmation Data Support**: Specialized import handling for confirmation data files
 - **Error Recovery**: Graceful handling of import failures with detailed error reporting
 - **Security Validation**: Prevents modification of imported cases and restricts access appropriately
 
@@ -1140,6 +1256,151 @@ const [data, setData] = useState<DataType | null>(null);
 - Configurable timeout periods
 - Activity detection
 - Automatic logout on timeout
+
+#### Business Logic Hooks Pattern
+
+The application implements a custom hooks pattern for encapsulating complex business logic, as demonstrated in the case-import system:
+
+#### useImportState (`app/components/sidebar/case-import/hooks/useImportState.ts`)
+
+**Purpose**: Centralized state management for import workflow
+
+**Pattern**: Encapsulates all stateful logic for the import process
+
+**Returns**:
+
+```typescript
+interface ImportState {
+  // File management
+  selectedFile: File | null;
+  setSelectedFile: (file: File | null) => void;
+  
+  // Progress tracking
+  isImporting: boolean;
+  importProgress: number;
+  progressStage: string;
+  
+  // Case management
+  existingCase: string | null;
+  previewData: CaseData | null;
+  
+  // UI state
+  showConfirmation: boolean;
+  setShowConfirmation: (show: boolean) => void;
+}
+```
+
+**Benefits**:
+
+- Consolidates related state in one hook
+- Provides clean API for components
+- Enables easy testing of state logic
+
+#### useFilePreview (`app/components/sidebar/case-import/hooks/useFilePreview.ts`)
+
+**Purpose**: File processing and validation logic
+
+**Pattern**: Handles asynchronous file operations with error handling
+
+**Functionality**:
+
+```typescript
+interface FilePreviewHook {
+  processFile: (file: File) => Promise<ProcessResult>;
+  validateZipStructure: (zipData: JSZip) => ValidationResult;
+  extractCaseData: (zipData: JSZip) => Promise<CaseData>;
+  previewImages: (zipData: JSZip) => Promise<ImagePreview[]>;
+}
+```
+
+**Benefits**:
+
+- Isolates complex file processing logic
+- Provides reusable validation functions
+- Handles error states consistently
+
+#### useImportExecution (`app/components/sidebar/case-import/hooks/useImportExecution.ts`)
+
+**Purpose**: Orchestrates the complete import process
+
+**Pattern**: Manages side effects and external API calls
+
+**Process Management**:
+
+```typescript
+interface ImportExecutionHook {
+  executeImport: (importData: ImportData) => Promise<ImportResult>;
+  uploadImages: (images: ImageData[]) => Promise<UploadResult[]>;
+  saveCaseData: (caseData: CaseData) => Promise<SaveResult>;
+  updateUserProfile: (caseNumber: string) => Promise<UpdateResult>;
+  reportProgress: (stage: string, progress: number) => void;
+}
+```
+
+**Benefits**:
+
+- Separates API calls from UI components
+- Provides consistent progress reporting
+- Enables comprehensive error handling
+
+#### Custom Hooks Best Practices
+
+**Single Responsibility**: Each hook handles one aspect of business logic
+
+```typescript
+// ✅ Good: Focused responsibility
+const useFileValidation = (file: File) => {
+  // Only handles file validation logic
+};
+
+// ❌ Avoid: Mixed concerns
+const useFileAndUserManagement = (file: File, user: User) => {
+  // Handles both file operations AND user management
+};
+```
+
+**Return Object Pattern**: Return objects for multiple values
+
+```typescript
+// ✅ Good: Named returns
+const useImportState = () => {
+  return {
+    isLoading,
+    error,
+    data,
+    refetch
+  };
+};
+
+// ❌ Avoid: Array returns for complex state
+const useImportState = () => [isLoading, error, data, refetch];
+```
+
+**Error Handling**: Consistent error handling patterns
+
+```typescript
+const useAsyncOperation = () => {
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const execute = async (params: OperationParams) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const result = await performOperation(params);
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return { execute, isLoading, error };
+};
+```
 
 ## Component Communication Patterns
 

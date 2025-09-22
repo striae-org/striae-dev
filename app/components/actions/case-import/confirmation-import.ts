@@ -60,7 +60,7 @@ export async function importConfirmationData(
       throw new Error(`Case "${result.caseNumber}" does not exist in your case list. You can only import confirmations for your own cases.`);
     }
 
-    onProgress?.('Processing confirmations', 50, 'Updating image annotations...');
+    onProgress?.('Processing confirmations', 50, 'Validating timestamps and updating annotations...');
 
     // Get case data to find image IDs
     const apiKey = await getDataApiKey();
@@ -123,9 +123,31 @@ export async function importConfirmationData(
         continue;
       }
 
-      // Set confirmationData from the imported confirmations (use the first/most recent one)
+      // Validate confirmation timestamp against annotation modification time
       const importedConfirmationData = confirmations.length > 0 ? confirmations[0] : null;
-      
+      if (importedConfirmationData && (annotationData as any).updatedAt) {
+        const confirmationTimestamp = new Date(importedConfirmationData.confirmedAt);
+        const annotationUpdatedAt = new Date((annotationData as any).updatedAt);
+        
+        console.log('Confirmation timestamp validation:', {
+          imageId: currentImageId,
+          confirmationTimestamp: importedConfirmationData.confirmedAt,
+          annotationUpdatedAt: (annotationData as any).updatedAt,
+          isValid: confirmationTimestamp >= annotationUpdatedAt
+        });
+
+        if (confirmationTimestamp < annotationUpdatedAt) {
+          throw new Error(
+            `Confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}) ` +
+            `was created at ${importedConfirmationData.confirmedAt} but the annotations were ` +
+            `last modified at ${(annotationData as any).updatedAt}. ` +
+            `Confirmations must be based on the original annotations and cannot be imported ` +
+            `for images that were modified after the confirmation was created.`
+          );
+        }
+      }
+
+      // Set confirmationData from the imported confirmations (use the first/most recent one)
       const updatedAnnotationData = {
         ...annotationData,
         // Ensure includeConfirmation remains true (original analyst requested confirmation)

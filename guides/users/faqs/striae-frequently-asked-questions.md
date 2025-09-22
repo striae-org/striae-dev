@@ -6,11 +6,12 @@
 3. [📥 Case Import & Review System](#-case-import--review-system)
 4. [📤 Case Data Export](#-case-data-export)
 5. [🎯 Image Annotation](#-image-annotation)
-6. [📄 PDF Generation](#-pdf-generation)
-7. [👤 Account Deletion](#-account-deletion)
-8. [🔧 Troubleshooting](#-troubleshooting)
-9. [🛡️ Security & Best Practices](#️-security--best-practices)
-10. [🚀 Getting Started Quickly](#-getting-started-quickly)
+6. [✅ Authenticated Confirmations System](#-authenticated-confirmations-system)
+7. [📄 PDF Generation](#-pdf-generation)
+8. [👤 Account Deletion](#-account-deletion)
+9. [🔧 Troubleshooting](#-troubleshooting)
+10. [🛡️ Security & Best Practices](#️-security--best-practices)
+11. [🚀 Getting Started Quickly](#-getting-started-quickly)
 
 ***
 
@@ -213,6 +214,90 @@ A: Yes, all box annotations are preserved in the PDF output with the same colors
 **Q: Is my original image edited to include the box annotations?**
 
 A: No! Your original image remains unaltered. The box annotations are overlaid on the image in the canvas and during the PDF generation process, but they do *not* modify the original file. This means you can always revert to the unannotated image if needed. Striae does not edit or change your original images in any way, ensuring the integrity of your evidence files is maintained. This holds true for all annotation types, including case numbers, class characteristics, index marks, and support level indicators; they are stored in a separate data structure and rendered dynamically without altering the original images.
+
+***
+
+## ✅ Authenticated Confirmations System
+
+**Q: What is the Authenticated Confirmations System?**
+
+A: The Authenticated Confirmations System provides a secure, digital workflow for independent verification of firearms identification conclusions. It allows reviewing examiners to confirm original findings using authenticated digital signatures, unique confirmation identifiers, and cryptographic validation. The system maintains forensic integrity while providing structured documentation for technical reviews and official reports.
+
+**Q: How does the confirmation workflow work between examiners?**
+
+A: The workflow involves two examiners: the Original Examiner (OE) who performs the initial analysis, and the Reviewing Examiner (RE) who provides independent confirmation. The process flows as follows: OE completes their examination and marks images requiring confirmation, then exports the case as a ZIP package. RE imports the package into read-only mode, conducts independent physical examination, and provides digital confirmation through Striae. RE exports the confirmation data back to OE, who imports it to complete the documentation process.
+
+**Q: What does "Include confirmation" mean when I'm annotating images?**
+
+A: When you check "Include confirmation" in the Image Notes sidebar, you're flagging that specific image as requiring independent verification from another examiner. This is typically used for identification conclusions where departmental protocols require a second examiner to confirm your findings. Images marked for confirmation will show up in exports and can receive digital confirmations from reviewing examiners.
+
+**Q: How do I export a case for confirmation review?**
+
+A: To export for confirmation review, navigate to Case Export in the sidebar, select "ZIP Package" format with JSON data format, ensure "Include Images" is selected, and click "Export Case." This creates a complete package containing all case data, images, and metadata with cryptographic checksums for integrity verification. Transfer this ZIP file securely to the reviewing examiner along with access to the physical evidence.
+
+**Q: What happens when I import a case for confirmation review?**
+
+A: When you import a case ZIP package for review, the case is automatically placed in read-only mode to preserve the integrity of the original work. You can view all annotations, images, and case details, but cannot modify any data. The system validates the package integrity using checksums and ensures you weren't the original examiner (preventing self-confirmation). The imported case appears in your read-only cases list for independent review.
+
+**Q: How do I provide a digital confirmation in Striae?**
+
+A: After importing and reviewing a case, if you confirm the original examiner's conclusions, click the "Confirm" button that appears in the interface. A confirmation modal will open requiring you to enter your full name and badge/ID number. The system then generates a unique confirmation ID and records all your credentials, timestamps, and authentication details as part of the confirmation record.
+
+**Q: What information is included in a confirmation record?**
+
+A: Each confirmation includes comprehensive authentication details: your full name and badge ID (as entered), a human-readable timestamp, a unique system-generated confirmation ID, your user ID and email from your profile, your company/laboratory affiliation, and an ISO timestamp of when the confirmation was created. This provides complete accountability and audit trail information.
+
+**Q: How do I export confirmation data back to the original examiner?**
+
+A: After providing confirmations, navigate to Case Export and look for the "Export Confirmations" button (this only appears if confirmation data exists). Click it to download a JSON file named `confirmation-data-[case]-[timestamp].json`. This file contains all confirmation information with cryptographic checksums for integrity verification. Transfer this file securely back to the original examiner.
+
+**Q: How do I import confirmation data I received from a reviewing examiner?**
+
+A: Navigate to Case Import in the sidebar and select the confirmation JSON file you received (files named `confirmation-data-...`). The system automatically detects confirmation files and validates the data integrity using checksums. It also performs timestamp validation to ensure confirmations weren't created before the annotations were last modified, preventing confirmations of outdated work.
+
+**Q: What security features protect the confirmation process?**
+
+A: The system includes multiple security layers: cryptographic checksums prevent data tampering, self-confirmation prevention blocks original examiners from confirming their own work, timestamp validation ensures confirmations are newer than annotation modifications, unique confirmation IDs provide audit trail tracking, and read-only import mode preserves original work integrity. All validation events are logged for compliance and accountability.
+
+**Q: What happens after confirmation data is imported?**
+
+A: Once confirmation data is successfully imported, the confirmed images become permanently read-only and display confirmation indicators in the interface. No additional confirmations can be added to already-confirmed images. The confirmation information appears in PDF reports with full examiner credentials and unique confirmation IDs. Edit functions are disabled for confirmed images to maintain the integrity of the confirmed work.
+
+**Q: Can I confirm my own work or cases I created?**
+
+A: No, the system specifically prevents self-confirmation to maintain the independence required for proper forensic verification. If you try to import a case package that you originally exported, the system will block the import with an error message. This security measure ensures that confirmations represent genuine independent review by a different examiner.
+
+**Q: What if my confirmation import fails with a checksum error?**
+
+A: Checksum validation failures indicate the confirmation file may have been modified since it was exported, which compromises forensic integrity. First, verify you received the correct file and that it wasn't corrupted during transfer. If the problem persists, request a new confirmation export from the reviewing examiner. Never attempt to modify confirmation files as this invalidates the cryptographic protection.
+
+**Q: What does timestamp validation check during confirmation import?**
+
+A: The system validates that confirmation timestamps are not earlier than the last modification time of the associated annotation data. This prevents importing confirmations that were created before the annotations were finalized, ensuring confirmations are based on the current version of the work. If validation fails, you'll see an error showing the confirmation time versus annotation modification time.
+
+**Q: How do confirmations appear in PDF reports?**
+
+A: Confirmed images in PDF reports show the confirmation information including the confirming examiner's full name, badge ID, confirmation timestamp, and unique confirmation ID. This provides official documentation of the independent verification for court proceedings and technical reviews. The confirmation details are formatted professionally alongside the examination findings.
+
+**Q: Can I remove or modify confirmations after they're imported?**
+
+A: No, confirmations are permanent and cannot be modified or removed once imported. This immutability is essential for maintaining forensic integrity and audit trails. If there's an error in confirmation data, the reviewing examiner must create a new confirmation export with corrected information, and you must import the new file (the system will prevent duplicate confirmations on the same image).
+
+**Q: What file formats are used for confirmations?**
+
+A: Case exports for confirmation review use ZIP format containing JSON data files and all associated images. Confirmation exports use JSON format with `.json` extension and descriptive filenames. Only these specific formats are accepted to ensure security and data integrity throughout the confirmation process.
+
+**Q: How do I know which of my cases have received confirmations?**
+
+A: Cases with imported confirmations will show confirmation indicators in the interface. Individual images that have been confirmed display confirmation status badges and become read-only. In the case management panel, you can identify cases with confirmations through visual indicators and status information.
+
+**Q: Is there a limit to how many confirmations an image can receive?**
+
+A: Each image can only receive one confirmation to maintain clarity and prevent confusion. Once an image has been confirmed by a reviewing examiner, it cannot receive additional confirmations. This ensures clear accountability and prevents conflicting verification records.
+
+**Q: What should I do if I need to make changes after receiving confirmations?**
+
+A: Images that have been confirmed cannot be modified, as this would invalidate the confirmation. If changes are necessary, you should create a new case with the updated work and follow the confirmation process again. This maintains the integrity of the original confirmed examination while allowing for necessary revisions.
 
 ***
 

@@ -9,7 +9,8 @@ import {
   deleteReadOnlyCase, 
   storeCaseDataInR2, 
   addReadOnlyCaseToUser,
-  removeReadOnlyCase
+  removeReadOnlyCase,
+  listReadOnlyCases
 } from './storage-operations';
 import { uploadImageBlob } from './image-operations';
 import { importAnnotations } from './annotation-import';
@@ -126,6 +127,31 @@ export async function importCaseForReview(
     const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
     importState.caseNumber = result.caseNumber;
+    
+    // Step 1.1: Clean up any existing read-only cases (only one allowed at a time)
+    onProgress?.('Checking existing read-only cases', 12, 'Cleaning up previous imports...');
+    try {
+      const existingReadOnlyCases = await listReadOnlyCases(user);
+      if (existingReadOnlyCases.length > 0) {
+        console.log(`Found ${existingReadOnlyCases.length} existing read-only case(s). Cleaning up before new import.`);
+        
+        // Delete all existing read-only cases (data and user references)
+        const deletePromises = existingReadOnlyCases.map(async (existingCase: ReadOnlyCaseMetadata) => {
+          try {
+            await deleteReadOnlyCase(user, existingCase.caseNumber);
+            console.log(`Cleaned up existing read-only case: ${existingCase.caseNumber}`);
+          } catch (error) {
+            console.warn(`Failed to clean up existing read-only case ${existingCase.caseNumber}:`, error);
+            // Don't throw here - just warn, as we want to proceed with the new import
+          }
+        });
+        
+        await Promise.all(deletePromises);
+      }
+    } catch (error) {
+      console.warn('Error during pre-import cleanup of existing read-only cases:', error);
+      // Don't fail the import due to cleanup issues
+    }
     
     // Step 1.5: Validate checksum if forensic metadata exists
     if (metadata?.forensicManifest && cleanedContent) {

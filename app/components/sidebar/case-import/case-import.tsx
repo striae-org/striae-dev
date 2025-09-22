@@ -13,6 +13,20 @@ import {
   CaseImportPreview,
   ConfirmationImportResult
 } from '~/types';
+import {
+  FileSelector,
+  CasePreviewSection,
+  ConfirmationPreviewSection,
+  ProgressSection,
+  ExistingCaseSection,
+  ConfirmationDialog,
+  useImportState,
+  useFilePreview,
+  useImportExecution,
+  isValidImportFile,
+  getImportType,
+  resetFileInput
+} from './index';
 import styles from './case-import.module.css';
 
 interface CaseImportProps {
@@ -21,309 +35,6 @@ interface CaseImportProps {
   onImportComplete?: (result: ImportResult | ConfirmationImportResult) => void;
 }
 
-// Consolidated state interfaces
-interface ImportState {
-  selectedFile: File | null;
-  isImporting: boolean;
-  isClearing: boolean;
-  isLoadingPreview: boolean;
-  showConfirmation: boolean;
-  importType: 'case' | 'confirmation' | null;
-}
-
-interface MessageState {
-  error: string;
-  success: string;
-}
-
-interface ProgressState {
-  stage: string;
-  progress: number;
-  details?: string;
-}
-
-// Confirmation preview interface
-interface ConfirmationPreview {
-  caseNumber: string;
-  fullName: string;
-  exportDate: string;
-  totalConfirmations: number;
-  confirmationIds: string[];
-}
-
-// Helper functions
-const isValidZipFile = (file: File): boolean => {
-  return file.type === 'application/zip' || 
-         file.type === 'application/x-zip-compressed' ||
-         file.name.toLowerCase().endsWith('.zip');
-};
-
-const isValidConfirmationFile = (file: File): boolean => {
-  return file.type === 'application/json' && 
-         isConfirmationDataFile(file.name);
-};
-
-const isValidImportFile = (file: File): boolean => {
-  return isValidZipFile(file) || isValidConfirmationFile(file);
-};
-
-const resetFileInput = (ref: React.RefObject<HTMLInputElement | null>) => {
-  if (ref.current) {
-    ref.current.value = '';
-  }
-};
-
-// JSX Components for better organization
-const ExistingCaseSection = ({ existingReadOnlyCase, selectedFile, onClear, isClearing, isImporting }: {
-  existingReadOnlyCase: string | null;
-  selectedFile: File | null;
-  onClear: () => void;
-  isClearing: boolean;
-  isImporting: boolean;
-}) => {
-  if (!existingReadOnlyCase) return null;
-
-  return (
-    <div className={styles.warningSection}>
-      <div className={styles.warningText}>
-        <strong>Current Review Case:</strong> "{existingReadOnlyCase}"
-        <p className={styles.warningSubtext}>
-          {selectedFile 
-            ? 'Importing a new case will automatically replace the existing one.'
-            : 'You can clear this case or import a new one to replace it.'
-          }
-        </p>
-      </div>
-      <button
-        className={styles.clearButton}
-        onClick={onClear}
-        disabled={isClearing || isImporting}
-      >
-        {isClearing ? 'Clearing...' : 'Clear Case'}
-      </button>
-    </div>
-  );
-};
-
-const CasePreviewSection = ({ casePreview, isLoadingPreview }: {
-  casePreview: CaseImportPreview | null;
-  isLoadingPreview: boolean;
-}) => {
-  if (isLoadingPreview) {
-    return (
-      <div className={styles.previewSection}>
-        <div className={styles.previewLoading}>
-          Loading case information...
-        </div>
-      </div>
-    );
-  }
-
-  if (!casePreview) return null;
-
-  return (
-    <>
-      {/* Case Information - Always Blue */}
-      <div className={styles.previewSection}>
-        <h3 className={styles.previewTitle}>Case Information</h3>
-        <div className={styles.previewGrid}>
-          <div className={styles.previewItem}>
-            <span className={styles.previewLabel}>Case Number:</span>
-            <span className={styles.previewValue}>{casePreview.caseNumber}</span>
-          </div>
-          <div className={styles.previewItem}>
-            <span className={styles.previewLabel}>Exported by:</span>
-            <span className={styles.previewValue}>
-              {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
-            </span>
-          </div>
-          <div className={styles.previewItem}>
-            <span className={styles.previewLabel}>Lab/Company:</span>
-            <span className={styles.previewValue}>{casePreview.exportedByCompany || 'N/A'}</span>
-          </div>
-          <div className={styles.previewItem}>
-            <span className={styles.previewLabel}>Export Date:</span>
-            <span className={styles.previewValue}>
-              {new Date(casePreview.exportDate).toLocaleDateString()}
-            </span>
-          </div>
-          <div className={styles.previewItem}>
-            <span className={styles.previewLabel}>Total Images:</span>
-            <span className={styles.previewValue}>{casePreview.totalFiles}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Data Integrity Checks - Green/Red Based on Validation */}
-      {casePreview.checksumValid !== undefined && (
-        <div className={`${styles.validationSection} ${casePreview.checksumValid ? styles.validationSectionValid : styles.validationSectionInvalid}`}>
-          <h3 className={styles.validationTitle}>Data Integrity Validation</h3>
-          <div className={styles.validationItem}>            
-            <span className={`${styles.validationValue} ${casePreview.checksumValid ? styles.validationSuccess : styles.validationError}`}>
-              {casePreview.checksumValid ? (
-                <>✓ Verified (Checksum: {casePreview.expectedChecksum})</>
-              ) : (
-                <>✗ FAILED - {casePreview.checksumError}</>
-              )}
-            </span>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-const ConfirmationPreviewSection = ({ confirmationPreview, isLoadingPreview }: {
-  confirmationPreview: ConfirmationPreview | null;
-  isLoadingPreview: boolean;
-}) => {
-  if (isLoadingPreview) {
-    return (
-      <div className={styles.previewSection}>
-        <div className={styles.previewLoading}>
-          Loading confirmation information...
-        </div>
-      </div>
-    );
-  }
-
-  if (!confirmationPreview) return null;
-
-  return (
-    <div className={styles.previewSection}>
-      <h3 className={styles.previewTitle}>Confirmation Data Information</h3>
-      <div className={styles.previewGrid}>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Case Number:</span>
-          <span className={styles.previewValue}>{confirmationPreview.caseNumber}</span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Exported by:</span>
-          <span className={styles.previewValue}>{confirmationPreview.fullName}</span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Export Date:</span>
-          <span className={styles.previewValue}>
-            {new Date(confirmationPreview.exportDate).toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              timeZoneName: 'short'
-            })}
-          </span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Total Confirmations:</span>
-          <span className={styles.previewValue}>{confirmationPreview.totalConfirmations}</span>
-        </div>
-        <div className={styles.previewItem}>
-          <span className={styles.previewLabel}>Confirmation IDs:</span>
-          <span className={styles.previewValue}>
-            {confirmationPreview.confirmationIds.length > 0 
-              ? confirmationPreview.confirmationIds.join(', ')
-              : 'None'
-            }
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ProgressSection = ({ importProgress }: { importProgress: ProgressState | null }) => {
-  if (!importProgress) return null;
-
-  return (
-    <div className={styles.progressSection}>
-      <div className={styles.progressText}>
-        {importProgress.stage}
-        {importProgress.details && (
-          <span className={styles.progressDetails}> - {importProgress.details}</span>
-        )}
-      </div>
-      <div className={styles.progressBar}>
-        <div 
-          className={styles.progressFill}
-          style={{ width: `${importProgress.progress}%` }}
-        />
-      </div>
-      <div className={styles.progressPercent}>
-        {Math.round(importProgress.progress)}%
-      </div>
-    </div>
-  );
-};
-
-const ConfirmationDialog = ({ 
-  showConfirmation, 
-  casePreview, 
-  onConfirm, 
-  onCancel 
-}: {
-  showConfirmation: boolean;
-  casePreview: CaseImportPreview | null;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => {
-  if (!showConfirmation || !casePreview) return null;
-
-  return (
-    <div className={styles.confirmationOverlay} onClick={(e) => e.stopPropagation()}>
-      <div className={styles.confirmationModal}>
-        <div className={styles.confirmationContent}>
-          <h3 className={styles.confirmationTitle}>Confirm Case Import</h3>
-          <p className={styles.confirmationText}>
-            Are you sure you want to import this case for review?
-          </p>
-          
-          <div className={styles.confirmationDetails}>
-            <div className={styles.confirmationItem}>
-              <strong>Case Number:</strong> {casePreview.caseNumber}
-            </div>
-            <div className={styles.confirmationItem}>
-              <strong>Exported by:</strong> {casePreview.exportedByName || casePreview.exportedBy || 'N/A'}
-            </div>
-            <div className={styles.confirmationItem}>
-              <strong>Lab/Company:</strong> {casePreview.exportedByCompany || 'N/A'}
-            </div>
-            <div className={styles.confirmationItem}>
-              <strong>Export Date:</strong> {new Date(casePreview.exportDate).toLocaleDateString()}
-            </div>
-            <div className={styles.confirmationItem}>
-              <strong>Total Images:</strong> {casePreview.totalFiles}
-            </div>
-            {casePreview.checksumValid !== undefined && (
-              <div className={`${styles.confirmationItem} ${casePreview.checksumValid ? styles.confirmationItemValid : styles.confirmationItemInvalid}`}>
-                <strong>Data Integrity:</strong> 
-                <span className={casePreview.checksumValid ? styles.confirmationSuccess : styles.confirmationError}>
-                  {casePreview.checksumValid ? '✓ Verified' : '✗ Failed'}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.confirmationButtons}>
-            <button
-              className={styles.confirmButton}
-              onClick={onConfirm}
-            >
-              Confirm Import
-            </button>
-            <button
-              className={styles.cancelButton}
-              onClick={onCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export const CaseImport = ({ 
   isOpen, 
   onClose, 
@@ -331,40 +42,57 @@ export const CaseImport = ({
 }: CaseImportProps) => {
   const { user } = useContext(AuthContext);
   
-  // Consolidated state
-  const [importState, setImportState] = useState<ImportState>({
-    selectedFile: null,
-    isImporting: false,
-    isClearing: false,
-    isLoadingPreview: false,
-    showConfirmation: false,
-    importType: null
-  });
-  
-  const [messages, setMessages] = useState<MessageState>({
-    error: '',
-    success: ''
-  });
+  // Use our custom hooks
+  const {
+    importState,
+    messages,
+    importProgress,
+    setError,
+    setSuccess,
+    updateImportState,
+    resetImportState,
+    setImportProgress
+  } = useImportState();
   
   const [existingReadOnlyCase, setExistingReadOnlyCase] = useState<string | null>(null);
-  const [importProgress, setImportProgress] = useState<ProgressState | null>(null);
-  const [casePreview, setCasePreview] = useState<CaseImportPreview | null>(null);
-  const [confirmationPreview, setConfirmationPreview] = useState<ConfirmationPreview | null>(null);
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Helper functions
-  const clearMessages = useCallback(() => {
-    setMessages({ error: '', success: '' });
-  }, []);
-
+  
+  // Clear import data helper
   const clearImportData = useCallback(() => {
-    setImportState(prev => ({ ...prev, selectedFile: null }));
-    setCasePreview(null);
-    setConfirmationPreview(null);
+    updateImportState({ selectedFile: null, importType: null });
+    clearPreviews();
     resetFileInput(fileInputRef);
-  }, []);
+  }, [updateImportState]);
 
+  // File preview hook
+  const {
+    casePreview,
+    confirmationPreview,
+    loadCasePreview,
+    loadConfirmationPreview,
+    clearPreviews
+  } = useFilePreview(
+    user,
+    setError,
+    (loading) => updateImportState({ isLoadingPreview: loading }),
+    clearImportData
+  );
+
+  // Import execution hook
+  const { executeImport } = useImportExecution({
+    user,
+    selectedFile: importState.selectedFile,
+    importType: importState.importType,
+    setImportProgress,
+    setError,
+    setSuccess,
+    setIsImporting: (importing) => updateImportState({ isImporting: importing }),
+    onImportComplete,
+    onUpdateExistingCase: setExistingReadOnlyCase,
+    onClose
+  });
+
+  // Check for existing read-only cases
   const checkForExistingReadOnlyCase = useCallback(async () => {
     if (!user) return;
     
@@ -376,13 +104,97 @@ export const CaseImport = ({
     }
   }, [user]);
 
-  // Combined effects for initialization and cleanup
-  useEffect(() => {
-    if (user) {
-      checkForExistingReadOnlyCase();
-    }
+  // Clear existing read-only case
+  const clearExistingReadOnlyCase = useCallback(async () => {
+    if (!user || !existingReadOnlyCase) return;
     
-    if (isOpen && user) {
+    updateImportState({ isClearing: true });
+    
+    try {
+      await deleteReadOnlyCase(user, existingReadOnlyCase);
+      
+      const clearedCaseName = existingReadOnlyCase;
+      setExistingReadOnlyCase(null);
+      setSuccess(`Removed read-only case "${clearedCaseName}"`);
+      
+      onImportComplete?.({ 
+        success: true,
+        caseNumber: '',
+        isReadOnly: false,
+        filesImported: 0,
+        annotationsImported: 0,
+        errors: [],
+        warnings: []
+      });
+      
+    } catch (error) {
+      console.error('Error clearing existing read-only case:', error);
+      setError(error instanceof Error ? error.message : 'Failed to clear existing case');
+    } finally {
+      updateImportState({ isClearing: false });
+    }
+  }, [user, existingReadOnlyCase, updateImportState, setSuccess, setError, onImportComplete]);
+
+  // Handle file selection
+  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!isValidImportFile(file)) {
+      setError('Only ZIP files (case imports) or JSON files (confirmation imports) are allowed. Please select a valid file.');
+      clearImportData();
+      return;
+    }
+
+    const importType = getImportType(file);
+    updateImportState({ 
+      selectedFile: file, 
+      importType 
+    });
+    clearPreviews();
+    
+    // Load preview based on import type
+    if (importType === 'case') {
+      await loadCasePreview(file);
+    } else if (importType === 'confirmation') {
+      await loadConfirmationPreview(file);
+    }
+  }, [clearImportData, setError, updateImportState, clearPreviews, loadCasePreview, loadConfirmationPreview]);
+
+  // Handle import action
+  const handleImport = useCallback(() => {
+    if (!user || !importState.selectedFile || !importState.importType) return;
+    
+    // For case imports, show confirmation dialog with preview
+    // For confirmation imports, proceed directly to import
+    if (importState.importType === 'case') {
+      if (!casePreview) return;
+      updateImportState({ showConfirmation: true });
+    } else {
+      // Direct import for confirmations
+      executeImport();
+    }
+  }, [user, importState.selectedFile, importState.importType, casePreview, updateImportState, executeImport]);
+
+  const handleCancelImport = useCallback(() => {
+    updateImportState({ showConfirmation: false });
+    clearImportData();
+  }, [updateImportState, clearImportData]);
+
+  const handleModalCancel = useCallback(() => {
+    clearImportData();
+    onClose();
+  }, [clearImportData, onClose]);
+
+  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && !importState.isImporting && !importState.isClearing) {
+      onClose();
+    }
+  }, [importState.isImporting, importState.isClearing, onClose]);
+
+  // Effects
+  useEffect(() => {
+    if (user && isOpen) {
       checkForExistingReadOnlyCase();
     }
   }, [user, isOpen, checkForExistingReadOnlyCase]);
@@ -407,261 +219,15 @@ export const CaseImport = ({
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
-      clearImportData();
-      clearMessages();
-      setImportProgress(null);
+      resetImportState();
     }
-  }, [isOpen, clearImportData, clearMessages]);
+  }, [isOpen, resetImportState]);
 
-  const clearExistingReadOnlyCase = useCallback(async () => {
-    if (!user || !existingReadOnlyCase) return;
-    
-    setImportState(prev => ({ ...prev, isClearing: true }));
-    clearMessages();
-    
-    try {
-      // Delete the read-only case properly (includes all data cleanup)
-      await deleteReadOnlyCase(user, existingReadOnlyCase);
-      
-      const clearedCaseName = existingReadOnlyCase;
-      setExistingReadOnlyCase(null);
-      setMessages({ error: '', success: `Removed read-only case "${clearedCaseName}"` });
-      
-      // Notify parent component about the clear (if currently loaded)
-      onImportComplete?.({ 
-        success: true,
-        caseNumber: '',
-        isReadOnly: false,
-        filesImported: 0,
-        annotationsImported: 0,
-        errors: [],
-        warnings: []
-      });
-      
-      // Clear success message after a delay
-      setTimeout(() => setMessages(prev => ({ ...prev, success: '' })), 3000);
-      
-    } catch (error) {
-      console.error('Error clearing existing read-only case:', error);
-      setMessages({ error: error instanceof Error ? error.message : 'Failed to clear existing case', success: '' });
-    } finally {
-      setImportState(prev => ({ ...prev, isClearing: false }));
-    }
-  }, [user, existingReadOnlyCase, onImportComplete, clearMessages]);
-
-  const loadCasePreview = useCallback(async (file: File) => {
-    if (!user) {
-      setMessages({ error: 'User authentication required', success: '' });
-      return;
-    }
-
-    setImportState(prev => ({ ...prev, isLoadingPreview: true }));
-    try {
-      const preview = await previewCaseImport(file, user);
-      setCasePreview(preview);
-    } catch (error) {
-      console.error('Error loading case preview:', error);
-      setMessages({ 
-        error: `Failed to read case information: ${error instanceof Error ? error.message : 'Unknown error'}`, 
-        success: '' 
-      });
-      clearImportData();
-    } finally {
-      setImportState(prev => ({ ...prev, isLoadingPreview: false }));
-    }
-  }, [user, clearImportData]);
-
-  const loadConfirmationPreview = useCallback(async (file: File) => {
-    if (!user) {
-      setMessages({ error: 'User authentication required', success: '' });
-      return;
-    }
-
-    setImportState(prev => ({ ...prev, isLoadingPreview: true }));
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      // Extract confirmation IDs from the confirmations object
-      const confirmationIds: string[] = [];
-      if (data.confirmations) {
-        Object.values(data.confirmations).forEach((imageConfirmations: any) => {
-          if (Array.isArray(imageConfirmations)) {
-            imageConfirmations.forEach((confirmation: any) => {
-              if (confirmation.confirmationId) {
-                confirmationIds.push(confirmation.confirmationId);
-              }
-            });
-          }
-        });
-      }
-
-      const preview: ConfirmationPreview = {
-        caseNumber: data.metadata?.caseNumber || 'Unknown',
-        fullName: data.metadata?.exportedByName || 'Unknown',
-        exportDate: data.metadata?.exportDate || new Date().toISOString(),
-        totalConfirmations: data.metadata?.totalConfirmations || confirmationIds.length,
-        confirmationIds
-      };
-      
-      setConfirmationPreview(preview);
-    } catch (error) {
-      console.error('Error loading confirmation preview:', error);
-      setMessages({ 
-        error: `Failed to read confirmation data: ${error instanceof Error ? error.message : 'Invalid JSON format'}`, 
-        success: '' 
-      });
-      clearImportData();
-    } finally {
-      setImportState(prev => ({ ...prev, isLoadingPreview: false }));
-    }
-  }, [user, clearImportData]);
-
-  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Detect file type and import type
-    const isZipFile = isValidZipFile(file);
-    const isConfirmationFile = isConfirmationDataFile(file.name);
-
-    if (!isZipFile && !isConfirmationFile) {
-      setMessages({ 
-        error: 'Only ZIP files (case imports) or JSON files (confirmation imports) are allowed. Please select a valid file.', 
-        success: '' 
-      });
-      clearImportData();
-      return;
-    }
-
-    const importType = isZipFile ? 'case' : 'confirmation';
-    setImportState(prev => ({ 
-      ...prev, 
-      selectedFile: file, 
-      importType 
-    }));
-    clearMessages();
-    setCasePreview(null);
-    setConfirmationPreview(null);
-    
-    // Load preview based on import type
-    if (importType === 'case') {
-      await loadCasePreview(file);
-    } else {
-      // Load confirmation preview
-      await loadConfirmationPreview(file);
-    }
-  }, [clearImportData, clearMessages, loadCasePreview, loadConfirmationPreview]);
-
-  const handleConfirmImport = useCallback(async () => {
-    if (!user || !importState.selectedFile || !importState.importType) return;
-    
-    setImportState(prev => ({ ...prev, showConfirmation: false, isImporting: true }));
-    clearMessages();
-    
-    try {
-      if (importState.importType === 'case') {
-        // Handle case import
-        setImportProgress({ stage: 'Starting case import...', progress: 0 });
-        
-        const result = await importCaseForReview(
-          user,
-          importState.selectedFile,
-          { overwriteExisting: true },
-          (stage: string, progress: number, details?: string) => {
-            setImportProgress({ stage, progress, details });
-          }
-        );
-        
-        if (result.success) {
-          setMessages({ error: '', success: `Successfully imported case "${result.caseNumber}" for review` });
-          setImportState(prev => ({ ...prev, selectedFile: null, importType: null }));
-          setCasePreview(null);
-          resetFileInput(fileInputRef);
-          
-          // Update existing case status
-          setExistingReadOnlyCase(result.caseNumber);
-          
-          // Call completion callback
-          onImportComplete?.(result);
-          
-          // Auto-close after success
-          setTimeout(() => {
-            onClose();
-          }, 2000);
-          
-        } else {
-          setMessages({ error: result.errors?.join(', ') || 'Case import failed', success: '' });
-        }
-        
-      } else if (importState.importType === 'confirmation') {
-        // Handle confirmation import
-        setImportProgress({ stage: 'Validating confirmation data...', progress: 50 });
-        
-        const result = await importConfirmationData(user, importState.selectedFile);
-        
-        if (result.success) {
-          setMessages({ 
-            error: '', 
-            success: `Successfully imported ${result.confirmationsImported} confirmation(s) for case "${result.caseNumber}"` 
-          });
-          setImportState(prev => ({ ...prev, selectedFile: null, importType: null }));
-          resetFileInput(fileInputRef);
-          
-          // Auto-close after success
-          setTimeout(() => {
-            onClose();
-          }, 2000);
-          
-        } else {
-          setMessages({ error: result.errors?.join(', ') || 'Confirmation import failed', success: '' });
-        }
-      }
-      
-    } catch (error) {
-      console.error('Import failed:', error);
-      setMessages({ error: error instanceof Error ? error.message : 'Import failed. Please try again.', success: '' });
-    } finally {
-      setImportState(prev => ({ ...prev, isImporting: false }));
-      setImportProgress(null);
-    }
-  }, [user, importState.selectedFile, importState.importType, onImportComplete, onClose, clearMessages]);
-
-  const handleImport = useCallback(() => {
-    if (!user || !importState.selectedFile || !importState.importType) return;
-    
-    // For case imports, show confirmation dialog with preview
-    // For confirmation imports, proceed directly to import
-    if (importState.importType === 'case') {
-      if (!casePreview) return;
-      setImportState(prev => ({ ...prev, showConfirmation: true }));
-    } else {
-      // Direct import for confirmations
-      handleConfirmImport();
-    }
-  }, [user, importState.selectedFile, importState.importType, casePreview, handleConfirmImport]);
-
-  const handleCancelImport = useCallback(() => {
-    setImportState(prev => ({ ...prev, showConfirmation: false }));
-    // Clear the import preview when user cancels
-    setCasePreview(null);
-    setImportState(prev => ({ ...prev, selectedFile: null }));
-    resetFileInput(fileInputRef);
-  }, []);
-
-  const handleModalCancel = useCallback(() => {
-    // Clear the import preview when closing modal
-    setCasePreview(null);
-    setImportState(prev => ({ ...prev, selectedFile: null }));
-    resetFileInput(fileInputRef);
-    onClose();
-  }, [onClose]);
-
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && !importState.isImporting && !importState.isClearing) {
-      onClose();
-    }
-  }, [importState.isImporting, importState.isClearing, onClose]);
+  // Handle confirmation import
+  const handleConfirmImport = useCallback(() => {
+    executeImport();
+    updateImportState({ showConfirmation: false });
+  }, [executeImport, updateImportState]);
 
   if (!isOpen) return null;
 
@@ -694,36 +260,12 @@ export const CaseImport = ({
             />
             
             {/* File selector */}
-            <div className={styles.fileSection}>
-              <div className={styles.fileInputGroup}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  id="zipFile"
-                  accept=".zip,.json"
-                  onChange={handleFileSelect}
-                  disabled={importState.isImporting || importState.isClearing}
-                  className={styles.fileInput}
-                />
-                <label htmlFor="zipFile" className={styles.fileLabel}>
-                  <span className={styles.fileLabelIcon}>📁</span>
-                  <span className={styles.fileLabelText}>
-                    {importState.selectedFile 
-                      ? importState.selectedFile.name 
-                      : 'Select ZIP file (case import) or JSON file (confirmation import)...'
-                    }
-                  </span>
-                </label>
-              </div>
-              
-              {importState.selectedFile && (
-                <div className={styles.fileInfo}>
-                  <span className={styles.fileSize}>
-                    {(importState.selectedFile.size / (1024 * 1024)).toFixed(2)} MB
-                  </span>
-                </div>
-              )}
-            </div>
+            <FileSelector
+              selectedFile={importState.selectedFile}
+              onFileSelect={handleFileSelect}
+              isDisabled={importState.isImporting || importState.isClearing}
+              onClear={clearImportData}
+            />
 
             {/* Import type indicator and preview */}
             {importState.selectedFile && importState.importType && (

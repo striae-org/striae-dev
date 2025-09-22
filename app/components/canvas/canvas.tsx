@@ -176,16 +176,6 @@ export const Canvas = ({
     if (loadError) return loadError.message;
     return 'An error occurred';
   };
-  
-  const isBlackColor = (color: string) => {
-    return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
-  };
-
-  const isBlueColor = (color: string) => {
-    const lowerColor = color.toLowerCase();
-    return lowerColor === '#0000ff' || lowerColor === 'blue' || lowerColor === '#00f' || 
-           lowerColor === '#0066cc' || lowerColor === '#0080ff' || lowerColor === '#007fff';
-  };
 
   // Programmatically determine if a color is dark and needs a light background
   const needsLightBackground = (color: string) => {
