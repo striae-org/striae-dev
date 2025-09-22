@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { FileData, AnnotationData, CaseExportData, AllCasesExportData, UserData } from '~/types';
+import { FileData, AnnotationData, CaseExportData, AllCasesExportData, ExportOptions } from '~/types';
 import { fetchFiles, getImageUrl } from './image-manage';
 import { getNotes } from './notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from './case-manage';
@@ -66,13 +66,6 @@ async function getUserExportMetadata(user: User) {
     exportedByName: user.displayName || 'N/A',
     exportedByCompany: 'N/A'
   };
-}
-
-export interface ExportOptions {
-  format?: 'json' | 'csv';
-  includeMetadata?: boolean;
-  includeUserInfo?: boolean;
-  protectForensicData?: boolean; // Enable read-only protection
 }
 
 /**
