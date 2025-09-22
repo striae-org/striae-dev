@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { BasicConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
 import styles from './confirmation.module.css';
 
@@ -12,12 +13,7 @@ interface ConfirmationModalProps {
     confirmationId: string;
   }) => void;
   company?: string;
-  existingConfirmation?: {
-    fullName: string;
-    badgeId: string;
-    timestamp: string;
-    confirmationId: string;
-  } | null;
+  existingConfirmation?: BasicConfirmationData | null;
 }
 
 // Generate a 10-character alphanumeric ID

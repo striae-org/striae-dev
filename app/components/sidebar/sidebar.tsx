@@ -5,9 +5,9 @@ import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
-import { CaseImport } from './case-import';
+import { CaseImport } from './case-import/case-import';
 import { FileData } from '~/types';
-import { ImportResult } from '../actions/case-review';
+import { ImportResult, ConfirmationImportResult } from '~/types';
 
 interface SidebarProps {
   user: User;
@@ -57,13 +57,17 @@ export const Sidebar = ({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const handleImportComplete = (result: ImportResult) => {
+  const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
-      // Load the imported case automatically
-      onCaseChange(result.caseNumber);
-      setCurrentCase(result.caseNumber);
-      setCaseNumber(result.caseNumber);
-      setSuccessAction('loaded');
+      // For case imports, load the imported case automatically
+      if ('isReadOnly' in result) {
+        // This is an ImportResult (case import)
+        onCaseChange(result.caseNumber);
+        setCurrentCase(result.caseNumber);
+        setCaseNumber(result.caseNumber);
+        setSuccessAction('loaded');
+      }
+      // For confirmation imports, no action needed - the confirmations are already loaded
     }
   };  
 

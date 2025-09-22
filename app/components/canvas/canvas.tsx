@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useContext } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
 import { ConfirmationModal } from './confirmation/confirmation';
-import { AnnotationData, BoxAnnotation } from '~/types/annotations';
+import { AnnotationData, BoxAnnotation, BasicConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
 import { storeConfirmation } from '~/components/actions/confirm-export';
 import styles from './canvas.module.css';
@@ -75,12 +75,7 @@ export const Canvas = ({
   };
 
   // Handle confirmation
-  const handleConfirmation = async (confirmationData: {
-    fullName: string;
-    badgeId: string;
-    timestamp: string;
-    confirmationId: string;
-  }) => {
+  const handleConfirmation = async (confirmationData: BasicConfirmationData) => {
     if (!onAnnotationUpdate || !annotationData) return;
     
     // Store in annotation data (existing functionality)
@@ -94,11 +89,19 @@ export const Canvas = ({
 
     // Store at case level for original analyst tracking
     if (user && caseNumber && currentImageId) {
+      // Create enhanced confirmation data for case-level storage
+      const enhancedConfirmationData = {
+        ...confirmationData,
+        confirmedBy: user.uid,
+        confirmedByEmail: user.email || '',
+        confirmedAt: new Date().toISOString()
+      };
+
       const success = await storeConfirmation(
         user,
         caseNumber,
         currentImageId,
-        confirmationData
+        enhancedConfirmationData
       );
       
       if (success) {

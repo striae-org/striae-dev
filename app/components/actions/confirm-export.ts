@@ -2,34 +2,9 @@ import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
 import { calculateCRC32 } from '~/utils/CRC32';
+import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
 
 const DATA_WORKER_URL = paths.data_worker_url;
-
-export interface ConfirmationData {
-  fullName: string;
-  badgeId: string;
-  timestamp: string;
-  confirmationId: string;
-  confirmedBy: string; // User UID
-  confirmedByEmail: string;
-  confirmedAt: string; // ISO timestamp
-}
-
-export interface CaseConfirmations {
-  [originalImageId: string]: ConfirmationData[];
-}
-
-export interface CaseDataWithConfirmations {
-  createdAt: string;
-  caseNumber: string;
-  files: any[];
-  isReadOnly?: boolean;
-  importedAt?: string;
-  originalMetadata?: any;
-  originalSummary?: any;
-  originalImageIds?: { [originalId: string]: string };
-  confirmations?: CaseConfirmations;
-}
 
 /**
  * Store a confirmation for a specific image, linked to the original image ID
@@ -38,12 +13,7 @@ export async function storeConfirmation(
   user: User,
   caseNumber: string,
   currentImageId: string,
-  confirmationData: {
-    fullName: string;
-    badgeId: string;
-    timestamp: string;
-    confirmationId: string;
-  }
+  confirmationData: ConfirmationData
 ): Promise<boolean> {
   try {
     const apiKey = await getDataApiKey();

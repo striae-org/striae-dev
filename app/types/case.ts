@@ -1,5 +1,5 @@
 import { FileData } from './file';
-import { AnnotationData } from './annotations';
+import { AnnotationData, ConfirmationData } from './annotations';
 
 // Case-related types and interfaces
 
@@ -64,4 +64,19 @@ export interface AllCasesExportData {
     earliestAnnotationDate?: string;
     latestAnnotationDate?: string;
   };
+}
+
+// Confirmation-related case types
+export interface CaseConfirmations {
+  [originalImageId: string]: ConfirmationData[];
+}
+
+export interface CaseDataWithConfirmations {
+  createdAt: string;
+  caseNumber: string;
+  files: any[];
+  isReadOnly?: boolean;
+  importedAt?: string;
+  originalImageIds?: { [originalId: string]: string };
+  confirmations?: CaseConfirmations;
 }

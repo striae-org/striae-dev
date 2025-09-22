@@ -10,7 +10,13 @@ import {
   UserData, 
   FileData, 
   ImageUploadResponse,
-  CaseData
+  CaseData,
+  ImportOptions,
+  ImportResult,
+  ConfirmationImportResult,
+  ConfirmationImportData,
+  CaseImportPreview,
+  ReadOnlyCaseMetadata
 } from '~/types';
 import { validateCaseNumber, checkExistingCase } from './case-manage';
 import { calculateCRC32, validateCaseIntegrity as validateForensicIntegrity } from '~/utils/CRC32';
@@ -43,54 +49,6 @@ async function validateExporterUid(exporterUid: string, currentUser: User): Prom
   }
 }
 const IMAGE_WORKER_URL = paths.image_worker_url;
-
-export interface ImportOptions {
-  overwriteExisting?: boolean;
-  validateIntegrity?: boolean;
-  preserveTimestamps?: boolean;
-}
-
-export interface ImportResult {
-  success: boolean;
-  caseNumber: string;
-  isReadOnly: boolean;
-  filesImported: number;
-  annotationsImported: number;
-  errors?: string[];
-  warnings?: string[];
-}
-
-export interface ReadOnlyCaseMetadata {
-  caseNumber: string;
-  importedAt: string;
-  originalExportDate: string;
-  originalExportedBy: string;
-  sourceChecksum?: string;
-  isReadOnly: true;
-}
-
-export interface CaseImportPreview {
-  caseNumber: string;
-  exportedBy: string | null;
-  exportedByName: string | null;
-  exportedByCompany: string | null;
-  exportDate: string;
-  totalFiles: number;
-  caseCreatedDate?: string;
-  checksumValid?: boolean;
-  checksumError?: string;
-  expectedChecksum?: string;
-  actualChecksum?: string;
-  // Enhanced validation details
-  validationDetails?: {
-    hasForensicManifest: boolean;
-    dataValid?: boolean;
-    imageValidation?: { [filename: string]: boolean };
-    manifestValid?: boolean;
-    validationSummary?: string;
-    integrityErrors?: string[];
-  };
-}
 
 /**
  * Preview case information from ZIP file without importing
@@ -268,6 +226,8 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
       exportDate: caseData.metadata.exportDate,
       totalFiles,
       caseCreatedDate: caseData.metadata.caseCreatedDate,
+      hasAnnotations: false, // We'll need to determine this during parsing if needed
+      validationSummary: checksumValid ? 'Validation successful' : (checksumError || 'Validation failed'),
       checksumValid,
       checksumError,
       expectedChecksum,
@@ -571,8 +531,6 @@ async function storeCaseDataInR2(
       // Add read-only metadata
       isReadOnly: true,
       importedAt: new Date().toISOString(),
-      originalMetadata: caseData.metadata,
-      originalSummary: caseData.summary,
       // Add original image ID mapping for confirmation linking
       originalImageIds: originalImageIds
     };
@@ -924,6 +882,191 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
   } catch (error) {
     console.error('Error deleting read-only case:', error);
     return false;
+  }
+}
+
+/**
+ * Check if file is a confirmation data import
+ */
+export function isConfirmationDataFile(filename: string): boolean {
+  return filename.startsWith('confirmation-data') && filename.endsWith('.json');
+}
+
+/**
+ * Validate confirmation data file checksum
+ */
+function validateConfirmationChecksum(jsonContent: string, expectedChecksum: string): boolean {
+  // Create data without checksum for validation
+  const data = JSON.parse(jsonContent);
+  const dataWithoutChecksum = {
+    ...data,
+    metadata: {
+      ...data.metadata,
+      checksum: undefined
+    }
+  };
+  delete dataWithoutChecksum.metadata.checksum;
+  
+  const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
+  const actualChecksum = calculateCRC32(contentForChecksum);
+  
+  return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
+}
+
+/**
+ * Import confirmation data from JSON file
+ */
+export async function importConfirmationData(
+  user: User,
+  confirmationFile: File,
+  onProgress?: (stage: string, progress: number, details?: string) => void
+): Promise<ConfirmationImportResult> {
+  const result: ConfirmationImportResult = {
+    success: false,
+    caseNumber: '',
+    confirmationsImported: 0,
+    imagesUpdated: 0,
+    errors: [],
+    warnings: []
+  };
+
+  try {
+    onProgress?.('Reading confirmation file', 10, 'Loading JSON data...');
+
+    // Read and parse the JSON file
+    const fileContent = await confirmationFile.text();
+    const confirmationData: ConfirmationImportData = JSON.parse(fileContent);
+    result.caseNumber = confirmationData.metadata.caseNumber;
+
+    onProgress?.('Validating checksum', 20, 'Verifying data integrity...');
+
+    // Validate checksum
+    if (!validateConfirmationChecksum(fileContent, confirmationData.metadata.checksum)) {
+      throw new Error('Confirmation data checksum validation failed. The file may have been tampered with or corrupted.');
+    }
+
+    onProgress?.('Validating exporter', 30, 'Checking exporter credentials...');
+
+    // Validate exporter UID exists and is not current user
+    const validation = await validateExporterUid(confirmationData.metadata.exportedByUid, user);
+    
+    if (!validation.exists) {
+      throw new Error(`Exporter UID ${confirmationData.metadata.exportedByUid} does not exist in the user database.`);
+    }
+    
+    if (validation.isSelf) {
+      throw new Error('You cannot import confirmation data that you exported yourself.');
+    }
+
+    onProgress?.('Validating case', 40, 'Checking case exists...');
+
+    // Check if case exists in user's regular cases
+    const caseExists = await checkExistingCase(user, result.caseNumber);
+    if (!caseExists) {
+      throw new Error(`Case "${result.caseNumber}" does not exist in your case list. You can only import confirmations for your own cases.`);
+    }
+
+    onProgress?.('Processing confirmations', 50, 'Updating image annotations...');
+
+    // Get case data to find image IDs
+    const apiKey = await getDataApiKey();
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/data.json`, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!caseResponse.ok) {
+      throw new Error(`Failed to fetch case data: ${caseResponse.status}`);
+    }
+
+    const caseData = await caseResponse.json() as any; // Using any for flexibility with originalImageIds
+    
+    // Build mapping from original image IDs to current image IDs
+    const imageIdMapping = new Map<string, string>();
+    
+    // If the case has originalImageIds mapping (from read-only import), use that
+    if (caseData.originalImageIds) {
+      for (const [originalId, currentId] of Object.entries(caseData.originalImageIds)) {
+        imageIdMapping.set(originalId, currentId as string);
+      }
+    } else {
+      // For regular cases, assume original IDs match current IDs
+      for (const file of caseData.files) {
+        imageIdMapping.set(file.id, file.id);
+      }
+    }
+
+    let processedCount = 0;
+    const totalConfirmations = Object.keys(confirmationData.confirmations).length;
+
+    // Process each confirmation
+    for (const [originalImageId, confirmations] of Object.entries(confirmationData.confirmations)) {
+      const currentImageId = imageIdMapping.get(originalImageId);
+      
+      if (!currentImageId) {
+        result.warnings?.push(`Could not find image with original ID: ${originalImageId}`);
+        continue;
+      }
+
+      // Get current annotation data for this image
+      const annotationResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
+        method: 'GET',
+        headers: {
+          'X-Custom-Auth-Key': apiKey
+        }
+      });
+
+      let annotationData = {};
+      if (annotationResponse.ok) {
+        annotationData = await annotationResponse.json();
+      }
+
+      // Check if confirmations already exist
+      if ((annotationData as any).confirmations && (annotationData as any).confirmations.length > 0) {
+        result.warnings?.push(`Image ${currentImageId} already has confirmation data - skipping`);
+        continue;
+      }
+
+      // Add confirmation data
+      const updatedAnnotationData = {
+        ...annotationData,
+        confirmations: confirmations
+      };
+
+      // Save updated annotation data
+      const saveResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Auth-Key': apiKey
+        },
+        body: JSON.stringify(updatedAnnotationData)
+      });
+
+      if (saveResponse.ok) {
+        result.imagesUpdated++;
+        result.confirmationsImported += confirmations.length;
+      } else {
+        result.warnings?.push(`Failed to update image ${currentImageId}: ${saveResponse.status}`);
+      }
+
+      processedCount++;
+      const progress = 50 + (processedCount / totalConfirmations) * 40;
+      onProgress?.('Processing confirmations', progress, `Updated ${result.imagesUpdated} images...`);
+    }
+
+    onProgress?.('Import complete', 100, `Successfully imported ${result.confirmationsImported} confirmations`);
+
+    result.success = true;
+    return result;
+
+  } catch (error) {
+    console.error('Confirmation import failed:', error);
+    result.success = false;
+    result.errors?.push(error instanceof Error ? error.message : 'Unknown error occurred during confirmation import');
+    return result;
   }
 }
 
