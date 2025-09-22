@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-09-22] - *[Release v0.9.22-beta](https://github.com/striae-org/striae/releases/tag/v0.9.22-beta)*
+
+- **Authenticated Confirmations System** - Complete implementation of firearms identification workflow with digital examiner verification and cryptographic integrity
+- **Independent Review Process** - Structured export/import workflow allowing reviewing examiners to confirm original findings with full audit trail
+- **Confirmation Security Framework** - Multi-layer validation including checksum verification, timestamp validation, and self-confirmation prevention
+- **Enhanced Documentation** - Comprehensive confirmation guides and FAQ integration covering complete workflow from examination to final documentation
+
 ## [2025-09-20] - *[Release v0.9.20-beta](https://github.com/striae-org/striae/releases/tag/v0.9.20-beta)*
 
 - **Export Security Enhancement** - Multi-layer authentication and validation for all case export operations with improved error handling
