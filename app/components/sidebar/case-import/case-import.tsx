@@ -669,7 +669,7 @@ export const CaseImport = ({
                   importState.isImporting || 
                   importState.isClearing || 
                   importState.isLoadingPreview ||
-                  (importState.importType === 'case' && (!casePreview || casePreview?.checksumValid === false))
+                  (importState.importType === 'case' && (!casePreview || casePreview.checksumValid !== true))
                 }
               >
                 {importState.isImporting ? 'Importing...' : 
