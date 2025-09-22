@@ -147,7 +147,7 @@ The confirmation process maintains chain of custody requirements while providing
    - If conclusions are confirmed, click "Confirm" button in Striae
    - Confirmation modal opens requiring examiner credentials
    - Enter full name and badge/ID number
-   - System generates unique confirmation ID (format: CONF-xxxxxxxx)
+   - System generates unique confirmation ID
 
 3. **Confirmation Data Creation**
 
@@ -259,7 +259,7 @@ interface ConfirmationData {
   fullName: string;           // Confirming examiner's full name
   badgeId: string;            // Badge/ID number  
   timestamp: string;          // Human-readable timestamp
-  confirmationId: string;     // Unique ID (CONF-xxxxxxxx)
+  confirmationId: string;     // Unique ID
   confirmedBy: string;        // User UID
   confirmedByEmail: string;   // Email address
   confirmedByCompany: string; // Laboratory/Company
@@ -440,7 +440,13 @@ const isConfirmationFile = isConfirmationDataFile(filename);
 - Data type and format validation
 - Range and constraint checks
 
-##### Step 3: Security Validation
+##### Step 3: Timestamp Validation
+
+- **Confirmation Time Verification**: System validates that confirmation timestamps are not earlier than the last modification time of the associated annotation data
+- **Data Integrity Check**: Ensures confirmations were created after the annotations were finalized, preventing confirmations of outdated or modified work
+- **Annotation History Protection**: Uses the `updatedAt` timestamp from annotation data to verify confirmation validity
+
+##### Step 4: Security Validation
 
 ```typescript
 // Security checks during import
@@ -452,7 +458,7 @@ const securityChecks = {
 };
 ```
 
-##### Step 4: Business Logic Validation
+##### Step 5: Business Logic Validation
 
 - Case number format and uniqueness
 - Confirmation data consistency
@@ -581,7 +587,7 @@ The UI provides immediate feedback during validation:
 
 ### Audit Trail and Compliance
 
-- **Unique Confirmation IDs**: System-generated identifiers for tracking (CONF-xxxxxxxx format)
+- **Unique Confirmation IDs**: System-generated identifiers for tracking
 - **Complete Timestamp Records**: ISO timestamps and human-readable formats
 - **Examiner Credential Logging**: Full authentication details in audit trail
 - **Chain of Custody**: Validation events maintain complete custody records
@@ -650,4 +656,4 @@ The UI provides immediate feedback during validation:
 
 ---
 
-*For technical support or questions about the confirmation process, contact your system administrator or refer to the Technical Support documentation.*
+*Need additional help? Don't hesitate to reach out to our [support team](https://www.striae.org/support). We're here to ensure you have secure and seamless access to Striae's features.*
