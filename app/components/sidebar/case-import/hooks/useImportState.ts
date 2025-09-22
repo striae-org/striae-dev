@@ -52,8 +52,6 @@ export const useImportState = () => {
 
   const setSuccess = useCallback((success: string) => {
     setMessages({ error: '', success });
-    // Auto-clear success message after 3 seconds
-    setTimeout(() => setMessages(prev => ({ ...prev, success: '' })), 3000);
   }, []);
 
   const updateImportState = useCallback((updates: Partial<ImportState>) => {

@@ -269,12 +269,22 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Automatic save handler for annotation updates
   const handleAnnotationUpdate = async (data: AnnotationData) => {
-    // Update local state immediately (always allow for confirmation data in read-only cases)
+    // Update local state immediately
     setAnnotationData(data);
     
-    // Don't save to server for read-only cases (but do allow local state updates for confirmations)
+    // For read-only cases, only save if it's confirmation data
     if (isReadOnlyCase) {
-      console.log('Read-only case: annotation data updated locally but not saved to server');
+      // Save confirmation data to server even in read-only cases
+      if (data.confirmationData && user && currentCase && imageId) {
+        try {
+          await saveNotes(user, currentCase, imageId, data);
+          console.log('Confirmation data saved to server in read-only case');
+        } catch (saveError) {
+          console.error('Failed to save confirmation data:', saveError);
+        }
+      } else {
+        console.log('Read-only case: non-confirmation annotation data updated locally but not saved to server');
+      }
       return;
     }
     

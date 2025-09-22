@@ -118,6 +118,41 @@ export async function getCaseConfirmations(
 }
 
 /**
+ * Get case data with forensic manifest information if available
+ */
+export async function getCaseDataWithManifest(
+  user: User,
+  caseNumber: string
+): Promise<{ confirmations: CaseConfirmations | null; forensicManifestCreatedAt?: string }> {
+  try {
+    const apiKey = await getDataApiKey();
+    
+    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch case data: ${response.status}`);
+      return { confirmations: null };
+    }
+
+    const caseData: CaseDataWithConfirmations & { forensicManifestCreatedAt?: string } = await response.json();
+    
+    return {
+      confirmations: caseData.confirmations || null,
+      forensicManifestCreatedAt: caseData.forensicManifestCreatedAt
+    };
+
+  } catch (error) {
+    console.error('Failed to get case data with manifest:', error);
+    return { confirmations: null };
+  }
+}
+
+/**
  * Get confirmations for a specific original image ID
  */
 export async function getImageConfirmations(
@@ -142,8 +177,8 @@ export async function exportConfirmationData(
   caseNumber: string
 ): Promise<void> {
   try {
-    // Get all confirmation data for the case
-    const caseConfirmations = await getCaseConfirmations(user, caseNumber);
+    // Get all confirmation data and forensic manifest info for the case
+    const { confirmations: caseConfirmations, forensicManifestCreatedAt } = await getCaseDataWithManifest(user, caseNumber);
     
     if (!caseConfirmations || Object.keys(caseConfirmations).length === 0) {
       throw new Error('No confirmation data found for this case');
@@ -171,6 +206,13 @@ export async function exportConfirmationData(
       console.warn('Failed to fetch user data for confirmation export metadata:', error);
     }
 
+    // Try to get the forensic manifest createdAt timestamp from the original case export
+    let originalExportCreatedAt: string | undefined = forensicManifestCreatedAt;
+    
+    if (!originalExportCreatedAt) {
+      console.warn(`No forensic manifest timestamp found for case ${caseNumber}. This case may have been imported before forensic linking was implemented, or the original export did not include a forensic manifest.`);
+    }
+
     // Create export data with metadata
     const exportData = {
       metadata: {
@@ -178,7 +220,8 @@ export async function exportConfirmationData(
         exportDate: new Date().toISOString(),
         ...userMetadata,
         totalConfirmations: Object.keys(caseConfirmations).length,
-        version: '1.0'
+        version: '1.0',
+        ...(originalExportCreatedAt && { originalExportCreatedAt })
       },
       confirmations: caseConfirmations
     };
@@ -207,14 +250,17 @@ export async function exportConfirmationData(
     const a = document.createElement('a');
     a.href = url;
     
-    // Use local timezone for filename date
+    // Use local timezone for filename timestamp
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    const dateString = `${year}-${month}-${day}`;
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestampString = `${year}${month}${day}-${hours}${minutes}${seconds}`;
     
-    a.download = `confirmation-data-${caseNumber}-${dateString}.json`;
+    a.download = `confirmation-data-${caseNumber}-${timestampString}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

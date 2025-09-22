@@ -218,10 +218,18 @@ export async function exportCaseData(
 
       try {
         annotations = await getNotes(user, caseNumber, file.id) || undefined;
+        
+        // Check if file has any annotation data beyond just defaults
         hasAnnotations = !!(annotations && (
           annotations.additionalNotes ||
           annotations.classNote ||
           annotations.customClass ||
+          annotations.leftCase ||
+          annotations.rightCase ||
+          annotations.leftItem ||
+          annotations.rightItem ||
+          annotations.supportLevel ||
+          annotations.classType ||
           (annotations.boxAnnotations && annotations.boxAnnotations.length > 0)
         ));
 
@@ -234,23 +242,26 @@ export async function exportCaseData(
           // Track confirmation data
           if (annotations?.confirmationData) {
             filesWithConfirmationsCount++;
-          } else if (annotations?.includeConfirmation) {
-            filesWithConfirmationsRequestedCount++;
+          }
+        }
+        
+        // Track confirmation requests separately (regardless of other annotations)
+        if (annotations?.includeConfirmation) {
+          filesWithConfirmationsRequestedCount++;
+        }
+          
+        // Track last modified (only for files with annotations)
+        if (hasAnnotations && annotations?.updatedAt) {
+          if (!lastModified || annotations.updatedAt > lastModified) {
+            lastModified = annotations.updatedAt;
           }
           
-          // Track last modified
-          if (annotations?.updatedAt) {
-            if (!lastModified || annotations.updatedAt > lastModified) {
-              lastModified = annotations.updatedAt;
-            }
-            
-            // Track annotation date range
-            if (!earliestAnnotationDate || annotations.updatedAt < earliestAnnotationDate) {
-              earliestAnnotationDate = annotations.updatedAt;
-            }
-            if (!latestAnnotationDate || annotations.updatedAt > latestAnnotationDate) {
-              latestAnnotationDate = annotations.updatedAt;
-            }
+          // Track annotation date range
+          if (!earliestAnnotationDate || annotations.updatedAt < earliestAnnotationDate) {
+            earliestAnnotationDate = annotations.updatedAt;
+          }
+          if (!latestAnnotationDate || annotations.updatedAt > latestAnnotationDate) {
+            latestAnnotationDate = annotations.updatedAt;
           }
         }
       } catch (error) {

@@ -51,6 +51,7 @@ export interface ConfirmationImportData {
     totalConfirmations: number;
     version: string;
     checksum: string;
+    originalExportCreatedAt?: string;
   };
   confirmations: {
     [originalImageId: string]: Array<{

@@ -261,7 +261,8 @@ export async function importCaseForReview(
     onProgress?.('Storing case data', 75, 'Creating case structure...');
     
     // Step 4: Store case data in R2
-    await storeCaseDataInR2(user, result.caseNumber, caseData, importedFiles, originalImageIdMapping);
+    const forensicManifestCreatedAt = metadata?.forensicManifest?.createdAt;
+    await storeCaseDataInR2(user, result.caseNumber, caseData, importedFiles, originalImageIdMapping, forensicManifestCreatedAt);
     importState.caseDataStored = true;
     
     onProgress?.('Importing annotations', 85, 'Processing annotations...');

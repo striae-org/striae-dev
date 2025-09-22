@@ -245,7 +245,7 @@ export const Canvas = ({
             <>
               {/* Show confirmation status based on whether confirmation data exists */}
               {annotationData?.confirmationData ? (
-                <>
+                <div className={styles.confirmationRow}>
                   <div className={styles.confirmationConfirmed}>
                     Identification Confirmed
                   </div>
@@ -255,9 +255,9 @@ export const Canvas = ({
                   >
                     View Confirmation Data
                   </button>
-                </>
+                </div>
               ) : (
-                <>
+                <div className={styles.confirmationRow}>
                   <div className={styles.confirmationIncluded}>
                     {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
                   </div>
@@ -269,7 +269,7 @@ export const Canvas = ({
                       Confirm
                     </button>
                   )}
-                </>
+                </div>
               )}
             </>
           )}
