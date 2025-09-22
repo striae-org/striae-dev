@@ -40,6 +40,8 @@ export interface ConfirmationImportData {
     exportDate: string;
     exportedBy: string;
     exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
     totalConfirmations: number;
     version: string;
     checksum: string;
@@ -52,6 +54,7 @@ export interface ConfirmationImportData {
       confirmationId: string;
       confirmedBy: string;
       confirmedByEmail: string;
+      confirmedByCompany: string;
       confirmedAt: string;
     }>;
   };

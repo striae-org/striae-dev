@@ -148,13 +148,35 @@ export async function exportConfirmationData(
       throw new Error('No confirmation data found for this case');
     }
 
+    // Get user metadata for export (same as case exports)
+    let userMetadata = {
+      exportedBy: user.email || 'Unknown User',
+      exportedByUid: user.uid,
+      exportedByName: user.displayName || 'N/A',
+      exportedByCompany: 'N/A'
+    };
+
+    try {
+      const { getUserData } = await import('~/utils/permissions');
+      const userData = await getUserData(user);
+      if (userData) {
+        userMetadata = {
+          exportedBy: user.email || 'Unknown User',
+          exportedByUid: userData.uid,
+          exportedByName: `${userData.firstName} ${userData.lastName}`.trim(),
+          exportedByCompany: userData.company
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to fetch user data for confirmation export metadata:', error);
+    }
+
     // Create export data with metadata
     const exportData = {
       metadata: {
         caseNumber,
         exportDate: new Date().toISOString(),
-        exportedBy: user.email || 'Unknown User',
-        exportedByUid: user.uid,
+        ...userMetadata,
         totalConfirmations: Object.keys(caseConfirmations).length,
         version: '1.0'
       },
