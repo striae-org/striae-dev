@@ -139,9 +139,9 @@
   position: absolute;
   top: var(--spaceS);
   right: var(--spaceS);
-  background: color-mix(in lab, var(--error) 90%, var(--white));
-  color: var(--error);
-  border: 1px solid color-mix(in lab, var(--error) 30%, transparent);
+  background: transparent;
+  color: var(--textLight);
+  border: none;
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -149,7 +149,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   line-height: 1;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
@@ -157,17 +157,14 @@
 }
 
 .clearFileButton:hover:not(:disabled) {
-  background: var(--error);
-  color: var(--white);
-  box-shadow: 0 2px 6px color-mix(in lab, var(--error) 30%, transparent);
+  color: var(--error);
+  background: transparent;
 }
 
 .clearFileButton:disabled {
-  background: color-mix(in lab, var(--background) 95%, transparent);
   color: var(--textLight);
-  border-color: color-mix(in lab, var(--text) 15%, transparent);
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 .fileInput {
