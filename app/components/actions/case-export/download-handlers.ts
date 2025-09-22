@@ -363,7 +363,7 @@ Case Information:
 - Export Date: ${new Date().toISOString()}
 - Exported By: ${exportData.metadata.exportedBy || 'Unknown'}
 - Total Files: ${exportData.metadata.totalFiles}
-- Total Annotations: ${exportData.summary?.totalBoxAnnotations || 0}
+- Total Annotations: ${(exportData.summary?.filesWithAnnotations || 0) + (exportData.summary?.totalBoxAnnotations || 0)}
 - Total Confirmations: ${exportData.summary?.filesWithConfirmations || 0}
 - Confirmations Requested: ${exportData.summary?.filesWithConfirmationsRequested || 0}
 
