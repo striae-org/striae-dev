@@ -7,6 +7,38 @@ import { calculateCRC32 } from '~/utils/CRC32';
 const USER_WORKER_URL = paths.user_worker_url;
 
 /**
+ * Remove forensic warning from JSON content for checksum validation
+ * This function ensures exact match with the content used during export checksum generation
+ */
+export function removeForensicWarning(content: string): string {
+  // The forensic warning pattern follows this exact format:
+  // /* CASE DATA WARNING
+  //  * This file contains evidence data for forensic examination.
+  //  * Any modification may compromise the integrity of the evidence.
+  //  * Handle according to your organization's chain of custody procedures.
+  //  * 
+  //  * File generated: YYYY-MM-DDTHH:mm:ss.sssZ
+  //  */
+  //
+  // Followed by one or more newlines before the actual JSON content
+  
+  // More comprehensive regex to handle various edge cases:
+  // - Different line endings (Windows \r\n, Unix \n, old Mac \r)
+  // - Multiple newlines after the comment block
+  // - Potential trailing spaces after the comment close
+  // - Non-greedy matching to stop at the first */ encountered
+  const forensicWarningRegex = /^\/\*\s*CASE\s+DATA\s+WARNING[\s\S]*?\*\/\s*\r?\n*/;
+  
+  let cleaned = content.replace(forensicWarningRegex, '');
+  
+  // Additional cleanup: remove any leading whitespace that might remain
+  // This ensures we match exactly what generateJSONContent() produces with protectForensicData: false
+  cleaned = cleaned.replace(/^\s+/, '');
+  
+  return cleaned;
+}
+
+/**
  * Validate that a user exists in the database by UID and is not the current user
  */
 export async function validateExporterUid(exporterUid: string, currentUser: User): Promise<{ exists: boolean; isSelf: boolean }> {

@@ -189,6 +189,15 @@ export async function validateCaseIntegrity(
   const dataValid = actualDataChecksum === expectedManifest.dataChecksum.toLowerCase();
   if (!dataValid) {
     errors.push(`Data checksum mismatch: expected ${expectedManifest.dataChecksum}, got ${actualDataChecksum}`);
+    // Add debug information for troubleshooting
+    console.warn('Checksum validation debug info:', {
+      expectedChecksum: expectedManifest.dataChecksum,
+      actualChecksum: actualDataChecksum,
+      dataContentLength: dataContent.length,
+      dataContentPreview: dataContent.substring(0, 200) + (dataContent.length > 200 ? '...' : ''),
+      startsWithComment: dataContent.startsWith('/*'),
+      firstLineEnd: dataContent.indexOf('\n')
+    });
   }
   
   // 2. Validate each image file checksum using the actual files provided
@@ -231,6 +240,17 @@ export async function validateCaseIntegrity(
   const manifestValid = recreatedManifest.manifestChecksum === expectedManifest.manifestChecksum.toLowerCase();
   if (!manifestValid) {
     errors.push(`Manifest checksum mismatch: expected ${expectedManifest.manifestChecksum}, got ${recreatedManifest.manifestChecksum}`);
+    
+    // Add detailed debugging information
+    console.warn('Manifest validation debug info:', {
+      expectedManifestChecksum: expectedManifest.manifestChecksum,
+      recreatedManifestChecksum: recreatedManifest.manifestChecksum,
+      expectedDataChecksum: expectedManifest.dataChecksum,
+      recreatedDataChecksum: recreatedManifest.dataChecksum,
+      expectedImageCount: Object.keys(expectedManifest.imageChecksums).length,
+      recreatedImageCount: Object.keys(recreatedManifest.imageChecksums).length,
+      imageFileKeys: Object.keys(imageFiles).sort()
+    });
     
     // Additional forensic detail: check what specifically differs
     if (recreatedManifest.dataChecksum !== expectedManifest.dataChecksum.toLowerCase()) {

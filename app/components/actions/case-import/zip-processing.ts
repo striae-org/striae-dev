@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import { CaseExportData, CaseImportPreview } from '~/types';
 import { validateCaseNumber } from '../case-manage';
 import { validateCaseIntegrity as validateForensicIntegrity } from '~/utils/CRC32';
-import { validateExporterUid } from './validation';
+import { validateExporterUid, removeForensicWarning } from './validation';
 
 /**
  * Preview case information from ZIP file without importing
@@ -47,7 +47,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
     }
     
     // Handle forensic protection warnings in JSON
-    const cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+    const cleanedContent = removeForensicWarning(dataContent);
     
     // Validate forensic manifest integrity
     const manifestFile = zip.file('FORENSIC_MANIFEST.json');
@@ -236,7 +236,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       }
       
       // Handle forensic protection warnings in JSON
-      cleanedContent = dataContent.replace(/^\/\*[\s\S]*?\*\/\s*/, '');
+      cleanedContent = removeForensicWarning(dataContent);
       caseData = JSON.parse(cleanedContent);
     } else {
       throw new Error('CSV import not yet supported. Please use JSON format.');
