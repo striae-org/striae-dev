@@ -51,7 +51,8 @@ export const CaseExport = ({
       if (isReadOnly && user && caseNumber.trim()) {
         try {
           const confirmations = await getCaseConfirmations(user, caseNumber.trim());
-          setHasConfirmationData(!!confirmations && Object.keys(confirmations).length > 0);
+          const hasData = !!confirmations && Object.keys(confirmations).length > 0;
+          setHasConfirmationData(hasData);
         } catch (error) {
           console.error('Failed to check confirmation data:', error);
           setHasConfirmationData(false);
@@ -62,7 +63,24 @@ export const CaseExport = ({
     };
 
     checkConfirmationData();
-  }, [isReadOnly, user, caseNumber]);
+  }, [isReadOnly, user?.uid, caseNumber]);
+
+  // Additional useEffect to check when modal opens
+  useEffect(() => {
+    if (isOpen && isReadOnly && user && caseNumber.trim()) {
+      const checkOnOpen = async () => {
+        try {
+          const confirmations = await getCaseConfirmations(user, caseNumber.trim());
+          const hasData = !!confirmations && Object.keys(confirmations).length > 0;
+          setHasConfirmationData(hasData);
+        } catch (error) {
+          console.error('Modal open confirmation check failed:', error);
+          setHasConfirmationData(false);
+        }
+      };
+      checkOnOpen();
+    }
+  }, [isOpen, isReadOnly, user?.uid, caseNumber]);
 
   // Force JSON format and disable images for read-only cases
   useEffect(() => {
