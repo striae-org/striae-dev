@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { FileData, AnnotationData, CaseExportData, AllCasesExportData, ExportOptions } from '~/types';
+import { AnnotationData, CaseExportData, AllCasesExportData, ExportOptions } from '~/types';
 import { fetchFiles } from '../image-manage';
 import { getNotes } from '../notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from '../case-manage';
