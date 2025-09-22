@@ -19,3 +19,6 @@ export * from './import';
 
 // Export types
 export * from './export';
+
+// Audit types
+export * from './audit';

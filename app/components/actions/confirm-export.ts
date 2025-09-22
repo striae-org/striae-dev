@@ -4,6 +4,7 @@ import { getDataApiKey } from '~/utils/auth';
 import { calculateCRC32 } from '~/utils/CRC32';
 import { getUserData } from '~/utils/permissions';
 import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
+import { auditService } from '~/services/audit.service';
 
 const DATA_WORKER_URL = paths.data_worker_url;
 
@@ -16,7 +17,12 @@ export async function storeConfirmation(
   currentImageId: string,
   confirmationData: ConfirmationData
 ): Promise<boolean> {
+  const startTime = Date.now();
+  
   try {
+    // Start workflow for confirmation creation
+    auditService.startWorkflow(caseNumber);
+    
     const apiKey = await getDataApiKey();
     
     // First, get the current case data
@@ -78,10 +84,50 @@ export async function storeConfirmation(
     }
 
     console.log(`Confirmation stored for original image ${originalImageId}:`, confirmationData);
+    
+    // Log successful confirmation creation
+    const endTime = Date.now();
+    await auditService.logConfirmationCreation(
+      user,
+      caseNumber,
+      confirmationData.confirmationId,
+      'success',
+      [],
+      undefined, // Original examiner UID not available in this context
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0, // Not applicable for confirmation creation
+        validationStepsCompleted: 1,
+        validationStepsFailed: 0
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     return true;
 
   } catch (error) {
     console.error('Failed to store confirmation:', error);
+    
+    // Log failed confirmation creation
+    const endTime = Date.now();
+    await auditService.logConfirmationCreation(
+      user,
+      caseNumber,
+      confirmationData?.confirmationId || 'unknown',
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      undefined,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     return false;
   }
 }
@@ -176,7 +222,12 @@ export async function exportConfirmationData(
   user: User, 
   caseNumber: string
 ): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    auditService.startWorkflow(caseNumber);
+    
     // Get all confirmation data and forensic manifest info for the case
     const { confirmations: caseConfirmations, forensicManifestCreatedAt } = await getCaseDataWithManifest(user, caseNumber);
     
@@ -268,8 +319,50 @@ export async function exportConfirmationData(
     
     console.log(`Confirmation data exported for case ${caseNumber} with checksum ${checksum.toUpperCase()}`);
     
+    // Log successful confirmation export
+    const endTime = Date.now();
+    const confirmationCount = Object.keys(caseConfirmations).length;
+    await auditService.logConfirmationExport(
+      user,
+      caseNumber,
+      `confirmation-data-${caseNumber}-${timestampString}.json`,
+      confirmationCount,
+      'success',
+      [],
+      undefined, // Original examiner UID not available here
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: new Blob([jsonString]).size,
+        validationStepsCompleted: confirmationCount,
+        validationStepsFailed: 0
+      }
+    );
+    
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('Failed to export confirmation data:', error);
+    
+    // Log failed confirmation export
+    const endTime = Date.now();
+    await auditService.logConfirmationExport(
+      user,
+      caseNumber,
+      `confirmation-data-${caseNumber}-error.json`,
+      0,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      undefined,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     throw error;
   }
 }

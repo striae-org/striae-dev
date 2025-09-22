@@ -14,6 +14,7 @@ import {
 } from './storage-operations';
 import { uploadImageBlob } from './image-operations';
 import { importAnnotations } from './annotation-import';
+import { auditService } from '~/services/audit.service';
 
 /**
  * Track the state of an import operation for cleanup purposes
@@ -102,6 +103,8 @@ export async function importCaseForReview(
   options: ImportOptions = {},
   onProgress?: (stage: string, progress: number, details?: string) => void
 ): Promise<ImportResult> {
+  const startTime = Date.now();
+  
   const result: ImportResult = {
     success: false,
     caseNumber: '',
@@ -127,6 +130,9 @@ export async function importCaseForReview(
     const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
     importState.caseNumber = result.caseNumber;
+    
+    // Start audit workflow
+    auditService.startWorkflow(result.caseNumber);
     
     // Step 1.1: Clean up any existing read-only cases (only one allowed at a time)
     onProgress?.('Checking existing read-only cases', 12, 'Cleaning up previous imports...');
@@ -289,12 +295,52 @@ export async function importCaseForReview(
     
     result.success = true;
     
+    // Log successful case import
+    const endTime = Date.now();
+    await auditService.logCaseImport(
+      user,
+      result.caseNumber,
+      zipFile.name,
+      'success',
+      true, // checksum validation passed
+      [],
+      caseData.metadata.exportedByUid,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: zipFile.size,
+        validationStepsCompleted: result.filesImported + result.annotationsImported,
+        validationStepsFailed: 0
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     return result;
     
   } catch (error) {
     console.error('Case import failed:', error);
     result.success = false;
     result.errors?.push(error instanceof Error ? error.message : 'Unknown error occurred during import');
+    
+    // Log failed case import
+    const endTime = Date.now();
+    await auditService.logCaseImport(
+      user,
+      result.caseNumber || 'unknown',
+      zipFile.name,
+      'failure',
+      false, // checksum validation failed
+      result.errors || [],
+      undefined,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: zipFile.size,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    auditService.endWorkflow();
     
     // Cleanup any partially imported data
     if (importState.uploadedFiles.length > 0 || importState.caseDataStored || importState.userProfileUpdated) {
