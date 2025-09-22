@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { auditService } from '~/services/audit.service';
-import { AuditTrail, ValidationAuditEntry, AuditAction, AuditResult } from '~/types';
+import { AuditTrail, ValidationAuditEntry, AuditAction, AuditResult, WorkflowPhase } from '~/types';
 import styles from './audit-trail.module.css';
 
 interface AuditTrailViewerProps {
@@ -25,14 +25,46 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
   }, [isOpen, caseNumber]);
 
   const loadAuditTrail = async () => {
-    if (!user) return;
+    if (!user?.uid) return;
 
     setLoading(true);
     setError('');
 
     try {
-      const trail = await auditService.getAuditTrail(caseNumber);
-      setAuditTrail(trail);
+      // Get entries for this user and case
+      const entries = await auditService.getAuditEntriesForUser(user.uid, {
+        caseNumber,
+        limit: 1000 // Get comprehensive audit trail
+      });
+
+      if (entries.length > 0) {
+        // Create audit trail structure from entries
+        const trail: AuditTrail = {
+          caseNumber,
+          workflowId: `workflow-${caseNumber}-${user.uid}`,
+          entries,
+          summary: {
+            totalEvents: entries.length,
+            successfulEvents: entries.filter(e => e.result === 'success').length,
+            failedEvents: entries.filter(e => e.result === 'failure').length,
+            warningEvents: entries.filter(e => e.result === 'warning').length,
+            workflowPhases: [...new Set(entries.map(e => e.details.workflowPhase).filter(Boolean))] as WorkflowPhase[],
+            participatingUsers: [...new Set(entries.map(e => e.userId))],
+            startTimestamp: entries[entries.length - 1]?.timestamp || new Date().toISOString(),
+            endTimestamp: entries[0]?.timestamp || new Date().toISOString(),
+            complianceStatus: entries.every(e => 
+              e.result === 'success' || e.result === 'warning'
+            ) ? 'compliant' : 'non-compliant',
+            securityIncidents: entries.filter(e => 
+              e.details.securityChecks && 
+              Object.values(e.details.securityChecks).some(check => !check)
+            ).length
+          }
+        };
+        setAuditTrail(trail);
+      } else {
+        setAuditTrail(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load audit trail');
     } finally {

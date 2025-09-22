@@ -13,7 +13,7 @@ import {
 } from '~/types';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
-import { generateWorkflowId } from '~/utils/id-generator';
+import { generateWorkflowId } from '../utils/id-generator';
 
 const DATA_WORKER_URL = paths.data_worker_url;
 
@@ -297,6 +297,26 @@ export class AuditService {
   }
 
   /**
+   * Get audit entries for display (public method for components)
+   */
+  public async getAuditEntriesForUser(userId: string, params?: {
+    startDate?: string;
+    endDate?: string;
+    caseNumber?: string;
+    action?: AuditAction;
+    result?: AuditResult;
+    workflowPhase?: WorkflowPhase;
+    offset?: number;
+    limit?: number;
+  }): Promise<ValidationAuditEntry[]> {
+    const queryParams: AuditQueryParams = {
+      userId,
+      ...params
+    };
+    return await this.getAuditEntries(queryParams);
+  }
+
+  /**
    * Get audit trail for a case
    */
   public async getAuditTrail(caseNumber: string): Promise<AuditTrail | null> {
@@ -363,7 +383,62 @@ export class AuditService {
    */
   private async getAuditEntries(params: AuditQueryParams): Promise<ValidationAuditEntry[]> {
     try {
-      // For now, return from buffer (in production, this would query storage)
+      // If userId is provided, fetch from server
+      if (params.userId) {
+        const apiKey = await getDataApiKey();
+        const url = new URL(`${DATA_WORKER_URL}/audit/`);
+        url.searchParams.set('userId', params.userId);
+        
+        if (params.startDate) {
+          url.searchParams.set('startDate', params.startDate);
+        }
+        
+        if (params.endDate) {
+          url.searchParams.set('endDate', params.endDate);
+        }
+        
+        const response = await fetch(url.toString(), {
+          method: 'GET',
+          headers: {
+            'X-Custom-Auth-Key': apiKey
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json() as { entries: ValidationAuditEntry[]; total: number };
+          let entries = result.entries;
+
+          // Apply client-side filters
+          if (params.caseNumber) {
+            entries = entries.filter(e => e.details.caseNumber === params.caseNumber);
+          }
+
+          if (params.action) {
+            entries = entries.filter(e => e.action === params.action);
+          }
+
+          if (params.result) {
+            entries = entries.filter(e => e.result === params.result);
+          }
+
+          if (params.workflowPhase) {
+            entries = entries.filter(e => e.details.workflowPhase === params.workflowPhase);
+          }
+
+          // Apply pagination
+          if (params.offset || params.limit) {
+            const offset = params.offset || 0;
+            const limit = params.limit || 100;
+            entries = entries.slice(offset, offset + limit);
+          }
+
+          return entries;
+        } else {
+          console.error('🚨 Audit: Failed to fetch entries from server');
+        }
+      }
+
+      // Fallback to buffer for backward compatibility
       let entries = [...this.auditBuffer];
 
       if (params.caseNumber) {
@@ -408,11 +483,12 @@ export class AuditService {
    */
   private async persistAuditEntry(entry: ValidationAuditEntry): Promise<void> {
     try {
-      // In production, this would store to R2, KV, or a database
-      // For now, we'll use the data worker to store audit entries
+      // Store to data worker with audit endpoint
       const apiKey = await getDataApiKey();
+      const url = new URL(`${DATA_WORKER_URL}/audit/`);
+      url.searchParams.set('userId', entry.userId);
       
-      const response = await fetch(`${DATA_WORKER_URL}/audit`, {
+      const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -422,7 +498,11 @@ export class AuditService {
       });
 
       if (!response.ok) {
-        console.error('🚨 Audit: Failed to persist entry:', response.status);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('🚨 Audit: Failed to persist entry:', response.status, errorData);
+      } else {
+        const result = await response.json() as { success: boolean; entryCount: number; filename: string };
+        console.log(`🔍 Audit: Entry persisted (${result.entryCount} total entries)`);
       }
     } catch (error) {
       console.error('🚨 Audit: Storage error:', error);
