@@ -210,7 +210,7 @@ export async function exportConfirmationData(
     let originalExportCreatedAt: string | undefined = forensicManifestCreatedAt;
     
     if (!originalExportCreatedAt) {
-      console.warn('No forensic manifest timestamp found for this case');
+      console.warn(`No forensic manifest timestamp found for case ${caseNumber}. This case may have been imported before forensic linking was implemented, or the original export did not include a forensic manifest.`);
     }
 
     // Create export data with metadata
