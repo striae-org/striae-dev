@@ -259,6 +259,33 @@
   box-shadow: none;
 }
 
+.confirmationExportButton {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--spaceXS);
+  padding: var(--spaceM) var(--spaceL);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  white-space: nowrap;
+  min-width: 140px;
+  box-shadow: 0 1px 3px color-mix(in lab, var(--accent) 30%, transparent);
+}
+
+.confirmationExportButton:hover:not(:disabled) {
+  background: color-mix(in lab, var(--accent) 85%, var(--black));
+  box-shadow: 0 2px 6px color-mix(in lab, var(--accent) 40%, transparent);
+}
+
+.confirmationExportButton:disabled {
+  background: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .divider {
   margin: var(--spaceL) 0;
   text-align: center;

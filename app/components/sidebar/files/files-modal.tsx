@@ -11,11 +11,12 @@ interface FilesModalProps {
   currentCase: string | null;
   files: FileData[];
   setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
+  isReadOnly?: boolean;
 }
 
 const FILES_PER_PAGE = 10;
 
-export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles }: FilesModalProps) => {
+export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles, isReadOnly = false }: FilesModalProps) => {
   const { user } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -33,6 +34,11 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
 
   const handleDeleteFile = async (fileId: string, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent file selection when clicking delete
+    
+    // Don't allow file deletion for read-only cases
+    if (isReadOnly) {
+      return;
+    }
     
     if (!user || !currentCase || !window.confirm('Are you sure you want to delete this file?')) {
       return;
@@ -128,9 +134,10 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
                     <button
                       className={styles.deleteButton}
                       onClick={(e) => handleDeleteFile(file.id, e)}
-                      disabled={deletingFileId === file.id}
+                      disabled={isReadOnly || deletingFileId === file.id}
                       aria-label={`Delete ${file.originalFilename}`}
-                      title="Delete file"
+                      title={isReadOnly ? "Cannot delete files for read-only cases" : "Delete file"}
+                      style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                     >
                       {deletingFileId === file.id ? '⏳' : '×'}
                     </button>

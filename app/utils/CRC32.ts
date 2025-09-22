@@ -132,16 +132,24 @@ export async function generateForensicManifest(
   
   // Calculate checksums for all image files
   const imageChecksums: { [filename: string]: string } = {};
-  for (const [filename, blob] of Object.entries(imageFiles)) {
-    imageChecksums[filename] = await calculateCRC32Binary(blob);
+  
+  // CRITICAL: Process files in sorted order to ensure deterministic JSON serialization
+  const sortedFilenames = Object.keys(imageFiles).sort();
+  for (const filename of sortedFilenames) {
+    imageChecksums[filename] = await calculateCRC32Binary(imageFiles[filename]);
   }
   
   // Create manifest content for overall checksum
-  const manifestContent = JSON.stringify({
+  // CRITICAL: This structure must match exactly what gets saved to the manifest file
+  // (minus the manifestChecksum field itself to avoid circular reference)
+  const manifestForChecksum = {
     dataChecksum,
     imageChecksums,
-    fileOrder: Object.keys(imageFiles).sort() // Deterministic ordering
-  });
+    totalFiles: Object.keys(imageFiles).length + 1, // +1 for data file
+    createdAt: new Date().toISOString()
+  };
+  
+  const manifestContent = JSON.stringify(manifestForChecksum);
   
   // Calculate checksum of the manifest itself
   const manifestChecksum = calculateCRC32(manifestContent);
@@ -150,8 +158,58 @@ export async function generateForensicManifest(
     dataChecksum,
     imageChecksums,
     manifestChecksum,
+    totalFiles: manifestForChecksum.totalFiles,
+    createdAt: manifestForChecksum.createdAt
+  };
+}
+
+/**
+ * Generate forensic manifest with specific timestamp (for validation purposes)
+ * This ensures that recreated manifests use the same timestamp as the original
+ * to produce identical checksums during validation
+ */
+export async function generateForensicManifestWithTimestamp(
+  dataContent: string,
+  imageFiles: { [filename: string]: Blob },
+  createdAt: string
+): Promise<{
+  dataChecksum: string;
+  imageChecksums: { [filename: string]: string };
+  manifestChecksum: string;
+  totalFiles: number;
+  createdAt: string;
+}> {
+  // Calculate data file checksum
+  const dataChecksum = calculateCRC32(dataContent);
+  
+  // Calculate checksums for all image files
+  const imageChecksums: { [filename: string]: string } = {};
+  
+  // CRITICAL: Process files in sorted order to ensure deterministic JSON serialization
+  const sortedFilenames = Object.keys(imageFiles).sort();
+  for (const filename of sortedFilenames) {
+    imageChecksums[filename] = await calculateCRC32Binary(imageFiles[filename]);
+  }
+  
+  // Create manifest content for overall checksum using the provided timestamp
+  const manifestForChecksum = {
+    dataChecksum,
+    imageChecksums,
     totalFiles: Object.keys(imageFiles).length + 1, // +1 for data file
-    createdAt: new Date().toISOString()
+    createdAt // Use the provided timestamp for exact recreation
+  };
+  
+  const manifestContent = JSON.stringify(manifestForChecksum);
+  
+  // Calculate checksum of the manifest itself
+  const manifestChecksum = calculateCRC32(manifestContent);
+  
+  return {
+    dataChecksum,
+    imageChecksums,
+    manifestChecksum,
+    totalFiles: manifestForChecksum.totalFiles,
+    createdAt: manifestForChecksum.createdAt
   };
 }
 
@@ -172,6 +230,8 @@ export async function validateCaseIntegrity(
     dataChecksum: string;
     imageChecksums: { [filename: string]: string };
     manifestChecksum: string;
+    totalFiles: number;
+    createdAt: string;
   }
 ): Promise<{
   isValid: boolean;
@@ -225,7 +285,12 @@ export async function validateCaseIntegrity(
   
   // 3. SECURITY FIX: Recreate the manifest using the same generation logic
   // This ensures we detect any tampering with the manifest structure or ordering
-  const recreatedManifest = await generateForensicManifest(dataContent, imageFiles);
+  // CRITICAL: Use the same timestamp as the original manifest to ensure identical content
+  const recreatedManifest = await generateForensicManifestWithTimestamp(
+    dataContent, 
+    imageFiles, 
+    expectedManifest.createdAt
+  );
   
   // Compare the recreated manifest checksum with the expected one
   const manifestValid = recreatedManifest.manifestChecksum === expectedManifest.manifestChecksum.toLowerCase();

@@ -1,7 +1,7 @@
 import puppeteer from "@cloudflare/puppeteer";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
+  'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
@@ -9,6 +9,75 @@ const corsHeaders = {
 const generateDocument = (data) => {
   const { imageUrl, caseNumber, annotationData, activeAnnotations, currentDate, notesUpdatedFormatted, userCompany } = data;
   const annotationsSet = new Set(activeAnnotations);
+  
+  // Helper functions for color detection
+  const isBlackColor = (color) => {
+    return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
+  };
+
+  const isBlueColor = (color) => {
+    const lowerColor = color.toLowerCase();
+    return lowerColor === '#0000ff' || lowerColor === 'blue' || lowerColor === '#00f' || 
+           lowerColor === '#0066cc' || lowerColor === '#0080ff' || lowerColor === '#007fff';
+  };
+
+  // Programmatically determine if a color is dark and needs a light background
+  const needsLightBackground = (color) => {
+    if (!color) return false;
+    
+    // Handle named colors
+    const namedColors = {
+      'black': '#000000',
+      'white': '#ffffff',
+      'red': '#ff0000',
+      'green': '#008000',
+      'blue': '#0000ff',
+      'yellow': '#ffff00',
+      'cyan': '#00ffff',
+      'magenta': '#ff00ff',
+      'silver': '#c0c0c0',
+      'gray': '#808080',
+      'maroon': '#800000',
+      'olive': '#808000',
+      'lime': '#00ff00',
+      'aqua': '#00ffff',
+      'teal': '#008080',
+      'navy': '#000080',
+      'fuchsia': '#ff00ff',
+      'purple': '#800080'
+    };
+    
+    let hexColor = color.toLowerCase().trim();
+    
+    // Convert named color to hex
+    if (namedColors[hexColor]) {
+      hexColor = namedColors[hexColor];
+    }
+    
+    // Remove # if present
+    hexColor = hexColor.replace('#', '');
+    
+    // Handle 3-digit hex codes
+    if (hexColor.length === 3) {
+      hexColor = hexColor.split('').map(char => char + char).join('');
+    }
+    
+    // Validate hex color
+    if (!/^[0-9a-f]{6}$/i.test(hexColor)) {
+      return false; // Invalid color, don't apply background
+    }
+    
+    // Convert to RGB
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+    
+    // Calculate relative luminance using WCAG formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Colors with luminance < 0.5 are considered dark
+    return luminance < 0.5;
+  };
   
   // Use passed currentDate or generate fallback
   const displayDate = currentDate || (() => {
@@ -219,6 +288,54 @@ const generateDocument = (data) => {
         margin-bottom: 8px;
         margin-top: 10px;
       }
+      .confirmation-data {
+        background: #f8f9fa;
+        border: 2px solid #28a745;
+        border-radius: 6px;
+        padding: 15px;
+        width: 280px;
+        font-family: 'Inter', Arial, sans-serif;
+      }
+      .confirmation-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #28a745;
+        margin-bottom: 12px;
+        text-align: center;
+        border-bottom: 1px solid #28a745;
+        padding-bottom: 6px;
+      }
+      .confirmation-field {
+        margin-bottom: 8px;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .confirmation-name {
+        font-weight: 700;
+        color: #333;
+        font-size: 14px;
+      }
+      .confirmation-badge {
+        color: #666;
+        font-weight: 600;
+      }
+      .confirmation-company {
+        color: #333;
+        font-weight: 500;
+        font-style: italic;
+      }
+      .confirmation-timestamp {
+        color: #555;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .confirmation-id {
+        color: #28a745;
+        font-weight: 700;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
       .additional-notes-section {
         max-width: 400px;
         font-family: 'Inter', Arial, sans-serif;
@@ -313,12 +430,12 @@ const generateDocument = (data) => {
 
         ${annotationData && annotationsSet?.has('number') ? `
         <div class="annotations-overlay">
-          <div class="left-annotation" style="${(annotationData.caseFontColor === '#000000' || annotationData.caseFontColor === 'black' || annotationData.caseFontColor === '#000') ? 'background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(0, 0, 0, 0.2); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);' : ''}">
+          <div class="left-annotation" style="${needsLightBackground(annotationData.caseFontColor || '#FFDE21') ? 'background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(0, 0, 0, 0.2); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);' : ''}">
             <div class="case-text" style="color: ${annotationData.caseFontColor || '#FFDE21'};">
               ${annotationData.leftCase}${annotationData.leftItem ? ` ${annotationData.leftItem}` : ''}
             </div>
           </div>
-          <div class="right-annotation" style="${(annotationData.caseFontColor === '#000000' || annotationData.caseFontColor === 'black' || annotationData.caseFontColor === '#000') ? 'background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(0, 0, 0, 0.2); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);' : ''}">
+          <div class="right-annotation" style="${needsLightBackground(annotationData.caseFontColor || '#FFDE21') ? 'background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(0, 0, 0, 0.2); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);' : ''}">
             <div class="case-text" style="color: ${annotationData.caseFontColor || '#FFDE21'};">
               ${annotationData.rightCase}${annotationData.rightItem ? ` ${annotationData.rightItem}` : ''}
             </div>
@@ -373,12 +490,30 @@ const generateDocument = (data) => {
     ${annotationData && ((annotationData.includeConfirmation === true) || annotationData.additionalNotes) ? `
     <div class="confirmation-section">
       ${annotationData && (annotationData.includeConfirmation === true) ? `
-      <div class="confirmation-box">
-        <div class="confirmation-label">Confirmation by:</div>
-        <div class="confirmation-line"></div>
-        <div class="confirmation-date-label">Date:</div>
-        <div class="confirmation-line"></div>
-      </div>
+        ${annotationData.confirmationData ? `
+        <div class="confirmation-data">
+          <div class="confirmation-title">IDENTIFICATION CONFIRMED</div>
+          <div class="confirmation-field">
+            <div class="confirmation-name">${annotationData.confirmationData.fullName}, ${annotationData.confirmationData.badgeId}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-company">${annotationData.confirmationData.confirmedByCompany || 'N/A'}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-timestamp">${annotationData.confirmationData.timestamp}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-id">ID: ${annotationData.confirmationData.confirmationId}</div>
+          </div>
+        </div>
+        ` : `
+        <div class="confirmation-box">
+          <div class="confirmation-label">Confirmation by:</div>
+          <div class="confirmation-line"></div>
+          <div class="confirmation-date-label">Date:</div>
+          <div class="confirmation-line"></div>
+        </div>
+        `}
       ` : '<div></div>'}
 
       ${annotationData && annotationsSet?.has('notes') && annotationData.additionalNotes && annotationData.additionalNotes.trim() ? `

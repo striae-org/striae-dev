@@ -1,5 +1,5 @@
 import { FileData } from './file';
-import { AnnotationData } from './annotations';
+import { AnnotationData, ConfirmationData } from './annotations';
 
 // Case-related types and interfaces
 
@@ -36,6 +36,8 @@ export interface CaseExportData {
     filesWithAnnotations: number;
     filesWithoutAnnotations: number;
     totalBoxAnnotations: number;
+    filesWithConfirmations?: number;
+    filesWithConfirmationsRequested?: number;
     lastModified?: string;
     earliestAnnotationDate?: string;
     latestAnnotationDate?: string;
@@ -54,6 +56,8 @@ export interface AllCasesExportData {
     totalCases: number;
     totalFiles: number;
     totalAnnotations: number;
+    totalConfirmations: number;
+    totalConfirmationsRequested: number;
   };
   cases: CaseExportData[];
   summary?: {
@@ -64,4 +68,19 @@ export interface AllCasesExportData {
     earliestAnnotationDate?: string;
     latestAnnotationDate?: string;
   };
+}
+
+// Confirmation-related case types
+export interface CaseConfirmations {
+  [originalImageId: string]: ConfirmationData[];
+}
+
+export interface CaseDataWithConfirmations {
+  createdAt: string;
+  caseNumber: string;
+  files: any[];
+  isReadOnly?: boolean;
+  importedAt?: string;
+  originalImageIds?: { [originalId: string]: string };
+  confirmations?: CaseConfirmations;
 }

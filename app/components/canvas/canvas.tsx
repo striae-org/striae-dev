@@ -1,6 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
-import { AnnotationData, BoxAnnotation } from '~/types/annotations';
+import { ConfirmationModal } from './confirmation/confirmation';
+import { AnnotationData, BoxAnnotation, ConfirmationData } from '~/types/annotations';
+import { AuthContext } from '~/contexts/auth.context';
+import { storeConfirmation } from '~/components/actions/confirm-export';
 import styles from './canvas.module.css';
 
 interface CanvasProps {
@@ -15,6 +18,9 @@ interface CanvasProps {
   isBoxAnnotationMode?: boolean;
   boxAnnotationColor?: string;
   isReadOnly?: boolean;
+  // Confirmation data for storing case-level confirmations
+  caseNumber?: string;
+  currentImageId?: string;
 }
 
 type ImageLoadError = {
@@ -32,17 +38,21 @@ export const Canvas = ({
   annotationData,
   onAnnotationUpdate,
   isBoxAnnotationMode = false,
-  boxAnnotationColor = '#ff0000',
-  isReadOnly = false
+  boxAnnotationColor = '#FF0000',
+  isReadOnly = false,
+  caseNumber,
+  currentImageId
 }: CanvasProps) => {
+  const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   // Handle box annotation changes
   const handleBoxAnnotationsChange = (boxAnnotations: BoxAnnotation[]) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -54,7 +64,7 @@ export const Canvas = ({
 
   // Handle annotation data changes (for additional notes updates)
   const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -62,6 +72,42 @@ export const Canvas = ({
     };
     
     onAnnotationUpdate(updatedAnnotationData);
+  };
+
+  // Handle confirmation
+  const handleConfirmation = async (confirmationData: ConfirmationData) => {
+    if (!onAnnotationUpdate || !annotationData) return;
+    
+    // Store in annotation data
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      confirmationData
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+    console.log('Confirmation data saved to annotation:', confirmationData);
+
+    // Store at case level for original analyst tracking
+    if (user && caseNumber && currentImageId) {
+      const success = await storeConfirmation(
+        user,
+        caseNumber,
+        currentImageId,
+        confirmationData
+      );
+      
+      if (success) {
+        console.log('Confirmation stored at case level for original image tracking');
+      } else {
+        console.error('Failed to store confirmation at case level');
+      }
+    } else {
+      console.warn('Missing required data for case-level confirmation storage:', {
+        hasUser: !!user,
+        caseNumber,
+        currentImageId
+      });
+    }
   };
 
   useEffect(() => {
@@ -135,6 +181,70 @@ export const Canvas = ({
     return color.toLowerCase() === '#000000' || color.toLowerCase() === 'black' || color.toLowerCase() === '#000';
   };
 
+  const isBlueColor = (color: string) => {
+    const lowerColor = color.toLowerCase();
+    return lowerColor === '#0000ff' || lowerColor === 'blue' || lowerColor === '#00f' || 
+           lowerColor === '#0066cc' || lowerColor === '#0080ff' || lowerColor === '#007fff';
+  };
+
+  // Programmatically determine if a color is dark and needs a light background
+  const needsLightBackground = (color: string) => {
+    if (!color) return false;
+    
+    // Handle named colors
+    const namedColors: { [key: string]: string } = {
+      'black': '#000000',
+      'white': '#ffffff',
+      'red': '#ff0000',
+      'green': '#008000',
+      'blue': '#0000ff',
+      'yellow': '#ffff00',
+      'cyan': '#00ffff',
+      'magenta': '#ff00ff',
+      'silver': '#c0c0c0',
+      'gray': '#808080',
+      'maroon': '#800000',
+      'olive': '#808000',
+      'lime': '#00ff00',
+      'aqua': '#00ffff',
+      'teal': '#008080',
+      'navy': '#000080',
+      'fuchsia': '#ff00ff',
+      'purple': '#800080'
+    };
+    
+    let hexColor = color.toLowerCase().trim();
+    
+    // Convert named color to hex
+    if (namedColors[hexColor]) {
+      hexColor = namedColors[hexColor];
+    }
+    
+    // Remove # if present
+    hexColor = hexColor.replace('#', '');
+    
+    // Handle 3-digit hex codes
+    if (hexColor.length === 3) {
+      hexColor = hexColor.split('').map(char => char + char).join('');
+    }
+    
+    // Validate hex color
+    if (!/^[0-9a-f]{6}$/i.test(hexColor)) {
+      return false; // Invalid color, don't apply background
+    }
+    
+    // Convert to RGB
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+    
+    // Calculate relative luminance using WCAG formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Colors with luminance < 0.5 are considered dark
+    return luminance < 0.5;
+  };
+
   return (    
     <div className={styles.canvasContainer}>
       {/* Filename & Connfirmation Field Display - Upper Left */}
@@ -142,9 +252,36 @@ export const Canvas = ({
         <div className={styles.filenameDisplay}>
           File: {filename}
           {annotationData?.includeConfirmation && (
-            <div className={styles.confirmationIncluded}>
-              Confirmation Field Included
-            </div>
+            <>
+              {/* Show confirmation status based on whether confirmation data exists */}
+              {annotationData?.confirmationData ? (
+                <>
+                  <div className={styles.confirmationConfirmed}>
+                    Identification Confirmed
+                  </div>
+                  <button 
+                    className={styles.viewConfirmationButton}
+                    onClick={() => setIsConfirmationModalOpen(true)}
+                  >
+                    View Confirmation Data
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className={styles.confirmationIncluded}>
+                    {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
+                  </div>
+                  {isReadOnly && (
+                    <button 
+                      className={styles.confirmButton}
+                      onClick={() => setIsConfirmationModalOpen(true)}
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
       )}
@@ -152,7 +289,7 @@ export const Canvas = ({
       {/* Company Display - Upper Right */}
       {company && (
         <div className={styles.companyDisplay}>
-          {company}
+          {isReadOnly ? 'CASE REVIEW ONLY' : company}
         </div>
       )}
       
@@ -197,11 +334,11 @@ export const Canvas = ({
               imageRef={imageRef}
               annotations={annotationData?.boxAnnotations || []}
               onAnnotationsChange={handleBoxAnnotationsChange}
-              isAnnotationMode={isBoxAnnotationMode}
+              isAnnotationMode={isBoxAnnotationMode && !annotationData?.confirmationData}
               annotationColor={boxAnnotationColor}
               annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
-              isReadOnly={isReadOnly}
+              isReadOnly={isReadOnly || !!annotationData?.confirmationData}
             />
           )}
           
@@ -213,7 +350,7 @@ export const Canvas = ({
                 className={styles.leftAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
@@ -228,7 +365,7 @@ export const Canvas = ({
                 className={styles.rightAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
@@ -247,7 +384,7 @@ export const Canvas = ({
                 className={styles.indexAnnotation}
                 style={{ 
                   color: annotationData.caseFontColor || '#FFDE21',
-                  backgroundColor: isBlackColor(annotationData.caseFontColor || '#FFDE21')
+                  backgroundColor: needsLightBackground(annotationData.caseFontColor || '#FFDE21')
                     ? 'rgba(255, 255, 255, 0.9)' : undefined
                 }}
               >
@@ -303,6 +440,15 @@ export const Canvas = ({
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={handleConfirmation}
+        company={company}
+        existingConfirmation={annotationData?.confirmationData || null}
+      />
     </div>    
   );
 };

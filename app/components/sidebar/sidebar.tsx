@@ -5,9 +5,9 @@ import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
-import { CaseImport } from './case-import';
+import { CaseImport } from './case-import/case-import';
 import { FileData } from '~/types';
-import { ImportResult } from '../actions/case-review';
+import { ImportResult, ConfirmationImportResult } from '~/types';
 
 interface SidebarProps {
   user: User;
@@ -30,6 +30,7 @@ interface SidebarProps {
   setShowNotes: (show: boolean) => void;
   onAnnotationRefresh?: () => void;
   isReadOnly?: boolean;
+  isConfirmed?: boolean;
 }
 
 export const Sidebar = ({ 
@@ -52,18 +53,23 @@ export const Sidebar = ({
   showNotes,
   setShowNotes,
   onAnnotationRefresh,
-  isReadOnly = false
+  isReadOnly = false,
+  isConfirmed = false
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const handleImportComplete = (result: ImportResult) => {
+  const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
-      // Load the imported case automatically
-      onCaseChange(result.caseNumber);
-      setCurrentCase(result.caseNumber);
-      setCaseNumber(result.caseNumber);
-      setSuccessAction('loaded');
+      // For case imports, load the imported case automatically
+      if ('isReadOnly' in result) {
+        // This is an ImportResult (case import)
+        onCaseChange(result.caseNumber);
+        setCurrentCase(result.caseNumber);
+        setCaseNumber(result.caseNumber);
+        setSuccessAction('loaded');
+      }
+      // For confirmation imports, no action needed - the confirmations are already loaded
     }
   };  
 
@@ -120,6 +126,7 @@ export const Sidebar = ({
             setSuccessAction={setSuccessAction}
             onNotesClick={() => setShowNotes(true)}
             isReadOnly={isReadOnly}
+            isConfirmed={isConfirmed}
           />
           <div className={styles.importSection}>
             <button 
