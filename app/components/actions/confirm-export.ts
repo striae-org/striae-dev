@@ -250,14 +250,17 @@ export async function exportConfirmationData(
     const a = document.createElement('a');
     a.href = url;
     
-    // Use local timezone for filename date
+    // Use local timezone for filename timestamp
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    const dateString = `${year}-${month}-${day}`;
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestampString = `${year}${month}${day}-${hours}${minutes}${seconds}`;
     
-    a.download = `confirmation-data-${caseNumber}-${dateString}.json`;
+    a.download = `confirmation-data-${caseNumber}-${timestampString}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
