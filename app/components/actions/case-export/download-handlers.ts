@@ -464,8 +464,8 @@ async function fetchImageAsBlob(fileData: FileData): Promise<Blob | null> {
  */
 function generateZipReadme(exportData: CaseExportData, protectForensicData: boolean = true): string {
   const totalFiles = exportData.files?.length || 0;
-  const filesWithAnnotations = exportData.files?.filter(f => f.annotations && Array.isArray(f.annotations.boxAnnotations) && f.annotations.boxAnnotations.length > 0).length || 0;
-  const totalBoxAnnotations = exportData.files?.reduce((sum, f) => sum + (Array.isArray(f.annotations?.boxAnnotations) ? f.annotations.boxAnnotations.length : 0), 0) || 0;
+  const filesWithAnnotations = exportData.summary?.filesWithAnnotations || 0;
+  const totalBoxAnnotations = exportData.summary?.totalBoxAnnotations || 0;
   const totalAnnotations = filesWithAnnotations + totalBoxAnnotations;
   const filesWithConfirmations = exportData.summary?.filesWithConfirmations || 0;
   const filesWithConfirmationsRequested = exportData.summary?.filesWithConfirmationsRequested || 0;
