@@ -4,6 +4,7 @@ import { ColorSelector } from '~/components/colors/colors';
 import { NotesModal } from './notes-modal';
 import { getNotes, saveNotes } from '~/components/actions/notes-manage';
 import { AnnotationData } from '~/types/annotations';
+import { auditService } from '~/services/audit.service';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
@@ -106,9 +107,11 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       return;
     }
 
+    let existingData: AnnotationData | null = null;
+    
     try {
       // First, get existing annotation data to preserve box annotations
-      const existingData = await getNotes(user, currentCase, imageId);
+      existingData = await getNotes(user, currentCase, imageId);
       
       // Create updated annotation data, preserving box annotations
       const annotationData: AnnotationData = {
@@ -145,6 +148,17 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       };
 
       await saveNotes(user, currentCase, imageId, annotationData);
+      
+      // Comprehensive audit logging for annotation save
+      await auditService.logAnnotationEdit(
+        user,
+        `${currentCase}-${imageId}`,
+        existingData,
+        annotationData,
+        currentCase,
+        'notes-sidebar'
+      );
+      
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       
@@ -154,6 +168,20 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       }
     } catch (error) {
       console.error('Failed to save notes:', error);
+      
+      // Audit logging for failed annotation save
+      try {
+        await auditService.logAnnotationEdit(
+          user,
+          `${currentCase}-${imageId}`,
+          existingData,
+          null, // Failed save, no new value
+          currentCase,
+          'notes-sidebar'
+        );
+      } catch (auditError) {
+        console.error('Failed to log annotation edit audit:', auditError);
+      }
     }
   };
 

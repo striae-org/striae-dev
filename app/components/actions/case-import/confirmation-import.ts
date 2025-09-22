@@ -185,8 +185,36 @@ export async function importConfirmationData(
       if (saveResponse.ok) {
         result.imagesUpdated++;
         result.confirmationsImported += confirmations.length;
+        
+        // Audit log successful confirmation import
+        try {
+          await auditService.logAnnotationEdit(
+            user,
+            `${result.caseNumber}-${currentImageId}`,
+            annotationData, // Previous state (without confirmation)
+            updatedAnnotationData, // New state (with confirmation)
+            result.caseNumber,
+            'confirmation-import'
+          );
+        } catch (auditError) {
+          console.error('Failed to log confirmation import audit:', auditError);
+        }
       } else {
         result.warnings?.push(`Failed to update image ${displayFilename}: ${saveResponse.status}`);
+        
+        // Audit log failed confirmation import
+        try {
+          await auditService.logAnnotationEdit(
+            user,
+            `${result.caseNumber}-${currentImageId}`,
+            annotationData, // Previous state
+            null, // Failed save
+            result.caseNumber,
+            'confirmation-import'
+          );
+        } catch (auditError) {
+          console.error('Failed to log failed confirmation import audit:', auditError);
+        }
       }
 
       processedCount++;
