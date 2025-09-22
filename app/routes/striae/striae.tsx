@@ -91,6 +91,7 @@ export const Striae = ({ user }: StriaePage) => {
 
   const handleCaseChange = (caseNumber: string) => {
     setCurrentCase(caseNumber);
+    setCaseNumber(caseNumber);
     setAnnotationData(null);
     setSelectedFilename(undefined);
     setImageId(undefined);    
@@ -130,9 +131,9 @@ export const Striae = ({ user }: StriaePage) => {
       return next;
     });
 
-    // Handle box annotation mode (only allow interaction for non-read-only cases)
+    // Handle box annotation mode (only allow interaction for non-read-only and non-confirmed cases)
     if (toolId === 'box') {
-      setIsBoxAnnotationMode(active && !isReadOnlyCase);
+      setIsBoxAnnotationMode(active && !isReadOnlyCase && !annotationData?.confirmationData);
     }
   };
 
@@ -210,6 +211,7 @@ export const Striae = ({ user }: StriaePage) => {
             supportLevel: notes.supportLevel || 'Inconclusive',
             hasSubclass: notes.hasSubclass,
             includeConfirmation: notes.includeConfirmation ?? false, // Required
+            confirmationData: notes.confirmationData, // Add imported confirmation data
             additionalNotes: notes.additionalNotes, // Optional - pass as-is
             boxAnnotations: notes.boxAnnotations || [],
             updatedAt: notes.updatedAt || new Date().toISOString()
@@ -267,13 +269,14 @@ export const Striae = ({ user }: StriaePage) => {
 
   // Automatic save handler for annotation updates
   const handleAnnotationUpdate = async (data: AnnotationData) => {
-    // Don't allow updates for read-only cases
+    // Update local state immediately (always allow for confirmation data in read-only cases)
+    setAnnotationData(data);
+    
+    // Don't save to server for read-only cases (but do allow local state updates for confirmations)
     if (isReadOnlyCase) {
+      console.log('Read-only case: annotation data updated locally but not saved to server');
       return;
     }
-
-    // Update local state immediately
-    setAnnotationData(data);
     
     // Auto-save to server if we have required data
     if (user && currentCase && imageId) {
@@ -315,6 +318,7 @@ export const Striae = ({ user }: StriaePage) => {
         setShowNotes={setShowNotes}
         onAnnotationRefresh={refreshAnnotationData}
         isReadOnly={isReadOnlyCase}
+        isConfirmed={!!annotationData?.confirmationData}
       />
       <main className={styles.mainContent}>
         <div className={styles.canvasArea}>
@@ -327,6 +331,7 @@ export const Striae = ({ user }: StriaePage) => {
               onColorChange={handleColorChange}
               selectedColor={boxAnnotationColor}
               isReadOnly={isReadOnlyCase}
+              isConfirmed={!!annotationData?.confirmationData}
             />
           </div>
           <Canvas 
@@ -341,6 +346,8 @@ export const Striae = ({ user }: StriaePage) => {
             boxAnnotationColor={boxAnnotationColor}
             onAnnotationUpdate={handleAnnotationUpdate}
             isReadOnly={isReadOnlyCase}
+            caseNumber={currentCase}
+            currentImageId={imageId}
           />
         </div>
       </main>

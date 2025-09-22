@@ -80,15 +80,6 @@ export const Login = () => {
     setIsClient(true);
   }, []);
 
-  // Handle case review account toggle changes
-  useEffect(() => {
-    if (isCaseReviewAccount) {
-      setCompany('CASE REVIEW ONLY');
-    } else {
-      setCompany('');
-    }
-  }, [isCaseReviewAccount]);
-
   // Email validation with regex and domain checking
   const validateEmailDomain = (email: string): boolean => {
     // Email regex pattern for basic validation
@@ -474,7 +465,7 @@ export const Login = () => {
                     placeholder="Lab/Company Name (required)"
                     autoComplete="organization"
                     className={styles.input}
-                    disabled={isLoading || isCaseReviewAccount}
+                    disabled={isLoading}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                   />                      

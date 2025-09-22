@@ -1,6 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import { BoxAnnotations } from './box-annotations/box-annotations';
-import { AnnotationData, BoxAnnotation } from '~/types/annotations';
+import { ConfirmationModal } from './confirmation/confirmation';
+import { AnnotationData, BoxAnnotation, ConfirmationData } from '~/types/annotations';
+import { AuthContext } from '~/contexts/auth.context';
+import { storeConfirmation } from '~/components/actions/confirm-export';
 import styles from './canvas.module.css';
 
 interface CanvasProps {
@@ -15,6 +18,9 @@ interface CanvasProps {
   isBoxAnnotationMode?: boolean;
   boxAnnotationColor?: string;
   isReadOnly?: boolean;
+  // Confirmation data for storing case-level confirmations
+  caseNumber?: string;
+  currentImageId?: string;
 }
 
 type ImageLoadError = {
@@ -32,17 +38,21 @@ export const Canvas = ({
   annotationData,
   onAnnotationUpdate,
   isBoxAnnotationMode = false,
-  boxAnnotationColor = '#ff0000',
-  isReadOnly = false
+  boxAnnotationColor = '#FF0000',
+  isReadOnly = false,
+  caseNumber,
+  currentImageId
 }: CanvasProps) => {
+  const { user } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<ImageLoadError | undefined>();
   const [isFlashing, setIsFlashing] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   // Handle box annotation changes
   const handleBoxAnnotationsChange = (boxAnnotations: BoxAnnotation[]) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -54,7 +64,7 @@ export const Canvas = ({
 
   // Handle annotation data changes (for additional notes updates)
   const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
-    if (!onAnnotationUpdate || !annotationData || isReadOnly) return;
+    if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
       ...annotationData,
@@ -62,6 +72,42 @@ export const Canvas = ({
     };
     
     onAnnotationUpdate(updatedAnnotationData);
+  };
+
+  // Handle confirmation
+  const handleConfirmation = async (confirmationData: ConfirmationData) => {
+    if (!onAnnotationUpdate || !annotationData) return;
+    
+    // Store in annotation data
+    const updatedAnnotationData: AnnotationData = {
+      ...annotationData,
+      confirmationData
+    };
+    
+    onAnnotationUpdate(updatedAnnotationData);
+    console.log('Confirmation data saved to annotation:', confirmationData);
+
+    // Store at case level for original analyst tracking
+    if (user && caseNumber && currentImageId) {
+      const success = await storeConfirmation(
+        user,
+        caseNumber,
+        currentImageId,
+        confirmationData
+      );
+      
+      if (success) {
+        console.log('Confirmation stored at case level for original image tracking');
+      } else {
+        console.error('Failed to store confirmation at case level');
+      }
+    } else {
+      console.warn('Missing required data for case-level confirmation storage:', {
+        hasUser: !!user,
+        caseNumber,
+        currentImageId
+      });
+    }
   };
 
   useEffect(() => {
@@ -142,9 +188,36 @@ export const Canvas = ({
         <div className={styles.filenameDisplay}>
           File: {filename}
           {annotationData?.includeConfirmation && (
-            <div className={styles.confirmationIncluded}>
-              Confirmation Field Included
-            </div>
+            <>
+              {/* Show confirmation status based on whether confirmation data exists */}
+              {annotationData?.confirmationData ? (
+                <>
+                  <div className={styles.confirmationConfirmed}>
+                    Identification Confirmed
+                  </div>
+                  <button 
+                    className={styles.viewConfirmationButton}
+                    onClick={() => setIsConfirmationModalOpen(true)}
+                  >
+                    View Confirmation Data
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className={styles.confirmationIncluded}>
+                    {isReadOnly ? 'Confirmation Requested' : 'Confirmation Field Included'}
+                  </div>
+                  {isReadOnly && (
+                    <button 
+                      className={styles.confirmButton}
+                      onClick={() => setIsConfirmationModalOpen(true)}
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
       )}
@@ -152,7 +225,7 @@ export const Canvas = ({
       {/* Company Display - Upper Right */}
       {company && (
         <div className={styles.companyDisplay}>
-          {company}
+          {isReadOnly ? 'CASE REVIEW ONLY' : company}
         </div>
       )}
       
@@ -197,11 +270,11 @@ export const Canvas = ({
               imageRef={imageRef}
               annotations={annotationData?.boxAnnotations || []}
               onAnnotationsChange={handleBoxAnnotationsChange}
-              isAnnotationMode={isBoxAnnotationMode}
+              isAnnotationMode={isBoxAnnotationMode && !annotationData?.confirmationData}
               annotationColor={boxAnnotationColor}
               annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
-              isReadOnly={isReadOnly}
+              isReadOnly={isReadOnly || !!annotationData?.confirmationData}
             />
           )}
           
@@ -303,6 +376,15 @@ export const Canvas = ({
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={() => setIsConfirmationModalOpen(false)}
+        onConfirm={handleConfirmation}
+        company={company}
+        existingConfirmation={annotationData?.confirmationData || null}
+      />
     </div>    
   );
 };

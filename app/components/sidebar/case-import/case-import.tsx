@@ -5,15 +5,20 @@ import {
   listReadOnlyCases, 
   deleteReadOnlyCase,
   previewCaseImport,
-  ImportResult,
-  CaseImportPreview
+  importConfirmationData,
+  isConfirmationDataFile
 } from '~/components/actions/case-review';
+import {
+  ImportResult,
+  CaseImportPreview,
+  ConfirmationImportResult
+} from '~/types';
 import styles from './case-import.module.css';
 
 interface CaseImportProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportComplete?: (result: ImportResult) => void;
+  onImportComplete?: (result: ImportResult | ConfirmationImportResult) => void;
 }
 
 // Consolidated state interfaces
@@ -23,6 +28,7 @@ interface ImportState {
   isClearing: boolean;
   isLoadingPreview: boolean;
   showConfirmation: boolean;
+  importType: 'case' | 'confirmation' | null;
 }
 
 interface MessageState {
@@ -41,6 +47,15 @@ const isValidZipFile = (file: File): boolean => {
   return file.type === 'application/zip' || 
          file.type === 'application/x-zip-compressed' ||
          file.name.toLowerCase().endsWith('.zip');
+};
+
+const isValidConfirmationFile = (file: File): boolean => {
+  return file.type === 'application/json' && 
+         isConfirmationDataFile(file.name);
+};
+
+const isValidImportFile = (file: File): boolean => {
+  return isValidZipFile(file) || isValidConfirmationFile(file);
 };
 
 const resetFileInput = (ref: React.RefObject<HTMLInputElement | null>) => {
@@ -254,7 +269,8 @@ export const CaseImport = ({
     isImporting: false,
     isClearing: false,
     isLoadingPreview: false,
-    showConfirmation: false
+    showConfirmation: false,
+    importType: null
   });
   
   const [messages, setMessages] = useState<MessageState>({
@@ -389,63 +405,100 @@ export const CaseImport = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!isValidZipFile(file)) {
-      setMessages({ error: 'Only ZIP files are allowed. Please select a valid .zip file.', success: '' });
+    // Detect file type and import type
+    const isZipFile = isValidZipFile(file);
+    const isConfirmationFile = isConfirmationDataFile(file.name);
+
+    if (!isZipFile && !isConfirmationFile) {
+      setMessages({ 
+        error: 'Only ZIP files (case imports) or JSON files (confirmation imports) are allowed. Please select a valid file.', 
+        success: '' 
+      });
       clearImportData();
       return;
     }
 
-    setImportState(prev => ({ ...prev, selectedFile: file }));
+    const importType = isZipFile ? 'case' : 'confirmation';
+    setImportState(prev => ({ 
+      ...prev, 
+      selectedFile: file, 
+      importType 
+    }));
     clearMessages();
     setCasePreview(null);
     
-    // Load case preview
-    await loadCasePreview(file);
+    // Load preview based on import type
+    if (importType === 'case') {
+      await loadCasePreview(file);
+    } else {
+      // For confirmation imports, we'll show different UI (no preview needed)
+      // The validation will happen during import
+    }
   }, [clearImportData, clearMessages, loadCasePreview]);
 
-  const handleImport = useCallback(() => {
-    if (!user || !importState.selectedFile || !casePreview) return;
-    
-    // Show confirmation dialog
-    setImportState(prev => ({ ...prev, showConfirmation: true }));
-  }, [user, importState.selectedFile, casePreview]);
-
   const handleConfirmImport = useCallback(async () => {
-    if (!user || !importState.selectedFile) return;
+    if (!user || !importState.selectedFile || !importState.importType) return;
     
     setImportState(prev => ({ ...prev, showConfirmation: false, isImporting: true }));
     clearMessages();
-    setImportProgress({ stage: 'Starting import...', progress: 0 });
     
     try {
-      const result = await importCaseForReview(
-        user,
-        importState.selectedFile,
-        { overwriteExisting: true },
-        (stage: string, progress: number, details?: string) => {
-          setImportProgress({ stage, progress, details });
+      if (importState.importType === 'case') {
+        // Handle case import
+        setImportProgress({ stage: 'Starting case import...', progress: 0 });
+        
+        const result = await importCaseForReview(
+          user,
+          importState.selectedFile,
+          { overwriteExisting: true },
+          (stage: string, progress: number, details?: string) => {
+            setImportProgress({ stage, progress, details });
+          }
+        );
+        
+        if (result.success) {
+          setMessages({ error: '', success: `Successfully imported case "${result.caseNumber}" for review` });
+          setImportState(prev => ({ ...prev, selectedFile: null, importType: null }));
+          setCasePreview(null);
+          resetFileInput(fileInputRef);
+          
+          // Update existing case status
+          setExistingReadOnlyCase(result.caseNumber);
+          
+          // Call completion callback
+          onImportComplete?.(result);
+          
+          // Auto-close after success
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+          
+        } else {
+          setMessages({ error: result.errors?.join(', ') || 'Case import failed', success: '' });
         }
-      );
-      
-      if (result.success) {
-        setMessages({ error: '', success: `Successfully imported case "${result.caseNumber}" for review` });
-        setImportState(prev => ({ ...prev, selectedFile: null }));
-        setCasePreview(null);
-        resetFileInput(fileInputRef);
         
-        // Update existing case status
-        setExistingReadOnlyCase(result.caseNumber);
+      } else if (importState.importType === 'confirmation') {
+        // Handle confirmation import
+        setImportProgress({ stage: 'Validating confirmation data...', progress: 50 });
         
-        // Call completion callback
-        onImportComplete?.(result);
+        const result = await importConfirmationData(user, importState.selectedFile);
         
-        // Auto-close after success
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-        
-      } else {
-        setMessages({ error: result.errors?.join(', ') || 'Import failed', success: '' });
+        if (result.success) {
+          setMessages({ 
+            error: '', 
+            success: `Successfully imported ${result.confirmationsImported} confirmation(s) for case "${result.caseNumber}"` 
+          });
+          setImportState(prev => ({ ...prev, selectedFile: null, importType: null }));
+          resetFileInput(fileInputRef);
+          
+          // Auto-close after success
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+          
+        } else {
+          setMessages({ error: result.errors?.join(', ') || 'Confirmation import failed', success: '' });
+        }
       }
       
     } catch (error) {
@@ -455,7 +508,21 @@ export const CaseImport = ({
       setImportState(prev => ({ ...prev, isImporting: false }));
       setImportProgress(null);
     }
-  }, [user, importState.selectedFile, onImportComplete, onClose, clearMessages]);
+  }, [user, importState.selectedFile, importState.importType, onImportComplete, onClose, clearMessages]);
+
+  const handleImport = useCallback(() => {
+    if (!user || !importState.selectedFile || !importState.importType) return;
+    
+    // For case imports, show confirmation dialog with preview
+    // For confirmation imports, proceed directly to import
+    if (importState.importType === 'case') {
+      if (!casePreview) return;
+      setImportState(prev => ({ ...prev, showConfirmation: true }));
+    } else {
+      // Direct import for confirmations
+      handleConfirmImport();
+    }
+  }, [user, importState.selectedFile, importState.importType, casePreview, handleConfirmImport]);
 
   const handleCancelImport = useCallback(() => {
     setImportState(prev => ({ ...prev, showConfirmation: false }));
@@ -516,7 +583,7 @@ export const CaseImport = ({
                   ref={fileInputRef}
                   type="file"
                   id="zipFile"
-                  accept=".zip"
+                  accept=".zip,.json"
                   onChange={handleFileSelect}
                   disabled={importState.isImporting || importState.isClearing}
                   className={styles.fileInput}
@@ -524,7 +591,10 @@ export const CaseImport = ({
                 <label htmlFor="zipFile" className={styles.fileLabel}>
                   <span className={styles.fileLabelIcon}>📁</span>
                   <span className={styles.fileLabelText}>
-                    {importState.selectedFile ? importState.selectedFile.name : 'Select ZIP file (JSON data files only)...'}
+                    {importState.selectedFile 
+                      ? importState.selectedFile.name 
+                      : 'Select ZIP file (case import) or JSON file (confirmation import)...'
+                    }
                   </span>
                 </label>
               </div>
@@ -538,11 +608,30 @@ export const CaseImport = ({
               )}
             </div>
 
-            {/* Case preview */}
-            <CasePreviewSection 
-              casePreview={casePreview} 
-              isLoadingPreview={importState.isLoadingPreview} 
-            />
+            {/* Import type indicator and preview */}
+            {importState.selectedFile && importState.importType && (
+              <div className={styles.importTypeSection}>
+                <div className={styles.importTypeIndicator}>
+                  <strong>Import Type:</strong> {importState.importType === 'case' ? 'Case Import' : 'Confirmation Import'}
+                </div>
+                
+                {importState.importType === 'case' && (
+                  <CasePreviewSection 
+                    casePreview={casePreview} 
+                    isLoadingPreview={importState.isLoadingPreview} 
+                  />
+                )}
+                
+                {importState.importType === 'confirmation' && (
+                  <div className={styles.confirmationInfo}>
+                    <p>Ready to import confirmation data. Validation will occur during import.</p>
+                    <div className={styles.confirmationFileInfo}>
+                      <span>📋 Confirmation data file selected</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Import progress */}
             <ProgressSection importProgress={importProgress} />
@@ -576,14 +665,15 @@ export const CaseImport = ({
                 onClick={handleImport}
                 disabled={
                   !importState.selectedFile || 
-                  !casePreview || 
+                  !importState.importType ||
                   importState.isImporting || 
                   importState.isClearing || 
                   importState.isLoadingPreview ||
-                  (casePreview?.checksumValid === false) // Disable if checksum validation failed
+                  (importState.importType === 'case' && (!casePreview || casePreview?.checksumValid === false))
                 }
               >
-                {importState.isImporting ? 'Importing...' : 'Import'}
+                {importState.isImporting ? 'Importing...' : 
+                 importState.importType === 'confirmation' ? 'Import Confirmations' : 'Import Case'}
               </button>
               
               <button

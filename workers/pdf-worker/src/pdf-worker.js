@@ -1,7 +1,7 @@
 import puppeteer from "@cloudflare/puppeteer";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
+  'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
@@ -219,6 +219,54 @@ const generateDocument = (data) => {
         margin-bottom: 8px;
         margin-top: 10px;
       }
+      .confirmation-data {
+        background: #f8f9fa;
+        border: 2px solid #28a745;
+        border-radius: 6px;
+        padding: 15px;
+        width: 280px;
+        font-family: 'Inter', Arial, sans-serif;
+      }
+      .confirmation-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #28a745;
+        margin-bottom: 12px;
+        text-align: center;
+        border-bottom: 1px solid #28a745;
+        padding-bottom: 6px;
+      }
+      .confirmation-field {
+        margin-bottom: 8px;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .confirmation-name {
+        font-weight: 700;
+        color: #333;
+        font-size: 14px;
+      }
+      .confirmation-badge {
+        color: #666;
+        font-weight: 600;
+      }
+      .confirmation-company {
+        color: #333;
+        font-weight: 500;
+        font-style: italic;
+      }
+      .confirmation-timestamp {
+        color: #555;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .confirmation-id {
+        color: #28a745;
+        font-weight: 700;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
       .additional-notes-section {
         max-width: 400px;
         font-family: 'Inter', Arial, sans-serif;
@@ -373,12 +421,30 @@ const generateDocument = (data) => {
     ${annotationData && ((annotationData.includeConfirmation === true) || annotationData.additionalNotes) ? `
     <div class="confirmation-section">
       ${annotationData && (annotationData.includeConfirmation === true) ? `
-      <div class="confirmation-box">
-        <div class="confirmation-label">Confirmation by:</div>
-        <div class="confirmation-line"></div>
-        <div class="confirmation-date-label">Date:</div>
-        <div class="confirmation-line"></div>
-      </div>
+        ${annotationData.confirmationData ? `
+        <div class="confirmation-data">
+          <div class="confirmation-title">IDENTIFICATION CONFIRMED</div>
+          <div class="confirmation-field">
+            <div class="confirmation-name">${annotationData.confirmationData.fullName}, ${annotationData.confirmationData.badgeId}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-company">${annotationData.confirmationData.confirmedByCompany || 'N/A'}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-timestamp">${annotationData.confirmationData.timestamp}</div>
+          </div>
+          <div class="confirmation-field">
+            <div class="confirmation-id">ID: ${annotationData.confirmationData.confirmationId}</div>
+          </div>
+        </div>
+        ` : `
+        <div class="confirmation-box">
+          <div class="confirmation-label">Confirmation by:</div>
+          <div class="confirmation-line"></div>
+          <div class="confirmation-date-label">Date:</div>
+          <div class="confirmation-line"></div>
+        </div>
+        `}
       ` : '<div></div>'}
 
       ${annotationData && annotationsSet?.has('notes') && annotationData.additionalNotes && annotationData.additionalNotes.trim() ? `

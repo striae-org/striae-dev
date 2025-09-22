@@ -14,6 +14,7 @@ interface ToolbarProps {
   onColorChange?: (color: string) => void;
   selectedColor?: string;
   isReadOnly?: boolean;
+  isConfirmed?: boolean;
 }
 
 export const Toolbar = ({ 
@@ -24,7 +25,8 @@ export const Toolbar = ({
   isGeneratingPDF = false,
   onColorChange,
   selectedColor = '#ff0000',
-  isReadOnly = false
+  isReadOnly = false,
+  isConfirmed = false
 }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
@@ -55,8 +57,8 @@ export const Toolbar = ({
         }
       } else {
         next.add(toolId);
-        // Show color selector when box tool is activated
-        if (toolId === 'box') {
+        // Show color selector when box tool is activated (but not for confirmed images or read-only mode)
+        if (toolId === 'box' && !isConfirmed && !isReadOnly) {
           setShowColorSelector(true);
         }
       }
@@ -137,7 +139,7 @@ export const Toolbar = ({
         selectedColor={selectedColor}
         onColorConfirm={handleColorConfirm}
         onCancel={handleColorCancel}
-        isVisible={showColorSelector && isVisible && !isReadOnly}
+        isVisible={showColorSelector && isVisible && !isReadOnly && !isConfirmed}
       />
     </div>
   );
