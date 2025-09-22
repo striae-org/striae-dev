@@ -34,6 +34,12 @@ export interface ConfirmationImportResult {
   warnings?: string[];
 }
 
+export interface R2ObjectMetadata {
+  lastModified: string;
+  size: number;
+  etag: string;
+}
+
 export interface ConfirmationImportData {
   metadata: {
     caseNumber: string;

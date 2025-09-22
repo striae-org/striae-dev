@@ -56,6 +56,8 @@ export async function checkReadOnlyCaseExists(
 
 /**
  * Create read-only case entry in user database
+ * Note: Only one read-only case is allowed at a time. This function will clear any existing 
+ * read-only cases before adding the new one to prevent accumulation of multiple read-only cases.
  */
 export async function addReadOnlyCaseToUser(
   user: User, 
@@ -84,15 +86,17 @@ export async function addReadOnlyCaseToUser(
       userData.readOnlyCases = [];
     }
     
-    // Check if case already exists (shouldn't happen if properly checked)
-    const existingIndex = userData.readOnlyCases.findIndex(c => c.caseNumber === caseMetadata.caseNumber);
-    if (existingIndex !== -1) {
-      // Update existing entry
-      userData.readOnlyCases[existingIndex] = caseMetadata;
-    } else {
-      // Add new entry
-      userData.readOnlyCases.push(caseMetadata);
+    // IMPORTANT: Only allow one read-only case at a time
+    // Clear any existing read-only cases before adding the new one
+    if (userData.readOnlyCases.length > 0) {
+      const existingCaseNumbers = userData.readOnlyCases.map(c => c.caseNumber).join(', ');
+      console.log(`Clearing ${userData.readOnlyCases.length} existing read-only case(s) (${existingCaseNumbers}) before importing new case: ${caseMetadata.caseNumber}`);
+      userData.readOnlyCases = [];
     }
+    
+    // Add the new read-only case (now the only one)
+    userData.readOnlyCases.push(caseMetadata);
+    console.log(`Added new read-only case to user profile: ${caseMetadata.caseNumber}`);
     
     // Update user data
     const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
