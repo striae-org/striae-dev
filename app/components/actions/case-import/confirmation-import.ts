@@ -123,9 +123,26 @@ export async function importConfirmationData(
         continue;
       }
 
-      // Set confirmationData from the imported confirmations (use the first/most recent one)
+      // Validate confirmation timestamp against annotation modification time
       const importedConfirmationData = confirmations.length > 0 ? confirmations[0] : null;
-      
+      if (importedConfirmationData) {
+        const confirmationTimestamp = new Date(importedConfirmationData.confirmedAt);
+        const annotationLastModified = (annotationData as any).lastModified 
+          ? new Date((annotationData as any).lastModified) 
+          : null;
+
+        if (annotationLastModified && confirmationTimestamp < annotationLastModified) {
+          throw new Error(
+            `Confirmation for image ${currentImageId} (${importedConfirmationData.confirmationId}) ` +
+            `was created at ${importedConfirmationData.confirmedAt} but the annotations were ` +
+            `last modified at ${(annotationData as any).lastModified}. ` +
+            `Confirmations must be based on the original annotations and cannot be imported ` +
+            `for images that were modified after the confirmation was created.`
+          );
+        }
+      }
+
+      // Set confirmationData from the imported confirmations (use the first/most recent one)
       const updatedAnnotationData = {
         ...annotationData,
         // Ensure includeConfirmation remains true (original analyst requested confirmation)
