@@ -246,10 +246,9 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     }
 
     // Update case data.json to remove file reference
-    const existingData = await caseResponse.json() as CaseData;
     const updatedData: CaseData = {
-      ...existingData,
-      files: (existingData.files || []).filter((f: FileData) => f.id !== fileId)
+      ...caseData,
+      files: (caseData.files || []).filter((f: FileData) => f.id !== fileId)
     };
 
     await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
