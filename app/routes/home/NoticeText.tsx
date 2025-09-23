@@ -48,6 +48,9 @@ const NoticeText = () => {
             <strong>Data Transit:</strong> All data transfers are encrypted via TLS, and access is controlled through the use of signed URLs.
         </li>
         <li>
+            <strong>Comprehensive Audit Trail:</strong> Striae maintains a detailed audit trail of all user and case-related activities, providing transparency and accountability. This includes logging user actions, data modifications, and system events to ensure a secure and traceable environment.
+        </li>
+        <li>
             <strong>Controlled Access and Monitoring:</strong> Access requests are logged for auditing and security. Data access is limited to you or authorized troubleshooting only. CORS support restricts data requests to Striae&apos;s domain exclusively.
         </li>
         <li>
