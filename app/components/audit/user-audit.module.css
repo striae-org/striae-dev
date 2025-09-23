@@ -35,6 +35,41 @@
   background: var(--backgroundLight);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.exportButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.exportButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exportButton:hover {
+  background: color-mix(in lab, var(--primary) 85%, var(--black));
+  box-shadow: 0 2px 6px color-mix(in lab, var(--primary) 30%, transparent);
+}
+
+.exportButton:active {
+  transform: translateY(0);
+}
+
 .title {
   margin: 0;
   color: var(--textTitle);

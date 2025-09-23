@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { auditService } from '~/services/audit.service';
+import { auditExportService } from '~/services/audit-export.service';
 import { AuditTrail, ValidationAuditEntry, AuditAction, AuditResult, WorkflowPhase } from '~/types';
 import styles from './audit-trail.module.css';
 
@@ -144,6 +145,58 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
     return `${(ms / 60000).toFixed(1)}m`;
   };
 
+  // Export functions
+  const handleExportCSV = () => {
+    if (!auditTrail) return;
+    
+    const filename = auditExportService.generateFilename('case', caseNumber, 'csv');
+    const filteredEntries = getFilteredEntries();
+    
+    if (filteredEntries.length === auditTrail.entries.length) {
+      // Export full audit trail with summary
+      auditExportService.exportAuditTrailToCSV(auditTrail, filename);
+    } else {
+      // Export only filtered entries
+      auditExportService.exportToCSV(filteredEntries, filename);
+    }
+  };
+
+  const handleExportJSON = () => {
+    if (!auditTrail) return;
+    
+    const filename = auditExportService.generateFilename('case', caseNumber, 'csv'); // Will be converted to .json
+    const filteredEntries = getFilteredEntries();
+    
+    if (filteredEntries.length === auditTrail.entries.length) {
+      // Export full audit trail
+      auditExportService.exportAuditTrailToJSON(auditTrail, filename);
+    } else {
+      // Export only filtered entries
+      auditExportService.exportToJSON(filteredEntries, filename);
+    }
+  };
+
+  const handleGenerateReport = () => {
+    if (!auditTrail) return;
+    
+    const reportText = auditExportService.generateReportSummary(auditTrail);
+    const filename = auditExportService.generateFilename('case', caseNumber, 'csv').replace('.csv', '-report.txt');
+    
+    const blob = new Blob([reportText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -151,7 +204,34 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       <div className={styles.modal}>
         <div className={styles.header}>
           <h2 className={styles.title}>Audit Trail - Case {caseNumber}</h2>
-          <button className={styles.closeButton} onClick={onClose}>×</button>
+          <div className={styles.headerActions}>
+            {auditTrail && (
+              <div className={styles.exportButtons}>
+                <button 
+                  onClick={handleExportCSV}
+                  className={styles.exportButton}
+                  title="Export to CSV for Excel analysis"
+                >
+                  📊 CSV
+                </button>
+                <button 
+                  onClick={handleExportJSON}
+                  className={styles.exportButton}
+                  title="Export to JSON for technical analysis"
+                >
+                  📄 JSON
+                </button>
+                <button 
+                  onClick={handleGenerateReport}
+                  className={styles.exportButton}
+                  title="Generate summary report"
+                >
+                  📋 Report
+                </button>
+              </div>
+            )}
+            <button className={styles.closeButton} onClick={onClose}>×</button>
+          </div>
         </div>
 
         <div className={styles.content}>
