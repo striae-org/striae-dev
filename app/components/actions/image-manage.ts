@@ -191,19 +191,24 @@ export const uploadFile = async (
 export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
   const startTime = Date.now();
   
+  // Get file info for audit logging (outside try block so it's available in catch)
+  let fileName = fileId; // Default to fileId
+  let fileToDelete: FileData | undefined;
+  
   try {
     const apiKey = await getDataApiKey();
-    let imageDeleteFailed = false;
-    let imageDeleteError = '';
-
+    
     // First, get the file info for audit logging
     const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
       headers: { 'X-Custom-Auth-Key': apiKey }
     });
     const caseData = await caseResponse.json() as CaseData;
-    const fileToDelete = (caseData.files || []).find((f: FileData) => f.id === fileId);
-    const fileName = fileToDelete?.originalFilename || fileId;
+    fileToDelete = (caseData.files || []).find((f: FileData) => f.id === fileId);
+    fileName = fileToDelete?.originalFilename || fileId;
     const fileSize = 0; // We don't store file size, so use 0
+
+    let imageDeleteFailed = false;
+    let imageDeleteError = '';
 
     // Attempt to delete image file
     const imagesApiToken = await getImageApiKey();
@@ -287,13 +292,15 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         userEmail: user.email || '',
         action: 'file-delete',
         result: 'failure',
-        fileName: fileId,
+        fileName: fileName, // Now uses the original filename
         fileType: 'unknown',
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         fileDetails: {
+          fileId: fileId,
           fileSize: 0,
-          deleteReason: 'Failed deletion attempt'
+          deleteReason: 'Failed deletion attempt',
+          originalFileName: fileToDelete?.originalFilename
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
