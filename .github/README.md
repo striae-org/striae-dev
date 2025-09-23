@@ -85,6 +85,14 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-09-22] - *[Release v0.9.22a-beta](https://github.com/striae-org/striae/releases/tag/v0.9.22a-beta)*
+
+- **Comprehensive Audit Trail System** - Complete forensic audit logging providing full visibility into all case-related activities, user actions, and system operations with 5-phase workflow categorization
+- **Mandatory Case Linkage Enhancement** - All case-related operations now require case number association ensuring complete audit trail integrity for forensic documentation  
+- **Enhanced Box Annotation Auditing** - Complete audit logging for box annotation creation, editing, and deletion with position data, color information, and file context
+- **File Lifecycle Tracking** - Comprehensive file operation logging including uploads, access, and deletion with integrity validation and performance metrics
+- **Authentication Activity Monitoring** - Complete user action tracking including login, logout, MFA operations, and profile management with security event logging
+
 ## [2025-09-22] - *[Release v0.9.22-beta](https://github.com/striae-org/striae/releases/tag/v0.9.22-beta)*
 
 - **Authenticated Confirmations System** - Complete implementation of firearms identification workflow with digital examiner verification and cryptographic integrity
