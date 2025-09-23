@@ -330,13 +330,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       caseDetails: {
         newCaseName: caseName,
         caseDescription,
@@ -368,13 +362,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       caseDetails: {
         oldCaseName: oldName,
         newCaseName: newName,
@@ -403,13 +391,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       caseDetails: {
         newCaseName: caseName,
         deleteReason,
@@ -443,13 +425,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName: fileName,
@@ -490,13 +466,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName,
@@ -530,13 +500,7 @@ export class AuditService {
       validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: result !== 'failure'
-      },
+      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId,
         originalFileName,
@@ -577,13 +541,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType,
@@ -625,13 +583,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType: newValue?.type,
@@ -671,13 +623,7 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType: annotationData?.type,
@@ -714,13 +660,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: [],
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: {
         sessionId,
         ipAddress,
@@ -751,13 +691,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: [],
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: {
         sessionId,
         sessionDuration,
@@ -788,13 +722,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
         ipAddress
@@ -835,13 +763,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: result === 'success',
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
         ipAddress
@@ -882,13 +804,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
         ipAddress
@@ -930,13 +846,7 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
+      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
         ipAddress
@@ -974,13 +884,7 @@ export class AuditService {
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
+      // Security checks removed - no actual validation performed
       performanceMetrics: {
         processingTimeMs: processingTime,
         fileSizeBytes: fileSize || 0,
@@ -1010,13 +914,7 @@ export class AuditService {
       fileName: `security-incident-${Date.now()}.log`,
       fileType: 'log-file',
       validationErrors: [description],
-      securityChecks: {
-        selfConfirmationPrevented: true,
-        userAuthenticationValid: false,
-        fileIntegrityValid: false,
-        timestampValidationPassed: true,
-        permissionChecksPassed: false
-      },
+      // Security checks removed - no actual validation performed
       securityDetails: {
         incidentType,
         severity,
