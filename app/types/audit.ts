@@ -3,21 +3,19 @@
 
 export type AuditAction = 
   // Case Management Actions
-  | 'case-create' | 'case-rename' | 'case-delete' | 'case-open' | 'case-close'
+  | 'case-create' | 'case-rename' | 'case-delete'
   // Confirmation Workflow Actions  
   | 'case-export' | 'case-import' | 'confirmation-create' | 'confirmation-export' | 'confirmation-import'
   // File Operations
-  | 'file-upload' | 'file-delete' | 'file-download' | 'file-process'
+  | 'file-upload' | 'file-delete'
   // Annotation Operations
-  | 'annotation-create' | 'annotation-edit' | 'annotation-save' | 'annotation-delete' | 'annotation-batch-operation'
+  | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
   // User & Session Management
-  | 'user-login' | 'user-logout' | 'session-timeout' | 'permission-change'
+  | 'user-login' | 'user-logout'
   // Document Generation
-  | 'pdf-generate' | 'pdf-download' | 'report-generate' | 'report-export'
-  // System Operations
-  | 'settings-change' | 'theme-change' | 'backup-create' | 'backup-restore'
+  | 'pdf-generate'
   // Security & Monitoring
-  | 'security-violation' | 'access-denied' | 'suspicious-activity' | 'data-breach-attempt'
+  | 'security-violation'
   // Legacy actions (for backward compatibility)
   | 'import' | 'export' | 'confirm' | 'validate';
 
@@ -25,7 +23,7 @@ export type AuditResult = 'success' | 'failure' | 'warning' | 'blocked' | 'pendi
 
 export type AuditFileType = 
   | 'case-package' | 'confirmation-data' | 'image-file' | 'pdf-document' 
-  | 'json-data' | 'csv-export' | 'backup-file' | 'log-file' | 'unknown';
+  | 'json-data' | 'csv-export' | 'log-file' | 'unknown';
 
 /**
  * Core audit entry structure for all validation events
@@ -75,9 +73,6 @@ export interface AuditDetails {
   
   // User Session Details
   sessionDetails?: SessionAuditDetails;
-  
-  // System Operation Details
-  systemDetails?: SystemAuditDetails;
   
   // Security Incident Details
   securityDetails?: SecurityAuditDetails;
@@ -167,7 +162,6 @@ export interface CreateAuditEntryParams {
   fileDetails?: FileAuditDetails;
   annotationDetails?: AnnotationAuditDetails;
   sessionDetails?: SessionAuditDetails;
-  systemDetails?: SystemAuditDetails;
   securityDetails?: SecurityAuditDetails;
 }
 
@@ -185,28 +179,6 @@ export interface AuditQueryParams {
   endDate?: string;
   limit?: number;
   offset?: number;
-}
-
-/**
- * Audit storage configuration
- */
-export interface AuditStorageConfig {
-  retentionPeriodDays: number;
-  encryptionEnabled: boolean;
-  compressionEnabled: boolean;
-  backupFrequency: 'daily' | 'weekly' | 'monthly';
-  complianceLevel: 'standard' | 'high' | 'forensic';
-}
-
-/**
- * Audit event subscription for real-time monitoring
- */
-export interface AuditEventSubscription {
-  eventTypes: AuditAction[];
-  resultTypes: AuditResult[];
-  userId?: string;
-  caseNumber?: string;
-  callback: (entry: ValidationAuditEntry) => void;
 }
 
 // =============================================================================
@@ -277,21 +249,6 @@ export interface SessionAuditDetails {
   logoutReason?: 'user-initiated' | 'timeout' | 'security' | 'error';
   failedAttempts?: number;
   permissionLevel?: string;
-}
-
-/**
- * System operation specific audit details
- */
-export interface SystemAuditDetails {
-  operationType?: 'backup' | 'restore' | 'maintenance' | 'update' | 'configuration';
-  systemVersion?: string;
-  configurationChanges?: Record<string, { from: any; to: any }>;
-  backupSize?: number;
-  backupLocation?: string;
-  maintenanceType?: string;
-  affectedComponents?: string[];
-  downtimeMinutes?: number;
-  rollbackAvailable?: boolean;
 }
 
 /**

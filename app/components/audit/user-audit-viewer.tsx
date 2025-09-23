@@ -66,7 +66,6 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
     switch (action) {
       case 'user-login': return '🔑';
       case 'user-logout': return '🚪';
-      case 'session-timeout': return '⏰';
       case 'case-create': return '📂';
       case 'case-rename': return '✏️';
       case 'case-delete': return '🗑️';
@@ -74,10 +73,9 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
       case 'file-delete': return '🗑️';
       case 'annotation-create': return '✨';
       case 'annotation-edit': return '✏️';
-      case 'annotation-save': return '💾';
+      case 'annotation-delete': return '❌';
       case 'pdf-generate': return '📄';
       case 'security-violation': return '🚨';
-      case 'access-denied': return '🛑';
       default: return '📄';
     }
   };
@@ -102,7 +100,7 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
   const successfulEntries = auditEntries.filter(e => e.result === 'success').length;
   const failedEntries = auditEntries.filter(e => e.result === 'failure').length;
   const securityIncidents = auditEntries.filter(e => 
-    e.action === 'security-violation' || e.action === 'access-denied'
+    e.action === 'security-violation'
   ).length;
   const loginSessions = auditEntries.filter(e => e.action === 'user-login').length;
 

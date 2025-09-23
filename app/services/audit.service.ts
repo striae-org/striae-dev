@@ -10,13 +10,7 @@ import {
   AuditResult,
   AuditFileType,
   SecurityCheckResults,
-  PerformanceMetrics,
-  CaseAuditDetails,
-  FileAuditDetails,
-  AnnotationAuditDetails,
-  SessionAuditDetails,
-  SystemAuditDetails,
-  SecurityAuditDetails
+  PerformanceMetrics
 } from '~/types';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
@@ -92,7 +86,6 @@ export class AuditService {
           fileDetails: params.fileDetails,
           annotationDetails: params.annotationDetails,
           sessionDetails: params.sessionDetails,
-          systemDetails: params.systemDetails,
           securityDetails: params.securityDetails
         }
       };

@@ -103,8 +103,6 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       case 'case-create': return '📂';
       case 'case-rename': return '✏️';
       case 'case-delete': return '🗑️';
-      case 'case-open': return '📂';
-      case 'case-close': return '📋';
       
       // Confirmation Workflow Actions  
       case 'case-export': return '📤';
@@ -116,39 +114,21 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       // File Operations
       case 'file-upload': return '⬆️';
       case 'file-delete': return '🗑️';
-      case 'file-download': return '⬇️';
-      case 'file-process': return '⚙️';
       
       // Annotation Operations
       case 'annotation-create': return '✨';
       case 'annotation-edit': return '✏️';
-      case 'annotation-save': return '💾';
       case 'annotation-delete': return '❌';
-      case 'annotation-batch-operation': return '📦';
       
       // User & Session Management
       case 'user-login': return '🔑';
       case 'user-logout': return '🚪';
-      case 'session-timeout': return '⏰';
-      case 'permission-change': return '🛡️';
       
       // Document Generation
       case 'pdf-generate': return '📄';
-      case 'pdf-download': return '📄';
-      case 'report-generate': return '📊';
-      case 'report-export': return '📤';
-      
-      // System Operations
-      case 'settings-change': return '⚙️';
-      case 'theme-change': return '🎨';
-      case 'backup-create': return '�';
-      case 'backup-restore': return '🔄';
       
       // Security & Monitoring
       case 'security-violation': return '🚨';
-      case 'access-denied': return '🛑';
-      case 'suspicious-activity': return '⚠️';
-      case 'data-breach-attempt': return '�';
       
       default: return '📄';
     }
