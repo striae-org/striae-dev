@@ -213,7 +213,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-create',
         result: 'failure',
         fileName: `${caseNumber}.case`,
@@ -390,7 +390,7 @@ export const renameCase = async (
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-rename',
         result: 'failure',
         fileName: `${oldCaseNumber}.case`,
@@ -492,7 +492,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-delete',
         result: 'failure',
         fileName: `${caseNumber}.case`,

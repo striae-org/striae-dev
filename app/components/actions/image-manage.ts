@@ -285,7 +285,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'file-delete',
         result: 'failure',
         fileName: fileId,

@@ -129,7 +129,7 @@ export class AuditService {
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'export',
       result,
       fileName,
@@ -168,7 +168,7 @@ export class AuditService {
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'import',
       result,
       fileName,
@@ -208,7 +208,7 @@ export class AuditService {
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'confirm',
       result,
       fileName: `confirmation-${confirmationId}`,
@@ -253,7 +253,7 @@ export class AuditService {
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'export',
       result,
       fileName,
@@ -294,7 +294,7 @@ export class AuditService {
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'import',
       result,
       fileName,
@@ -325,7 +325,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-create',
       result: 'success',
       fileName: `${caseNumber}.case`,
@@ -364,7 +364,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-rename',
       result: 'success',
       fileName: `${caseNumber}.case`,
@@ -400,7 +400,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-delete',
       result: 'success',
       fileName: `${caseNumber}.case`,
@@ -441,7 +441,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-upload',
       result,
       fileName,
@@ -489,7 +489,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-delete',
       result: 'success',
       fileName,
@@ -530,7 +530,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-access',
       result,
       fileName,
@@ -578,7 +578,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-create',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
@@ -627,7 +627,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-edit',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
@@ -674,7 +674,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-delete',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
@@ -719,7 +719,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-login',
       result: 'success',
       fileName: `session-${sessionId}.log`,
@@ -757,7 +757,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-logout',
       result: 'success',
       fileName: `session-${sessionId}.log`,
@@ -795,7 +795,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-profile-update',
       result,
       fileName: `profile-update-${profileField}.log`,
@@ -839,7 +839,7 @@ export class AuditService {
     errors: string[] = []
   ): Promise<void> {
     // For password resets, we might not have the full user object yet
-    const userId = 'password-reset'; // Placeholder for reset operations
+    const userId = ''; // No user ID available during password reset
     
     await this.logEvent({
       userId,
@@ -891,7 +891,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-account-delete',
       result,
       fileName: `account-deletion-${user.uid}.log`,
@@ -940,7 +940,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId,
-      userEmail: userEmail || 'unknown@example.com',
+      userEmail: userEmail || '',
       action: 'user-account-delete',
       result,
       fileName: `account-deletion-${userId}.log`,
@@ -984,7 +984,7 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'pdf-generate',
       result,
       fileName,
