@@ -206,6 +206,7 @@ export interface CaseAuditDetails {
  * File operation specific audit details
  */
 export interface FileAuditDetails {
+  fileId?: string;
   originalFileName?: string;
   fileSize: number;
   mimeType?: string;

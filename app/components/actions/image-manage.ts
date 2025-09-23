@@ -118,7 +118,8 @@ export const uploadFile = async (
               caseNumber,
               'success',
               endTime - startTime,
-              'clean'
+              'clean',
+              imageData.result.id
             );
           } catch (auditError) {
             console.error('Failed to log successful file upload:', auditError);
@@ -273,7 +274,9 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         fileName,
         fileSize,
         'User-requested deletion via file list',
-        caseNumber
+        caseNumber,
+        fileId,
+        fileToDelete?.originalFilename
       );
     } catch (auditError) {
       console.error('Failed to log file deletion:', auditError);
@@ -352,7 +355,8 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: s
         caseNumber,
         'failure',
         Date.now() - startTime,
-        'Image URL generation failed'
+        'Image URL generation failed',
+        fileData.originalFilename
       );
       throw new Error('Failed to get signed image URL');
     }
@@ -368,7 +372,8 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: s
         caseNumber,
         'failure',
         Date.now() - startTime,
-        'Invalid signed URL returned'
+        'Invalid signed URL returned',
+        fileData.originalFilename
       );
       throw new Error('Invalid signed URL returned');
     }
@@ -382,7 +387,8 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: s
       caseNumber,
       'success',
       Date.now() - startTime,
-      'Image viewer access'
+      'Image viewer access',
+      fileData.originalFilename
     );
     
     return signedUrl;
@@ -397,7 +403,8 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: s
         caseNumber,
         'failure',
         Date.now() - startTime,
-        'Unexpected error during image access'
+        'Unexpected error during image access',
+        fileData.originalFilename
       );
     }
     throw error;

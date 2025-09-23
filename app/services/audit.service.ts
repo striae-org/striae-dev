@@ -428,7 +428,8 @@ export class AuditService {
     caseNumber?: string,
     result: AuditResult = 'success',
     processingTime?: number,
-    virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed'
+    virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed',
+    fileId?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -453,7 +454,9 @@ export class AuditService {
         uploadMethod,
         processingTime,
         virusScanResult,
-        thumbnailGenerated: result === 'success' && this.isImageFile(mimeType)
+        thumbnailGenerated: result === 'success' && this.isImageFile(mimeType),
+        fileId: fileId,
+        originalFileName: fileName
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
@@ -472,7 +475,9 @@ export class AuditService {
     fileName: string,
     fileSize: number,
     deleteReason: string,
-    caseNumber?: string
+    caseNumber?: string,
+    fileId?: string,
+    originalFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -492,6 +497,8 @@ export class AuditService {
         permissionChecksPassed: true
       },
       fileDetails: {
+        fileId: fileId,
+        originalFileName: originalFileName,
         fileSize,
         deleteReason
       }
@@ -509,7 +516,8 @@ export class AuditService {
     caseNumber?: string,
     result: AuditResult = 'success',
     processingTime?: number,
-    accessReason?: string
+    accessReason?: string,
+    originalFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -529,6 +537,8 @@ export class AuditService {
         permissionChecksPassed: result !== 'failure'
       },
       fileDetails: {
+        fileId: fileId,
+        originalFileName: originalFileName,
         fileSize: 0, // File size not available for access events
         uploadMethod: accessMethod as any, // Reuse for access method
         processingTime,
