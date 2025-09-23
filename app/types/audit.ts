@@ -101,7 +101,6 @@ export interface SecurityCheckResults {
   timestampValidationPassed: boolean;
   permissionChecksPassed: boolean;
   exporterUidValidated?: boolean;
-  crossLaboratoryRestrictions?: boolean;
 }
 
 /**
