@@ -46,7 +46,12 @@ export class AuditExportService {
       'Checksum Valid',
       'Validation Errors',
       'Security Issues',
-      'Workflow Phase'
+      'Workflow Phase',
+      'Profile Field',
+      'Old Value',
+      'New Value',
+      'Reset Method',
+      'Verification Method'
     ];
 
     const csvContent = [
@@ -115,7 +120,12 @@ export class AuditExportService {
       'Checksum Valid',
       'Validation Errors',
       'Security Issues',
-      'Workflow Phase'
+      'Workflow Phase',
+      'Profile Field',
+      'Old Value',
+      'New Value',
+      'Reset Method',
+      'Verification Method'
     ];
 
     const csvContent = [
@@ -139,6 +149,7 @@ export class AuditExportService {
     const annotationDetails = entry.details.annotationDetails;
     const sessionDetails = entry.details.sessionDetails;
     const securityChecks = entry.details.securityChecks;
+    const userProfileDetails = entry.details.userProfileDetails;
     
     // Calculate security check status
     const securityIssues = securityChecks ? 
@@ -175,7 +186,12 @@ export class AuditExportService {
         (entry.details.checksumValid ? 'Yes' : 'No') : '',
       this.formatForCSV(entry.details.validationErrors?.join('; ')),
       this.formatForCSV(securityIssues),
-      this.formatForCSV(entry.details.workflowPhase)
+      this.formatForCSV(entry.details.workflowPhase),
+      this.formatForCSV(userProfileDetails?.profileField),
+      this.formatForCSV(userProfileDetails?.oldValue),
+      this.formatForCSV(userProfileDetails?.newValue),
+      this.formatForCSV(userProfileDetails?.resetMethod),
+      this.formatForCSV(userProfileDetails?.verificationMethod)
     ];
 
     return values.join(',');

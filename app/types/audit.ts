@@ -11,7 +11,7 @@ export type AuditAction =
   // Annotation Operations
   | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
   // User & Session Management
-  | 'user-login' | 'user-logout'
+  | 'user-login' | 'user-logout' | 'user-profile-update' | 'user-password-reset'
   // Document Generation
   | 'pdf-generate'
   // Security & Monitoring
@@ -76,6 +76,9 @@ export interface AuditDetails {
   
   // Security Incident Details
   securityDetails?: SecurityAuditDetails;
+  
+  // User Profile & Authentication Details
+  userProfileDetails?: UserProfileAuditDetails;
 }
 
 /**
@@ -163,6 +166,7 @@ export interface CreateAuditEntryParams {
   annotationDetails?: AnnotationAuditDetails;
   sessionDetails?: SessionAuditDetails;
   securityDetails?: SecurityAuditDetails;
+  userProfileDetails?: UserProfileAuditDetails;
 }
 
 /**
@@ -267,4 +271,21 @@ export interface SecurityAuditDetails {
   mitigationSteps?: string[];
   falsePositive?: boolean;
   relatedIncidents?: string[];
+}
+
+/**
+ * User profile and authentication specific audit details
+ */
+export interface UserProfileAuditDetails {
+  profileField?: 'displayName' | 'email' | 'organization' | 'role' | 'preferences' | 'avatar';
+  oldValue?: string;
+  newValue?: string;
+  resetMethod?: 'email' | 'sms' | 'security-questions' | 'admin-reset';
+  resetToken?: string; // Partial token for tracking (last 4 chars)
+  verificationMethod?: 'email-link' | 'sms-code' | 'totp' | 'backup-codes';
+  verificationAttempts?: number;
+  passwordComplexityMet?: boolean;
+  previousPasswordReused?: boolean;
+  accountLocked?: boolean;
+  unlockMethod?: 'time-based' | 'admin-unlock' | 'successful-verification';
 }

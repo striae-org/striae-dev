@@ -739,6 +739,97 @@ export class AuditService {
   }
 
   /**
+   * Log user profile update event
+   */
+  public async logUserProfileUpdate(
+    user: User,
+    profileField: 'displayName' | 'email' | 'organization' | 'role' | 'preferences' | 'avatar',
+    oldValue: string,
+    newValue: string,
+    result: AuditResult,
+    sessionId?: string,
+    ipAddress?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'user-profile-update',
+      result,
+      fileName: `profile-update-${profileField}.log`,
+      fileType: 'log-file',
+      checksumValid: result === 'success',
+      validationErrors: errors,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: result === 'success'
+      },
+      sessionDetails: sessionId ? {
+        sessionId,
+        ipAddress
+      } : undefined,
+      userProfileDetails: {
+        profileField,
+        oldValue,
+        newValue
+      }
+    });
+  }
+
+  /**
+   * Log password reset event
+   */
+  public async logPasswordReset(
+    userEmail: string,
+    resetMethod: 'email' | 'sms' | 'security-questions' | 'admin-reset',
+    result: AuditResult,
+    resetToken?: string,
+    verificationMethod?: 'email-link' | 'sms-code' | 'totp' | 'backup-codes',
+    verificationAttempts?: number,
+    passwordComplexityMet?: boolean,
+    previousPasswordReused?: boolean,
+    sessionId?: string,
+    ipAddress?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    // For password resets, we might not have the full user object yet
+    const userId = 'password-reset'; // Placeholder for reset operations
+    
+    await this.logEvent({
+      userId,
+      userEmail,
+      action: 'user-password-reset',
+      result,
+      fileName: `password-reset-${resetMethod}.log`,
+      fileType: 'log-file',
+      checksumValid: result === 'success',
+      validationErrors: errors,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: result === 'success',
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: result === 'success'
+      },
+      sessionDetails: sessionId ? {
+        sessionId,
+        ipAddress
+      } : undefined,
+      userProfileDetails: {
+        resetMethod,
+        resetToken: resetToken ? `***${resetToken.slice(-4)}` : undefined, // Only store last 4 chars
+        verificationMethod,
+        verificationAttempts,
+        passwordComplexityMet,
+        previousPasswordReused
+      }
+    });
+  }
+
+  /**
    * Log PDF generation event
    */
   public async logPDFGeneration(

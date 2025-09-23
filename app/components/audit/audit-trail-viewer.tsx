@@ -124,6 +124,8 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       // User & Session Management
       case 'user-login': return '🔑';
       case 'user-logout': return '🚪';
+      case 'user-profile-update': return '👤';
+      case 'user-password-reset': return '🔒';
       
       // Document Generation
       case 'pdf-generate': return '📄';
