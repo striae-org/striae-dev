@@ -15,7 +15,8 @@ export async function storeConfirmation(
   user: User,
   caseNumber: string,
   currentImageId: string,
-  confirmationData: ConfirmationData
+  confirmationData: ConfirmationData,
+  originalImageFileName?: string
 ): Promise<boolean> {
   const startTime = Date.now();
   
@@ -99,7 +100,9 @@ export async function storeConfirmation(
         fileSizeBytes: 0, // Not applicable for confirmation creation
         validationStepsCompleted: 1,
         validationStepsFailed: 0
-      }
+      },
+      currentImageId,
+      originalImageFileName
     );
     
     auditService.endWorkflow();
@@ -123,7 +126,9 @@ export async function storeConfirmation(
         fileSizeBytes: 0,
         validationStepsCompleted: 0,
         validationStepsFailed: 1
-      }
+      },
+      currentImageId,
+      originalImageFileName
     );
     
     auditService.endWorkflow();

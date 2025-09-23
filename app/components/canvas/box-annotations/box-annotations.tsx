@@ -33,6 +33,9 @@ interface BoxAnnotationsProps {
   };
   onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
   isReadOnly?: boolean;
+  caseNumber?: string;
+  imageFileId?: string;
+  originalImageFileName?: string;
 }
 
 interface DrawingState {
@@ -60,7 +63,10 @@ export const BoxAnnotations = ({
   className,
   annotationData,
   onAnnotationDataChange,
-  isReadOnly = false
+  isReadOnly = false,
+  caseNumber,
+  imageFileId,
+  originalImageFileName
 }: BoxAnnotationsProps) => {
   const { user } = useContext(AuthContext);
   const [drawingState, setDrawingState] = useState<DrawingState>({
@@ -231,7 +237,11 @@ export const BoxAnnotations = ({
               position: { x, y, width, height },
               annotationType: 'box',
               color: annotationColor
-            }
+            },
+            caseNumber,
+            'box-tool',
+            imageFileId,
+            originalImageFileName
           );
         }
         
@@ -326,7 +336,11 @@ export const BoxAnnotations = ({
             color: annotationToRemove.color,
             label: annotationToRemove.label || 'Unlabeled',
             deletedAt: new Date().toISOString()
-          }
+          },
+          caseNumber,
+          'user-requested',
+          imageFileId,
+          originalImageFileName
         );
       }
     } catch (error) {
@@ -415,7 +429,11 @@ export const BoxAnnotations = ({
             },
             color: targetAnnotation.color,
             label: label || 'Unlabeled'
-          }
+          },
+          caseNumber,
+          'label-edit',
+          imageFileId,
+          originalImageFileName
         );
       }
       

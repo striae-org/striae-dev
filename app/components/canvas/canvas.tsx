@@ -94,7 +94,8 @@ export const Canvas = ({
         user,
         caseNumber,
         currentImageId,
-        confirmationData
+        confirmationData,
+        filename
       );
       
       if (success) {
@@ -330,6 +331,9 @@ export const Canvas = ({
               annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
               isReadOnly={isReadOnly || !!annotationData?.confirmationData}
+              caseNumber={caseNumber}
+              imageFileId={currentImageId}
+              originalImageFileName={filename}
             />
           )}
           

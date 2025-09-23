@@ -194,7 +194,9 @@ export class AuditService {
     result: AuditResult,
     errors: string[] = [],
     originalExaminerUid?: string,
-    performanceMetrics?: PerformanceMetrics
+    performanceMetrics?: PerformanceMetrics,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
@@ -215,11 +217,16 @@ export class AuditService {
       validationErrors: errors,
       caseNumber,
       confirmationId,
-      workflowPhase: 'confirmation-creation',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid,
-      reviewingExaminerUid: user.uid
+      reviewingExaminerUid: user.uid,
+      fileDetails: imageFileId && originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0 // Not applicable for confirmation creation
+      } : undefined
     });
   }
 
@@ -254,7 +261,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
-      workflowPhase: 'confirmation-export',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid,
@@ -295,7 +302,7 @@ export class AuditService {
       checksumValid,
       validationErrors: errors,
       caseNumber,
-      workflowPhase: 'confirmation-import',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid: user.uid,
@@ -326,7 +333,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
-      workflowPhase: 'case-export',
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -365,6 +372,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -400,6 +408,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -441,6 +450,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -489,6 +499,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -529,6 +540,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -562,7 +574,9 @@ export class AuditService {
     annotationType: 'measurement' | 'identification' | 'comparison' | 'note' | 'region',
     annotationData: any,
     caseNumber?: string,
-    tool?: string
+    tool?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -574,6 +588,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -588,7 +603,14 @@ export class AuditService {
         tool,
         canvasPosition: annotationData?.position,
         annotationSize: annotationData?.size
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 
@@ -601,7 +623,9 @@ export class AuditService {
     previousValue: any,
     newValue: any,
     caseNumber?: string,
-    tool?: string
+    tool?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -613,6 +637,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -626,7 +651,14 @@ export class AuditService {
         annotationData: newValue,
         previousValue,
         tool
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 
@@ -638,7 +670,9 @@ export class AuditService {
     annotationId: string,
     annotationData: any,
     caseNumber?: string,
-    deleteReason?: string
+    deleteReason?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -650,6 +684,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -662,7 +697,14 @@ export class AuditService {
         annotationType: annotationData?.type,
         annotationData,
         tool: deleteReason
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 
@@ -686,6 +728,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: true,
       validationErrors: [],
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -723,6 +766,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: true,
       validationErrors: [],
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -760,6 +804,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -807,6 +852,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: result === 'success',
@@ -854,6 +900,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -902,6 +949,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -946,6 +994,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
