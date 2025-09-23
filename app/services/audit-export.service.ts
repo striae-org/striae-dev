@@ -35,13 +35,10 @@ export class AuditExportService {
       'Upload Method',
       'Delete Reason',
       'Source Location',
-      'Virus Scan',
       'Thumbnail Generated',
       'Annotation Type',
       'Annotation Tool',
       'Session ID',
-      'IP Address',
-      'User Location',
       'Processing Time (ms)',
       'Checksum Valid',
       'Validation Errors',
@@ -115,13 +112,10 @@ export class AuditExportService {
       'Upload Method',
       'Delete Reason',
       'Source Location',
-      'Virus Scan',
       'Thumbnail Generated',
       'Annotation Type',
       'Annotation Tool',
       'Session ID',
-      'IP Address',
-      'User Location',
       'Processing Time (ms)',
       'Checksum Valid',
       'Validation Errors',
@@ -185,14 +179,11 @@ export class AuditExportService {
       this.formatForCSV(fileDetails?.uploadMethod),
       this.formatForCSV(fileDetails?.deleteReason),
       this.formatForCSV(fileDetails?.sourceLocation),
-      this.formatVirusScan(fileDetails?.virusScanResult),
       fileDetails?.thumbnailGenerated !== undefined ? 
         (fileDetails.thumbnailGenerated ? 'Yes' : 'No') : '',
       this.formatForCSV(annotationDetails?.annotationType),
       this.formatForCSV(annotationDetails?.tool),
       this.formatForCSV(sessionDetails?.sessionId),
-      this.formatForCSV(sessionDetails?.ipAddress),
-      this.formatForCSV(sessionDetails?.location),
       entry.details.performanceMetrics?.processingTimeMs || '',
       entry.details.checksumValid !== undefined ? 
         (entry.details.checksumValid ? 'Yes' : 'No') : '',
@@ -214,20 +205,6 @@ export class AuditExportService {
     ];
 
     return values.join(',');
-  }
-
-  /**
-   * Format virus scan result for CSV
-   */
-  private formatVirusScan(result?: string): string {
-    if (!result) return '';
-    switch (result) {
-      case 'clean': return 'Clean';
-      case 'infected': return 'Infected';
-      case 'quarantined': return 'Quarantined';
-      case 'failed': return 'Failed';
-      default: return result;
-    }
   }
 
   /**

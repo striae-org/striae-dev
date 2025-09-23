@@ -69,7 +69,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       // Log account deletion attempt
       await auditService.logAccountDeletionSimple(
         user.uid,
-        user.email || 'unknown@example.com',
+        user.email || '',
         'pending',
         'user-requested',
         'uid-email',
@@ -101,7 +101,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
         // Log successful account deletion
         await auditService.logAccountDeletionSimple(
           user.uid,
-          user.email || 'unknown@example.com',
+          user.email || '',
           'success',
           'user-requested',
           'uid-email',
@@ -132,7 +132,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       // Log failed account deletion
       await auditService.logAccountDeletionSimple(
         user.uid,
-        user.email || 'unknown@example.com',
+        user.email || '',
         'failure',
         'user-requested',
         'uid-email',

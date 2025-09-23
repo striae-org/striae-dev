@@ -183,9 +183,7 @@ export const Login = () => {
           user,
           sessionId,
           'firebase',
-          undefined, // ipAddress - not easily available on client side
-          navigator.userAgent,
-          undefined // location - would require geolocation permission
+          navigator.userAgent
         );
       } catch (auditError) {
         console.error('Failed to log user login audit:', auditError);
@@ -320,7 +318,6 @@ export const Login = () => {
           incidentType,
           severity,
           `Failed authentication attempt: ${errorCode} - ${message}`,
-          undefined, // sourceIp not easily available on client side
           'authentication-endpoint',
           true // Blocked by system
         );

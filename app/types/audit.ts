@@ -96,12 +96,8 @@ export type WorkflowPhase =
  */
 export interface SecurityCheckResults {
   selfConfirmationPrevented: boolean;
-  userAuthenticationValid: boolean;
   fileIntegrityValid: boolean;
-  timestampValidationPassed: boolean;
-  permissionChecksPassed: boolean;
   exporterUidValidated?: boolean;
-  crossLaboratoryRestrictions?: boolean;
 }
 
 /**
@@ -110,9 +106,8 @@ export interface SecurityCheckResults {
 export interface PerformanceMetrics {
   processingTimeMs: number;
   fileSizeBytes: number;
-  validationStepsCompleted: number;
-  validationStepsFailed: number;
-  retryAttempts?: number;
+  validationStepsCompleted?: number;
+  validationStepsFailed?: number;
 }
 
 /**
@@ -195,13 +190,10 @@ export interface AuditQueryParams {
 export interface CaseAuditDetails {
   oldCaseName?: string;
   newCaseName?: string;
-  caseDescription?: string;
-  caseType?: string;
   totalFiles?: number;
   totalAnnotations?: number;
   createdDate?: string;
   lastModified?: string;
-  caseSize?: number; // in bytes
   deleteReason?: string;
   backupCreated?: boolean;
 }
@@ -216,12 +208,9 @@ export interface FileAuditDetails {
   mimeType?: string;
   uploadMethod?: 'drag-drop' | 'file-picker' | 'api' | 'import';
   processingTime?: number;
-  compressionApplied?: boolean;
   thumbnailGenerated?: boolean;
-  virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed';
   deleteReason?: string;
   sourceLocation?: string;
-  destinationPath?: string;
 }
 
 /**
@@ -234,9 +223,7 @@ export interface AnnotationAuditDetails {
   canvasPosition?: { x: number; y: number };
   annotationSize?: { width: number; height: number };
   previousValue?: any; // For edit operations
-  batchSize?: number; // For batch operations
   tool?: string; // Which tool was used to create/edit
-  confidence?: number; // AI confidence level if applicable
 }
 
 /**
@@ -244,16 +231,10 @@ export interface AnnotationAuditDetails {
  */
 export interface SessionAuditDetails {
   sessionId?: string;
-  ipAddress?: string;
   userAgent?: string;
-  location?: string;
-  deviceType?: 'desktop' | 'tablet' | 'mobile' | 'unknown';
-  browserType?: string;
   sessionDuration?: number;
   loginMethod?: 'firebase' | 'sso' | 'api-key' | 'manual';
   logoutReason?: 'user-initiated' | 'timeout' | 'security' | 'error';
-  failedAttempts?: number;
-  permissionLevel?: string;
 }
 
 /**
@@ -262,15 +243,11 @@ export interface SessionAuditDetails {
 export interface SecurityAuditDetails {
   incidentType?: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation';
   severity?: 'low' | 'medium' | 'high' | 'critical';
-  attackVector?: string;
-  sourceIp?: string;
   targetResource?: string;
   blockedBySystem?: boolean;
   investigationId?: string;
   reportedToAuthorities?: boolean;
   mitigationSteps?: string[];
-  falsePositive?: boolean;
-  relatedIncidents?: string[];
 }
 
 /**
@@ -286,8 +263,6 @@ export interface UserProfileAuditDetails {
   verificationAttempts?: number;
   passwordComplexityMet?: boolean;
   previousPasswordReused?: boolean;
-  accountLocked?: boolean;
-  unlockMethod?: 'time-based' | 'admin-unlock' | 'successful-verification';
   // Account deletion specific fields
   deletionReason?: 'user-requested' | 'admin-initiated' | 'policy-violation' | 'inactive-account';
   dataRetentionPeriod?: number; // Days before permanent deletion

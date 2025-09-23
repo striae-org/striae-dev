@@ -334,9 +334,7 @@ export async function importCaseForReview(
       undefined,
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: zipFile.size,
-        validationStepsCompleted: 0,
-        validationStepsFailed: 1
+        fileSizeBytes: zipFile.size
       }
     );
     

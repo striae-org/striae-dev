@@ -121,20 +121,16 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: false, // Not applicable for exports
-      userAuthenticationValid: true,
-      fileIntegrityValid: result === 'success',
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: result === 'success'
     };
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'export',
       result,
       fileName,
       fileType: 'case-package',
-      checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'case-export',
@@ -159,16 +155,13 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
       fileIntegrityValid: checksumValid,
-      timestampValidationPassed: result !== 'failure',
-      permissionChecksPassed: result !== 'failure',
       exporterUidValidated: !!originalExaminerUid
     };
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'import',
       result,
       fileName,
@@ -200,20 +193,16 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
-      fileIntegrityValid: true,
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: true
     };
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'confirm',
       result,
       fileName: `confirmation-${confirmationId}`,
       fileType: 'confirmation-data',
-      checksumValid: true,
       validationErrors: errors,
       caseNumber,
       confirmationId,
@@ -245,20 +234,16 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: false, // Not applicable for exports
-      userAuthenticationValid: true,
-      fileIntegrityValid: result === 'success',
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: result === 'success'
     };
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'export',
       result,
       fileName,
       fileType: 'confirmation-data',
-      checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'confirmation',
@@ -285,16 +270,13 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
       fileIntegrityValid: checksumValid,
-      timestampValidationPassed: result !== 'failure',
-      permissionChecksPassed: result !== 'failure',
       exporterUidValidated: !!reviewingExaminerUid
     };
 
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'import',
       result,
       fileName,
@@ -319,36 +301,23 @@ export class AuditService {
   public async logCaseCreation(
     user: User,
     caseNumber: string,
-    caseName: string,
-    caseDescription?: string,
-    caseType?: string
+    caseName: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-create',
       result: 'success',
       fileName: `${caseNumber}.case`,
       fileType: 'case-package',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       caseDetails: {
         newCaseName: caseName,
-        caseDescription,
-        caseType,
         createdDate: new Date().toISOString(),
         totalFiles: 0,
-        totalAnnotations: 0,
-        caseSize: 0
+        totalAnnotations: 0
       }
     });
   }
@@ -364,22 +333,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-rename',
       result: 'success',
       fileName: `${caseNumber}.case`,
       fileType: 'case-package',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       caseDetails: {
         oldCaseName: oldName,
         newCaseName: newName,
@@ -400,22 +361,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'case-delete',
       result: 'success',
       fileName: `${caseNumber}.case`,
       fileType: 'case-package',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       caseDetails: {
         newCaseName: caseName,
         deleteReason,
@@ -437,27 +390,18 @@ export class AuditService {
     caseNumber: string,
     result: AuditResult = 'success',
     processingTime?: number,
-    virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed',
     fileId?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-upload',
       result,
       fileName,
       fileType: this.getFileTypeFromMime(mimeType),
-      checksumValid: result === 'success',
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName: fileName,
@@ -465,14 +409,11 @@ export class AuditService {
         mimeType,
         uploadMethod,
         processingTime,
-        virusScanResult,
         thumbnailGenerated: result === 'success' && this.isImageFile(mimeType)
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
-        fileSizeBytes: fileSize,
-        validationStepsCompleted: 1,
-        validationStepsFailed: result === 'success' ? 0 : 1
+        fileSizeBytes: fileSize
       } : undefined
     });
   }
@@ -491,22 +432,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-delete',
       result: 'success',
       fileName,
       fileType: 'unknown',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName,
@@ -532,22 +465,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'file-access',
       result,
       fileName,
       fileType: 'image-file', // Most file access in Striae is for images
-      checksumValid: result === 'success',
       validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: result !== 'failure'
-      },
       fileDetails: {
         fileId,
         originalFileName,
@@ -558,9 +483,7 @@ export class AuditService {
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
-        fileSizeBytes: 0,
-        validationStepsCompleted: 1,
-        validationStepsFailed: result === 'failure' ? 1 : 0
+        fileSizeBytes: 0
       } : undefined
     });
   }
@@ -580,22 +503,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-create',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
       fileType: 'json-data',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       annotationDetails: {
         annotationId,
         annotationType,
@@ -629,22 +544,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-edit',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
       fileType: 'json-data',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       annotationDetails: {
         annotationId,
         annotationType: newValue?.type,
@@ -676,22 +583,14 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'annotation-delete',
       result: 'success',
       fileName: `annotation-${annotationId}.json`,
       fileType: 'json-data',
-      checksumValid: true,
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       annotationDetails: {
         annotationId,
         annotationType: annotationData?.type,
@@ -715,34 +614,20 @@ export class AuditService {
     user: User,
     sessionId: string,
     loginMethod: 'firebase' | 'sso' | 'api-key' | 'manual',
-    ipAddress?: string,
-    userAgent?: string,
-    location?: string
+    userAgent?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-login',
       result: 'success',
       fileName: `session-${sessionId}.log`,
       fileType: 'log-file',
-      checksumValid: true,
       validationErrors: [],
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       sessionDetails: {
         sessionId,
-        ipAddress,
         userAgent,
-        location,
-        deviceType: this.getDeviceType(userAgent),
-        browserType: this.getBrowserType(userAgent),
         loginMethod
       }
     });
@@ -759,21 +644,13 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-logout',
       result: 'success',
       fileName: `session-${sessionId}.log`,
       fileType: 'log-file',
-      checksumValid: true,
       validationErrors: [],
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       sessionDetails: {
         sessionId,
         sessionDuration,
@@ -797,24 +674,15 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-profile-update',
       result,
       fileName: `profile-update-${profileField}.log`,
       fileType: 'log-file',
-      checksumValid: result === 'success',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
       sessionDetails: sessionId ? {
-        sessionId,
-        ipAddress
+        sessionId
       } : undefined,
       userProfileDetails: {
         profileField,
@@ -841,7 +709,7 @@ export class AuditService {
     errors: string[] = []
   ): Promise<void> {
     // For password resets, we might not have the full user object yet
-    const userId = 'password-reset'; // Placeholder for reset operations
+    const userId = ''; // No user ID available during password reset
     
     await this.logEvent({
       userId,
@@ -850,19 +718,10 @@ export class AuditService {
       result,
       fileName: `password-reset-${resetMethod}.log`,
       fileType: 'log-file',
-      checksumValid: result === 'success',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: result === 'success',
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
       sessionDetails: sessionId ? {
-        sessionId,
-        ipAddress
+        sessionId
       } : undefined,
       userProfileDetails: {
         resetMethod,
@@ -893,24 +752,15 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'user-account-delete',
       result,
       fileName: `account-deletion-${user.uid}.log`,
       fileType: 'log-file',
-      checksumValid: result === 'success',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
       sessionDetails: sessionId ? {
         sessionId,
-        ipAddress
       } : undefined,
       userProfileDetails: {
         deletionReason,
@@ -942,24 +792,15 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId,
-      userEmail: userEmail || 'unknown@example.com',
+      userEmail: userEmail || '',
       action: 'user-account-delete',
       result,
       fileName: `account-deletion-${userId}.log`,
       fileType: 'log-file',
-      checksumValid: result === 'success',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: true,
-        timestampValidationPassed: true,
-        permissionChecksPassed: result === 'success'
-      },
       sessionDetails: sessionId ? {
         sessionId,
-        ipAddress
       } : undefined,
       userProfileDetails: {
         deletionReason,
@@ -986,27 +827,17 @@ export class AuditService {
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
-      userEmail: user.email || 'unknown@example.com',
+      userEmail: user.email || '',
       action: 'pdf-generate',
       result,
       fileName,
       fileType: 'pdf-document',
-      checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'casework',
-      securityChecks: {
-        selfConfirmationPrevented: false,
-        userAuthenticationValid: true,
-        fileIntegrityValid: result === 'success',
-        timestampValidationPassed: true,
-        permissionChecksPassed: true
-      },
       performanceMetrics: {
         processingTimeMs: processingTime,
-        fileSizeBytes: fileSize || 0,
-        validationStepsCompleted: 1,
-        validationStepsFailed: errors.length
+        fileSizeBytes: fileSize || 0
       }
     });
   }
@@ -1019,7 +850,6 @@ export class AuditService {
     incidentType: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation',
     severity: 'low' | 'medium' | 'high' | 'critical',
     description: string,
-    sourceIp?: string,
     targetResource?: string,
     blockedBySystem: boolean = true
   ): Promise<void> {
@@ -1030,19 +860,10 @@ export class AuditService {
       result: blockedBySystem ? 'blocked' : 'failure',
       fileName: `security-incident-${Date.now()}.log`,
       fileType: 'log-file',
-      checksumValid: true,
       validationErrors: [description],
-      securityChecks: {
-        selfConfirmationPrevented: true,
-        userAuthenticationValid: false,
-        fileIntegrityValid: false,
-        timestampValidationPassed: true,
-        permissionChecksPassed: false
-      },
       securityDetails: {
         incidentType,
         severity,
-        sourceIp,
         targetResource,
         blockedBySystem,
         investigationId: `INV-${Date.now()}`,
@@ -1074,28 +895,6 @@ export class AuditService {
    */
   private isImageFile(mimeType: string): boolean {
     return mimeType.startsWith('image/');
-  }
-
-  /**
-   * Get device type from user agent
-   */
-  private getDeviceType(userAgent?: string): 'desktop' | 'tablet' | 'mobile' | 'unknown' {
-    if (!userAgent) return 'unknown';
-    if (/tablet|ipad/i.test(userAgent)) return 'tablet';
-    if (/mobile|android|iphone/i.test(userAgent)) return 'mobile';
-    return 'desktop';
-  }
-
-  /**
-   * Get browser type from user agent
-   */
-  private getBrowserType(userAgent?: string): string {
-    if (!userAgent) return 'unknown';
-    if (userAgent.includes('Chrome')) return 'Chrome';
-    if (userAgent.includes('Firefox')) return 'Firefox';
-    if (userAgent.includes('Safari')) return 'Safari';
-    if (userAgent.includes('Edge')) return 'Edge';
-    return 'unknown';
   }
 
   /**
@@ -1162,7 +961,6 @@ export class AuditService {
     const securityIncidents = entries.filter(e => 
       e.result === 'failure' && 
       (e.details.securityChecks?.selfConfirmationPrevented === false ||
-       !e.details.securityChecks?.userAuthenticationValid ||
        !e.details.securityChecks?.fileIntegrityValid)
     ).length;
 

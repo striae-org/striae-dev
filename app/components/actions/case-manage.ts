@@ -199,9 +199,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     await auditService.logCaseCreation(
       user,
       caseNumber,
-      caseNumber, // Using case number as case name for now
-      `New case created by ${user.email}`,
-      'standard'
+      caseNumber // Using case number as case name for now
     );
 
     console.log(`✅ Case created: ${caseNumber} (${endTime - startTime}ms)`);
@@ -213,24 +211,19 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-create',
         result: 'failure',
         fileName: `${caseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         caseDetails: {
-          newCaseName: caseNumber,
-          caseDescription: `Failed case creation attempt by ${user.email}`,
-          caseType: 'standard'
+          newCaseName: caseNumber
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {
@@ -390,12 +383,11 @@ export const renameCase = async (
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-rename',
         result: 'failure',
         fileName: `${oldCaseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber: oldCaseNumber,
         caseDetails: {
@@ -405,9 +397,7 @@ export const renameCase = async (
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {
@@ -492,12 +482,11 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'case-delete',
         result: 'failure',
         fileName: `${caseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         caseDetails: {
@@ -508,9 +497,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {

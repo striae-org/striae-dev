@@ -49,8 +49,7 @@ export const uploadFile = async (
         'file-picker',
         caseNumber,
         'failure',
-        Date.now() - startTime,
-        'clean'
+        Date.now() - startTime
       );
     } catch (auditError) {
       console.error('Failed to log file upload permission denial:', auditError);
@@ -118,7 +117,6 @@ export const uploadFile = async (
               caseNumber,
               'success',
               endTime - startTime,
-              'clean',
               imageData.result.id
             );
           } catch (auditError) {
@@ -138,8 +136,7 @@ export const uploadFile = async (
               'file-picker',
               caseNumber,
               'failure',
-              endTime - startTime,
-              'clean'
+              endTime - startTime
             );
           } catch (auditError) {
             console.error('Failed to log file upload failure:', auditError);
@@ -157,8 +154,7 @@ export const uploadFile = async (
             'file-picker',
             caseNumber,
             'failure',
-            endTime - startTime,
-            'clean'
+            endTime - startTime
           );
         } catch (auditError) {
           console.error('Failed to log file upload failure:', auditError);
@@ -178,8 +174,7 @@ export const uploadFile = async (
           'file-picker',
           caseNumber,
           'failure',
-          Date.now() - startTime,
-          'clean'
+          Date.now() - startTime
         );
       } catch (auditError) {
         console.error('Failed to log file upload error:', auditError);
@@ -290,12 +285,11 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     try {
       await auditService.logEvent({
         userId: user.uid,
-        userEmail: user.email || 'unknown@example.com',
+        userEmail: user.email || '',
         action: 'file-delete',
         result: 'failure',
         fileName: fileId,
         fileType: 'unknown',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         fileDetails: {
@@ -304,9 +298,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {
