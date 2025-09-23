@@ -37,6 +37,21 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     }
   }, [isOpen, user, dateRange, customStartDate, customEndDate, filterCaseNumber, caseNumber]);
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [isOpen, onClose]);
+
   const loadUserData = async () => {
     if (!user) return;
     
