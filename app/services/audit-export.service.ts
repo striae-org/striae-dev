@@ -315,7 +315,7 @@ export class AuditExportService {
     const successRate = ((summary.successfulEvents / summary.totalEvents) * 100).toFixed(1);
     
     return `
-FORENSIC AUDIT TRAIL REPORT
+STRIAE AUDIT TRAIL REPORT
 ============================
 
 Case Number: ${auditTrail.caseNumber}
