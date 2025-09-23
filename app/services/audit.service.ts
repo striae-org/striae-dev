@@ -217,7 +217,7 @@ export class AuditService {
       validationErrors: errors,
       caseNumber,
       confirmationId,
-      workflowPhase: 'confirmation-creation',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid,
@@ -261,7 +261,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
-      workflowPhase: 'confirmation-export',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid,
@@ -302,7 +302,7 @@ export class AuditService {
       checksumValid,
       validationErrors: errors,
       caseNumber,
-      workflowPhase: 'confirmation-import',
+      workflowPhase: 'confirmation',
       securityChecks,
       performanceMetrics,
       originalExaminerUid: user.uid,
@@ -333,7 +333,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
-      workflowPhase: 'case-export',
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -372,6 +372,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -407,6 +408,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -448,6 +450,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -496,6 +499,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -536,6 +540,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -583,6 +588,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -631,6 +637,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -677,6 +684,7 @@ export class AuditService {
       checksumValid: true,
       validationErrors: [],
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -720,6 +728,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: true,
       validationErrors: [],
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -757,6 +766,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: true,
       validationErrors: [],
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -794,6 +804,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -841,6 +852,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: result === 'success',
@@ -888,6 +900,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -936,6 +949,7 @@ export class AuditService {
       fileType: 'log-file',
       checksumValid: result === 'success',
       validationErrors: errors,
+      workflowPhase: 'user-management',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,
@@ -980,6 +994,7 @@ export class AuditService {
       checksumValid: result === 'success',
       validationErrors: errors,
       caseNumber,
+      workflowPhase: 'casework',
       securityChecks: {
         selfConfirmationPrevented: false,
         userAuthenticationValid: true,

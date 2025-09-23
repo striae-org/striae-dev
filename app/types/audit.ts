@@ -82,14 +82,14 @@ export interface AuditDetails {
 }
 
 /**
- * Workflow phases for tracking progression through confirmation system
+ * Workflow phases for tracking different types of forensic activities
  */
 export type WorkflowPhase = 
-  | 'case-export'           // Phase 2: Original examiner exports case
-  | 'case-import'           // Phase 3: Reviewing examiner imports case
-  | 'confirmation-creation' // Phase 4: Reviewing examiner creates confirmation
-  | 'confirmation-export'   // Phase 5: Reviewing examiner exports confirmation
-  | 'confirmation-import';  // Phase 6: Original examiner imports confirmation
+  | 'casework'             // All case, notes, image, and pdf related actions
+  | 'case-export'          // Only case exporting
+  | 'case-import'          // Only case importing  
+  | 'confirmation'         // Only confirmation-related activity
+  | 'user-management';     // User login, logout, profile management, account activities
 
 /**
  * Security validation results
