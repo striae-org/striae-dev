@@ -4,11 +4,6 @@ import { auditService } from '~/services/audit.service';
 import { auditExportService } from '~/services/audit-export.service';
 import { ValidationAuditEntry, AuditAction, AuditResult, AuditTrail, UserData } from '~/types';
 import { getUserData } from '~/utils/permissions';
-import { getDateRangeDisplay, calculateDateRange } from '~/services/audit/audit-utils';
-import { AuditFilters } from './audit-filters/audit-filters';
-import { AuditEntryList } from './audit-entry-list/audit-entry-list';
-import { AuditExportButtons } from './audit-export-buttons/audit-export-buttons';
-import { AuditSummaryStats } from './audit-summary-stats/audit-summary-stats';
 import styles from './user-audit.module.css';
 
 interface UserAuditViewerProps {
@@ -65,6 +60,7 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
       setUserData(data);
     } catch (error) {
       console.error('Failed to load user data:', error);
+      // Don't set error state for user data failure, just log it
     }
   };
 
@@ -87,9 +83,10 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
           endDate = new Date(customEndDate + 'T23:59:59').toISOString();
         }
       } else if (dateRange !== 'all') {
-        const range = calculateDateRange(dateRange);
-        startDate = range.startDate;
-        endDate = range.endDate;
+        const days = parseInt(dateRange.replace('d', ''));
+        const date = new Date();
+        date.setDate(date.getDate() - days);
+        startDate = date.toISOString();
       }
 
       // Get audit entries (filtered by case if specified)
@@ -156,10 +153,19 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     setCustomEndDate('');
   };
 
+  const getFilteredEntries = (): ValidationAuditEntry[] => {
+    return auditEntries.filter(entry => {
+      const actionMatch = filterAction === 'all' || entry.action === filterAction;
+      const resultMatch = filterResult === 'all' || entry.result === filterResult;
+      return actionMatch && resultMatch;
+    });
+  };
+
   // Export functions
   const handleExportCSV = async () => {
     if (!user) return;
     
+    const filteredEntries = getFilteredEntries();
     const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
     const identifier = effectiveCaseNumber || user.uid;
     const type = effectiveCaseNumber ? 'case' : 'user';
@@ -167,9 +173,11 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     
     try {
       if (auditTrail && effectiveCaseNumber) {
+        // Use full audit trail export for case-specific data
         auditExportService.exportAuditTrailToCSV(auditTrail, filename);
       } else {
-        auditExportService.exportToCSV(auditEntries, filename);
+        // Use regular entry export for user data
+        auditExportService.exportToCSV(filteredEntries, filename);
       }
     } catch (error) {
       console.error('Export failed:', error);
@@ -180,16 +188,19 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
   const handleExportJSON = async () => {
     if (!user) return;
     
+    const filteredEntries = getFilteredEntries();
     const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
     const identifier = effectiveCaseNumber || user.uid;
     const type = effectiveCaseNumber ? 'case' : 'user';
-    const filename = auditExportService.generateFilename(type, identifier, 'csv').replace('.csv', '.json');
+    const filename = auditExportService.generateFilename(type, identifier, 'csv'); // Will be converted to .json
     
     try {
       if (auditTrail && effectiveCaseNumber) {
+        // Use full audit trail export for case-specific data
         auditExportService.exportAuditTrailToJSON(auditTrail, filename);
       } else {
-        auditExportService.exportToJSON(auditEntries, filename);
+        // Use regular entry export for user data
+        auditExportService.exportToJSON(filteredEntries, filename);
       }
     } catch (error) {
       console.error('Export failed:', error);
@@ -200,6 +211,7 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
   const handleGenerateReport = async () => {
     if (!user) return;
     
+    const filteredEntries = getFilteredEntries();
     const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
     const identifier = effectiveCaseNumber || user.uid;
     const type = effectiveCaseNumber ? 'case' : 'user';
@@ -209,21 +221,22 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
       let reportContent: string;
       
       if (auditTrail && effectiveCaseNumber) {
+        // Use audit trail report for case-specific data
         reportContent = auditExportService.generateReportSummary(auditTrail);
       } else {
         // Generate user-specific report
-        const totalEntries = auditEntries.length;
-        const successfulActions = auditEntries.filter(e => e.result === 'success').length;
-        const failedActions = auditEntries.filter(e => e.result === 'failure').length;
+        const totalEntries = filteredEntries.length;
+        const successfulActions = filteredEntries.filter(e => e.result === 'success').length;
+        const failedActions = filteredEntries.filter(e => e.result === 'failure').length;
         
-        const actionCounts = auditEntries.reduce((acc, entry) => {
+        const actionCounts = filteredEntries.reduce((acc, entry) => {
           acc[entry.action] = (acc[entry.action] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
 
-        const dateRange = auditEntries.length > 0 ? {
-          earliest: new Date(Math.min(...auditEntries.map(e => new Date(e.timestamp).getTime()))),
-          latest: new Date(Math.max(...auditEntries.map(e => new Date(e.timestamp).getTime())))
+        const dateRange = filteredEntries.length > 0 ? {
+          earliest: new Date(Math.min(...filteredEntries.map(e => new Date(e.timestamp).getTime()))),
+          latest: new Date(Math.max(...filteredEntries.map(e => new Date(e.timestamp).getTime())))
         } : null;
 
         reportContent = `${caseNumber ? 'CASE' : 'USER'} AUDIT REPORT
@@ -246,7 +259,7 @@ ${Object.entries(actionCounts)
   .join('\n')}
 
 === RECENT ACTIVITIES ===
-${auditEntries.slice(0, 10).map(entry => 
+${filteredEntries.slice(0, 10).map(entry => 
   `${new Date(entry.timestamp).toLocaleString()} | ${entry.action} | ${entry.result}${entry.details.caseNumber ? ` | Case: ${entry.details.caseNumber}` : ''}`
 ).join('\n')}
 
@@ -270,6 +283,87 @@ Generated by Striae Forensic Annotation System
     }
   };
 
+  const getActionIcon = (action: AuditAction): string => {
+    switch (action) {
+      // User & Session Management
+      case 'user-login': return '🔑';
+      case 'user-logout': return '🚪';
+      case 'user-profile-update': return '👤';
+      case 'user-password-reset': return '🔒';
+      
+      // Case Management
+      case 'case-create': return '📂';
+      case 'case-rename': return '✏️';
+      case 'case-delete': return '🗑️';
+      
+      // Confirmation Workflow
+      case 'case-export': return '📤';
+      case 'case-import': return '📥';
+      case 'confirmation-create': return '✅';
+      case 'confirmation-export': return '📤';
+      case 'confirmation-import': return '📥';
+      
+      // File Operations
+      case 'file-upload': return '⬆️';
+      case 'file-delete': return '🗑️';
+      case 'file-access': return '👁️';
+      
+      // Annotation Operations
+      case 'annotation-create': return '✨';
+      case 'annotation-edit': return '✏️';
+      case 'annotation-delete': return '❌';
+      
+      // Document Generation
+      case 'pdf-generate': return '📄';
+      
+      // Security & Monitoring
+      case 'security-violation': return '🚨';
+      
+      // Legacy Actions
+      case 'export': return '📤';
+      case 'import': return '📥';
+      case 'confirm': return '✓';
+      
+      default: return '📄';
+    }
+  };
+
+  const getStatusIcon = (result: AuditResult): string => {
+    switch (result) {
+      case 'success': return '✅';
+      case 'failure': return '❌';
+      case 'warning': return '⚠️';
+      case 'blocked': return '🛑';
+      case 'pending': return '⏳';
+      default: return '❓';
+    }
+  };
+
+  const formatTimestamp = (timestamp: string): string => {
+    return new Date(timestamp).toLocaleString();
+  };
+
+  const getDateRangeDisplay = (): string => {
+    switch (dateRange) {
+      case 'all':
+        return 'All Time';
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          const startFormatted = new Date(customStartDate).toLocaleDateString();
+          const endFormatted = new Date(customEndDate).toLocaleDateString();
+          return `${startFormatted} - ${endFormatted}`;
+        } else if (customStartDate) {
+          return `From ${new Date(customStartDate).toLocaleDateString()}`;
+        } else if (customEndDate) {
+          return `Until ${new Date(customEndDate).toLocaleDateString()}`;
+        } else {
+          return 'Custom Range';
+        }
+      default:
+        return `Last ${dateRange}`;
+    }
+  };
+
   // Get summary statistics
   const totalEntries = auditEntries.length;
   const successfulEntries = auditEntries.filter(e => e.result === 'success').length;
@@ -289,62 +383,477 @@ Generated by Striae Forensic Annotation System
             {title || (caseNumber ? `Audit Trail - Case ${caseNumber}` : 'My Audit Trail')}
           </h2>
           <div className={styles.headerActions}>
-            <AuditExportButtons
-              hasEntries={auditEntries.length > 0}
-              onExportCSV={handleExportCSV}
-              onExportJSON={handleExportJSON}
-              onGenerateReport={handleGenerateReport}
-            />
-            <button onClick={onClose} className={styles.closeButton}>×</button>
+            {auditEntries.length > 0 && (
+              <div className={styles.exportButtons}>
+                <button 
+                  onClick={handleExportCSV}
+                  className={styles.exportButton}
+                  title="Export to CSV for Excel analysis"
+                >
+                  📊 CSV
+                </button>
+                <button 
+                  onClick={handleExportJSON}
+                  className={styles.exportButton}
+                  title="Export to JSON for technical analysis"
+                >
+                  📄 JSON
+                </button>
+                <button 
+                  onClick={handleGenerateReport}
+                  className={styles.exportButton}
+                  title="Generate summary report"
+                >
+                  📋 Report
+                </button>
+              </div>
+            )}
+            <button className={styles.closeButton} onClick={onClose}>×</button>
           </div>
         </div>
 
         <div className={styles.content}>
-          {loading ? (
-            <div className={styles.loading}>Loading audit data...</div>
-          ) : error ? (
-            <div className={styles.error}>{error}</div>
-          ) : (
+          {loading && (
+            <div className={styles.loading}>
+              <div className={styles.spinner}></div>
+              <p>Loading your audit trail...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className={styles.error}>
+              <p>Error: {error}</p>
+              <button onClick={loadAuditData} className={styles.retryButton}>
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && (
             <>
-              <div className={styles.sidebar}>
-                <AuditSummaryStats
-                  totalEntries={totalEntries}
-                  successfulEntries={successfulEntries}
-                  failedEntries={failedEntries}
-                  securityIncidents={securityIncidents}
-                  loginSessions={loginSessions}
-                />
-                
-                <AuditFilters
-                  filterAction={filterAction}
-                  filterResult={filterResult}
-                  dateRange={dateRange}
-                  customStartDate={customStartDate}
-                  customEndDate={customEndDate}
-                  customStartDateInput={customStartDateInput}
-                  customEndDateInput={customEndDateInput}
-                  filterCaseNumber={filterCaseNumber}
-                  caseNumberInput={caseNumberInput}
-                  caseNumber={caseNumber}
-                  onFilterActionChange={setFilterAction}
-                  onFilterResultChange={setFilterResult}
-                  onDateRangeChange={setDateRange}
-                  onCustomStartDateInputChange={setCustomStartDateInput}
-                  onCustomEndDateInputChange={setCustomEndDateInput}
-                  onCaseNumberInputChange={setCaseNumberInput}
-                  onApplyCaseFilter={handleApplyCaseFilter}
-                  onClearCaseFilter={handleClearCaseFilter}
-                  onApplyCustomDateRange={handleApplyCustomDateRange}
-                  onClearCustomDateRange={handleClearCustomDateRange}
-                />
+              {/* User Information Section */}
+              {user && (
+                <div className={styles.summary}>
+                  <h3>User Information</h3>
+                  <div className={styles.userInfoContent}>
+                    <div className={styles.userInfoItem}>
+                      Name: <strong>
+                        {userData ? `${userData.firstName} ${userData.lastName}` : user.displayName || 'Not provided'}
+                      </strong>
+                    </div>
+                    <div className={styles.userInfoItem}>
+                      Email: <strong>{user.email || 'Not provided'}</strong>
+                    </div>
+                    <div className={styles.userInfoItem}>
+                      Lab/Company: <strong>{userData?.company || 'Not provided'}</strong>
+                    </div>
+                    <div className={styles.userInfoItem}>
+                      User ID: <strong>{user.uid}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Summary Section */}
+              <div className={styles.summary}>
+                <h3>
+                  {(caseNumber || filterCaseNumber.trim()) 
+                    ? `Case Activity Summary - ${caseNumber || filterCaseNumber.trim()} (${getDateRangeDisplay()})`
+                    : `Activity Summary (${getDateRangeDisplay()})`
+                  }
+                </h3>
+                <div className={styles.summaryGrid}>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.label}>Total Activities:</span>
+                    <span className={styles.value}>{totalEntries}</span>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.label}>Successful:</span>
+                    <span className={styles.value}>{successfulEntries}</span>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.label}>Failed:</span>
+                    <span className={styles.value}>{failedEntries}</span>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.label}>Login Sessions:</span>
+                    <span className={styles.value}>{loginSessions}</span>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.label}>Security Incidents:</span>
+                    <span className={`${styles.value} ${securityIncidents > 0 ? styles.warning : ''}`}>
+                      {securityIncidents}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className={styles.main}>
-                <AuditEntryList
-                  entries={auditEntries}
-                  filterAction={filterAction}
-                  filterResult={filterResult}
-                />
+              {/* Filters */}
+              <div className={styles.filters}>
+                <div className={styles.filterGroup}>
+                  <label htmlFor="dateRange">Time Period:</label>
+                  <select 
+                    id="dateRange"
+                    value={dateRange} 
+                    onChange={(e) => {
+                      const newRange = e.target.value as '1d' | '7d' | '30d' | 'all' | 'custom';
+                      setDateRange(newRange);
+                      // When switching to custom, populate inputs with current applied values
+                      if (newRange === 'custom') {
+                        setCustomStartDateInput(customStartDate);
+                        setCustomEndDateInput(customEndDate);
+                      }
+                    }}
+                    className={styles.filterSelect}
+                  >
+                    <option value="1d">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="all">All Time</option>
+                    <option value="custom">Custom Range</option>
+                  </select>
+                </div>
+
+                {/* Custom Date Range Inputs */}
+                {dateRange === 'custom' && (
+                  <div className={styles.customDateRange}>
+                    <div className={styles.customDateInputs}>
+                      <div className={styles.filterGroup}>
+                        <label htmlFor="startDate">Start Date:</label>
+                        <input
+                          type="date"
+                          id="startDate"
+                          value={customStartDateInput}
+                          onChange={(e) => setCustomStartDateInput(e.target.value)}
+                          className={styles.filterInput}
+                          max={customEndDateInput || new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div className={styles.filterGroup}>
+                        <label htmlFor="endDate">End Date:</label>
+                        <input
+                          type="date"
+                          id="endDate"
+                          value={customEndDateInput}
+                          onChange={(e) => setCustomEndDateInput(e.target.value)}
+                          className={styles.filterInput}
+                          min={customStartDateInput}
+                          max={new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div className={styles.dateRangeButtons}>
+                        {(customStartDateInput || customEndDateInput) && (
+                          <button
+                            type="button"
+                            onClick={handleApplyCustomDateRange}
+                            className={styles.filterButton}
+                            title="Apply custom date range"
+                          >
+                            Apply Dates
+                          </button>
+                        )}
+                        {(customStartDate || customEndDate) && (
+                          <button
+                            type="button"
+                            onClick={handleClearCustomDateRange}
+                            className={styles.clearButton}
+                            title="Clear custom date range"
+                          >
+                            Clear Dates
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {(customStartDate || customEndDate) && (
+                      <div className={styles.activeFilter}>
+                        <small>
+                          Custom range: 
+                          {customStartDate && <strong> from {new Date(customStartDate).toLocaleDateString()}</strong>}
+                          {customEndDate && <strong> to {new Date(customEndDate).toLocaleDateString()}</strong>}
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className={styles.filterGroup}>
+                  <label htmlFor="caseFilter">Case Number:</label>
+                  <div className={styles.inputWithButton}>
+                    <input
+                      type="text"
+                      id="caseFilter"
+                      value={caseNumberInput}
+                      onChange={(e) => setCaseNumberInput(e.target.value)}
+                      className={styles.filterInput}
+                      placeholder="Enter case number..."
+                      disabled={!!caseNumber} // Disable if already viewing a specific case
+                      title={caseNumber ? "Case filter disabled - viewing specific case" : "Enter complete case number and click Filter"}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && caseNumberInput.trim() && !caseNumber) {
+                          handleApplyCaseFilter();
+                        }
+                      }}
+                    />
+                    {!caseNumber && (
+                      <div className={styles.caseFilterButtons}>
+                        {caseNumberInput.trim() && (
+                          <button
+                            type="button"
+                            onClick={handleApplyCaseFilter}
+                            className={styles.filterButton}
+                            title="Apply case filter"
+                          >
+                            Filter
+                          </button>
+                        )}
+                        {filterCaseNumber && (
+                          <button
+                            type="button"
+                            onClick={handleClearCaseFilter}
+                            className={styles.clearButton}
+                            title="Clear case filter"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {filterCaseNumber && !caseNumber && (
+                    <div className={styles.activeFilter}>
+                      <small>Filtering by case: <strong>{filterCaseNumber}</strong></small>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.filterGroup}>
+                  <label htmlFor="actionFilter">Activity Type:</label>
+                  <select 
+                    id="actionFilter"
+                    value={filterAction} 
+                    onChange={(e) => setFilterAction(e.target.value as AuditAction | 'all')}
+                    className={styles.filterSelect}
+                  >
+                    <option value="all">All Activities</option>
+                    <optgroup label="User Sessions">
+                      <option value="user-login">Login</option>
+                      <option value="user-logout">Logout</option>
+                    </optgroup>
+                    <optgroup label="Case Management">
+                      <option value="case-create">Case Create</option>
+                      <option value="case-rename">Case Rename</option>
+                      <option value="case-delete">Case Delete</option>
+                    </optgroup>
+                    <optgroup label="File Operations">
+                      <option value="file-upload">File Upload</option>
+                      <option value="file-access">File Access</option>
+                      <option value="file-delete">File Delete</option>
+                    </optgroup>
+                    <optgroup label="Annotations">
+                      <option value="annotation-create">Annotation Create</option>
+                      <option value="annotation-edit">Annotation Edit</option>
+                      <option value="annotation-delete">Annotation Delete</option>
+                    </optgroup>
+                    <optgroup label="Confirmation Workflow">
+                      <option value="case-export">Case Export</option>
+                      <option value="case-import">Case Import</option>
+                      <option value="confirmation-create">Confirmation Create</option>
+                      <option value="confirmation-export">Confirmation Export</option>
+                      <option value="confirmation-import">Confirmation Import</option>
+                    </optgroup>
+                    <optgroup label="Documents">
+                      <option value="pdf-generate">PDF Generate</option>
+                    </optgroup>
+                    <optgroup label="Security">
+                      <option value="security-violation">Security Violation</option>
+                    </optgroup>
+                  </select>
+                </div>
+
+                <div className={styles.filterGroup}>
+                  <label htmlFor="resultFilter">Result:</label>
+                  <select 
+                    id="resultFilter"
+                    value={filterResult} 
+                    onChange={(e) => setFilterResult(e.target.value as AuditResult | 'all')}
+                    className={styles.filterSelect}
+                  >
+                    <option value="all">All Results</option>
+                    <option value="success">Success</option>
+                    <option value="failure">Failure</option>
+                    <option value="warning">Warning</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Entries List */}
+              <div className={styles.entriesList}>
+                <h3>Activity Log ({getFilteredEntries().length} entries)</h3>
+                {getFilteredEntries().length === 0 ? (
+                  <div className={styles.noEntries}>
+                    <p>No activities match the current filters.</p>
+                  </div>
+                ) : (
+                  getFilteredEntries().map((entry, index) => (
+                    <div key={index} className={`${styles.entry} ${styles[entry.result]}`}>
+                      <div className={styles.entryHeader}>
+                        <div className={styles.entryIcons}>
+                          <span className={styles.actionIcon}>{getActionIcon(entry.action)}</span>
+                          <span className={styles.statusIcon}>{getStatusIcon(entry.result)}</span>
+                        </div>
+                        <div className={styles.entryTitle}>
+                          <span className={styles.action}>{entry.action.toUpperCase().replace(/-/g, ' ')}</span>
+                          <span className={styles.fileName}>{entry.details.fileName}</span>
+                        </div>
+                        <div className={styles.entryTimestamp}>
+                          {formatTimestamp(entry.timestamp)}
+                        </div>
+                      </div>
+
+                      {/* Basic Details */}
+                      <div className={styles.entryDetails}>
+                        {entry.details.caseNumber && (
+                          <div className={styles.detailRow}>
+                            <span className={styles.detailLabel}>Case:</span>
+                            <span className={styles.detailValue}>{entry.details.caseNumber}</span>
+                          </div>
+                        )}
+
+                        {entry.result === 'failure' && entry.details.validationErrors.length > 0 && (
+                          <div className={styles.detailRow}>
+                            <span className={styles.detailLabel}>Error:</span>
+                            <span className={styles.detailValue}>{entry.details.validationErrors[0]}</span>
+                          </div>
+                        )}
+
+                        {/* Session Details for Login/Logout */}
+                        {(entry.action === 'user-login' || entry.action === 'user-logout') && entry.details.sessionDetails && (
+                          <>
+                            {entry.details.sessionDetails.userAgent && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>User Agent:</span>
+                                <span className={styles.detailValue}>{entry.details.sessionDetails.userAgent}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {/* Security Details */}
+                        {entry.action === 'security-violation' && entry.details.securityDetails && (
+                          <>
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Severity:</span>
+                              <span className={`${styles.detailValue} ${styles.severity} ${styles[entry.details.securityDetails.severity || 'low']}`}>
+                                {(entry.details.securityDetails.severity || 'low').toUpperCase()}
+                              </span>
+                            </div>
+                            {entry.details.securityDetails.incidentType && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Type:</span>
+                                <span className={styles.detailValue}>{entry.details.securityDetails.incidentType}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {/* File Operation Details */}
+                        {(entry.action === 'file-upload' || entry.action === 'file-delete' || entry.action === 'file-access') && entry.details.fileDetails && (
+                          <>
+                            {/* File ID */}
+                            {entry.details.fileDetails.fileId && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>File ID:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.fileId}</span>
+                              </div>
+                            )}
+                            
+                            {/* Original Filename */}
+                            {entry.details.fileDetails.originalFileName && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Original Filename:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.originalFileName}</span>
+                              </div>
+                            )}
+                            
+                            {/* File Size */}
+                            {entry.details.fileDetails.fileSize > 0 && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>File Size:</span>
+                                <span className={styles.detailValue}>
+                                  {(entry.details.fileDetails.fileSize / 1024 / 1024).toFixed(2)} MB
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Access Method/Upload Method */}
+                            {entry.details.fileDetails.uploadMethod && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>
+                                  {entry.action === 'file-access' ? 'Access Method' : 'Upload Method'}:
+                                </span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.uploadMethod}</span>
+                              </div>
+                            )}
+                            
+                            {/* Delete Reason */}
+                            {entry.details.fileDetails.deleteReason && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Reason:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.deleteReason}</span>
+                              </div>
+                            )}
+                            
+                            {/* Access Source */}
+                            {entry.details.fileDetails.sourceLocation && entry.action === 'file-access' && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Access Source:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.sourceLocation}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {/* Annotation Details */}
+                        {(entry.action === 'annotation-create' || entry.action === 'annotation-edit' || entry.action === 'annotation-delete') && entry.details.fileDetails && (
+                          <>
+                            {/* File ID */}
+                            {entry.details.fileDetails.fileId && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>File ID:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.fileId}</span>
+                              </div>
+                            )}
+                            
+                            {/* Original Filename */}
+                            {entry.details.fileDetails.originalFileName && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Original Filename:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.originalFileName}</span>
+                              </div>
+                            )}
+                            
+                            {/* Annotation Type */}
+                            {entry.details.annotationDetails?.annotationType && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Annotation Type:</span>
+                                <span className={styles.detailValue}>{entry.details.annotationDetails.annotationType}</span>
+                              </div>
+                            )}
+                            
+                            {/* Tool Used */}
+                            {entry.details.annotationDetails?.tool && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Tool:</span>
+                                <span className={styles.detailValue}>{entry.details.annotationDetails.tool}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </>
           )}

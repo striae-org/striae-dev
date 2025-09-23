@@ -199,8 +199,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     await auditService.logCaseCreation(
       user,
       caseNumber,
-      'success',
-      'Case created successfully'
+      caseNumber // Using case number as case name for now
     );
 
     console.log(`✅ Case created: ${caseNumber} (${endTime - startTime}ms)`);
@@ -371,10 +370,9 @@ export const renameCase = async (
     const endTime = Date.now();
     await auditService.logCaseRename(
       user,
+      newCaseNumber, // Use new case number as the current context
       oldCaseNumber,
-      newCaseNumber,
-      'success',
-      'Case renamed successfully'
+      newCaseNumber
     );
 
     console.log(`✅ Case renamed: ${oldCaseNumber} → ${newCaseNumber} (${endTime - startTime}ms)`);
@@ -471,8 +469,9 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     await auditService.logCaseDeletion(
       user,
       caseNumber,
-      'success',
-      'User-requested deletion via case actions'
+      caseName,
+      'User-requested deletion via case actions',
+      false // No backup created for standard deletions
     );
 
     console.log(`✅ Case deleted: ${caseNumber} (${fileCount} files) (${endTime - startTime}ms)`);
