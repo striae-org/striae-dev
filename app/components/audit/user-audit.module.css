@@ -157,15 +157,10 @@
 
 /* Common heading styles */
 .summary h3,
-.userInfo h3,
 .entriesList h3 {
   margin: 0 0 16px 0;
   color: var(--textTitle);
   font-size: 1.2rem;
-}
-
-.userInfo h3 {
-  margin-bottom: 12px;
 }
 
 .summaryGrid {
@@ -202,10 +197,6 @@
 }
 
 /* User Information Section */
-.userInfo {
-  margin-bottom: 24px;
-}
-
 .userInfoContent {
   display: flex;
   flex-direction: column;
