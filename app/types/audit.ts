@@ -208,11 +208,9 @@ export interface FileAuditDetails {
   mimeType?: string;
   uploadMethod?: 'drag-drop' | 'file-picker' | 'api' | 'import';
   processingTime?: number;
-  compressionApplied?: boolean;
   thumbnailGenerated?: boolean;
   deleteReason?: string;
   sourceLocation?: string;
-  destinationPath?: string;
 }
 
 /**
@@ -225,9 +223,7 @@ export interface AnnotationAuditDetails {
   canvasPosition?: { x: number; y: number };
   annotationSize?: { width: number; height: number };
   previousValue?: any; // For edit operations
-  batchSize?: number; // For batch operations
   tool?: string; // Which tool was used to create/edit
-  confidence?: number; // AI confidence level if applicable
 }
 
 /**
@@ -267,8 +263,6 @@ export interface UserProfileAuditDetails {
   verificationAttempts?: number;
   passwordComplexityMet?: boolean;
   previousPasswordReused?: boolean;
-  accountLocked?: boolean;
-  unlockMethod?: 'time-based' | 'admin-unlock' | 'successful-verification';
   // Account deletion specific fields
   deletionReason?: 'user-requested' | 'admin-initiated' | 'policy-violation' | 'inactive-account';
   dataRetentionPeriod?: number; // Days before permanent deletion
