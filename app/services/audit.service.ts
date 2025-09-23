@@ -499,6 +499,51 @@ export class AuditService {
   }
 
   /**
+   * Log file access event (e.g., viewing an image)
+   */
+  public async logFileAccess(
+    user: User,
+    fileName: string,
+    fileId: string,
+    accessMethod: 'direct-url' | 'signed-url' | 'download',
+    caseNumber?: string,
+    result: AuditResult = 'success',
+    processingTime?: number,
+    accessReason?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'file-access',
+      result,
+      fileName,
+      fileType: 'image-file', // Most file access in Striae is for images
+      checksumValid: result === 'success',
+      validationErrors: result === 'failure' ? ['File access failed'] : [],
+      caseNumber,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: result === 'success',
+        timestampValidationPassed: true,
+        permissionChecksPassed: result !== 'failure'
+      },
+      fileDetails: {
+        fileSize: 0, // File size not available for access events
+        uploadMethod: accessMethod as any, // Reuse for access method
+        processingTime,
+        sourceLocation: accessReason || 'Image viewer'
+      },
+      performanceMetrics: processingTime ? {
+        processingTimeMs: processingTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 1,
+        validationStepsFailed: result === 'failure' ? 1 : 0
+      } : undefined
+    });
+  }
+
+  /**
    * Log annotation creation event
    */
   public async logAnnotationCreate(

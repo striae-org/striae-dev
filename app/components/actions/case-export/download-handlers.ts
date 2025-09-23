@@ -314,7 +314,7 @@ export async function downloadCaseAsZip(
       for (let i = 0; i < exportData.files.length; i++) {
         const file = exportData.files[i];
         try {
-          const imageBlob = await fetchImageAsBlob(file.fileData);
+          const imageBlob = await fetchImageAsBlob(user, file.fileData, caseNumber);
           if (imageBlob) {
             imageFolder.file(file.fileData.originalFilename, imageBlob);
             imageFiles[file.fileData.originalFilename] = imageBlob;
@@ -444,9 +444,9 @@ For questions about this export, contact your Striae system administrator.
 /**
  * Helper function to fetch image as blob
  */
-async function fetchImageAsBlob(fileData: FileData): Promise<Blob | null> {
+async function fetchImageAsBlob(user: User, fileData: FileData, caseNumber: string): Promise<Blob | null> {
   try {
-    const imageUrl = await getImageUrl(fileData);
+    const imageUrl = await getImageUrl(user, fileData, caseNumber);
     if (!imageUrl) return null;
     
     const response = await fetch(imageUrl);

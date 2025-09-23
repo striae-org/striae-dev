@@ -114,6 +114,7 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       // File Operations
       case 'file-upload': return '⬆️';
       case 'file-delete': return '🗑️';
+      case 'file-access': return '👁️';
       
       // Annotation Operations
       case 'annotation-create': return '✨';

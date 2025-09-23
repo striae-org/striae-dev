@@ -71,6 +71,7 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
       case 'case-delete': return '🗑️';
       case 'file-upload': return '⬆️';
       case 'file-delete': return '🗑️';
+      case 'file-access': return '👁️';
       case 'annotation-create': return '✨';
       case 'annotation-edit': return '✏️';
       case 'annotation-delete': return '❌';

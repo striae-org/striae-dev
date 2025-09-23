@@ -7,7 +7,7 @@ export type AuditAction =
   // Confirmation Workflow Actions  
   | 'case-export' | 'case-import' | 'confirmation-create' | 'confirmation-export' | 'confirmation-import'
   // File Operations
-  | 'file-upload' | 'file-delete'
+  | 'file-upload' | 'file-delete' | 'file-access'
   // Annotation Operations
   | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
   // User & Session Management

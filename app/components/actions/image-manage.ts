@@ -326,25 +326,80 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
 };
 
 
-export const getImageUrl = async (fileData: FileData): Promise<string> => {
-  const { accountHash } = await getImageConfig();  
-  const imagesApiToken = await getImageApiKey();
-  const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
+export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: string): Promise<string> => {
+  const startTime = Date.now();
   
-  const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${imagesApiToken}`,
-      'Accept': 'text/plain'
+  try {
+    const { accountHash } = await getImageConfig();  
+    const imagesApiToken = await getImageApiKey();
+    const imageDeliveryUrl = `https://imagedelivery.net/${accountHash}/${fileData.id}/${DEFAULT_VARIANT}`;
+    
+    const workerResponse = await fetch(`${IMAGE_URL}/${imageDeliveryUrl}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${imagesApiToken}`,
+        'Accept': 'text/plain'
+      }
+    });
+    
+    if (!workerResponse.ok) {
+      // Log failed image access
+      await auditService.logFileAccess(
+        user,
+        fileData.originalFilename || fileData.id,
+        fileData.id,
+        'signed-url',
+        caseNumber,
+        'failure',
+        Date.now() - startTime,
+        'Image URL generation failed'
+      );
+      throw new Error('Failed to get signed image URL');
     }
-  });
-  
-  if (!workerResponse.ok) throw new Error('Failed to get signed image URL');
-  
-  const signedUrl = await workerResponse.text();
-  if (!signedUrl.includes('sig=') || !signedUrl.includes('exp=')) {
-    throw new Error('Invalid signed URL returned');
+    
+    const signedUrl = await workerResponse.text();
+    if (!signedUrl.includes('sig=') || !signedUrl.includes('exp=')) {
+      // Log invalid URL response
+      await auditService.logFileAccess(
+        user,
+        fileData.originalFilename || fileData.id,
+        fileData.id,
+        'signed-url',
+        caseNumber,
+        'failure',
+        Date.now() - startTime,
+        'Invalid signed URL returned'
+      );
+      throw new Error('Invalid signed URL returned');
+    }
+    
+    // Log successful image access
+    await auditService.logFileAccess(
+      user,
+      fileData.originalFilename || fileData.id,
+      fileData.id,
+      'signed-url',
+      caseNumber,
+      'success',
+      Date.now() - startTime,
+      'Image viewer access'
+    );
+    
+    return signedUrl;
+  } catch (error) {
+    // Log any unexpected errors if not already logged
+    if (!(error instanceof Error && error.message.includes('Failed to get signed image URL'))) {
+      await auditService.logFileAccess(
+        user,
+        fileData.originalFilename || fileData.id,
+        fileData.id,
+        'signed-url',
+        caseNumber,
+        'failure',
+        Date.now() - startTime,
+        'Unexpected error during image access'
+      );
+    }
+    throw error;
   }
-  
-  return signedUrl;
 };

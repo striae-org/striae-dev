@@ -252,7 +252,7 @@ export const Striae = ({ user }: StriaePage) => {
       setSelectedFilename(undefined);
       setImageLoaded(false);
     
-    const signedUrl = await getImageUrl(file);
+    const signedUrl = await getImageUrl(user, file, caseNumber);
     if (!signedUrl) throw new Error('No URL returned');
 
     setSelectedImage(signedUrl);
