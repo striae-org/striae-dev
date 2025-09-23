@@ -434,7 +434,7 @@ export class AuditService {
     fileSize: number,
     mimeType: string,
     uploadMethod: 'drag-drop' | 'file-picker' | 'api' | 'import',
-    caseNumber?: string,
+    caseNumber: string,
     result: AuditResult = 'success',
     processingTime?: number,
     virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed',
@@ -459,14 +459,14 @@ export class AuditService {
         permissionChecksPassed: true
       },
       fileDetails: {
+        fileId: fileId || undefined,
+        originalFileName: fileName,
         fileSize,
         mimeType,
         uploadMethod,
         processingTime,
         virusScanResult,
-        thumbnailGenerated: result === 'success' && this.isImageFile(mimeType),
-        fileId: fileId,
-        originalFileName: fileName
+        thumbnailGenerated: result === 'success' && this.isImageFile(mimeType)
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
@@ -485,7 +485,7 @@ export class AuditService {
     fileName: string,
     fileSize: number,
     deleteReason: string,
-    caseNumber?: string,
+    caseNumber: string,
     fileId?: string,
     originalFileName?: string
   ): Promise<void> {
@@ -508,8 +508,8 @@ export class AuditService {
         permissionChecksPassed: true
       },
       fileDetails: {
-        fileId: fileId,
-        originalFileName: originalFileName,
+        fileId: fileId || undefined,
+        originalFileName,
         fileSize,
         deleteReason
       }
@@ -524,7 +524,7 @@ export class AuditService {
     fileName: string,
     fileId: string,
     accessMethod: 'direct-url' | 'signed-url' | 'download',
-    caseNumber?: string,
+    caseNumber: string,
     result: AuditResult = 'success',
     processingTime?: number,
     accessReason?: string,
@@ -549,8 +549,8 @@ export class AuditService {
         permissionChecksPassed: result !== 'failure'
       },
       fileDetails: {
-        fileId: fileId,
-        originalFileName: originalFileName,
+        fileId,
+        originalFileName,
         fileSize: 0, // File size not available for access events
         uploadMethod: accessMethod as any, // Reuse for access method
         processingTime,
@@ -573,7 +573,7 @@ export class AuditService {
     annotationId: string,
     annotationType: 'measurement' | 'identification' | 'comparison' | 'note' | 'region',
     annotationData: any,
-    caseNumber?: string,
+    caseNumber: string,
     tool?: string,
     imageFileId?: string,
     originalImageFileName?: string
@@ -622,7 +622,7 @@ export class AuditService {
     annotationId: string,
     previousValue: any,
     newValue: any,
-    caseNumber?: string,
+    caseNumber: string,
     tool?: string,
     imageFileId?: string,
     originalImageFileName?: string
@@ -669,7 +669,7 @@ export class AuditService {
     user: User,
     annotationId: string,
     annotationData: any,
-    caseNumber?: string,
+    caseNumber: string,
     deleteReason?: string,
     imageFileId?: string,
     originalImageFileName?: string

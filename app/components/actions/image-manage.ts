@@ -329,7 +329,7 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
 };
 
 
-export const getImageUrl = async (user: User, fileData: FileData, caseNumber?: string): Promise<string> => {
+export const getImageUrl = async (user: User, fileData: FileData, caseNumber: string): Promise<string> => {
   const startTime = Date.now();
   
   try {
