@@ -4,6 +4,7 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { DeleteAccount } from './delete-account';
+import { UserAuditViewer } from '../audit/user-audit-viewer';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
 import { getUserData } from '~/utils/permissions';
@@ -29,6 +30,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAuditViewer, setShowAuditViewer] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -116,6 +118,15 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   };
 
   if (!isOpen) return null;
+
+  if (showAuditViewer) {
+    return (
+      <UserAuditViewer 
+        isOpen={showAuditViewer}
+        onClose={() => setShowAuditViewer(false)}
+      />
+    );
+  }
 
   if (showResetForm) {
     return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
@@ -218,6 +229,13 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                   disabled={isLoading}
                 >
                   {isLoading ? 'Updating...' : 'Update Profile'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuditViewer(true)}
+                  className={styles.secondaryButton}
+                >
+                  View My Audit Trail
                 </button>
                 <button
                   type="button"

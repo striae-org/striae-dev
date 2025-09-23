@@ -93,10 +93,63 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
 
   const getActionIcon = (action: AuditAction): string => {
     switch (action) {
+      // Legacy confirmation workflow actions
       case 'export': return '📤';
       case 'import': return '📥';
       case 'confirm': return '✓';
       case 'validate': return '🔍';
+      
+      // Case Management Actions
+      case 'case-create': return '📂';
+      case 'case-rename': return '✏️';
+      case 'case-delete': return '🗑️';
+      case 'case-open': return '📂';
+      case 'case-close': return '📋';
+      
+      // Confirmation Workflow Actions  
+      case 'case-export': return '📤';
+      case 'case-import': return '📥';
+      case 'confirmation-create': return '✅';
+      case 'confirmation-export': return '📤';
+      case 'confirmation-import': return '📥';
+      
+      // File Operations
+      case 'file-upload': return '⬆️';
+      case 'file-delete': return '🗑️';
+      case 'file-download': return '⬇️';
+      case 'file-process': return '⚙️';
+      
+      // Annotation Operations
+      case 'annotation-create': return '✨';
+      case 'annotation-edit': return '✏️';
+      case 'annotation-save': return '💾';
+      case 'annotation-delete': return '❌';
+      case 'annotation-batch-operation': return '📦';
+      
+      // User & Session Management
+      case 'user-login': return '🔑';
+      case 'user-logout': return '🚪';
+      case 'session-timeout': return '⏰';
+      case 'permission-change': return '🛡️';
+      
+      // Document Generation
+      case 'pdf-generate': return '📄';
+      case 'pdf-download': return '📄';
+      case 'report-generate': return '📊';
+      case 'report-export': return '📤';
+      
+      // System Operations
+      case 'settings-change': return '⚙️';
+      case 'theme-change': return '🎨';
+      case 'backup-create': return '�';
+      case 'backup-restore': return '🔄';
+      
+      // Security & Monitoring
+      case 'security-violation': return '🚨';
+      case 'access-denied': return '🛑';
+      case 'suspicious-activity': return '⚠️';
+      case 'data-breach-attempt': return '�';
+      
       default: return '📄';
     }
   };
@@ -184,10 +237,53 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                     className={styles.filterSelect}
                   >
                     <option value="all">All Actions</option>
-                    <option value="export">Export</option>
-                    <option value="import">Import</option>
-                    <option value="confirm">Confirm</option>
-                    <option value="validate">Validate</option>
+                    <optgroup label="Case Management">
+                      <option value="case-create">Case Create</option>
+                      <option value="case-rename">Case Rename</option>
+                      <option value="case-delete">Case Delete</option>
+                      <option value="case-open">Case Open</option>
+                      <option value="case-close">Case Close</option>
+                    </optgroup>
+                    <optgroup label="File Operations">
+                      <option value="file-upload">File Upload</option>
+                      <option value="file-delete">File Delete</option>
+                      <option value="file-download">File Download</option>
+                      <option value="file-process">File Process</option>
+                    </optgroup>
+                    <optgroup label="Annotations">
+                      <option value="annotation-create">Annotation Create</option>
+                      <option value="annotation-edit">Annotation Edit</option>
+                      <option value="annotation-save">Annotation Save</option>
+                      <option value="annotation-delete">Annotation Delete</option>
+                    </optgroup>
+                    <optgroup label="User & Session">
+                      <option value="user-login">User Login</option>
+                      <option value="user-logout">User Logout</option>
+                      <option value="session-timeout">Session Timeout</option>
+                    </optgroup>
+                    <optgroup label="Document Generation">
+                      <option value="pdf-generate">PDF Generate</option>
+                      <option value="pdf-download">PDF Download</option>
+                      <option value="report-generate">Report Generate</option>
+                    </optgroup>
+                    <optgroup label="Confirmation Workflow">
+                      <option value="case-export">Case Export</option>
+                      <option value="case-import">Case Import</option>
+                      <option value="confirmation-create">Confirmation Create</option>
+                      <option value="confirmation-export">Confirmation Export</option>
+                      <option value="confirmation-import">Confirmation Import</option>
+                    </optgroup>
+                    <optgroup label="Security">
+                      <option value="security-violation">Security Violation</option>
+                      <option value="access-denied">Access Denied</option>
+                      <option value="suspicious-activity">Suspicious Activity</option>
+                    </optgroup>
+                    <optgroup label="Legacy">
+                      <option value="export">Export</option>
+                      <option value="import">Import</option>
+                      <option value="confirm">Confirm</option>
+                      <option value="validate">Validate</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div className={styles.filterGroup}>
@@ -202,6 +298,8 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                     <option value="success">Success</option>
                     <option value="failure">Failure</option>
                     <option value="warning">Warning</option>
+                    <option value="blocked">Blocked</option>
+                    <option value="pending">Pending</option>
                   </select>
                 </div>
               </div>
@@ -288,6 +386,93 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                               </div>
                             ))}
                           </div>
+                        </div>
+                      )}
+
+                      {/* Annotation Details */}
+                      {entry.details.annotationDetails && (
+                        <div className={styles.annotationDetails}>
+                          <span className={styles.detailLabel}>Annotation Details:</span>
+                          <div className={styles.annotationInfo}>
+                            {entry.details.annotationDetails.annotationType && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Type:</span>
+                                <span className={styles.detailValue}>{entry.details.annotationDetails.annotationType}</span>
+                              </div>
+                            )}
+                            {entry.details.annotationDetails.tool && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Tool:</span>
+                                <span className={styles.detailValue}>{entry.details.annotationDetails.tool}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* File Operation Details */}
+                      {(entry.action === 'file-upload' || entry.action === 'file-delete') && (
+                        <div className={styles.fileDetails}>
+                          <div className={styles.detailRow}>
+                            <span className={styles.detailLabel}>File Size:</span>
+                            <span className={styles.detailValue}>
+                              {entry.details.performanceMetrics?.fileSizeBytes 
+                                ? `${(entry.details.performanceMetrics.fileSizeBytes / 1024 / 1024).toFixed(2)} MB`
+                                : 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Session Details */}
+                      {(entry.action === 'user-login' || entry.action === 'user-logout') && entry.details.sessionDetails && (
+                        <div className={styles.sessionDetails}>
+                          <div className={styles.detailRow}>
+                            <span className={styles.detailLabel}>Session ID:</span>
+                            <span className={styles.detailValue}>{entry.details.sessionDetails.sessionId}</span>
+                          </div>
+                          {entry.details.sessionDetails.ipAddress && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>IP Address:</span>
+                              <span className={styles.detailValue}>{entry.details.sessionDetails.ipAddress}</span>
+                            </div>
+                          )}
+                          {entry.details.sessionDetails.location && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Location:</span>
+                              <span className={styles.detailValue}>{entry.details.sessionDetails.location}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Security Incident Details */}
+                      {entry.action === 'security-violation' && entry.details.securityDetails && (
+                        <div className={styles.securityDetails}>
+                          <div className={styles.detailRow}>
+                            <span className={styles.detailLabel}>Severity:</span>
+                            <span className={`${styles.detailValue} ${styles.severity} ${styles[entry.details.securityDetails.severity || 'low']}`}>
+                              {(entry.details.securityDetails.severity || 'low').toUpperCase()}
+                            </span>
+                          </div>
+                          {entry.details.securityDetails.incidentType && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Incident Type:</span>
+                              <span className={styles.detailValue}>{entry.details.securityDetails.incidentType}</span>
+                            </div>
+                          )}
+                          {entry.details.securityDetails.sourceIp && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Source IP:</span>
+                              <span className={styles.detailValue}>{entry.details.securityDetails.sourceIp}</span>
+                            </div>
+                          )}
+                          {entry.details.securityDetails.attackVector && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Attack Vector:</span>
+                              <span className={styles.detailValue}>{entry.details.securityDetails.attackVector}</span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
