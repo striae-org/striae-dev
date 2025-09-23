@@ -77,24 +77,6 @@
   font-weight: var(--fontWeightMedium);
 }
 
-.dateRangeDisplay {
-  color: var(--textLight);
-  font-size: 0.9rem;
-  margin-top: 4px;
-  font-weight: var(--fontWeightRegular);
-}
-
-.userInfoBadge {
-  color: var(--textLight);
-  font-size: 0.85rem;
-  margin-top: 4px;
-  background: var(--backgroundLight);
-  padding: 3px 8px;
-  border-radius: 4px;
-  display: inline-block;
-  border: 1px solid color-mix(in lab, var(--textLight) 15%, transparent);
-}
-
 .closeButton {
   background: none;
   border: none;
