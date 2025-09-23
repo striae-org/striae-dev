@@ -96,10 +96,7 @@ export type WorkflowPhase =
  */
 export interface SecurityCheckResults {
   selfConfirmationPrevented: boolean;
-  userAuthenticationValid: boolean;
   fileIntegrityValid: boolean;
-  timestampValidationPassed: boolean;
-  permissionChecksPassed: boolean;
   exporterUidValidated?: boolean;
 }
 

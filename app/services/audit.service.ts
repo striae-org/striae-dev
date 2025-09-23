@@ -121,10 +121,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: false, // Not applicable for exports
-      userAuthenticationValid: true,
-      fileIntegrityValid: result === 'success',
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: result === 'success'
     };
 
     await this.logEvent({
@@ -158,10 +155,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
       fileIntegrityValid: checksumValid,
-      timestampValidationPassed: result !== 'failure',
-      permissionChecksPassed: result !== 'failure',
       exporterUidValidated: !!originalExaminerUid
     };
 
@@ -199,10 +193,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
-      fileIntegrityValid: true,
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: true
     };
 
     await this.logEvent({
@@ -243,10 +234,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: false, // Not applicable for exports
-      userAuthenticationValid: true,
-      fileIntegrityValid: result === 'success',
-      timestampValidationPassed: true,
-      permissionChecksPassed: true
+      fileIntegrityValid: result === 'success'
     };
 
     await this.logEvent({
@@ -282,10 +270,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
-      userAuthenticationValid: true,
       fileIntegrityValid: checksumValid,
-      timestampValidationPassed: result !== 'failure',
-      permissionChecksPassed: result !== 'failure',
       exporterUidValidated: !!reviewingExaminerUid
     };
 
@@ -330,7 +315,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       caseDetails: {
         newCaseName: caseName,
         caseDescription,
@@ -362,7 +346,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       caseDetails: {
         oldCaseName: oldName,
         newCaseName: newName,
@@ -391,7 +374,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       caseDetails: {
         newCaseName: caseName,
         deleteReason,
@@ -425,7 +407,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName: fileName,
@@ -464,7 +445,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId: fileId || undefined,
         originalFileName,
@@ -498,7 +478,6 @@ export class AuditService {
       validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       fileDetails: {
         fileId,
         originalFileName,
@@ -537,7 +516,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType,
@@ -579,7 +557,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType: newValue?.type,
@@ -619,7 +596,6 @@ export class AuditService {
       validationErrors: [],
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       annotationDetails: {
         annotationId,
         annotationType: annotationData?.type,
@@ -654,7 +630,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: [],
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: {
         sessionId,
         userAgent,
@@ -681,7 +656,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: [],
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: {
         sessionId,
         sessionDuration,
@@ -712,7 +686,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId
       } : undefined,
@@ -752,7 +725,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId
       } : undefined,
@@ -792,7 +764,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
       } : undefined,
@@ -833,7 +804,6 @@ export class AuditService {
       fileType: 'log-file',
       validationErrors: errors,
       workflowPhase: 'user-management',
-      // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
       } : undefined,
@@ -870,7 +840,6 @@ export class AuditService {
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'casework',
-      // Security checks removed - no actual validation performed
       performanceMetrics: {
         processingTimeMs: processingTime,
         fileSizeBytes: fileSize || 0
@@ -897,7 +866,6 @@ export class AuditService {
       fileName: `security-incident-${Date.now()}.log`,
       fileType: 'log-file',
       validationErrors: [description],
-      // Security checks removed - no actual validation performed
       securityDetails: {
         incidentType,
         severity,
@@ -998,7 +966,6 @@ export class AuditService {
     const securityIncidents = entries.filter(e => 
       e.result === 'failure' && 
       (e.details.securityChecks?.selfConfirmationPrevented === false ||
-       !e.details.securityChecks?.userAuthenticationValid ||
        !e.details.securityChecks?.fileIntegrityValid)
     ).length;
 
