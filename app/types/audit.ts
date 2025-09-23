@@ -11,7 +11,7 @@ export type AuditAction =
   // Annotation Operations
   | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
   // User & Session Management
-  | 'user-login' | 'user-logout' | 'user-profile-update' | 'user-password-reset'
+  | 'user-login' | 'user-logout' | 'user-profile-update' | 'user-password-reset' | 'user-account-delete'
   // Document Generation
   | 'pdf-generate'
   // Security & Monitoring
@@ -288,4 +288,11 @@ export interface UserProfileAuditDetails {
   previousPasswordReused?: boolean;
   accountLocked?: boolean;
   unlockMethod?: 'time-based' | 'admin-unlock' | 'successful-verification';
+  // Account deletion specific fields
+  deletionReason?: 'user-requested' | 'admin-initiated' | 'policy-violation' | 'inactive-account';
+  dataRetentionPeriod?: number; // Days before permanent deletion
+  confirmationMethod?: 'uid-email' | 'password' | 'admin-override';
+  casesCount?: number; // Number of cases deleted with account
+  filesCount?: number; // Number of files deleted with account
+  emailNotificationSent?: boolean;
 }

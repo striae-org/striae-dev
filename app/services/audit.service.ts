@@ -830,6 +830,101 @@ export class AuditService {
   }
 
   /**
+   * Log user account deletion event
+   */
+  public async logAccountDeletion(
+    user: User,
+    result: AuditResult,
+    deletionReason: 'user-requested' | 'admin-initiated' | 'policy-violation' | 'inactive-account' = 'user-requested',
+    confirmationMethod: 'uid-email' | 'password' | 'admin-override' = 'uid-email',
+    casesCount?: number,
+    filesCount?: number,
+    dataRetentionPeriod?: number,
+    emailNotificationSent?: boolean,
+    sessionId?: string,
+    ipAddress?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || 'unknown@example.com',
+      action: 'user-account-delete',
+      result,
+      fileName: `account-deletion-${user.uid}.log`,
+      fileType: 'log-file',
+      checksumValid: result === 'success',
+      validationErrors: errors,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: result === 'success'
+      },
+      sessionDetails: sessionId ? {
+        sessionId,
+        ipAddress
+      } : undefined,
+      userProfileDetails: {
+        deletionReason,
+        confirmationMethod,
+        casesCount,
+        filesCount,
+        dataRetentionPeriod,
+        emailNotificationSent
+      }
+    });
+  }
+
+  /**
+   * Log user account deletion event with simplified user data
+   */
+  public async logAccountDeletionSimple(
+    userId: string,
+    userEmail: string,
+    result: AuditResult,
+    deletionReason: 'user-requested' | 'admin-initiated' | 'policy-violation' | 'inactive-account' = 'user-requested',
+    confirmationMethod: 'uid-email' | 'password' | 'admin-override' = 'uid-email',
+    casesCount?: number,
+    filesCount?: number,
+    dataRetentionPeriod?: number,
+    emailNotificationSent?: boolean,
+    sessionId?: string,
+    ipAddress?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId,
+      userEmail: userEmail || 'unknown@example.com',
+      action: 'user-account-delete',
+      result,
+      fileName: `account-deletion-${userId}.log`,
+      fileType: 'log-file',
+      checksumValid: result === 'success',
+      validationErrors: errors,
+      securityChecks: {
+        selfConfirmationPrevented: false,
+        userAuthenticationValid: true,
+        fileIntegrityValid: true,
+        timestampValidationPassed: true,
+        permissionChecksPassed: result === 'success'
+      },
+      sessionDetails: sessionId ? {
+        sessionId,
+        ipAddress
+      } : undefined,
+      userProfileDetails: {
+        deletionReason,
+        confirmationMethod,
+        casesCount,
+        filesCount,
+        dataRetentionPeriod,
+        emailNotificationSent
+      }
+    });
+  }
+
+  /**
    * Log PDF generation event
    */
   public async logPDFGeneration(

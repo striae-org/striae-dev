@@ -51,7 +51,13 @@ export class AuditExportService {
       'Old Value',
       'New Value',
       'Reset Method',
-      'Verification Method'
+      'Verification Method',
+      'Deletion Reason',
+      'Confirmation Method',
+      'Cases Count',
+      'Files Count',
+      'Data Retention Period',
+      'Email Notification Sent'
     ];
 
     const csvContent = [
@@ -125,7 +131,13 @@ export class AuditExportService {
       'Old Value',
       'New Value',
       'Reset Method',
-      'Verification Method'
+      'Verification Method',
+      'Deletion Reason',
+      'Confirmation Method',
+      'Cases Count',
+      'Files Count',
+      'Data Retention Period',
+      'Email Notification Sent'
     ];
 
     const csvContent = [
@@ -191,7 +203,14 @@ export class AuditExportService {
       this.formatForCSV(userProfileDetails?.oldValue),
       this.formatForCSV(userProfileDetails?.newValue),
       this.formatForCSV(userProfileDetails?.resetMethod),
-      this.formatForCSV(userProfileDetails?.verificationMethod)
+      this.formatForCSV(userProfileDetails?.verificationMethod),
+      this.formatForCSV(userProfileDetails?.deletionReason),
+      this.formatForCSV(userProfileDetails?.confirmationMethod),
+      userProfileDetails?.casesCount?.toString() || '',
+      userProfileDetails?.filesCount?.toString() || '',
+      userProfileDetails?.dataRetentionPeriod?.toString() || '',
+      userProfileDetails?.emailNotificationSent !== undefined ? 
+        (userProfileDetails.emailNotificationSent ? 'Yes' : 'No') : ''
     ];
 
     return values.join(',');
