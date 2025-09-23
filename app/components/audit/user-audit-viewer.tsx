@@ -2,15 +2,17 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { auditService } from '~/services/audit.service';
 import { auditExportService } from '~/services/audit-export.service';
-import { ValidationAuditEntry, AuditAction, AuditResult } from '~/types';
+import { ValidationAuditEntry, AuditAction, AuditResult, AuditTrail } from '~/types';
 import styles from './user-audit.module.css';
 
 interface UserAuditViewerProps {
   isOpen: boolean;
   onClose: () => void;
+  caseNumber?: string; // Optional: filter by specific case
+  title?: string; // Optional: custom title
 }
 
-export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
+export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAuditViewerProps) => {
   const { user } = useContext(AuthContext);
   const [auditEntries, setAuditEntries] = useState<ValidationAuditEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -18,14 +20,15 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
   const [filterAction, setFilterAction] = useState<AuditAction | 'all'>('all');
   const [filterResult, setFilterResult] = useState<AuditResult | 'all'>('all');
   const [dateRange, setDateRange] = useState<'1d' | '7d' | '30d' | 'all'>('30d');
+  const [auditTrail, setAuditTrail] = useState<AuditTrail | null>(null);
 
   useEffect(() => {
     if (isOpen && user) {
-      loadUserAuditTrail();
+      loadAuditData();
     }
-  }, [isOpen, user, dateRange]);
+  }, [isOpen, user, dateRange, caseNumber]);
 
-  const loadUserAuditTrail = async () => {
+  const loadAuditData = async () => {
     if (!user?.uid) return;
 
     setLoading(true);
@@ -41,15 +44,42 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
         startDate = date.toISOString();
       }
 
-      // Get user-specific audit entries
+      // Get audit entries (filtered by case if specified)
       const entries = await auditService.getAuditEntriesForUser(user.uid, {
+        caseNumber,
         startDate,
-        limit: 500
+        limit: caseNumber ? 1000 : 500 // More entries for case-specific view
       });
 
       setAuditEntries(entries);
+
+      // If case-specific, create audit trail for enhanced export functionality
+      if (caseNumber && entries.length > 0) {
+        const trail: AuditTrail = {
+          caseNumber,
+          workflowId: `workflow-${caseNumber}-${user.uid}`,
+          entries,
+          summary: {
+            totalEvents: entries.length,
+            successfulEvents: entries.filter(e => e.result === 'success').length,
+            failedEvents: entries.filter(e => e.result === 'failure').length,
+            warningEvents: entries.filter(e => e.result === 'warning').length,
+            workflowPhases: [...new Set(entries
+              .map(e => e.details.workflowPhase)
+              .filter(Boolean))] as any[],
+            participatingUsers: [...new Set(entries.map(e => e.userId))],
+            startTimestamp: entries[entries.length - 1]?.timestamp || new Date().toISOString(),
+            endTimestamp: entries[0]?.timestamp || new Date().toISOString(),
+            complianceStatus: entries.some(e => e.result === 'failure') ? 'non-compliant' : 'compliant',
+            securityIncidents: entries.filter(e => e.action === 'security-violation').length
+          }
+        };
+        setAuditTrail(trail);
+      } else {
+        setAuditTrail(null);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load user audit trail');
+      setError(err instanceof Error ? err.message : 'Failed to load audit data');
     } finally {
       setLoading(false);
     }
@@ -68,10 +98,18 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const filename = `user-audit-${user.uid}-${new Date().toISOString().split('T')[0]}.csv`;
+    const identifier = caseNumber || user.uid;
+    const type = caseNumber ? 'case' : 'user';
+    const filename = auditExportService.generateFilename(type, identifier, 'csv');
     
     try {
-      await auditExportService.exportToCSV(filteredEntries, filename);
+      if (auditTrail && caseNumber) {
+        // Use full audit trail export for case-specific data
+        auditExportService.exportAuditTrailToCSV(auditTrail, filename);
+      } else {
+        // Use regular entry export for user data
+        auditExportService.exportToCSV(filteredEntries, filename);
+      }
     } catch (error) {
       console.error('Export failed:', error);
       setError('Failed to export audit trail to CSV');
@@ -82,10 +120,18 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const filename = `user-audit-${user.uid}-${new Date().toISOString().split('T')[0]}.json`;
+    const identifier = caseNumber || user.uid;
+    const type = caseNumber ? 'case' : 'user';
+    const filename = auditExportService.generateFilename(type, identifier, 'csv'); // Will be converted to .json
     
     try {
-      await auditExportService.exportToJSON(filteredEntries, filename);
+      if (auditTrail && caseNumber) {
+        // Use full audit trail export for case-specific data
+        auditExportService.exportAuditTrailToJSON(auditTrail, filename);
+      } else {
+        // Use regular entry export for user data
+        auditExportService.exportToJSON(filteredEntries, filename);
+      }
     } catch (error) {
       console.error('Export failed:', error);
       setError('Failed to export audit trail to JSON');
@@ -96,28 +142,36 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const filename = `user-audit-report-${user.uid}-${new Date().toISOString().split('T')[0]}.txt`;
+    const identifier = caseNumber || user.uid;
+    const type = caseNumber ? 'case' : 'user';
+    const filename = `${type}-audit-report-${identifier}-${new Date().toISOString().split('T')[0]}.txt`;
     
     try {
-      // Generate a simple user audit report
-      const totalEntries = filteredEntries.length;
-      const successfulActions = filteredEntries.filter(e => e.result === 'success').length;
-      const failedActions = filteredEntries.filter(e => e.result === 'failure').length;
+      let reportContent: string;
       
-      const actionCounts = filteredEntries.reduce((acc, entry) => {
-        acc[entry.action] = (acc[entry.action] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      if (auditTrail && caseNumber) {
+        // Use audit trail report for case-specific data
+        reportContent = auditExportService.generateReportSummary(auditTrail);
+      } else {
+        // Generate user-specific report
+        const totalEntries = filteredEntries.length;
+        const successfulActions = filteredEntries.filter(e => e.result === 'success').length;
+        const failedActions = filteredEntries.filter(e => e.result === 'failure').length;
+        
+        const actionCounts = filteredEntries.reduce((acc, entry) => {
+          acc[entry.action] = (acc[entry.action] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
 
-      const dateRange = filteredEntries.length > 0 ? {
-        earliest: new Date(Math.min(...filteredEntries.map(e => new Date(e.timestamp).getTime()))),
-        latest: new Date(Math.max(...filteredEntries.map(e => new Date(e.timestamp).getTime())))
-      } : null;
+        const dateRange = filteredEntries.length > 0 ? {
+          earliest: new Date(Math.min(...filteredEntries.map(e => new Date(e.timestamp).getTime()))),
+          latest: new Date(Math.max(...filteredEntries.map(e => new Date(e.timestamp).getTime())))
+        } : null;
 
-      const reportContent = `USER AUDIT REPORT
+        reportContent = `${caseNumber ? 'CASE' : 'USER'} AUDIT REPORT
 Generated: ${new Date().toISOString()}
-User: ${user.email}
-User ID: ${user.uid}
+${caseNumber ? `Case: ${caseNumber}` : `User: ${user.email}`}
+${caseNumber ? '' : `User ID: ${user.uid}`}
 
 === SUMMARY ===
 Total Actions: ${totalEntries}
@@ -140,6 +194,7 @@ ${filteredEntries.slice(0, 10).map(entry =>
 
 Generated by Striae Forensic Annotation System
 `;
+      }
       
       // Create and download the report file
       const blob = new Blob([reportContent], { type: 'text/plain' });
@@ -232,7 +287,9 @@ Generated by Striae Forensic Annotation System
     <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>My Audit Trail</h2>
+          <h2 className={styles.title}>
+            {title || (caseNumber ? `Audit Trail - Case ${caseNumber}` : 'My Audit Trail')}
+          </h2>
           <div className={styles.headerActions}>
             {auditEntries.length > 0 && (
               <div className={styles.exportButtons}>
@@ -274,7 +331,7 @@ Generated by Striae Forensic Annotation System
           {error && (
             <div className={styles.error}>
               <p>Error: {error}</p>
-              <button onClick={loadUserAuditTrail} className={styles.retryButton}>
+              <button onClick={loadAuditData} className={styles.retryButton}>
                 Retry
               </button>
             </div>
@@ -284,7 +341,12 @@ Generated by Striae Forensic Annotation System
             <>
               {/* Summary Section */}
               <div className={styles.summary}>
-                <h3>Activity Summary ({dateRange === 'all' ? 'All Time' : `Last ${dateRange}`})</h3>
+                <h3>
+                  {caseNumber 
+                    ? `Case Activity Summary - ${caseNumber} (${dateRange === 'all' ? 'All Time' : `Last ${dateRange}`})`
+                    : `Activity Summary (${dateRange === 'all' ? 'All Time' : `Last ${dateRange}`})`
+                  }
+                </h3>
                 <div className={styles.summaryGrid}>
                   <div className={styles.summaryItem}>
                     <span className={styles.label}>Total Activities:</span>

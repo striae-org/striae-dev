@@ -13,7 +13,7 @@ import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
 import { FilesModal } from '../files/files-modal';
 import { CaseExport, ExportFormat } from '../case-export/case-export';
-import { AuditTrailViewer } from '~/components/audit/audit-trail-viewer';
+import { UserAuditViewer } from '~/components/audit/user-audit-viewer';
 import {
   validateCaseNumber,
   checkExistingCase,
@@ -692,11 +692,12 @@ return (
         </div>
       )}
       
-      {/* Audit Trail Viewer */}
-      <AuditTrailViewer 
+      {/* Unified Audit Viewer */}
+      <UserAuditViewer 
         caseNumber={currentCase || ''}
         isOpen={isAuditTrailOpen}
         onClose={() => setIsAuditTrailOpen(false)}
+        title={`Audit Trail - Case ${currentCase}`}
       />
       
       </div>
