@@ -301,9 +301,7 @@ export class AuditService {
   public async logCaseCreation(
     user: User,
     caseNumber: string,
-    caseName: string,
-    caseDescription?: string,
-    caseType?: string
+    caseName: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -317,12 +315,9 @@ export class AuditService {
       workflowPhase: 'casework',
       caseDetails: {
         newCaseName: caseName,
-        caseDescription,
-        caseType,
         createdDate: new Date().toISOString(),
         totalFiles: 0,
-        totalAnnotations: 0,
-        caseSize: 0
+        totalAnnotations: 0
       }
     });
   }

@@ -199,9 +199,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     await auditService.logCaseCreation(
       user,
       caseNumber,
-      caseNumber, // Using case number as case name for now
-      `New case created by ${user.email}`,
-      'standard'
+      caseNumber // Using case number as case name for now
     );
 
     console.log(`✅ Case created: ${caseNumber} (${endTime - startTime}ms)`);
@@ -221,9 +219,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         caseDetails: {
-          newCaseName: caseNumber,
-          caseDescription: `Failed case creation attempt by ${user.email}`,
-          caseType: 'standard'
+          newCaseName: caseNumber
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,

@@ -108,7 +108,6 @@ export interface PerformanceMetrics {
   fileSizeBytes: number;
   validationStepsCompleted?: number;
   validationStepsFailed?: number;
-  retryAttempts?: number;
 }
 
 /**
@@ -191,13 +190,10 @@ export interface AuditQueryParams {
 export interface CaseAuditDetails {
   oldCaseName?: string;
   newCaseName?: string;
-  caseDescription?: string;
-  caseType?: string;
   totalFiles?: number;
   totalAnnotations?: number;
   createdDate?: string;
   lastModified?: string;
-  caseSize?: number; // in bytes
   deleteReason?: string;
   backupCreated?: boolean;
 }
