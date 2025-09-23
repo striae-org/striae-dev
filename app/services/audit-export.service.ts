@@ -35,7 +35,6 @@ export class AuditExportService {
       'Upload Method',
       'Delete Reason',
       'Source Location',
-      'Virus Scan',
       'Thumbnail Generated',
       'Annotation Type',
       'Annotation Tool',
@@ -115,7 +114,6 @@ export class AuditExportService {
       'Upload Method',
       'Delete Reason',
       'Source Location',
-      'Virus Scan',
       'Thumbnail Generated',
       'Annotation Type',
       'Annotation Tool',
@@ -185,7 +183,6 @@ export class AuditExportService {
       this.formatForCSV(fileDetails?.uploadMethod),
       this.formatForCSV(fileDetails?.deleteReason),
       this.formatForCSV(fileDetails?.sourceLocation),
-      this.formatVirusScan(fileDetails?.virusScanResult),
       fileDetails?.thumbnailGenerated !== undefined ? 
         (fileDetails.thumbnailGenerated ? 'Yes' : 'No') : '',
       this.formatForCSV(annotationDetails?.annotationType),
@@ -214,20 +211,6 @@ export class AuditExportService {
     ];
 
     return values.join(',');
-  }
-
-  /**
-   * Format virus scan result for CSV
-   */
-  private formatVirusScan(result?: string): string {
-    if (!result) return '';
-    switch (result) {
-      case 'clean': return 'Clean';
-      case 'infected': return 'Infected';
-      case 'quarantined': return 'Quarantined';
-      case 'failed': return 'Failed';
-      default: return result;
-    }
   }
 
   /**

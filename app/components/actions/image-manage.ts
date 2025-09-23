@@ -49,8 +49,7 @@ export const uploadFile = async (
         'file-picker',
         caseNumber,
         'failure',
-        Date.now() - startTime,
-        'clean'
+        Date.now() - startTime
       );
     } catch (auditError) {
       console.error('Failed to log file upload permission denial:', auditError);
@@ -118,7 +117,6 @@ export const uploadFile = async (
               caseNumber,
               'success',
               endTime - startTime,
-              'clean',
               imageData.result.id
             );
           } catch (auditError) {
@@ -138,8 +136,7 @@ export const uploadFile = async (
               'file-picker',
               caseNumber,
               'failure',
-              endTime - startTime,
-              'clean'
+              endTime - startTime
             );
           } catch (auditError) {
             console.error('Failed to log file upload failure:', auditError);
@@ -157,8 +154,7 @@ export const uploadFile = async (
             'file-picker',
             caseNumber,
             'failure',
-            endTime - startTime,
-            'clean'
+            endTime - startTime
           );
         } catch (auditError) {
           console.error('Failed to log file upload failure:', auditError);
@@ -178,8 +174,7 @@ export const uploadFile = async (
           'file-picker',
           caseNumber,
           'failure',
-          Date.now() - startTime,
-          'clean'
+          Date.now() - startTime
         );
       } catch (auditError) {
         console.error('Failed to log file upload error:', auditError);

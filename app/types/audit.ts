@@ -218,7 +218,6 @@ export interface FileAuditDetails {
   processingTime?: number;
   compressionApplied?: boolean;
   thumbnailGenerated?: boolean;
-  virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed';
   deleteReason?: string;
   sourceLocation?: string;
   destinationPath?: string;

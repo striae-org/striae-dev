@@ -437,7 +437,6 @@ export class AuditService {
     caseNumber: string,
     result: AuditResult = 'success',
     processingTime?: number,
-    virusScanResult?: 'clean' | 'infected' | 'quarantined' | 'failed',
     fileId?: string
   ): Promise<void> {
     await this.logEvent({
@@ -465,7 +464,6 @@ export class AuditService {
         mimeType,
         uploadMethod,
         processingTime,
-        virusScanResult,
         thumbnailGenerated: result === 'success' && this.isImageFile(mimeType)
       },
       performanceMetrics: processingTime ? {
