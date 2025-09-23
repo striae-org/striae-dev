@@ -94,7 +94,8 @@ export const Canvas = ({
         user,
         caseNumber,
         currentImageId,
-        confirmationData
+        confirmationData,
+        filename
       );
       
       if (success) {

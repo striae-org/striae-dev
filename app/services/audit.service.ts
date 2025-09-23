@@ -194,7 +194,9 @@ export class AuditService {
     result: AuditResult,
     errors: string[] = [],
     originalExaminerUid?: string,
-    performanceMetrics?: PerformanceMetrics
+    performanceMetrics?: PerformanceMetrics,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
@@ -219,7 +221,12 @@ export class AuditService {
       securityChecks,
       performanceMetrics,
       originalExaminerUid,
-      reviewingExaminerUid: user.uid
+      reviewingExaminerUid: user.uid,
+      fileDetails: imageFileId && originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0 // Not applicable for confirmation creation
+      } : undefined
     });
   }
 

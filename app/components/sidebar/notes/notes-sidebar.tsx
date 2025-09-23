@@ -13,13 +13,14 @@ interface NotesSidebarProps {
   user: User;
   imageId: string;
   onAnnotationRefresh?: () => void;
+  originalFileName?: string;
 }
 
 type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
-export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh }: NotesSidebarProps) => {
+export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh, originalFileName }: NotesSidebarProps) => {
   // Loading/Saving Notes States
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
@@ -156,7 +157,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         existingData,
         annotationData,
         currentCase,
-        'notes-sidebar'
+        'notes-sidebar',
+        imageId,
+        originalFileName
       );
       
       setSaveSuccess(true);
@@ -177,7 +180,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
           existingData,
           null, // Failed save, no new value
           currentCase,
-          'notes-sidebar'
+          'notes-sidebar',
+          imageId,
+          originalFileName
         );
       } catch (auditError) {
         console.error('Failed to log annotation edit audit:', auditError);

@@ -105,6 +105,7 @@ export const Sidebar = ({
           user={user}
           imageId={imageId || ''}
           onAnnotationRefresh={onAnnotationRefresh}
+          originalFileName={files.find(file => file.id === imageId)?.originalFilename}
         />
       ) : (
         <>
