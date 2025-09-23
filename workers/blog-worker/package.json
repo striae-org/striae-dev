@@ -1,0 +1,16 @@
+{
+  "name": "blog-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for reliable blog RSS feed fetching and caching",
+  "main": "src/blog-worker.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240903.0",
+    "wrangler": "^3.72.0",
+    "vitest": "^2.0.5"
+  }
+}

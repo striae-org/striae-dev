@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './blog-feed.module.css';
 import sanitizeHtml from 'sanitize-html';
+import config from '~/config/config.json';
 
 interface BlogPost {
   title: string;
@@ -17,26 +18,24 @@ export const BlogFeed = () => {
   useEffect(() => {
     const fetchBlogFeed = async () => {
       try {
-        // Use RSS2JSON service for reliable RSS feed fetching
-        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://blog.striae.org/rss.xml')}&count=3`);
-        const data = await response.json() as { status: string; items: any[] };
+        // Use our dedicated blog worker for reliable RSS feed fetching
+        const response = await fetch(`${config.blog_worker_url}/api/feed`);
         
-        // Check if RSS2JSON returned success
-        if (data.status !== 'ok') {
-          throw new Error('RSS2JSON service returned error status');
+        if (!response.ok) {
+          throw new Error(`Blog worker responded with ${response.status}: ${response.statusText}`);
         }
         
-        // Map RSS2JSON items directly (no XML parsing needed)
-        const blogPosts: BlogPost[] = data.items.map(item => {
-          return {
-            title: item.title?.trim() || '',
-            link: item.link?.trim() || '',
-            description: truncateDescription(item.description?.trim() || ''),
-            pubDate: formatDate(item.pubDate || '')
-          };
-        });
+        const data = await response.json() as { posts?: BlogPost[]; error?: string; fallback?: string };
         
+        // Check if worker returned an error
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        // Use the posts from our worker (already processed and truncated)
+        const blogPosts: BlogPost[] = data.posts || [];
         setPosts(blogPosts);
+        
       } catch (err) {
         console.error('Error fetching blog feed:', err);
         setError('Unable to load blog posts');
