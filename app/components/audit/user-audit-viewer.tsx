@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { auditService } from '~/services/audit.service';
 import { auditExportService } from '~/services/audit-export.service';
-import { ValidationAuditEntry, AuditAction, AuditResult, AuditTrail } from '~/types';
+import { ValidationAuditEntry, AuditAction, AuditResult, AuditTrail, UserData } from '~/types';
+import { getUserData } from '~/utils/permissions';
 import styles from './user-audit.module.css';
 
 interface UserAuditViewerProps {
@@ -15,18 +16,35 @@ interface UserAuditViewerProps {
 export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAuditViewerProps) => {
   const { user } = useContext(AuthContext);
   const [auditEntries, setAuditEntries] = useState<ValidationAuditEntry[]>([]);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [filterAction, setFilterAction] = useState<AuditAction | 'all'>('all');
   const [filterResult, setFilterResult] = useState<AuditResult | 'all'>('all');
-  const [dateRange, setDateRange] = useState<'1d' | '7d' | '30d' | 'all'>('30d');
+  const [filterCaseNumber, setFilterCaseNumber] = useState<string>('');
+  const [dateRange, setDateRange] = useState<'1d' | '7d' | '30d' | 'all' | 'custom'>('30d');
+  const [customStartDate, setCustomStartDate] = useState<string>('');
+  const [customEndDate, setCustomEndDate] = useState<string>('');
   const [auditTrail, setAuditTrail] = useState<AuditTrail | null>(null);
 
   useEffect(() => {
     if (isOpen && user) {
       loadAuditData();
+      loadUserData();
     }
-  }, [isOpen, user, dateRange, caseNumber]);
+  }, [isOpen, user, dateRange, customStartDate, customEndDate, filterCaseNumber, caseNumber]);
+
+  const loadUserData = async () => {
+    if (!user) return;
+    
+    try {
+      const data = await getUserData(user);
+      setUserData(data);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+      // Don't set error state for user data failure, just log it
+    }
+  };
 
   const loadAuditData = async () => {
     if (!user?.uid) return;
@@ -37,7 +55,16 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     try {
       // Calculate date range
       let startDate: string | undefined;
-      if (dateRange !== 'all') {
+      let endDate: string | undefined;
+      
+      if (dateRange === 'custom') {
+        if (customStartDate) {
+          startDate = new Date(customStartDate + 'T00:00:00').toISOString();
+        }
+        if (customEndDate) {
+          endDate = new Date(customEndDate + 'T23:59:59').toISOString();
+        }
+      } else if (dateRange !== 'all') {
         const days = parseInt(dateRange.replace('d', ''));
         const date = new Date();
         date.setDate(date.getDate() - days);
@@ -45,19 +72,21 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
       }
 
       // Get audit entries (filtered by case if specified)
+      const effectiveCaseNumber = caseNumber || (filterCaseNumber.trim() || undefined);
       const entries = await auditService.getAuditEntriesForUser(user.uid, {
-        caseNumber,
+        caseNumber: effectiveCaseNumber,
         startDate,
-        limit: caseNumber ? 1000 : 500 // More entries for case-specific view
+        endDate,
+        limit: effectiveCaseNumber ? 1000 : 500 // More entries for case-specific view
       });
 
       setAuditEntries(entries);
 
       // If case-specific, create audit trail for enhanced export functionality
-      if (caseNumber && entries.length > 0) {
+      if (effectiveCaseNumber && entries.length > 0) {
         const trail: AuditTrail = {
-          caseNumber,
-          workflowId: `workflow-${caseNumber}-${user.uid}`,
+          caseNumber: effectiveCaseNumber,
+          workflowId: `workflow-${effectiveCaseNumber}-${user.uid}`,
           entries,
           summary: {
             totalEvents: entries.length,
@@ -98,12 +127,13 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const identifier = caseNumber || user.uid;
-    const type = caseNumber ? 'case' : 'user';
+    const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
+    const identifier = effectiveCaseNumber || user.uid;
+    const type = effectiveCaseNumber ? 'case' : 'user';
     const filename = auditExportService.generateFilename(type, identifier, 'csv');
     
     try {
-      if (auditTrail && caseNumber) {
+      if (auditTrail && effectiveCaseNumber) {
         // Use full audit trail export for case-specific data
         auditExportService.exportAuditTrailToCSV(auditTrail, filename);
       } else {
@@ -120,12 +150,13 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const identifier = caseNumber || user.uid;
-    const type = caseNumber ? 'case' : 'user';
+    const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
+    const identifier = effectiveCaseNumber || user.uid;
+    const type = effectiveCaseNumber ? 'case' : 'user';
     const filename = auditExportService.generateFilename(type, identifier, 'csv'); // Will be converted to .json
     
     try {
-      if (auditTrail && caseNumber) {
+      if (auditTrail && effectiveCaseNumber) {
         // Use full audit trail export for case-specific data
         auditExportService.exportAuditTrailToJSON(auditTrail, filename);
       } else {
@@ -142,14 +173,15 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
     if (!user) return;
     
     const filteredEntries = getFilteredEntries();
-    const identifier = caseNumber || user.uid;
-    const type = caseNumber ? 'case' : 'user';
+    const effectiveCaseNumber = caseNumber || filterCaseNumber.trim();
+    const identifier = effectiveCaseNumber || user.uid;
+    const type = effectiveCaseNumber ? 'case' : 'user';
     const filename = `${type}-audit-report-${identifier}-${new Date().toISOString().split('T')[0]}.txt`;
     
     try {
       let reportContent: string;
       
-      if (auditTrail && caseNumber) {
+      if (auditTrail && effectiveCaseNumber) {
         // Use audit trail report for case-specific data
         reportContent = auditExportService.generateReportSummary(auditTrail);
       } else {
@@ -272,6 +304,27 @@ Generated by Striae Forensic Annotation System
     return new Date(timestamp).toLocaleString();
   };
 
+  const getDateRangeDisplay = (): string => {
+    switch (dateRange) {
+      case 'all':
+        return 'All Time';
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          const startFormatted = new Date(customStartDate).toLocaleDateString();
+          const endFormatted = new Date(customEndDate).toLocaleDateString();
+          return `${startFormatted} - ${endFormatted}`;
+        } else if (customStartDate) {
+          return `From ${new Date(customStartDate).toLocaleDateString()}`;
+        } else if (customEndDate) {
+          return `Until ${new Date(customEndDate).toLocaleDateString()}`;
+        } else {
+          return 'Custom Range';
+        }
+      default:
+        return `Last ${dateRange}`;
+    }
+  };
+
   // Get summary statistics
   const totalEntries = auditEntries.length;
   const successfulEntries = auditEntries.filter(e => e.result === 'success').length;
@@ -320,6 +373,33 @@ Generated by Striae Forensic Annotation System
           </div>
         </div>
 
+        {/* User Information Section */}
+        {user && (
+          <div className={styles.summary}>
+            <h3>Audited User Information</h3>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryItem}>
+                <span className={styles.label}>Name:</span>
+                <span className={styles.value}>
+                  {userData ? `${userData.firstName} ${userData.lastName}` : user.displayName || 'Not provided'}
+                </span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.label}>Email:</span>
+                <span className={styles.value}>{user.email || 'Not provided'}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.label}>Lab/Company:</span>
+                <span className={styles.value}>{userData?.company || 'Not provided'}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.label}>User ID:</span>
+                <span className={styles.value} title={user.uid}>{user.uid.substring(0, 12)}...</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.content}>
           {loading && (
             <div className={styles.loading}>
@@ -342,9 +422,9 @@ Generated by Striae Forensic Annotation System
               {/* Summary Section */}
               <div className={styles.summary}>
                 <h3>
-                  {caseNumber 
-                    ? `Case Activity Summary - ${caseNumber} (${dateRange === 'all' ? 'All Time' : `Last ${dateRange}`})`
-                    : `Activity Summary (${dateRange === 'all' ? 'All Time' : `Last ${dateRange}`})`
+                  {(caseNumber || filterCaseNumber.trim()) 
+                    ? `Case Activity Summary - ${caseNumber || filterCaseNumber.trim()} (${getDateRangeDisplay()})`
+                    : `Activity Summary (${getDateRangeDisplay()})`
                   }
                 </h3>
                 <div className={styles.summaryGrid}>
@@ -380,14 +460,70 @@ Generated by Striae Forensic Annotation System
                   <select 
                     id="dateRange"
                     value={dateRange} 
-                    onChange={(e) => setDateRange(e.target.value as '1d' | '7d' | '30d' | 'all')}
+                    onChange={(e) => setDateRange(e.target.value as '1d' | '7d' | '30d' | 'all' | 'custom')}
                     className={styles.filterSelect}
                   >
                     <option value="1d">Last 24 Hours</option>
                     <option value="7d">Last 7 Days</option>
                     <option value="30d">Last 30 Days</option>
                     <option value="all">All Time</option>
+                    <option value="custom">Custom Range</option>
                   </select>
+                </div>
+
+                {/* Custom Date Range Inputs */}
+                {dateRange === 'custom' && (
+                  <div className={styles.customDateRange}>
+                    <div className={styles.filterGroup}>
+                      <label htmlFor="startDate">Start Date:</label>
+                      <input
+                        type="date"
+                        id="startDate"
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
+                        className={styles.filterInput}
+                        max={customEndDate || new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div className={styles.filterGroup}>
+                      <label htmlFor="endDate">End Date:</label>
+                      <input
+                        type="date"
+                        id="endDate"
+                        value={customEndDate}
+                        onChange={(e) => setCustomEndDate(e.target.value)}
+                        className={styles.filterInput}
+                        min={customStartDate}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className={styles.filterGroup}>
+                  <label htmlFor="caseFilter">Case Number:</label>
+                  <div className={styles.inputWithButton}>
+                    <input
+                      type="text"
+                      id="caseFilter"
+                      value={filterCaseNumber}
+                      onChange={(e) => setFilterCaseNumber(e.target.value)}
+                      className={styles.filterInput}
+                      placeholder="Enter case number..."
+                      disabled={!!caseNumber} // Disable if already viewing a specific case
+                      title={caseNumber ? "Case filter disabled - viewing specific case" : "Filter by case number"}
+                    />
+                    {filterCaseNumber && !caseNumber && (
+                      <button
+                        type="button"
+                        onClick={() => setFilterCaseNumber('')}
+                        className={styles.clearButton}
+                        title="Clear case filter"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className={styles.filterGroup}>

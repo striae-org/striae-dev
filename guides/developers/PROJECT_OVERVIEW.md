@@ -100,7 +100,7 @@ For new developers joining the project:
 
 ## Project Status
 
-Striae is currently in **Beta** (v0.9.22a) with active development featuring a complete authenticated confirmation system and comprehensive audit logging. The release candidate is expected to deploy on October 1, 2025. The project is actively maintained and welcomes contributions from the forensic technology community.
+Striae is currently in **Beta** (v0.9.22aaaaa) with active development featuring a complete authenticated confirmation system and comprehensive audit logging. The release candidate is expected to deploy on October 1, 2025. The project is actively maintained and welcomes contributions from the forensic technology community.
 
 ---
 
