@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
 import { SignOut } from '~/components/actions/signout';
+import { auditService } from '~/services/audit.service';
 import styles from './mfa-enrollment.module.css';
 
 interface MFAEnrollmentProps {
@@ -203,6 +204,28 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       }
       setErrorMessage(errorMsg);
       onError(errorMsg);
+      
+      // Log security violation for failed MFA enrollment attempts
+      try {
+        let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+        
+        if (authError.code === 'auth/invalid-verification-code') {
+          severity = 'high'; // Invalid MFA codes during enrollment are serious
+        }
+        
+        await auditService.logSecurityViolation(
+          user, // User object available during enrollment
+          'unauthorized-access',
+          severity,
+          `Failed MFA enrollment: ${authError.code} - ${errorMsg}`,
+          undefined, // sourceIp not easily available on client side
+          'mfa-enrollment-endpoint',
+          true // Blocked by system
+        );
+      } catch (auditError) {
+        console.error('Failed to log MFA enrollment security violation audit:', auditError);
+        // Continue with error flow even if audit logging fails
+      }
     } finally {
       setIsLoading(false);
     }

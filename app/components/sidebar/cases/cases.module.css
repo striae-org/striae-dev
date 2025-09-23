@@ -484,6 +484,39 @@
   padding-top: 1rem;
 }
 
+.caseActionsButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0.75rem;
+}
+
+.caseActionsButton:hover:not(:disabled) {
+  background-color: #0b5ed7;
+}
+
+.caseActionsButton:disabled {
+  background-color: var(--backgroundLight);
+  color: var(--textLight);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.caseActionsButton:disabled:hover {
+  background-color: var(--backgroundLight);
+  transform: none;
+}
+
+.caseActionsButton:active {
+  transform: translateY(0);
+}
+
 .caseActionsToggle {
   width: 100%;
   padding: 0.75rem;
@@ -523,6 +556,38 @@
   background-color: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #dee2e6;
+}
+
+.exportSection {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.exportButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #198754;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exportButton:hover:not(:disabled) {
+  background-color: #157347;
+}
+
+.exportButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.renameDeleteSection {
+  /* Additional spacing for rename/delete section */
 }
 
 .caseActionsContent .caseRename {
@@ -575,6 +640,34 @@
 
 .caseActionsContent .deleteCaseSection button:disabled {
   background-color: #f5c6cb;
+  cursor: not-allowed;
+}
+
+.auditTrailSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.auditTrailButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auditTrailButton:hover:not(:disabled) {
+  background-color: #5a359a;
+}
+
+.auditTrailButton:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
   cursor: not-allowed;
 }
 

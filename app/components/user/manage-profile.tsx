@@ -4,9 +4,11 @@ import {
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
 import { DeleteAccount } from './delete-account';
+import { UserAuditViewer } from '../audit/user-audit-viewer';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
 import { getUserData } from '~/utils/permissions';
+import { auditService } from '~/services/audit.service';
 import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import styles from './manage-profile.module.css';
@@ -29,6 +31,7 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   const [success, setSuccess] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAuditViewer, setShowAuditViewer] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -75,6 +78,8 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
     setError('');
     setSuccess('');
     
+    const oldDisplayName = user?.displayName || '';
+    
     try {
       if (!user) throw new Error(ERROR_MESSAGES.NO_USER);
 
@@ -102,9 +107,31 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         throw new Error('Failed to update profile in database');
       }
 
+      // Log successful profile update
+      await auditService.logUserProfileUpdate(
+        user,
+        'displayName',
+        oldDisplayName,
+        displayName,
+        'success'
+      );
+
       setSuccess(ERROR_MESSAGES.PROFILE_UPDATED);
     } catch (err) {
       const { message } = handleAuthError(err);
+      
+      // Log failed profile update
+      await auditService.logUserProfileUpdate(
+        user!,
+        'displayName',
+        oldDisplayName,
+        displayName,
+        'failure',
+        undefined, // no session ID
+        undefined, // no IP address
+        [message] // error details
+      );
+      
       setError(message);
     } finally {
       setIsLoading(false);
@@ -116,6 +143,15 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
   };
 
   if (!isOpen) return null;
+
+  if (showAuditViewer) {
+    return (
+      <UserAuditViewer 
+        isOpen={showAuditViewer}
+        onClose={() => setShowAuditViewer(false)}
+      />
+    );
+  }
 
   if (showResetForm) {
     return <PasswordReset isModal={true} onBack={() => setShowResetForm(false)} />;
@@ -218,6 +254,13 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
                   disabled={isLoading}
                 >
                   {isLoading ? 'Updating...' : 'Update Profile'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuditViewer(true)}
+                  className={styles.secondaryButton}
+                >
+                  View My Audit Trail
                 </button>
                 <button
                   type="button"

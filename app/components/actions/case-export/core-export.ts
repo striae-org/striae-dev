@@ -4,6 +4,7 @@ import { fetchFiles } from '../image-manage';
 import { getNotes } from '../notes-manage';
 import { checkExistingCase, validateCaseNumber, listCases } from '../case-manage';
 import { getUserExportMetadata } from './metadata-helpers';
+import { auditService } from '~/services/audit.service';
 
 /**
  * Export all cases for a user
@@ -13,11 +14,17 @@ export async function exportAllCases(
   options: ExportOptions = {},
   onProgress?: (current: number, total: number, caseName: string) => void
 ): Promise<AllCasesExportData> {
-  const {
-    includeMetadata = true
-  } = options;
-
+  const startTime = Date.now();
+  const fileName = `all-cases-export-${new Date().toISOString().split('T')[0]}.json`;
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow('all-cases');
+    
+    const {
+      includeMetadata = true
+    } = options;
+
     // Get user export metadata
     const userMetadata = await getUserExportMetadata(user);
     
@@ -160,10 +167,49 @@ export async function exportAllCases(
       onProgress(caseNumbers.length, caseNumbers.length, 'Export completed!');
     }
     
+    // Log successful export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      fileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0, // Will be calculated when downloaded
+        validationStepsCompleted: caseNumbers.length,
+        validationStepsFailed: exportedCases.filter(c => c.summary?.exportError).length
+      }
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     return allCasesExport;
 
   } catch (error) {
     console.error('Export all cases failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      fileName,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error(`Failed to export all cases: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -176,6 +222,9 @@ export async function exportCaseData(
   caseNumber: string,
   options: ExportOptions = {}
 ): Promise<CaseExportData> {
+  const startTime = Date.now();
+  const fileName = `${caseNumber}-export.json`;
+  
   const {
     includeMetadata = true
   } = options;
@@ -195,6 +244,9 @@ export async function exportCaseData(
   }
 
   try {
+    // Start workflow for single case
+    auditService.startWorkflow(caseNumber);
+    
     // Fetch all files for the case
     const files = await fetchFiles(user, caseNumber);
     
@@ -300,10 +352,47 @@ export async function exportCaseData(
       })
     };
 
+    // Log successful export
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      caseNumber,
+      fileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0, // Will be calculated when downloaded
+        validationStepsCompleted: files.length,
+        validationStepsFailed: 0
+      }
+    );
+    
+    auditService.endWorkflow();
+
     return exportData;
 
   } catch (error) {
     console.error('Case export failed:', error);
+    
+    // Log failed export
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      caseNumber,
+      fileName,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     throw new Error(`Failed to export case ${caseNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

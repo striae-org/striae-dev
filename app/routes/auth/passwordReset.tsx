@@ -3,6 +3,7 @@ import { Link } from '@remix-run/react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
+import { auditService } from '~/services/audit.service';
 import styles from './passwordReset.module.css';
 
 interface PasswordResetProps {
@@ -23,10 +24,34 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
     setIsLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
+      
+      // Log successful password reset request
+      await auditService.logPasswordReset(
+        email,
+        'email',
+        'success'
+      );
+      
       setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
       setTimeout(onBack, 2000);
     } catch (err) {
       const { message } = handleAuthError(err);
+      
+      // Log failed password reset attempt
+      await auditService.logPasswordReset(
+        email,
+        'email',
+        'failure',
+        undefined, // no reset token on failure
+        'email-link',
+        1, // first attempt
+        undefined, // password complexity not relevant here
+        undefined, // previous password reuse not relevant here
+        undefined, // no session ID
+        undefined, // no IP address available
+        [message] // error details
+      );
+      
       setError(message);
     } finally {
       setIsLoading(false);

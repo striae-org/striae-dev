@@ -1,5 +1,7 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect, useContext } from 'react';
 import { BoxAnnotation } from '~/types';
+import { AuthContext } from '~/contexts/auth.context';
+import { auditService } from '~/services/audit.service';
 import styles from './box-annotations.module.css';
 
 // Constants
@@ -60,6 +62,7 @@ export const BoxAnnotations = ({
   onAnnotationDataChange,
   isReadOnly = false
 }: BoxAnnotationsProps) => {
+  const { user } = useContext(AuthContext);
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
     startX: 0,
@@ -181,7 +184,7 @@ export const BoxAnnotations = ({
   }, [drawingState.isDrawing, isAnnotationMode, getRelativeCoordinates]);
 
   // Handle mouse up - complete drawing and save annotation
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback(async () => {
     if (!drawingState.isDrawing || !isAnnotationMode || !isMountedRef.current) return;
     
     const { startX, startY, currentX, currentY } = drawingState;
@@ -213,19 +216,38 @@ export const BoxAnnotations = ({
         timestamp: new Date().toISOString()
       };
       
-      // Save the annotation immediately
-      const updatedAnnotations = [...annotations, newAnnotation];
-      onAnnotationsChange(updatedAnnotations);
-      
-      // Show label dialog positioned near the annotation with boundary checks
-      const dialogPosition = calculateDialogPosition(x, y);
-      setLabelDialog({
-        isVisible: true,
-        annotationId: newAnnotation.id,
-        x: dialogPosition.x,
-        y: dialogPosition.y,
-        label: ''
-      });
+      try {
+        // Save the annotation immediately
+        const updatedAnnotations = [...annotations, newAnnotation];
+        onAnnotationsChange(updatedAnnotations);
+        
+        // Log annotation creation audit
+        if (user) {
+          await auditService.logAnnotationCreate(
+            user,
+            newAnnotation.id,
+            'region',
+            {
+              position: { x, y, width, height },
+              annotationType: 'box',
+              color: annotationColor
+            }
+          );
+        }
+        
+        // Show label dialog positioned near the annotation with boundary checks
+        const dialogPosition = calculateDialogPosition(x, y);
+        setLabelDialog({
+          isVisible: true,
+          annotationId: newAnnotation.id,
+          x: dialogPosition.x,
+          y: dialogPosition.y,
+          label: ''
+        });
+      } catch (error) {
+        console.error('Failed to create annotation or log audit:', error);
+        // Continue with UI flow even if audit logging fails
+      }
     }
   }, [
     drawingState, 
@@ -234,54 +256,84 @@ export const BoxAnnotations = ({
     annotations, 
     onAnnotationsChange, 
     generateAnnotationId,
-    calculateDialogPosition
+    calculateDialogPosition,
+    user
   ]);
 
   // Remove a box annotation with validation
-  const removeBoxAnnotation = useCallback((annotationId: string) => {
+  const removeBoxAnnotation = useCallback(async (annotationId: string) => {
     // Find the annotation being removed
     const annotationToRemove = annotations.find(annotation => annotation.id === annotationId);
     
-    // Filter out the removed annotation
-    const updatedAnnotations = annotations.filter(annotation => annotation.id !== annotationId);
+    if (!annotationToRemove) {
+      console.warn('Attempted to remove non-existent annotation:', annotationId);
+      return;
+    }
     
-    // Check if the removed annotation has a preset color and label that needs to be removed from Additional Notes
-    if (annotationToRemove?.label && annotationData && onAnnotationDataChange) {
-      const presetColorName = PRESET_COLOR_NAMES[annotationToRemove.color.toLowerCase()];
+    try {
+      // Filter out the removed annotation
+      const updatedAnnotations = annotations.filter(annotation => annotation.id !== annotationId);
       
-      if (presetColorName) {
-        const labelEntry = `${presetColorName}: ${annotationToRemove.label}`;
-        const existingNotes = annotationData.additionalNotes || '';
+      // Check if the removed annotation has a preset color and label that needs to be removed from Additional Notes
+      if (annotationToRemove?.label && annotationData && onAnnotationDataChange) {
+        const presetColorName = PRESET_COLOR_NAMES[annotationToRemove.color.toLowerCase()];
         
-        // Remove the specific entry from Additional Notes
-        let updatedAdditionalNotes = existingNotes;
-        
-        // Handle different positions of the entry (beginning, middle, end)
-        if (existingNotes.includes(labelEntry)) {
-          // Split by lines to find and remove the exact entry
-          const lines = existingNotes.split('\n');
-          const filteredLines = lines.filter(line => line !== labelEntry);
-          updatedAdditionalNotes = filteredLines.join('\n');
+        if (presetColorName) {
+          const labelEntry = `${presetColorName}: ${annotationToRemove.label}`;
+          const existingNotes = annotationData.additionalNotes || '';
           
-          // Clean up any resulting empty lines at the beginning or end
-          updatedAdditionalNotes = updatedAdditionalNotes.replace(/^\n+|\n+$/g, '');
+          // Remove the specific entry from Additional Notes
+          let updatedAdditionalNotes = existingNotes;
+          
+          // Handle different positions of the entry (beginning, middle, end)
+          if (existingNotes.includes(labelEntry)) {
+            // Split by lines to find and remove the exact entry
+            const lines = existingNotes.split('\n');
+            const filteredLines = lines.filter(line => line !== labelEntry);
+            updatedAdditionalNotes = filteredLines.join('\n');
+            
+            // Clean up any resulting empty lines at the beginning or end
+            updatedAdditionalNotes = updatedAdditionalNotes.replace(/^\n+|\n+$/g, '');
+          }
+          
+          // Update both annotations and additional notes
+          onAnnotationDataChange({
+            ...annotationData,
+            additionalNotes: updatedAdditionalNotes,
+            boxAnnotations: updatedAnnotations
+          });
+        } else {
+          // No preset color, just update annotations
+          onAnnotationsChange(updatedAnnotations);
         }
-        
-        // Update both annotations and additional notes
-        onAnnotationDataChange({
-          ...annotationData,
-          additionalNotes: updatedAdditionalNotes,
-          boxAnnotations: updatedAnnotations
-        });
       } else {
-        // No preset color, just update annotations
+        // No label or no annotation data callback, just update annotations
         onAnnotationsChange(updatedAnnotations);
       }
-    } else {
-      // No label or no annotation data callback, just update annotations
-      onAnnotationsChange(updatedAnnotations);
+      
+      // Log annotation deletion audit
+      if (user) {
+        await auditService.logAnnotationDelete(
+          user,
+          annotationId,
+          {
+            position: { 
+              x: annotationToRemove.x, 
+              y: annotationToRemove.y, 
+              width: annotationToRemove.width, 
+              height: annotationToRemove.height 
+            },
+            color: annotationToRemove.color,
+            label: annotationToRemove.label || 'Unlabeled',
+            deletedAt: new Date().toISOString()
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Failed to remove annotation or log audit:', error);
+      // Continue with removal even if audit logging fails
     }
-  }, [annotations, onAnnotationsChange, annotationData, onAnnotationDataChange]);
+  }, [annotations, onAnnotationsChange, annotationData, onAnnotationDataChange, user]);
 
   // Handle right-click to remove annotation
   const handleAnnotationRightClick = useCallback((e: React.MouseEvent, annotationId: string) => {
@@ -291,7 +343,7 @@ export const BoxAnnotations = ({
   }, [removeBoxAnnotation]);
 
   // Handle label confirmation with improved error handling
-  const handleLabelConfirm = useCallback(() => {
+  const handleLabelConfirm = useCallback(async () => {
     if (!labelDialog.annotationId || !isMountedRef.current) return;
     
     // Find the annotation being labeled
@@ -303,30 +355,31 @@ export const BoxAnnotations = ({
     }
 
     const label = labelDialog.label.trim();
+    const previousLabel = targetAnnotation.label;
     
-    // Always update the box annotation with the label (even if empty)
-    const updatedAnnotations = annotations.map(annotation => 
-      annotation.id === labelDialog.annotationId 
-        ? { ...annotation, label: label || undefined }
-        : annotation
-    );
-
-    // Prepare additional notes update for preset colors
-    let updatedAdditionalNotes = annotationData?.additionalNotes;
-    const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
-    
-    if (label && presetColorName && annotationData) {
-      const existingNotes = annotationData.additionalNotes || '';
-      const labelEntry = `${presetColorName}: ${label}`;
-      
-      // Append to existing notes with proper formatting
-      updatedAdditionalNotes = existingNotes 
-        ? `${existingNotes}\n${labelEntry}`
-        : labelEntry;
-    }
-
-    // Make a single combined update with both annotations and additional notes
     try {
+      // Always update the box annotation with the label (even if empty)
+      const updatedAnnotations = annotations.map(annotation => 
+        annotation.id === labelDialog.annotationId 
+          ? { ...annotation, label: label || undefined }
+          : annotation
+      );
+
+      // Prepare additional notes update for preset colors
+      let updatedAdditionalNotes = annotationData?.additionalNotes;
+      const presetColorName = PRESET_COLOR_NAMES[targetAnnotation.color.toLowerCase()];
+      
+      if (label && presetColorName && annotationData) {
+        const existingNotes = annotationData.additionalNotes || '';
+        const labelEntry = `${presetColorName}: ${label}`;
+        
+        // Append to existing notes with proper formatting
+        updatedAdditionalNotes = existingNotes 
+          ? `${existingNotes}\n${labelEntry}`
+          : labelEntry;
+      }
+
+      // Make a single combined update with both annotations and additional notes
       if (onAnnotationDataChange && annotationData) {
         onAnnotationDataChange({
           ...annotationData,
@@ -337,13 +390,42 @@ export const BoxAnnotations = ({
         // Fallback to just updating annotations if no combined callback
         onAnnotationsChange(updatedAnnotations);
       }
+      
+      // Log annotation edit audit (only if label actually changed)
+      if (user && label !== previousLabel) {
+        await auditService.logAnnotationEdit(
+          user,
+          labelDialog.annotationId,
+          {
+            position: { 
+              x: targetAnnotation.x, 
+              y: targetAnnotation.y, 
+              width: targetAnnotation.width, 
+              height: targetAnnotation.height 
+            },
+            color: targetAnnotation.color,
+            label: previousLabel || 'Unlabeled'
+          },
+          {
+            position: { 
+              x: targetAnnotation.x, 
+              y: targetAnnotation.y, 
+              width: targetAnnotation.width, 
+              height: targetAnnotation.height 
+            },
+            color: targetAnnotation.color,
+            label: label || 'Unlabeled'
+          }
+        );
+      }
+      
+      setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
     } catch (error) {
-      console.error('Error updating annotation data:', error);
+      console.error('Error updating annotation data or logging audit:', error);
       // Still try to close dialog even if update fails
+      setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
     }
-    
-    setLabelDialog({ isVisible: false, annotationId: null, x: 0, y: 0, label: '' });
-  }, [labelDialog, annotations, onAnnotationsChange, annotationData, onAnnotationDataChange]);
+  }, [labelDialog, annotations, onAnnotationsChange, annotationData, onAnnotationDataChange, user]);
 
   // Handle label cancellation
   const handleLabelCancel = useCallback(() => {

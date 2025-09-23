@@ -25,6 +25,7 @@ import { getUserApiKey } from '~/utils/auth';
 import { UserData } from '~/types';
 import paths from '~/config/config.json';
 import freeEmailDomains from 'free-email-domains';
+import { auditService } from '~/services/audit.service';
 
 export const meta = () => {
   return baseMeta({
@@ -173,7 +174,23 @@ export const Login = () => {
       
       console.log("User signed in:", user.email);
       setUser(user);
-      setShowMfaEnrollment(false);      
+      setShowMfaEnrollment(false);
+      
+      // Log successful login audit
+      try {
+        const sessionId = `session_${user.uid}_${Date.now()}`;
+        await auditService.logUserLogin(
+          user,
+          sessionId,
+          'firebase',
+          undefined, // ipAddress - not easily available on client side
+          navigator.userAgent,
+          undefined // location - would require geolocation permission
+        );
+      } catch (auditError) {
+        console.error('Failed to log user login audit:', auditError);
+        // Continue with login even if audit logging fails
+      }      
     } else {
       setUser(null);
       setShowMfaEnrollment(false);
@@ -279,6 +296,39 @@ export const Login = () => {
   } catch (err) {
     const { message } = handleAuthError(err);
     setError(message);
+    
+    // Log security violation for failed authentication attempts
+    try {
+      // Extract error details for audit
+      const errorCode = err && typeof err === 'object' && 'code' in err ? err.code : 'unknown';
+      const isAuthError = typeof errorCode === 'string' && errorCode.startsWith('auth/');
+      
+      if (isAuthError) {
+        // Determine severity based on error type
+        let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+        let incidentType: 'unauthorized-access' | 'brute-force' | 'privilege-escalation' = 'unauthorized-access';
+        
+        if (errorCode === 'auth/too-many-requests') {
+          severity = 'high';
+          incidentType = 'brute-force';
+        } else if (errorCode === 'auth/user-disabled') {
+          severity = 'critical';
+        }
+        
+        await auditService.logSecurityViolation(
+          null, // No user object for failed auth
+          incidentType,
+          severity,
+          `Failed authentication attempt: ${errorCode} - ${message}`,
+          undefined, // sourceIp not easily available on client side
+          'authentication-endpoint',
+          true // Blocked by system
+        );
+      }
+    } catch (auditError) {
+      console.error('Failed to log security violation audit:', auditError);
+      // Continue with error flow even if audit logging fails
+    }
   } finally {
     setIsLoading(false);
   }

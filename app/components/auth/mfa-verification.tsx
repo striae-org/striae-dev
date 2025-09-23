@@ -9,6 +9,7 @@ import {
 import { auth } from '~/services/firebase';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
 import { SignOut } from '~/components/actions/signout';
+import { auditService } from '~/services/audit.service';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -123,6 +124,30 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       }
       setErrorMessage(errorMsg);
       onError(errorMsg);
+      
+      // Log security violation for failed MFA attempts
+      try {
+        let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium';
+        let incidentType: 'unauthorized-access' | 'brute-force' = 'unauthorized-access';
+        
+        if (authError.code === 'auth/invalid-verification-code') {
+          severity = 'high'; // Invalid MFA codes are serious security events
+          incidentType = 'brute-force';
+        }
+        
+        await auditService.logSecurityViolation(
+          null, // No user object during MFA verification failure
+          incidentType,
+          severity,
+          `Failed MFA verification: ${authError.code} - ${errorMsg}`,
+          undefined, // sourceIp not easily available on client side
+          'mfa-verification-endpoint',
+          true // Blocked by system
+        );
+      } catch (auditError) {
+        console.error('Failed to log MFA security violation audit:', auditError);
+        // Continue with error flow even if audit logging fails
+      }
     } finally {
       setLoading(false);
     }

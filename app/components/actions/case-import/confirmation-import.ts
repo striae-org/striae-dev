@@ -4,6 +4,7 @@ import { getDataApiKey } from '~/utils/auth';
 import { ConfirmationImportResult, ConfirmationImportData } from '~/types';
 import { checkExistingCase } from '../case-manage';
 import { validateExporterUid, validateConfirmationChecksum } from './validation';
+import { auditService } from '~/services/audit.service';
 
 const DATA_WORKER_URL = paths.data_worker_url;
 
@@ -15,6 +16,8 @@ export async function importConfirmationData(
   confirmationFile: File,
   onProgress?: (stage: string, progress: number, details?: string) => void
 ): Promise<ConfirmationImportResult> {
+  const startTime = Date.now();
+  
   const result: ConfirmationImportResult = {
     success: false,
     caseNumber: '',
@@ -31,11 +34,15 @@ export async function importConfirmationData(
     const fileContent = await confirmationFile.text();
     const confirmationData: ConfirmationImportData = JSON.parse(fileContent);
     result.caseNumber = confirmationData.metadata.caseNumber;
+    
+    // Start audit workflow
+    auditService.startWorkflow(result.caseNumber);
 
     onProgress?.('Validating checksum', 20, 'Verifying data integrity...');
 
     // Validate checksum
-    if (!validateConfirmationChecksum(fileContent, confirmationData.metadata.checksum)) {
+    const checksumValid = validateConfirmationChecksum(fileContent, confirmationData.metadata.checksum);
+    if (!checksumValid) {
       throw new Error('Confirmation data checksum validation failed. The file may have been tampered with or corrupted.');
     }
 
@@ -178,8 +185,36 @@ export async function importConfirmationData(
       if (saveResponse.ok) {
         result.imagesUpdated++;
         result.confirmationsImported += confirmations.length;
+        
+        // Audit log successful confirmation import
+        try {
+          await auditService.logAnnotationEdit(
+            user,
+            `${result.caseNumber}-${currentImageId}`,
+            annotationData, // Previous state (without confirmation)
+            updatedAnnotationData, // New state (with confirmation)
+            result.caseNumber,
+            'confirmation-import'
+          );
+        } catch (auditError) {
+          console.error('Failed to log confirmation import audit:', auditError);
+        }
       } else {
         result.warnings?.push(`Failed to update image ${displayFilename}: ${saveResponse.status}`);
+        
+        // Audit log failed confirmation import
+        try {
+          await auditService.logAnnotationEdit(
+            user,
+            `${result.caseNumber}-${currentImageId}`,
+            annotationData, // Previous state
+            null, // Failed save
+            result.caseNumber,
+            'confirmation-import'
+          );
+        } catch (auditError) {
+          console.error('Failed to log failed confirmation import audit:', auditError);
+        }
       }
 
       processedCount++;
@@ -201,12 +236,55 @@ export async function importConfirmationData(
       result.success = true;
     }
     
+    // Log confirmation import audit event
+    const endTime = Date.now();
+    await auditService.logConfirmationImport(
+      user,
+      result.caseNumber,
+      confirmationFile.name,
+      result.success ? (result.errors && result.errors.length > 0 ? 'warning' : 'success') : 'failure',
+      checksumValid,
+      result.confirmationsImported,
+      result.errors || [],
+      confirmationData.metadata.exportedByUid,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: confirmationFile.size,
+        validationStepsCompleted: result.confirmationsImported,
+        validationStepsFailed: result.errors ? result.errors.length : 0
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     return result;
 
   } catch (error) {
     console.error('Confirmation import failed:', error);
     result.success = false;
     result.errors?.push(error instanceof Error ? error.message : 'Unknown error occurred during confirmation import');
+    
+    // Log failed confirmation import
+    const endTime = Date.now();
+    await auditService.logConfirmationImport(
+      user,
+      result.caseNumber || 'unknown',
+      confirmationFile.name,
+      'failure',
+      false,
+      0,
+      result.errors || [],
+      undefined,
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: confirmationFile.size,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      }
+    );
+    
+    auditService.endWorkflow();
+    
     return result;
   }
 }

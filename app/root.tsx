@@ -25,6 +25,7 @@ import { INACTIVITY_CONFIG } from '~/config/inactivity';
 import { AuthContext } from '~/contexts/auth.context';
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import { auditService } from '~/services/audit.service';
 import './reset.module.css';
 
 export const links: LinksFunction = () => [
@@ -126,8 +127,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     extendSession();
   };
 
-  const handleSignOutNow = () => {
+  const handleSignOutNow = async () => {
     setShowInactivityWarning(false);
+    
+    // Log timeout logout audit before signing out
+    if (user) {
+      try {
+        const sessionId = `session_${user.uid}_timeout_${Date.now()}`;
+        await auditService.logUserLogout(
+          user,
+          sessionId,
+          INACTIVITY_CONFIG.TIMEOUT_MINUTES * 60, // sessionDuration in seconds
+          'timeout'
+        );
+      } catch (auditError) {
+        console.error('Failed to log timeout logout audit:', auditError);
+        // Continue with logout even if audit logging fails
+      }
+    }
+    
     auth.signOut();
   };
 

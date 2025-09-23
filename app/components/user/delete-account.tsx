@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { signOut } from 'firebase/auth';
+import { signOut, User } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
+import { auditService } from '~/services/audit.service';
 import styles from './delete-account.module.css';
 
 interface DeleteAccountProps {
@@ -65,6 +66,19 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
     setError('');
     
     try {
+      // Log account deletion attempt
+      await auditService.logAccountDeletionSimple(
+        user.uid,
+        user.email || 'unknown@example.com',
+        'pending',
+        'user-requested',
+        'uid-email',
+        undefined, // casesCount - to be filled after deletion
+        undefined, // filesCount - to be filled after deletion
+        undefined, // dataRetentionPeriod
+        false // emailNotificationSent - initially false
+      );
+
       // Get API key for user-worker authentication
       const apiKey = await getUserApiKey();
       
@@ -84,6 +98,19 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       const result = await deleteResponse.json() as { success: boolean; message?: string };
       
       if (result.success) {
+        // Log successful account deletion
+        await auditService.logAccountDeletionSimple(
+          user.uid,
+          user.email || 'unknown@example.com',
+          'success',
+          'user-requested',
+          'uid-email',
+          undefined, // casesCount - not available from response
+          undefined, // filesCount - not available from response
+          undefined, // dataRetentionPeriod
+          true // emailNotificationSent - assuming true on success
+        );
+
         setSuccess(true);
         
         // Log out user and close modal after 3 seconds
@@ -102,6 +129,22 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       }
       
     } catch (err) {
+      // Log failed account deletion
+      await auditService.logAccountDeletionSimple(
+        user.uid,
+        user.email || 'unknown@example.com',
+        'failure',
+        'user-requested',
+        'uid-email',
+        undefined, // casesCount
+        undefined, // filesCount
+        undefined, // dataRetentionPeriod
+        false, // emailNotificationSent
+        undefined, // sessionId
+        undefined, // ipAddress
+        [err instanceof Error ? err.message : 'Unknown error during account deletion']
+      );
+
       console.error('Delete account error:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete account. Please try again or contact support.');
     } finally {
