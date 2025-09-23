@@ -33,7 +33,7 @@ interface BoxAnnotationsProps {
   };
   onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
   isReadOnly?: boolean;
-  caseNumber?: string;
+  caseNumber: string; // Required for audit logging
   imageFileId?: string;
   originalImageFileName?: string;
 }

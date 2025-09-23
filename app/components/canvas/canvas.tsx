@@ -20,7 +20,7 @@ interface CanvasProps {
   boxAnnotationColor?: string;
   isReadOnly?: boolean;
   // Confirmation data for storing case-level confirmations
-  caseNumber?: string;
+  caseNumber: string; // Required for audit logging
   currentImageId?: string;
 }
 
