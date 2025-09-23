@@ -285,6 +285,7 @@ export class AuditMethodsService {
     user: User,
     fileName: string,
     caseNumber: string,
+    result: AuditResult = 'success',
     fileId?: string,
     accessMethod: string = 'viewer'
   ): Promise<void> {
@@ -292,10 +293,10 @@ export class AuditMethodsService {
       userId: user.uid,
       userEmail: user.email || '',
       action: 'file-access',
-      result: 'success',
+      result,
       fileName,
       fileType: 'image-file',
-      validationErrors: [],
+      validationErrors: result === 'failure' ? ['File access failed'] : [],
       caseNumber,
       workflowPhase: 'casework',
       fileDetails: {
@@ -362,5 +363,266 @@ export class AuditMethodsService {
         severity
       }
     });
+  }
+
+  /**
+   * Log confirmation creation event
+   */
+  public async logConfirmationCreation(
+    user: User,
+    caseNumber: string,
+    confirmationType: string,
+    result: AuditResult,
+    duration: number,
+    description: string,
+    fileName?: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'confirmation-create',
+      result,
+      fileName: fileName || `confirmation-${caseNumber}.pdf`,
+      fileType: 'pdf-document',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber,
+      workflowPhase: 'confirmation',
+      performanceMetrics: {
+        processingTimeMs: duration,
+        fileSizeBytes: 0
+      }
+    });
+  }
+
+  /**
+   * Log confirmation export event
+   */
+  public async logConfirmationExport(
+    user: User,
+    caseNumber: string,
+    result: AuditResult,
+    duration: number,
+    description: string,
+    fileName?: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'confirmation-export',
+      result,
+      fileName: fileName || `confirmation-export-${caseNumber}.zip`,
+      fileType: 'case-package',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber,
+      workflowPhase: 'confirmation',
+      performanceMetrics: {
+        processingTimeMs: duration,
+        fileSizeBytes: 0
+      }
+    });
+  }
+
+  /**
+   * Log confirmation import event
+   */
+  public async logConfirmationImport(
+    user: User,
+    caseNumber: string,
+    result: AuditResult,
+    duration: number,
+    description: string,
+    fileName?: string,
+    fileSize?: number,
+    validationErrors?: string[]
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'confirmation-import',
+      result,
+      fileName: fileName || `confirmation-import-${caseNumber}.zip`,
+      fileType: 'case-package',
+      validationErrors: validationErrors || (result === 'failure' ? [description] : []),
+      caseNumber,
+      workflowPhase: 'confirmation',
+      performanceMetrics: {
+        processingTimeMs: duration,
+        fileSizeBytes: fileSize || 0
+      },
+      fileDetails: fileSize ? {
+        fileSize
+      } : undefined
+    });
+  }
+
+  /**
+   * Log case creation event
+   */
+  public async logCaseCreation(
+    user: User,
+    caseNumber: string,
+    result: AuditResult,
+    description: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'case-create',
+      result,
+      fileName: `case-${caseNumber}.json`,
+      fileType: 'json-data',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber,
+      workflowPhase: 'casework'
+    });
+  }
+
+  /**
+   * Log case rename event
+   */
+  public async logCaseRename(
+    user: User,
+    oldCaseNumber: string,
+    newCaseNumber: string,
+    result: AuditResult,
+    description: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'case-rename',
+      result,
+      fileName: `case-${newCaseNumber}.json`,
+      fileType: 'json-data',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber: newCaseNumber,
+      workflowPhase: 'casework'
+    });
+  }
+
+  /**
+   * Log case deletion event
+   */
+  public async logCaseDeletion(
+    user: User,
+    caseNumber: string,
+    result: AuditResult,
+    description: string,
+    filesDeleted?: number
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'case-delete',
+      result,
+      fileName: `case-${caseNumber}.json`,
+      fileType: 'json-data',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber,
+      workflowPhase: 'casework'
+    });
+  }
+
+  /**
+   * Log PDF generation event
+   */
+  public async logPDFGeneration(
+    user: User,
+    caseNumber: string,
+    result: AuditResult,
+    duration: number,
+    description: string,
+    fileName?: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'pdf-generate',
+      result,
+      fileName: fileName || `report-${caseNumber}.pdf`,
+      fileType: 'pdf-document',
+      validationErrors: result === 'failure' ? [description] : [],
+      caseNumber,
+      workflowPhase: 'casework',
+      performanceMetrics: {
+        processingTimeMs: duration,
+        fileSizeBytes: 0
+      }
+    });
+  }
+
+  /**
+   * Log user profile update event
+   */
+  public async logUserProfileUpdate(
+    user: User,
+    result: AuditResult,
+    description: string,
+    changedFields?: string[]
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'user-profile-update',
+      result,
+      fileName: `profile-${user.uid}.json`,
+      fileType: 'json-data',
+      validationErrors: result === 'failure' ? [description] : [],
+      workflowPhase: 'user-management'
+    });
+  }
+
+  /**
+   * Log password reset event
+   */
+  public async logPasswordReset(
+    user: User,
+    result: AuditResult,
+    description: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'user-password-reset',
+      result,
+      fileName: 'password-reset.log',
+      fileType: 'log-file',
+      validationErrors: result === 'failure' ? [description] : [],
+      workflowPhase: 'user-management'
+    });
+  }
+
+  /**
+   * Log account deletion event (simple version)
+   */
+  public async logAccountDeletionSimple(
+    user: User,
+    result: AuditResult,
+    description: string
+  ): Promise<void> {
+    await this.deps.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'user-account-delete',
+      result,
+      fileName: 'account-deletion.log',
+      fileType: 'log-file',
+      validationErrors: result === 'failure' ? [description] : [],
+      workflowPhase: 'user-management'
+    });
+  }
+
+  /**
+   * Log file deletion event (alias for logFileDelete)
+   */
+  public async logFileDeletion(
+    user: User,
+    fileName: string,
+    caseNumber: string,
+    result: AuditResult,
+    deleteReason?: string,
+    fileId?: string
+  ): Promise<void> {
+    return this.logFileDelete(user, fileName, caseNumber, result, deleteReason, fileId);
   }
 }

@@ -17,9 +17,7 @@ export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {
           const sessionId = `session_${user.uid}_logout_${Date.now()}`;
           await auditService.logUserLogout(
             user,
-            sessionId,
-            0, // sessionDuration - we don't track session start time here
-            'user-initiated'
+            0 // sessionDuration - we don't track session start time here
           );
         } catch (auditError) {
           console.error('Failed to log user logout audit:', auditError);

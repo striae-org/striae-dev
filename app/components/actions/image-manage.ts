@@ -46,10 +46,11 @@ export const uploadFile = async (
         file.name,
         file.size,
         file.type,
-        'file-picker',
         caseNumber,
         'failure',
-        Date.now() - startTime
+        ['File upload permission denied'],
+        undefined,
+        'file-picker'
       );
     } catch (auditError) {
       console.error('Failed to log file upload permission denial:', auditError);
@@ -113,11 +114,11 @@ export const uploadFile = async (
               file.name,
               file.size,
               file.type,
-              'file-picker',
               caseNumber,
               'success',
-              endTime - startTime,
-              imageData.result.id
+              [],
+              imageData.result.id,
+              'file-picker'
             );
           } catch (auditError) {
             console.error('Failed to log successful file upload:', auditError);
@@ -133,10 +134,11 @@ export const uploadFile = async (
               file.name,
               file.size,
               file.type,
-              'file-picker',
               caseNumber,
               'failure',
-              endTime - startTime
+              [error instanceof Error ? error.message : 'Upload failed'],
+              undefined,
+              'file-picker'
             );
           } catch (auditError) {
             console.error('Failed to log file upload failure:', auditError);
@@ -151,10 +153,11 @@ export const uploadFile = async (
             file.name,
             file.size,
             file.type,
-            'file-picker',
             caseNumber,
             'failure',
-            endTime - startTime
+            ['Upload failed'],
+            undefined,
+            'file-picker'
           );
         } catch (auditError) {
           console.error('Failed to log file upload failure:', auditError);
@@ -171,10 +174,11 @@ export const uploadFile = async (
           file.name,
           file.size,
           file.type,
-          'file-picker',
           caseNumber,
           'failure',
-          Date.now() - startTime
+          ['Upload failed'],
+          undefined,
+          'file-picker'
         );
       } catch (auditError) {
         console.error('Failed to log file upload error:', auditError);
@@ -271,11 +275,10 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
       await auditService.logFileDeletion(
         user,
         fileName,
-        fileSize,
-        'User-requested deletion via file list',
         caseNumber,
-        fileId,
-        fileToDelete?.originalFilename
+        'success',
+        'User-requested deletion via file list',
+        fileId
       );
     } catch (auditError) {
       console.error('Failed to log file deletion:', auditError);
@@ -348,13 +351,10 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
       await auditService.logFileAccess(
         user,
         fileData.originalFilename || fileData.id,
-        fileData.id,
-        'signed-url',
         caseNumber,
         'failure',
-        Date.now() - startTime,
-        'Image URL generation failed',
-        fileData.originalFilename
+        fileData.id,
+        'signed-url'
       );
       throw new Error('Failed to get signed image URL');
     }
@@ -365,13 +365,10 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
       await auditService.logFileAccess(
         user,
         fileData.originalFilename || fileData.id,
-        fileData.id,
-        'signed-url',
         caseNumber,
         'failure',
-        Date.now() - startTime,
-        'Invalid signed URL returned',
-        fileData.originalFilename
+        fileData.id,
+        'signed-url'
       );
       throw new Error('Invalid signed URL returned');
     }
@@ -380,13 +377,10 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
     await auditService.logFileAccess(
       user,
       fileData.originalFilename || fileData.id,
-      fileData.id,
-      'signed-url',
       caseNumber,
       'success',
-      Date.now() - startTime,
-      'Image viewer access',
-      fileData.originalFilename
+      fileData.id,
+      'signed-url'
     );
     
     return signedUrl;
@@ -396,13 +390,10 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
       await auditService.logFileAccess(
         user,
         fileData.originalFilename || fileData.id,
-        fileData.id,
-        'signed-url',
         caseNumber,
         'failure',
-        Date.now() - startTime,
-        'Unexpected error during image access',
-        fileData.originalFilename
+        fileData.id,
+        'signed-url'
       );
     }
     throw error;
