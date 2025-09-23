@@ -64,19 +64,43 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
 
   const getActionIcon = (action: AuditAction): string => {
     switch (action) {
+      // User & Session Management
       case 'user-login': return '🔑';
       case 'user-logout': return '🚪';
+      
+      // Case Management
       case 'case-create': return '📂';
       case 'case-rename': return '✏️';
       case 'case-delete': return '🗑️';
+      
+      // Confirmation Workflow
+      case 'case-export': return '📤';
+      case 'case-import': return '📥';
+      case 'confirmation-create': return '✅';
+      case 'confirmation-export': return '📤';
+      case 'confirmation-import': return '📥';
+      
+      // File Operations
       case 'file-upload': return '⬆️';
       case 'file-delete': return '🗑️';
       case 'file-access': return '👁️';
+      
+      // Annotation Operations
       case 'annotation-create': return '✨';
       case 'annotation-edit': return '✏️';
       case 'annotation-delete': return '❌';
+      
+      // Document Generation
       case 'pdf-generate': return '📄';
+      
+      // Security & Monitoring
       case 'security-violation': return '🚨';
+      
+      // Legacy Actions
+      case 'export': return '📤';
+      case 'import': return '📥';
+      case 'confirm': return '✓';
+      
       default: return '📄';
     }
   };
@@ -192,7 +216,6 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
                     <optgroup label="User Sessions">
                       <option value="user-login">Login</option>
                       <option value="user-logout">Logout</option>
-                      <option value="session-timeout">Session Timeout</option>
                     </optgroup>
                     <optgroup label="Case Management">
                       <option value="case-create">Case Create</option>
@@ -201,16 +224,26 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
                     </optgroup>
                     <optgroup label="File Operations">
                       <option value="file-upload">File Upload</option>
+                      <option value="file-access">File Access</option>
                       <option value="file-delete">File Delete</option>
                     </optgroup>
                     <optgroup label="Annotations">
                       <option value="annotation-create">Annotation Create</option>
                       <option value="annotation-edit">Annotation Edit</option>
-                      <option value="annotation-save">Annotation Save</option>
+                      <option value="annotation-delete">Annotation Delete</option>
+                    </optgroup>
+                    <optgroup label="Confirmation Workflow">
+                      <option value="case-export">Case Export</option>
+                      <option value="case-import">Case Import</option>
+                      <option value="confirmation-create">Confirmation Create</option>
+                      <option value="confirmation-export">Confirmation Export</option>
+                      <option value="confirmation-import">Confirmation Import</option>
+                    </optgroup>
+                    <optgroup label="Documents">
+                      <option value="pdf-generate">PDF Generate</option>
                     </optgroup>
                     <optgroup label="Security">
                       <option value="security-violation">Security Violation</option>
-                      <option value="access-denied">Access Denied</option>
                     </optgroup>
                   </select>
                 </div>
@@ -303,6 +336,63 @@ export const UserAuditViewer = ({ isOpen, onClose }: UserAuditViewerProps) => {
                               <div className={styles.detailRow}>
                                 <span className={styles.detailLabel}>Type:</span>
                                 <span className={styles.detailValue}>{entry.details.securityDetails.incidentType}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        {/* File Operation Details */}
+                        {(entry.action === 'file-upload' || entry.action === 'file-delete' || entry.action === 'file-access') && entry.details.fileDetails && (
+                          <>
+                            {/* File ID */}
+                            {entry.details.fileDetails.fileId && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>File ID:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.fileId}</span>
+                              </div>
+                            )}
+                            
+                            {/* Original Filename */}
+                            {entry.details.fileDetails.originalFileName && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Original Filename:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.originalFileName}</span>
+                              </div>
+                            )}
+                            
+                            {/* File Size */}
+                            {entry.details.fileDetails.fileSize > 0 && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>File Size:</span>
+                                <span className={styles.detailValue}>
+                                  {(entry.details.fileDetails.fileSize / 1024 / 1024).toFixed(2)} MB
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Access Method/Upload Method */}
+                            {entry.details.fileDetails.uploadMethod && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>
+                                  {entry.action === 'file-access' ? 'Access Method' : 'Upload Method'}:
+                                </span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.uploadMethod}</span>
+                              </div>
+                            )}
+                            
+                            {/* Delete Reason */}
+                            {entry.details.fileDetails.deleteReason && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Reason:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.deleteReason}</span>
+                              </div>
+                            )}
+                            
+                            {/* Access Source */}
+                            {entry.details.fileDetails.sourceLocation && entry.action === 'file-access' && (
+                              <div className={styles.detailRow}>
+                                <span className={styles.detailLabel}>Access Source:</span>
+                                <span className={styles.detailValue}>{entry.details.fileDetails.sourceLocation}</span>
                               </div>
                             )}
                           </>

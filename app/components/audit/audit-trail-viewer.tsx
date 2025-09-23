@@ -97,7 +97,6 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
       case 'export': return '📤';
       case 'import': return '📥';
       case 'confirm': return '✓';
-      case 'validate': return '🔍';
       
       // Case Management Actions
       case 'case-create': return '📂';
@@ -222,30 +221,23 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                       <option value="case-create">Case Create</option>
                       <option value="case-rename">Case Rename</option>
                       <option value="case-delete">Case Delete</option>
-                      <option value="case-open">Case Open</option>
-                      <option value="case-close">Case Close</option>
                     </optgroup>
                     <optgroup label="File Operations">
                       <option value="file-upload">File Upload</option>
+                      <option value="file-access">File Access</option>
                       <option value="file-delete">File Delete</option>
-                      <option value="file-download">File Download</option>
-                      <option value="file-process">File Process</option>
                     </optgroup>
                     <optgroup label="Annotations">
                       <option value="annotation-create">Annotation Create</option>
                       <option value="annotation-edit">Annotation Edit</option>
-                      <option value="annotation-save">Annotation Save</option>
                       <option value="annotation-delete">Annotation Delete</option>
                     </optgroup>
                     <optgroup label="User & Session">
                       <option value="user-login">User Login</option>
                       <option value="user-logout">User Logout</option>
-                      <option value="session-timeout">Session Timeout</option>
                     </optgroup>
                     <optgroup label="Document Generation">
                       <option value="pdf-generate">PDF Generate</option>
-                      <option value="pdf-download">PDF Download</option>
-                      <option value="report-generate">Report Generate</option>
                     </optgroup>
                     <optgroup label="Confirmation Workflow">
                       <option value="case-export">Case Export</option>
@@ -256,14 +248,11 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                     </optgroup>
                     <optgroup label="Security">
                       <option value="security-violation">Security Violation</option>
-                      <option value="access-denied">Access Denied</option>
-                      <option value="suspicious-activity">Suspicious Activity</option>
                     </optgroup>
                     <optgroup label="Legacy">
                       <option value="export">Export</option>
                       <option value="import">Import</option>
                       <option value="confirm">Confirm</option>
-                      <option value="validate">Validate</option>
                     </optgroup>
                   </select>
                 </div>
@@ -392,16 +381,92 @@ export const AuditTrailViewer = ({ caseNumber, isOpen, onClose }: AuditTrailView
                       )}
 
                       {/* File Operation Details */}
-                      {(entry.action === 'file-upload' || entry.action === 'file-delete') && (
+                      {(entry.action === 'file-upload' || entry.action === 'file-delete' || entry.action === 'file-access') && (
                         <div className={styles.fileDetails}>
+                          {/* File ID */}
+                          {entry.details.fileDetails?.fileId && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>File ID:</span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.fileId}</span>
+                            </div>
+                          )}
+                          
+                          {/* Original Filename */}
+                          {entry.details.fileDetails?.originalFileName && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Original Filename:</span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.originalFileName}</span>
+                            </div>
+                          )}
+                          
+                          {/* File Size */}
                           <div className={styles.detailRow}>
                             <span className={styles.detailLabel}>File Size:</span>
                             <span className={styles.detailValue}>
-                              {entry.details.performanceMetrics?.fileSizeBytes 
-                                ? `${(entry.details.performanceMetrics.fileSizeBytes / 1024 / 1024).toFixed(2)} MB`
-                                : 'N/A'}
+                              {entry.details.fileDetails?.fileSize 
+                                ? `${(entry.details.fileDetails.fileSize / 1024 / 1024).toFixed(2)} MB`
+                                : entry.details.performanceMetrics?.fileSizeBytes 
+                                  ? `${(entry.details.performanceMetrics.fileSizeBytes / 1024 / 1024).toFixed(2)} MB`
+                                  : 'N/A'}
                             </span>
                           </div>
+                          
+                          {/* MIME Type */}
+                          {entry.details.fileDetails?.mimeType && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>MIME Type:</span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.mimeType}</span>
+                            </div>
+                          )}
+                          
+                          {/* Upload Method (for uploads) or Access Method (for access) */}
+                          {entry.details.fileDetails?.uploadMethod && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>
+                                {entry.action === 'file-access' ? 'Access Method' : 'Upload Method'}:
+                              </span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.uploadMethod}</span>
+                            </div>
+                          )}
+                          
+                          {/* Delete Reason (for deletions) */}
+                          {entry.details.fileDetails?.deleteReason && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Delete Reason:</span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.deleteReason}</span>
+                            </div>
+                          )}
+                          
+                          {/* Source Location (for access events) */}
+                          {entry.details.fileDetails?.sourceLocation && entry.action === 'file-access' && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Access Source:</span>
+                              <span className={styles.detailValue}>{entry.details.fileDetails.sourceLocation}</span>
+                            </div>
+                          )}
+                          
+                          {/* Virus Scan Result (for uploads) */}
+                          {entry.details.fileDetails?.virusScanResult && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Virus Scan:</span>
+                              <span className={styles.detailValue}>
+                                {entry.details.fileDetails.virusScanResult === 'clean' ? '✅ Clean' :
+                                 entry.details.fileDetails.virusScanResult === 'infected' ? '🦠 Infected' :
+                                 entry.details.fileDetails.virusScanResult === 'quarantined' ? '🔒 Quarantined' :
+                                 '❌ Failed'}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Thumbnail Generated (for image uploads) */}
+                          {entry.details.fileDetails?.thumbnailGenerated !== undefined && (
+                            <div className={styles.detailRow}>
+                              <span className={styles.detailLabel}>Thumbnail:</span>
+                              <span className={styles.detailValue}>
+                                {entry.details.fileDetails.thumbnailGenerated ? '✅ Generated' : '❌ Not Generated'}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
