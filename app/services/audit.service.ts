@@ -562,7 +562,9 @@ export class AuditService {
     annotationType: 'measurement' | 'identification' | 'comparison' | 'note' | 'region',
     annotationData: any,
     caseNumber?: string,
-    tool?: string
+    tool?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -588,7 +590,14 @@ export class AuditService {
         tool,
         canvasPosition: annotationData?.position,
         annotationSize: annotationData?.size
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 
@@ -601,7 +610,9 @@ export class AuditService {
     previousValue: any,
     newValue: any,
     caseNumber?: string,
-    tool?: string
+    tool?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -626,7 +637,14 @@ export class AuditService {
         annotationData: newValue,
         previousValue,
         tool
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 
@@ -638,7 +656,9 @@ export class AuditService {
     annotationId: string,
     annotationData: any,
     caseNumber?: string,
-    deleteReason?: string
+    deleteReason?: string,
+    imageFileId?: string,
+    originalImageFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -662,7 +682,14 @@ export class AuditService {
         annotationType: annotationData?.type,
         annotationData,
         tool: deleteReason
-      }
+      },
+      fileDetails: imageFileId || originalImageFileName ? {
+        fileId: imageFileId,
+        originalFileName: originalImageFileName,
+        fileSize: 0, // Not available for image annotations
+        mimeType: 'image/*', // Generic image type
+        uploadMethod: 'api'
+      } : undefined
     });
   }
 

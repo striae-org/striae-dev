@@ -330,6 +330,9 @@ export const Canvas = ({
               annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
               isReadOnly={isReadOnly || !!annotationData?.confirmationData}
+              caseNumber={caseNumber}
+              imageFileId={currentImageId}
+              originalImageFileName={filename}
             />
           )}
           
