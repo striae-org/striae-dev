@@ -643,9 +643,7 @@ export class AuditService {
     user: User,
     sessionId: string,
     loginMethod: 'firebase' | 'sso' | 'api-key' | 'manual',
-    ipAddress?: string,
-    userAgent?: string,
-    location?: string
+    userAgent?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -659,11 +657,7 @@ export class AuditService {
       // Security checks removed - no actual validation performed
       sessionDetails: {
         sessionId,
-        ipAddress,
         userAgent,
-        location,
-        deviceType: this.getDeviceType(userAgent),
-        browserType: this.getBrowserType(userAgent),
         loginMethod
       }
     });
@@ -720,8 +714,7 @@ export class AuditService {
       workflowPhase: 'user-management',
       // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
-        sessionId,
-        ipAddress
+        sessionId
       } : undefined,
       userProfileDetails: {
         profileField,
@@ -761,8 +754,7 @@ export class AuditService {
       workflowPhase: 'user-management',
       // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
-        sessionId,
-        ipAddress
+        sessionId
       } : undefined,
       userProfileDetails: {
         resetMethod,
@@ -803,7 +795,6 @@ export class AuditService {
       // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
-        ipAddress
       } : undefined,
       userProfileDetails: {
         deletionReason,
@@ -845,7 +836,6 @@ export class AuditService {
       // Security checks removed - no actual validation performed
       sessionDetails: sessionId ? {
         sessionId,
-        ipAddress
       } : undefined,
       userProfileDetails: {
         deletionReason,
@@ -944,28 +934,6 @@ export class AuditService {
    */
   private isImageFile(mimeType: string): boolean {
     return mimeType.startsWith('image/');
-  }
-
-  /**
-   * Get device type from user agent
-   */
-  private getDeviceType(userAgent?: string): 'desktop' | 'tablet' | 'mobile' | 'unknown' {
-    if (!userAgent) return 'unknown';
-    if (/tablet|ipad/i.test(userAgent)) return 'tablet';
-    if (/mobile|android|iphone/i.test(userAgent)) return 'mobile';
-    return 'desktop';
-  }
-
-  /**
-   * Get browser type from user agent
-   */
-  private getBrowserType(userAgent?: string): string {
-    if (!userAgent) return 'unknown';
-    if (userAgent.includes('Chrome')) return 'Chrome';
-    if (userAgent.includes('Firefox')) return 'Firefox';
-    if (userAgent.includes('Safari')) return 'Safari';
-    if (userAgent.includes('Edge')) return 'Edge';
-    return 'unknown';
   }
 
   /**

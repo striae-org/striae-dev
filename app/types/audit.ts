@@ -243,16 +243,10 @@ export interface AnnotationAuditDetails {
  */
 export interface SessionAuditDetails {
   sessionId?: string;
-  ipAddress?: string;
   userAgent?: string;
-  location?: string;
-  deviceType?: 'desktop' | 'tablet' | 'mobile' | 'unknown';
-  browserType?: string;
   sessionDuration?: number;
   loginMethod?: 'firebase' | 'sso' | 'api-key' | 'manual';
   logoutReason?: 'user-initiated' | 'timeout' | 'security' | 'error';
-  failedAttempts?: number;
-  permissionLevel?: string;
 }
 
 /**
