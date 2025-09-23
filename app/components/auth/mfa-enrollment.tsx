@@ -218,7 +218,6 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
           'unauthorized-access',
           severity,
           `Failed MFA enrollment: ${authError.code} - ${errorMsg}`,
-          undefined, // sourceIp not easily available on client side
           'mfa-enrollment-endpoint',
           true // Blocked by system
         );

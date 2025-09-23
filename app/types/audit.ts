@@ -255,15 +255,11 @@ export interface SessionAuditDetails {
 export interface SecurityAuditDetails {
   incidentType?: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation';
   severity?: 'low' | 'medium' | 'high' | 'critical';
-  attackVector?: string;
-  sourceIp?: string;
   targetResource?: string;
   blockedBySystem?: boolean;
   investigationId?: string;
   reportedToAuthorities?: boolean;
   mitigationSteps?: string[];
-  falsePositive?: boolean;
-  relatedIncidents?: string[];
 }
 
 /**

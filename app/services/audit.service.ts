@@ -886,7 +886,6 @@ export class AuditService {
     incidentType: 'unauthorized-access' | 'data-breach' | 'malware' | 'injection' | 'brute-force' | 'privilege-escalation',
     severity: 'low' | 'medium' | 'high' | 'critical',
     description: string,
-    sourceIp?: string,
     targetResource?: string,
     blockedBySystem: boolean = true
   ): Promise<void> {
@@ -902,7 +901,6 @@ export class AuditService {
       securityDetails: {
         incidentType,
         severity,
-        sourceIp,
         targetResource,
         blockedBySystem,
         investigationId: `INV-${Date.now()}`,

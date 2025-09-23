@@ -140,7 +140,6 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
           incidentType,
           severity,
           `Failed MFA verification: ${authError.code} - ${errorMsg}`,
-          undefined, // sourceIp not easily available on client side
           'mfa-verification-endpoint',
           true // Blocked by system
         );

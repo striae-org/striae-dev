@@ -318,7 +318,6 @@ export const Login = () => {
           incidentType,
           severity,
           `Failed authentication attempt: ${errorCode} - ${message}`,
-          undefined, // sourceIp not easily available on client side
           'authentication-endpoint',
           true // Blocked by system
         );
