@@ -150,11 +150,6 @@
   border: 1px solid color-mix(in lab, var(--textLight) 20%, transparent);
 }
 
-/* User Information Section */
-.userInfo {
-  margin-bottom: 24px;
-}
-
 /* Common heading styles */
 .summary h3,
 .entriesList h3 {
