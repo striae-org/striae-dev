@@ -110,8 +110,8 @@ export interface SecurityCheckResults {
 export interface PerformanceMetrics {
   processingTimeMs: number;
   fileSizeBytes: number;
-  validationStepsCompleted: number;
-  validationStepsFailed: number;
+  validationStepsCompleted?: number;
+  validationStepsFailed?: number;
   retryAttempts?: number;
 }
 

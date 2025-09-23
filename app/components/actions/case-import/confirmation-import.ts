@@ -277,9 +277,7 @@ export async function importConfirmationData(
       undefined,
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: confirmationFile.size,
-        validationStepsCompleted: 0,
-        validationStepsFailed: 1
+        fileSizeBytes: confirmationFile.size
       }
     );
     

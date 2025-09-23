@@ -97,9 +97,7 @@ export async function storeConfirmation(
       undefined, // Original examiner UID not available in this context
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: 0, // Not applicable for confirmation creation
-        validationStepsCompleted: 1,
-        validationStepsFailed: 0
+        fileSizeBytes: 0 // Not applicable for confirmation creation
       },
       currentImageId,
       originalImageFileName
@@ -123,9 +121,7 @@ export async function storeConfirmation(
       undefined,
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: 0,
-        validationStepsCompleted: 0,
-        validationStepsFailed: 1
+        fileSizeBytes: 0
       },
       currentImageId,
       originalImageFileName
@@ -360,9 +356,7 @@ export async function exportConfirmationData(
       undefined,
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: 0,
-        validationStepsCompleted: 0,
-        validationStepsFailed: 1
+        fileSizeBytes: 0
       }
     );
     

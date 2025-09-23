@@ -227,9 +227,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {
@@ -403,9 +401,7 @@ export const renameCase = async (
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {
@@ -505,9 +501,7 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {

@@ -298,9 +298,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         },
         performanceMetrics: {
           processingTimeMs: endTime - startTime,
-          fileSizeBytes: 0,
-          validationStepsCompleted: 0,
-          validationStepsFailed: 1
+          fileSizeBytes: 0
         }
       });
     } catch (auditError) {

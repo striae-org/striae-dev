@@ -437,9 +437,7 @@ export class AuditService {
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
-        fileSizeBytes: fileSize,
-        validationStepsCompleted: 1,
-        validationStepsFailed: result === 'success' ? 0 : 1
+        fileSizeBytes: fileSize
       } : undefined
     });
   }
@@ -511,9 +509,7 @@ export class AuditService {
       },
       performanceMetrics: processingTime ? {
         processingTimeMs: processingTime,
-        fileSizeBytes: 0,
-        validationStepsCompleted: 1,
-        validationStepsFailed: result === 'failure' ? 1 : 0
+        fileSizeBytes: 0
       } : undefined
     });
   }
@@ -887,9 +883,7 @@ export class AuditService {
       // Security checks removed - no actual validation performed
       performanceMetrics: {
         processingTimeMs: processingTime,
-        fileSizeBytes: fileSize || 0,
-        validationStepsCompleted: 1,
-        validationStepsFailed: errors.length
+        fileSizeBytes: fileSize || 0
       }
     });
   }
