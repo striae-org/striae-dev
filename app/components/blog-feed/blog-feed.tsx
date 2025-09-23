@@ -17,27 +17,22 @@ export const BlogFeed = () => {
   useEffect(() => {
     const fetchBlogFeed = async () => {
       try {
-        // Use a CORS proxy to fetch the RSS feed
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://blog.striae.org/rss.xml')}`);
-        const data = await response.json() as { contents: string };
+        // Use RSS2JSON service for reliable RSS feed fetching
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://blog.striae.org/rss.xml')}&count=3`);
+        const data = await response.json() as { status: string; items: any[] };
         
-        // Parse the XML
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        // Check if RSS2JSON returned success
+        if (data.status !== 'ok') {
+          throw new Error('RSS2JSON service returned error status');
+        }
         
-        // Extract items
-        const items = xmlDoc.querySelectorAll('item');
-        const blogPosts: BlogPost[] = Array.from(items).slice(0, 3).map(item => {
-          const title = item.querySelector('title')?.textContent || '';
-          const link = item.querySelector('link')?.textContent || '';
-          const description = item.querySelector('description')?.textContent || '';
-          const pubDate = item.querySelector('pubDate')?.textContent || '';
-          
+        // Map RSS2JSON items directly (no XML parsing needed)
+        const blogPosts: BlogPost[] = data.items.map(item => {
           return {
-            title: title.trim(),
-            link: link.trim(),
-            description: truncateDescription(description.trim()),
-            pubDate: formatDate(pubDate)
+            title: item.title?.trim() || '',
+            link: item.link?.trim() || '',
+            description: truncateDescription(item.description?.trim() || ''),
+            pubDate: formatDate(item.pubDate || '')
           };
         });
         
