@@ -390,10 +390,9 @@
 
 .detailRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
-  gap: 12px;
+  gap: 8px;
 }
 
 .detailRow:last-child {
@@ -404,14 +403,13 @@
   color: var(--textBody);
   font-size: 0.85rem;
   font-weight: 500;
-  min-width: 80px;
+  min-width: max-content;
+  flex-shrink: 0;
 }
 
 .detailValue {
   color: var(--text);
   font-size: 0.85rem;
-  text-align: right;
-  flex: 1;
   word-break: break-word;
 }
 
