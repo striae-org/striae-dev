@@ -290,7 +290,6 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         result: 'failure',
         fileName: fileId,
         fileType: 'unknown',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         fileDetails: {

@@ -218,7 +218,6 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
         result: 'failure',
         fileName: `${caseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         caseDetails: {
@@ -395,7 +394,6 @@ export const renameCase = async (
         result: 'failure',
         fileName: `${oldCaseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber: oldCaseNumber,
         caseDetails: {
@@ -497,7 +495,6 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
         result: 'failure',
         fileName: `${caseNumber}.case`,
         fileType: 'case-package',
-        checksumValid: false,
         validationErrors: [error instanceof Error ? error.message : 'Unknown error'],
         caseNumber,
         caseDetails: {
