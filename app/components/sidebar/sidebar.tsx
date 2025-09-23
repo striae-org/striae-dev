@@ -134,7 +134,7 @@ export const Sidebar = ({
               onClick={() => setIsImportModalOpen(true)}
               className={styles.importButton}
             >
-              Import/Clear Case
+              Import/Clear RO Case
             </button>
           </div>
         </>

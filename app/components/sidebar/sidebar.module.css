@@ -269,8 +269,7 @@
 /* Import Section */
 .importSection {
   margin-top: auto;
-  padding: 1.5rem;
-  padding-top: 1rem;
+  padding: 1rem 0;
   border-top: 1px solid var(--divider);
 }
 
@@ -286,6 +285,7 @@
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
   box-shadow: 0 1px 3px color-mix(in lab, var(--success) 30%, transparent);
+  box-sizing: border-box;
 }
 
 .importButton:hover {
