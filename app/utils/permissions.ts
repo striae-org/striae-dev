@@ -99,6 +99,50 @@ export const getUserUsage = async (user: User): Promise<UserUsage> => {
 };
 
 /**
+ * Create a new user in the KV store
+ */
+export const createUser = async (
+  user: User, 
+  firstName: string, 
+  lastName: string, 
+  company: string,
+  permitted: boolean = false
+): Promise<UserData> => {
+  try {
+    const userData: UserData = {
+      uid: user.uid,
+      email: user.email,
+      firstName,
+      lastName,
+      company,
+      permitted,
+      cases: [],
+      readOnlyCases: [],
+      createdAt: new Date().toISOString()
+    };
+
+    const apiKey = await getUserApiKey();
+    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create user data: ${response.status} ${response.statusText}`);
+    }
+
+    return userData;
+  } catch (error) {
+    console.error('Error creating user data:', error);
+    throw error;
+  }
+};
+
+/**
  * Check if user can create a new case
  */
 export const canCreateCase = async (user: User): Promise<{ canCreate: boolean; reason?: string }> => {

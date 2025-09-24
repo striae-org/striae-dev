@@ -21,9 +21,7 @@ import { Icon } from '~/components/icon/icon';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
-import { getUserApiKey } from '~/utils/auth';
-import { UserData } from '~/types';
-import paths from '~/config/config.json';
+import { getUserData, createUser } from '~/utils/permissions';
 import freeEmailDomains from 'free-email-domains';
 import { auditService } from '~/services/audit.service';
 import { generateUniqueId } from '~/utils/id-generator';
@@ -34,27 +32,6 @@ export const meta = () => {
     description: 'Login to your Striae account to access your projects and data',
   });
 };
-
-const USER_WORKER_URL = paths.user_worker_url;
-
-const createUserData = (
-  uid: string,
-  email: string | null,
-  firstName: string,
-  lastName: string,
-  company: string,
-  isCaseReviewAccount: boolean = false
-): UserData => ({
-  uid,
-  email,
-  firstName,
-  lastName,
-  company,
-  permitted: !isCaseReviewAccount, // Set to false if it's a case review account
-  cases: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-});
 
 export const Login = () => {
   const [error, setError] = useState('');
@@ -114,29 +91,14 @@ export const Login = () => {
     return isStrong;
   };  
 
-  // Check if user exists in the USER_DB
+  // Check if user exists in the USER_DB using centralized function
   const checkUserExists = async (uid: string): Promise<boolean> => {
     try {
-      const apiKey = await getUserApiKey();
-      const response = await fetch(`${USER_WORKER_URL}/${uid}`, {
-        headers: {
-          'X-Custom-Auth-Key': apiKey
-        }
-      });
+      // Create a minimal user object for the centralized function
+      const tempUser = { uid } as User;
+      const userData = await getUserData(tempUser);
       
-      // If response is 404, user doesn't exist
-      if (response.status === 404) {
-        return false;
-      }
-      
-      // If response is ok, user exists
-      if (response.ok) {
-        return true;
-      }
-      
-      // For other errors (500, etc.), log but assume user exists to avoid false positives
-      console.error('Error checking user existence, status:', response.status);
-      return true;
+      return userData !== null;
     } catch (error) {
       console.error('Error checking user existence:', error);
       // On network/API errors, assume user exists to avoid false positives
@@ -241,31 +203,14 @@ export const Login = () => {
         displayName: `${formFirstName} ${formLastName}`
       });
 
-      // Get API key      
-      const apiKey = await getUserApiKey();
-
-      // Add to KV database
-      const userData = createUserData(
-        createCredential.user.uid,
-        createCredential.user.email,
+      // Create user data using centralized function
+      const userData = await createUser(
+        createCredential.user,
         formFirstName,
         formLastName,
         formCompany || '', // Use company from form, fallback to empty string
-        isCaseReviewAccount // Pass the case review flag
+        !isCaseReviewAccount // permitted = true if NOT a case review account
       );
-
-      const response = await fetch(`${USER_WORKER_URL}/${createCredential.user.uid}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': apiKey
-        },
-        body: JSON.stringify(userData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create user data');
-      }
 
       // Log user registration audit event
       try {
