@@ -98,7 +98,7 @@ echo.
 echo [94mDeployed Components:[0m
 echo   ✅ Configuration setup and placeholder replacement
 echo   ✅ Worker dependencies (npm install)
-echo   ✅ 6 Cloudflare Workers
+echo   ✅ 7 Cloudflare Workers
 echo   ✅ Worker environment variables
 echo   ✅ Cloudflare Pages frontend
 echo   ✅ Pages environment variables

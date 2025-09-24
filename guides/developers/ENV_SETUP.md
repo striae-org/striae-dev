@@ -110,7 +110,7 @@ The new deployment system provides a streamlined 6-step automated process:
 
 1. **Configuration Setup** - `npm run deploy-config` validates environment and configures all files
 2. **Install Worker Dependencies** - Installs dependencies for all workers
-3. **Deploy Workers** - Deploys all 6 Cloudflare Workers
+3. **Deploy Workers** - Deploys all 7 Cloudflare Workers
 4. **Deploy Worker Secrets** - `npm run deploy-workers:secrets` sets environment variables
 5. **Deploy Pages** - Deploys frontend application (includes build)
 6. **Deploy Pages Secrets** - Sets Pages environment variables

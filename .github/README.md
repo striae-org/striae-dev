@@ -71,7 +71,7 @@ Set up these Cloudflare services first:
 
 ### What Gets Deployed
 
-- ✅ 6 Cloudflare Workers (backend microservices)
+- ✅ 7 Cloudflare Workers (backend microservices)
 - ✅ Cloudflare Pages frontend
 - ✅ All environment variables and secrets
 - ✅ CORS configuration
