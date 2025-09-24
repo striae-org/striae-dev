@@ -228,7 +228,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         <p><strong>256-bit Encryption</strong> refers to the length of the encryption key. The longer the key, the more secure the encryption, as it increases the complexity of potential decryption attempts exponentially.</p>
       </li>
       <li>
-        <p><strong>Used by the U.S. Government:</strong> AES-256 has been adopted as the encryption standard by the U.S. government for securing classified information. Specifically, it is approved by the National Institute of Standards and Technology (NIST) and used to protect sensitive information.</p>
+        <p><strong>Used by the U.S. Government:</strong> AES-256 has been adopted as the encryption standard by the U.S. government for securing classified information. Specifically, it is approved by the National Institute of Standards and Technology (NIST) and used to protect sensitive information².</p>
       </li>
     </ul>
     </li>
@@ -236,13 +236,13 @@ You agree that the original English text shall prevail in the case of a dispute.
     <p><strong>Why AES-256 is Secure</strong></p>
     <ul>
       <li>
-        <p><strong>Key Size:</strong> A 256-bit key length means there are 2^256 possible key combinations, making it virtually impossible to break using current computing capabilities.</p>
+        <p><strong>Key Size:</strong> A 256-bit key length means there are 2^256 possible key combinations³, making it virtually impossible to break using current computing capabilities.</p>
       </li>
       <li>
-        <p><strong>Resistance to Brute Force:</strong> Even with advanced computational power, it would take billions of years to attempt all possible key combinations.</p>
+        <p><strong>Resistance to Brute Force:</strong> Even with advanced computational power, it would take billions of years to attempt all possible key combinations⁴.</p>
       </li>
       <li>
-        <p><strong>Global Trust:</strong> AES-256 is trusted worldwide by governments, financial institutions, and security-focused organizations for its unparalleled ability to secure data.</p>
+        <p><strong>Global Trust:</strong> AES-256 is trusted worldwide by governments, financial institutions, and security-focused organizations for its unparalleled ability to secure data⁵.</p>
       </li>
     </ul>
     </li>
@@ -298,6 +298,11 @@ You agree that the original English text shall prevail in the case of a dispute.
         <section className={styles.section}>
           <h2 className={styles.heading}>References</h2>
           <p><small>¹ Cloudflare automatically encrypts all data at rest using AES-256 with GCM mode across their R2 and KV storage platforms.</small></p>
+          <p><small>² NIST has approved AES-256 for protecting classified information up to the SECRET level and is widely adopted by the U.S. government.</small></p>
+          <p><small>³ The mathematical calculation: 2^256 = approximately 1.16 × 10^77 possible key combinations, making brute force attacks computationally infeasible.</small></p>
+          <p><small>⁴ Based on cryptographic analysis, even with advanced quantum computing developments, AES-256 would require astronomical amounts of time to break through brute force.</small></p>
+          <p><small>⁵ AES-256 is the encryption standard of choice for major banks, healthcare systems, government agencies, and technology companies worldwide.</small></p>
+          
           <ul className={styles.list}>
             <li>
               <p><strong>Cloudflare Security Documentation:</strong></p>
@@ -307,17 +312,27 @@ You agree that the original English text shall prevail in the case of a dispute.
               </ul>
             </li>
             <li>
-              <p><strong>Industry Standards:</strong></p>
+              <p><strong>Government and Standards Documentation:</strong></p>
               <ul>
-                <li><a href="https://www.nist.gov/publications/advanced-encryption-standard-aes" target="_blank" rel="noopener noreferrer">NIST Advanced Encryption Standard (AES)</a> - Official specification for AES encryption</li>
-                <li><a href="https://www.cloudflare.com/learning/ssl/what-is-encryption/" target="_blank" rel="noopener noreferrer">Cloudflare Learning: What is Encryption?</a> - Educational resource on encryption fundamentals</li>
+                <li><a href="https://www.nist.gov/publications/advanced-encryption-standard-aes" target="_blank" rel="noopener noreferrer">NIST Advanced Encryption Standard (AES)</a> - Official NIST specification for AES encryption</li>
+                <li><a href="https://csrc.nist.gov/publications/detail/fips/197/final" target="_blank" rel="noopener noreferrer">NIST FIPS 197</a> - Federal approval and technical specifications for AES</li>
+                <li><a href="https://www.nsa.gov/Portals/75/documents/resources/everyone/csfc/capability-packages/Data-at-Rest%20Capability%20Package%20v5.0.pdf?ver=u2-HEakuVfDs1-sonI-Now%3d%3d" target="_blank" rel="noopener noreferrer">NSA Commercial Solutions for Classified</a> - Government approval of AES-256 for classified information</li>
               </ul>
             </li>
             <li>
-              <p><strong>Compliance and Trust:</strong></p>
+              <p><strong>Cryptographic Analysis and Security Research:</strong></p>
+              <ul>
+                <li><a href="https://eprint.iacr.org/2009/374.pdf" target="_blank" rel="noopener noreferrer">Cryptographic Analysis of AES-256</a> - Academic research on AES-256 security properties</li>
+                <li><a href="https://www.schneier.com/academic/aes/" target="_blank" rel="noopener noreferrer">Schneier on Cryptography</a> - Expert analysis of AES security and brute force resistance</li>
+                <li><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.140-2.pdf" target="_blank" rel="noopener noreferrer">NIST FIPS 140-2</a> - Cryptographic module validation standards</li>
+              </ul>
+            </li>
+            <li>
+              <p><strong>Industry Adoption and Trust:</strong></p>
               <ul>
                 <li><a href="https://www.cloudflare.com/trust-hub/" target="_blank" rel="noopener noreferrer">Cloudflare Trust Hub</a> - Comprehensive security and compliance information</li>
                 <li><a href="https://www.cloudflare.com/trust-hub/compliance-resources/" target="_blank" rel="noopener noreferrer">Cloudflare Compliance Resources</a> - Industry certifications and compliance documentation</li>
+                <li><a href="https://www.cloudflare.com/learning/ssl/what-is-encryption/" target="_blank" rel="noopener noreferrer">Cloudflare Learning: What is Encryption?</a> - Educational resource on encryption fundamentals</li>
               </ul>
             </li>
           </ul>

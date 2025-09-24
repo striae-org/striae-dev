@@ -39,7 +39,6 @@ Striae's audit trail system provides comprehensive forensic accountability and c
 ### 🔒 Security & Compliance
 
 - **Tamper-Proof**: Immutable audit entries with integrity validation
-- **Access Control**: Role-based audit data access
 - **Forensic Standards**: Meets requirements for legal evidence handling
 
 ### 📈 Advanced Analytics
@@ -500,7 +499,6 @@ UserAuditViewer/
 ### Access Control
 
 - **User Isolation**: Users can only access their own audit data
-- **Role-Based Access**: Admin users have broader audit access
 - **Secure Storage**: Data encrypted at rest using AES-256 encryption in Cloudflare R2¹ and KV²
 
 ### Compliance Features
