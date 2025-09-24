@@ -1136,7 +1136,7 @@ export class AuditService {
     const timestamps = entries.map(e => e.timestamp).sort();
     const securityIncidents = entries.filter(e => 
       e.result === 'failure' && 
-      (e.details.securityChecks?.selfConfirmationPrevented === false ||
+      (e.details.securityChecks?.selfConfirmationPrevented === true ||
        !e.details.securityChecks?.fileIntegrityValid)
     ).length;
 
@@ -1302,9 +1302,22 @@ export class AuditService {
     }
 
     if (entry.details.securityChecks) {
-      const securityIssues = Object.entries(entry.details.securityChecks)
-        .filter(([_, value]) => value === false)
-        .map(([key, _]) => key);
+      const securityIssues = [];
+      
+      // selfConfirmationPrevented: true means issue (prevention was needed)
+      if (entry.details.securityChecks.selfConfirmationPrevented === true) {
+        securityIssues.push('selfConfirmationPrevented');
+      }
+      
+      // fileIntegrityValid: false means issue (integrity failed)
+      if (entry.details.securityChecks.fileIntegrityValid === false) {
+        securityIssues.push('fileIntegrityValid');
+      }
+      
+      // exporterUidValidated: false means issue (validation failed)
+      if (entry.details.securityChecks.exporterUidValidated === false) {
+        securityIssues.push('exporterUidValidated');
+      }
       
       if (securityIssues.length > 0) {
         console.warn('   Security Issues:', securityIssues);
