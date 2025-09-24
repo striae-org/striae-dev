@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { User } from 'firebase/auth';
 import { importCaseForReview, importConfirmationData } from '~/components/actions/case-review';
-import { ImportResult, ConfirmationImportResult, CaseImportPreview } from '~/types';
+import { ImportResult, ConfirmationImportResult } from '~/types';
 
 interface ProgressState {
   stage: string;
@@ -14,6 +14,7 @@ interface UseImportExecutionProps {
   selectedFile: File | null;
   importType: 'case' | 'confirmation' | null;
   setImportProgress: (progress: ProgressState | null) => void;
+  clearMessages: () => void;
   setError: (error: string) => void;
   setSuccess: (success: string) => void;
   setIsImporting: (importing: boolean) => void;
@@ -30,6 +31,7 @@ export const useImportExecution = ({
   selectedFile,
   importType,
   setImportProgress,
+  clearMessages,
   setError,
   setSuccess,
   setIsImporting,
@@ -41,6 +43,8 @@ export const useImportExecution = ({
   const executeImport = useCallback(async () => {
     if (!user || !selectedFile || !importType) return;
     
+    // Clear any existing success and error messages when starting a new import
+    clearMessages();
     setIsImporting(true);
     
     try {
@@ -110,6 +114,7 @@ export const useImportExecution = ({
     selectedFile, 
     importType, 
     setImportProgress, 
+    clearMessages,
     setError, 
     setSuccess, 
     setIsImporting, 

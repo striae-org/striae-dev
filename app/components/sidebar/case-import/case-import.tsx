@@ -1,12 +1,8 @@
 import { useState, useEffect, useRef, useContext, useCallback } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { 
-  importCaseForReview, 
   listReadOnlyCases, 
-  deleteReadOnlyCase,
-  previewCaseImport,
-  importConfirmationData,
-  isConfirmationDataFile
+  deleteReadOnlyCase
 } from '~/components/actions/case-review';
 import {
   ImportResult,
@@ -47,6 +43,7 @@ export const CaseImport = ({
     importState,
     messages,
     importProgress,
+    clearMessages,
     setError,
     setSuccess,
     updateImportState,
@@ -84,6 +81,7 @@ export const CaseImport = ({
     selectedFile: importState.selectedFile,
     importType: importState.importType,
     setImportProgress,
+    clearMessages,
     setError,
     setSuccess,
     setIsImporting: (importing) => updateImportState({ isImporting: importing }),
