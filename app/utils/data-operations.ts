@@ -122,10 +122,12 @@ export const updateCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Modification denied: ${modifyCheck.reason}`);
+    // Check modification permissions if requested
+    if (options.validateAccess !== false) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Modification denied: ${modifyCheck.reason}`);
+      }
     }
 
     // Validate inputs
