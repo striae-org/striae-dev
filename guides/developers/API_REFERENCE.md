@@ -26,9 +26,8 @@
      - [Get File Data](#get-file-data)
      - [Save File Data](#save-file-data)
      - [Delete File](#delete-file)
-     - [Create Audit Entry](#create-audit-entry)
+     - [Store Audit Entry](#store-audit-entry)
      - [Get User Audit Entries](#get-user-audit-entries)
-     - [Get Audit Trail Summary](#get-audit-trail-summary)
 7. [Keys Worker API](#keys-worker-api)
    - [Endpoints](#endpoints-4)
      - [Get Environment Key](#get-environment-key)
@@ -56,6 +55,7 @@
       - [CaseImportProps Interface](#caseimportprops-interface)
       - [ImportOptions Interface](#importoptions-interface)
       - [ImportResult Interface](#importresult-interface)
+      - [ConfirmationImportResult Interface](#confirmationimportresult-interface)
       - [ReadOnlyCaseMetadata Interface](#readonlycasemetadata-interface)
       - [CaseImportPreview Interface](#caseimportpreview-interface)
     - [File Management Types](#file-management-types)
@@ -538,21 +538,25 @@ DELETE /{filename}.json
 - `403`: Forbidden
 - `500`: Server error
 
-#### Create Audit Entry
+#### Store Audit Entry
 
 ```http
-POST /api/audit
+POST /audit/
 ```
 
 **Description**: Create a new audit trail entry for compliance tracking
 
+**Query Parameters**:
+- `userId` (required): User identifier
+
 **Request Body**:
 ```json
 {
+  "timestamp": "2025-09-23T14:30:15.123Z",
   "userId": "string",
   "userEmail": "string",
   "action": "AuditAction",
-  "result": "AuditResult",
+  "result": "AuditResult", 
   "details": {
     "fileName": "string",
     "fileType": "AuditFileType",
@@ -575,14 +579,6 @@ POST /api/audit
       "annotationType": "string",
       "tool": "string",
       "canvasPosition": {"x": "number", "y": "number"}
-    },
-    "sessionDetails": {
-      "sessionId": "string",
-      "userAgent": "string"
-    },
-    "securityDetails": {
-      "incidentType": "string",
-      "severity": "string"
     }
   }
 }
@@ -592,40 +588,33 @@ POST /api/audit
 ```json
 {
   "success": true,
-  "entryId": "string"
+  "entryCount": 15,
+  "filename": "audit-trails/aDzwq3G6IBVRJVCEFijdg7B0fwq2-2025-09-23.json"
 }
 ```
 
 **Status Codes**:
-- `200`: Audit entry created successfully
-- `400`: Invalid request data
+- `200`: Audit entry stored successfully
+- `400`: userId parameter required or invalid request data
 - `403`: Forbidden
 - `500`: Server error
 
 #### Get User Audit Entries
 
 ```http
-GET /api/audit/{userId}
+GET /audit/
 ```
 
 **Description**: Retrieve audit trail entries for a specific user
 
-**Parameters**:
-- `userId` (path): User identifier
-
 **Query Parameters**:
-- `caseNumber` (optional): Filter by case number
-- `action` (optional): Filter by audit action
-- `result` (optional): Filter by result type
-- `workflowPhase` (optional): Filter by workflow phase
-- `startDate` (optional): Start date filter (ISO 8601)
-- `endDate` (optional): End date filter (ISO 8601)
-- `limit` (optional): Maximum entries to return (default: 100)
-- `offset` (optional): Pagination offset (default: 0)
+- `userId` (required): User identifier
+- `startDate` (optional): Start date filter (YYYY-MM-DD format)
+- `endDate` (optional): End date filter (YYYY-MM-DD format)
 
 **Example**:
 ```http
-GET /api/audit/user123?caseNumber=CASE-2025-001&limit=50&startDate=2025-01-01T00:00:00Z
+GET /audit/?userId=aDzwq3G6IBVRJVCEFijdg7B0fwq2&startDate=2025-09-01&endDate=2025-09-30
 ```
 
 **Response**:
@@ -634,79 +623,31 @@ GET /api/audit/user123?caseNumber=CASE-2025-001&limit=50&startDate=2025-01-01T00
   "entries": [
     {
       "timestamp": "2025-09-23T14:30:15.123Z",
-      "userId": "user123",
+      "userId": "aDzwq3G6IBVRJVCEFijdg7B0fwq2",
       "userEmail": "user@example.com",
-      "action": "file-upload",
+      "action": "export",
       "result": "success",
       "details": {
-        "fileName": "evidence.jpg",
-        "fileType": "image-file",
+        "fileName": "CASE-2025-001-annotations.json",
+        "fileType": "json-data",
         "caseNumber": "CASE-2025-001",
         "checksumValid": true,
         "validationErrors": [],
-        "workflowPhase": "casework",
-        "fileDetails": {
-          "fileId": "img_123",
-          "originalFileName": "evidence.jpg",
-          "fileSize": 2048576,
-          "mimeType": "image/jpeg",
-          "uploadMethod": "drag-drop"
-        }
+        "workflowPhase": "case-export"
       }
     }
   ],
-  "totalCount": 1,
-  "hasMore": false
+  "total": 15
 }
 ```
 
 **Status Codes**:
 - `200`: Success
-- `400`: Invalid parameters
+- `400`: userId parameter required
 - `403`: Forbidden
-- `404`: User not found
 - `500`: Server error
 
-#### Get Audit Trail Summary
-
-```http
-GET /api/audit/{userId}/summary
-```
-
-**Description**: Get audit trail summary statistics for a user
-
-**Parameters**:
-- `userId` (path): User identifier
-
-**Query Parameters**:
-- `caseNumber` (optional): Filter by case number
-- `startDate` (optional): Start date filter (ISO 8601)
-- `endDate` (optional): End date filter (ISO 8601)
-
-**Response**:
-```json
-{
-  "summary": {
-    "totalEvents": 150,
-    "successfulEvents": 145,
-    "failedEvents": 3,
-    "warningEvents": 2,
-    "workflowPhases": ["casework", "confirmation"],
-    "participatingUsers": ["user123"],
-    "startTimestamp": "2025-01-01T00:00:00.000Z",
-    "endTimestamp": "2025-09-23T14:30:15.123Z",
-    "complianceStatus": "compliant",
-    "securityIncidents": 0
-  }
-}
-```
-
-**Status Codes**:
-- `200`: Success
-- `400`: Invalid parameters  
-- `403`: Forbidden
-- `404`: User not found
-- `500`: Server error
+**Note**: If no date range is specified, returns entries for the current date only. Date range queries read multiple daily files and aggregate results.
 
 ## Keys Worker API
 
@@ -1206,7 +1147,7 @@ Props interface for the main case import component:
 interface CaseImportProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportComplete: (caseNumber: string, success: boolean) => void;
+  onImportComplete?: (result: ImportResult | ConfirmationImportResult) => void;
 }
 ```
 
@@ -1233,6 +1174,21 @@ interface ImportResult {
   isReadOnly: boolean;
   filesImported: number;
   annotationsImported: number;
+  errors?: string[];
+  warnings?: string[];
+}
+```
+
+#### ConfirmationImportResult Interface
+
+Result structure returned from confirmation import operations:
+
+```typescript
+interface ConfirmationImportResult {
+  success: boolean;
+  caseNumber: string;
+  confirmationsImported: number;
+  imagesUpdated: number;
   errors?: string[];
   warnings?: string[];
 }

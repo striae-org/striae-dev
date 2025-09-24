@@ -269,3 +269,19 @@
     margin-top: var(--spaceS);
   }
 }
+
+.footnote {
+  font-size: var(--fontSizeBodyS);
+  color: var(--textLight);
+  opacity: 0.8;
+  margin: var(--spaceS) 0;
+}
+
+.footnote a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.footnote a:hover {
+  color: var(--accent);
+}

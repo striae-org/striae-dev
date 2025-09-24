@@ -501,7 +501,7 @@ UserAuditViewer/
 
 - **User Isolation**: Users can only access their own audit data
 - **Role-Based Access**: Admin users have broader audit access
-- **Secure Storage**: Data encrypted at rest in Cloudflare R2
+- **Secure Storage**: Data encrypted at rest using AES-256 encryption in Cloudflare R2¹ and KV²
 
 ### Compliance Features
 
@@ -826,6 +826,29 @@ if (!healthCheck.healthy) {
   console.error('Audit service unhealthy:', healthCheck.issues);
 }
 ```
+
+---
+
+## References
+
+¹ Cloudflare R2 Storage uses AES-256 encryption with GCM (Galois/Counter Mode) for all objects at rest:
+
+- [Cloudflare R2 Data Security](https://developers.cloudflare.com/r2/reference/data-security/)
+
+² Cloudflare KV uses AES-256 encryption with GCM (Galois/Counter Mode) for all stored values:
+
+- [Cloudflare KV Data Security](https://developers.cloudflare.com/kv/reference/data-security/)
+
+General Cloudflare security and compliance resources:
+
+- [Cloudflare Trust & Safety](https://www.cloudflare.com/trust-hub/)
+- [Cloudflare Compliance Resources](https://www.cloudflare.com/trust-hub/compliance-resources/)
+
+Additional security and forensic standards references:
+
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [ISO/IEC 27001 Information Security Management](https://www.iso.org/isoiec-27001-information-security.html)
+- [Digital Forensics Standards (ASTM E2916)](https://www.astm.org/Standards/E2916.htm)
 
 ---
 

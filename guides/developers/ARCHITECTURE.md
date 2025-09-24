@@ -638,7 +638,7 @@ striae-data/
 - All data transmission over HTTPS/TLS
 - Signed URLs for image access
 - No plaintext storage of sensitive data
-- AES-256 encryption for stored data
+- AES-256 encryption for stored data in R2 and KV storage¹
 
 #### 3. Access Controls
 
@@ -736,3 +736,12 @@ const corsHeaders = {
 
 - Role-based access control and operations
 - Agency-based report formatting
+
+---
+
+## References
+
+¹ Cloudflare uses AES-256 encryption with GCM (Galois/Counter Mode) for data at rest:
+
+- [Cloudflare R2 Data Security](https://developers.cloudflare.com/r2/reference/data-security/)
+- [Cloudflare KV Data Security](https://developers.cloudflare.com/kv/reference/data-security/)

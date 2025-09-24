@@ -42,7 +42,7 @@ const NoticeText = () => {
             <strong>Authentication and Password Security:</strong> Striae relies on Firebase Authentication, a secure platform by Google, to manage user authentication. Features of Firebase include hashed passwords, secure token generation, and multi-factor authentication options.
         </li>
         <li>
-            <strong>Data Storage:</strong> Your data is encrypted and protected against unauthorized access. Measures include data segregation, AES-256 encryption, and no plaintext storage of sensitive information.
+            <strong>Data Storage:</strong> Your data is encrypted and protected against unauthorized access. Measures include data segregation, AES-256 encryption with GCM mode via Cloudflare R2 and KV storage¹, and no plaintext storage of sensitive information.
         </li>
         <li>
             <strong>Data Transit:</strong> All data transfers are encrypted via TLS, and access is controlled through the use of signed URLs.
@@ -66,6 +66,11 @@ const NoticeText = () => {
         to="/terms#storage">
         Data Storage Addendum
       </Link> in the Terms & Conditions, or contact us at <a href="mailto:info@striae.org" target="_blank" rel="noopener noreferrer">info@striae.org</a>.</p>
+      
+      <p className={styles.footnote}>
+        <small>¹ For detailed encryption specifications, see: <a href="https://developers.cloudflare.com/r2/reference/data-security/" target="_blank" rel="noopener noreferrer">Cloudflare R2 Security</a> and <a href="https://developers.cloudflare.com/kv/reference/data-security/" target="_blank" rel="noopener noreferrer">Cloudflare KV Security</a></small>
+      </p>
+      
       <p>
         <strong>Community, Collaboration & Open Innovation</strong>
       </p>

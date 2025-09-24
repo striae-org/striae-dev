@@ -216,7 +216,7 @@ You agree that the original English text shall prevail in the case of a dispute.
   </li>
   <li>
     <p><strong>AES-256 Encryption</strong></p>
-    <p>Striae uses AES-256 encryption to safeguard Your Data at rest. This encryption standard is one of the most secure methods available, ensuring that even if Data storage is breached, the information remains unreadable and protected.</p>
+    <p>Striae uses AES-256 encryption with GCM (Galois/Counter Mode) to safeguard Your Data at rest through Cloudflare's R2 and KV storage systems¹. This encryption standard is one of the most secure methods available, ensuring that even if Data storage is breached, the information remains unreadable and protected.</p>
   </li>
   <li>
     <p><strong>What is AES-256?</strong></p>
@@ -293,6 +293,34 @@ You agree that the original English text shall prevail in the case of a dispute.
 <p>Legal Entity: The Stephenson Jack Lu Living Trust</p>
 </li>
 </ul>
+        </section>
+        
+        <section className={styles.section}>
+          <h2 className={styles.heading}>References</h2>
+          <p><small>¹ Cloudflare automatically encrypts all data at rest using AES-256 with GCM mode across their R2 and KV storage platforms.</small></p>
+          <ul className={styles.list}>
+            <li>
+              <p><strong>Cloudflare Security Documentation:</strong></p>
+              <ul>
+                <li><a href="https://developers.cloudflare.com/r2/reference/data-security/" target="_blank" rel="noopener noreferrer">Cloudflare R2 Data Security</a> - Details on AES-256 encryption with GCM mode for object storage</li>
+                <li><a href="https://developers.cloudflare.com/kv/reference/data-security/" target="_blank" rel="noopener noreferrer">Cloudflare KV Data Security</a> - Details on AES-256 encryption with GCM mode for key-value storage</li>
+              </ul>
+            </li>
+            <li>
+              <p><strong>Industry Standards:</strong></p>
+              <ul>
+                <li><a href="https://www.nist.gov/publications/advanced-encryption-standard-aes" target="_blank" rel="noopener noreferrer">NIST Advanced Encryption Standard (AES)</a> - Official specification for AES encryption</li>
+                <li><a href="https://www.cloudflare.com/learning/ssl/what-is-encryption/" target="_blank" rel="noopener noreferrer">Cloudflare Learning: What is Encryption?</a> - Educational resource on encryption fundamentals</li>
+              </ul>
+            </li>
+            <li>
+              <p><strong>Compliance and Trust:</strong></p>
+              <ul>
+                <li><a href="https://www.cloudflare.com/trust-hub/" target="_blank" rel="noopener noreferrer">Cloudflare Trust Hub</a> - Comprehensive security and compliance information</li>
+                <li><a href="https://www.cloudflare.com/trust-hub/compliance-resources/" target="_blank" rel="noopener noreferrer">Cloudflare Compliance Resources</a> - Industry certifications and compliance documentation</li>
+              </ul>
+            </li>
+          </ul>
         </section>
       </div>      
     </div>
