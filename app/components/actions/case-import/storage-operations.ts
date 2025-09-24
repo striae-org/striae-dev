@@ -112,7 +112,7 @@ export async function storeCaseDataInR2(
     };
     
     // Store in R2
-    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    const response = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
     const dataApiKey = await getDataApiKey();
     
     // Get case data first to get file IDs for deletion
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       headers: { 'X-Custom-Auth-Key': dataApiKey }
     });
 
@@ -242,7 +242,7 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
       }
 
       // Delete case file using data worker
-      await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
         method: 'DELETE',
         headers: { 'X-Custom-Auth-Key': dataApiKey }
       });

@@ -76,7 +76,7 @@ export const getCaseData = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -140,7 +140,7 @@ export const updateCaseData = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`;
 
     // Add timestamp if requested (default: true)
     const dataToSave = options.includeTimestamp !== false ? {
@@ -190,7 +190,7 @@ export const deleteCaseData = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`;
 
     const response = await fetch(url, {
       method: 'DELETE',
@@ -243,7 +243,7 @@ export const getFileAnnotations = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/${encodeURIComponent(fileId)}/data.json`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -304,7 +304,7 @@ export const saveFileAnnotations = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/${encodeURIComponent(fileId)}/data.json`;
 
     // Add timestamp to annotation data
     const dataToSave = {
@@ -355,7 +355,7 @@ export const deleteFileAnnotations = async (
     }
 
     const apiKey = await getDataApiKey();
-    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+    const url = `${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/${encodeURIComponent(fileId)}/data.json`;
 
     const response = await fetch(url, {
       method: 'DELETE',
