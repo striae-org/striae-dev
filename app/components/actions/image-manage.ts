@@ -301,8 +301,9 @@ const getImageConfig = async (): Promise<ImageDeliveryConfig> => {
 };
 
 
-export const getImageUrl = async (user: User, fileData: FileData, caseNumber: string): Promise<string> => {
+export const getImageUrl = async (user: User, fileData: FileData, caseNumber: string, accessReason?: string): Promise<string> => {
   const startTime = Date.now();
+  const defaultAccessReason = accessReason || 'Image viewer access';
   
   try {
     const { accountHash } = await getImageConfig();  
@@ -359,7 +360,7 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
       caseNumber,
       'success',
       Date.now() - startTime,
-      'Image viewer access',
+      defaultAccessReason,
       fileData.originalFilename
     );
     
@@ -375,7 +376,7 @@ export const getImageUrl = async (user: User, fileData: FileData, caseNumber: st
         caseNumber,
         'failure',
         Date.now() - startTime,
-        'Unexpected error during image access',
+        `Unexpected error during ${accessReason || 'image access'}`,
         fileData.originalFilename
       );
     }

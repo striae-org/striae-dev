@@ -446,7 +446,7 @@ For questions about this export, contact your Striae system administrator.
  */
 async function fetchImageAsBlob(user: User, fileData: FileData, caseNumber: string): Promise<Blob | null> {
   try {
-    const imageUrl = await getImageUrl(user, fileData, caseNumber);
+    const imageUrl = await getImageUrl(user, fileData, caseNumber, 'Export Package');
     if (!imageUrl) return null;
     
     const response = await fetch(imageUrl);
