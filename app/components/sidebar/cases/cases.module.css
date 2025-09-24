@@ -587,7 +587,9 @@
 }
 
 .renameDeleteSection {
-  /* Additional spacing for rename/delete section */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
 }
 
 .caseActionsContent .caseRename {
@@ -645,8 +647,6 @@
 
 .auditTrailSection {
   margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #dee2e6;
 }
 
 .auditTrailButton {
