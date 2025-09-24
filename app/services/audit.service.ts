@@ -949,6 +949,40 @@ export class AuditService {
   }
 
   /**
+   * Mark pending email verification as successful (retroactive)
+   * Called when user completes MFA enrollment, which implies email verification was successful
+   */
+  public async markEmailVerificationSuccessful(
+    user: User,
+    reason: string = 'MFA enrollment completed',
+    sessionId?: string,
+    userAgent?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'email-verification',
+      result: 'success',
+      fileName: `email-verification-${user.uid}.log`,
+      fileType: 'log-file',
+      validationErrors: [],
+      workflowPhase: 'user-management',
+      sessionDetails: sessionId ? {
+        sessionId,
+        userAgent
+      } : { userAgent },
+      userProfileDetails: {
+        verificationMethod: 'email-link',
+        verificationAttempts: 1,
+        verificationDate: new Date().toISOString(),
+        emailVerified: true,
+        retroactiveVerification: true,
+        retroactiveReason: reason
+      }
+    });
+  }
+
+  /**
    * Log PDF generation event
    */
   public async logPDFGeneration(

@@ -292,4 +292,7 @@ export interface UserProfileAuditDetails {
   verificationDate?: string;
   emailVerified?: boolean;
   emailNotificationSent?: boolean;
+  // NEW: Retroactive verification fields
+  retroactiveVerification?: boolean;
+  retroactiveReason?: string;
 }

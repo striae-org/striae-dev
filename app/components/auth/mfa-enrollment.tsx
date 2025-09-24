@@ -204,6 +204,21 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
         console.error('Failed to log MFA enrollment success audit:', auditError);
         // Continue with enrollment success flow even if audit logging fails
       }
+
+      // Mark email verification as successful (retroactive)
+      // Since MFA enrollment requires email verification to be completed first,
+      // we can safely mark any pending email verification as successful
+      try {
+        await auditService.markEmailVerificationSuccessful(
+          user,
+          'MFA enrollment completed - email verification implied',
+          undefined, // sessionId not available in enrollment context
+          navigator.userAgent
+        );
+      } catch (auditError) {
+        console.error('Failed to log retroactive email verification success:', auditError);
+        // Continue with enrollment success flow even if audit logging fails
+      }
       
       onSuccess();
     } catch (error: unknown) {
