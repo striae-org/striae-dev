@@ -2,27 +2,18 @@ import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { 
   getImageApiKey,
-  getDataApiKey,
   getAccountHash 
 } from '~/utils/auth';
 import { canUploadFile } from '~/utils/permissions';
+import { getCaseData, updateCaseData, deleteFileAnnotations } from '~/utils/data-operations';
 import { CaseData, FileData, ImageUploadResponse } from '~/types';
 import { auditService } from '~/services/audit.service';
 
-const WORKER_URL = paths.data_worker_url;
 const IMAGE_URL = paths.image_worker_url;
 
-interface FileApiResponse {
-  files: FileData[];
-}
-
 export const fetchFiles = async (user: User, caseNumber: string): Promise<FileData[]> => {
-  const apiKey = await getDataApiKey();
-  const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-    headers: { 'X-Custom-Auth-Key': apiKey }
-  });
-  const data = (await response.json()) as FileApiResponse;
-  return data.files || [];
+  const caseData = await getCaseData(user, caseNumber);
+  return caseData?.files || [];
 };
 
 export const uploadFile = async (
@@ -85,26 +76,18 @@ export const uploadFile = async (
             uploadedAt: new Date().toISOString()
           };
 
-          // Update case data
-          const apiKey = await getDataApiKey();
-          const response = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-            headers: { 'X-Custom-Auth-Key': apiKey }
-          });
-          const existingData = await response.json() as CaseData;
+          // Update case data using centralized function
+          const existingData = await getCaseData(user, caseNumber);
+          if (!existingData) {
+            throw new Error('Case not found');
+          }
 
           const updatedData = {
             ...existingData,
             files: [...(existingData.files || []), newFile]
           };
 
-          await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-            method: 'PUT',
-            headers: {
-              'X-Custom-Auth-Key': apiKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
-          });
+          await updateCaseData(user, caseNumber, updatedData);
 
           // Log successful file upload
           try {
@@ -196,13 +179,12 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
   let fileToDelete: FileData | undefined;
   
   try {
-    const apiKey = await getDataApiKey();
+    // Get the case data using centralized function
+    const caseData = await getCaseData(user, caseNumber);
+    if (!caseData) {
+      throw new Error('Case not found');
+    }
     
-    // First, get the file info for audit logging
-    const caseResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      headers: { 'X-Custom-Auth-Key': apiKey }
-    });
-    const caseData = await caseResponse.json() as CaseData;
     fileToDelete = (caseData.files || []).find((f: FileData) => f.id === fileId);
     fileName = fileToDelete?.originalFilename || fileId;
     const fileSize = 0; // We don't store file size, so use 0
@@ -237,33 +219,21 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
     }
 
     // Clean up data files regardless of image deletion success/404
-    // Try to delete notes file - ignore 404
-    const notesResponse = await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`, {
-      method: 'DELETE',
-      headers: {
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    // Only throw if error is not 404 (notes file not found)
-    if (!notesResponse.ok && notesResponse.status !== 404) {
-      throw new Error(`Failed to delete notes: ${notesResponse.statusText}`);
+    // Try to delete notes file using centralized function
+    try {
+      await deleteFileAnnotations(user, caseNumber, fileId);
+    } catch (error) {
+      // Ignore 404 errors - notes file might not exist
+      console.log('Notes file deletion result:', error);
     }
 
-    // Update case data.json to remove file reference
+    // Update case data.json to remove file reference using centralized function
     const updatedData: CaseData = {
       ...caseData,
       files: (caseData.files || []).filter((f: FileData) => f.id !== fileId)
     };
 
-    await fetch(`${WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'PUT',
-      headers: {
-        'X-Custom-Auth-Key': apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedData)
-    });
+    await updateCaseData(user, caseNumber, updatedData);
 
     // Log successful file deletion
     const endTime = Date.now();
