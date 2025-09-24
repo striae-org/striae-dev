@@ -16,7 +16,7 @@ const hasValidHeader = (request, env) =>
 // Helper function to generate audit file names with user and date
 const generateAuditFileName = (userId) => {
   const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  return `audit-trails/${userId}-${date}.json`;
+  return `audit-trails/${userId}/${date}.json`;
 };
 
 // Helper function to append audit entry to existing file
@@ -98,7 +98,7 @@ export default {
               
               while (currentDate <= end) {
                 const dateStr = currentDate.toISOString().split('T')[0];
-                const filename = `audit-trails/${userId}-${dateStr}.json`;
+                const filename = `audit-trails/${userId}/${dateStr}.json`;
                 const file = await bucket.get(filename);
                 
                 if (file) {
