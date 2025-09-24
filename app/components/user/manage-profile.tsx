@@ -128,7 +128,6 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         displayName,
         'failure',
         undefined, // no session ID
-        undefined, // no IP address
         [message] // error details
       );
       

@@ -26,6 +26,7 @@ import { UserData } from '~/types';
 import paths from '~/config/config.json';
 import freeEmailDomains from 'free-email-domains';
 import { auditService } from '~/services/audit.service';
+import { generateUniqueId } from '~/utils/id-generator';
 
 export const meta = () => {
   return baseMeta({
@@ -178,7 +179,7 @@ export const Login = () => {
       
       // Log successful login audit
       try {
-        const sessionId = `session_${user.uid}_${Date.now()}`;
+        const sessionId = `session_${user.uid}_${Date.now()}_${generateUniqueId(8)}`;
         await auditService.logUserLogin(
           user,
           sessionId,
@@ -266,7 +267,41 @@ export const Login = () => {
         throw new Error('Failed to create user data');
       }
 
+      // Log user registration audit event
+      try {
+        await auditService.logUserRegistration(
+          createCredential.user,
+          formFirstName,
+          formLastName,
+          formCompany || '',
+          'email-password',
+          navigator.userAgent
+        );
+      } catch (auditError) {
+        console.error('Failed to log user registration audit:', auditError);
+        // Continue with registration flow even if audit logging fails
+      }
+
       await sendEmailVerification(createCredential.user);
+      
+      // Log email verification sent audit event
+      try {
+        // This logs that we sent the verification email, not that it was verified
+        // The actual verification happens when user clicks the email link
+        await auditService.logEmailVerification(
+          createCredential.user,
+          'pending', // Status pending until user clicks verification link
+          'email-link',
+          1, // First attempt
+          undefined, // No sessionId during registration
+          navigator.userAgent,
+          [] // No errors since we successfully sent the email
+        );
+      } catch (auditError) {
+        console.error('Failed to log email verification audit:', auditError);
+        // Continue with registration flow even if audit logging fails
+      }
+      
       setError('Please check your email to verify your account');
       handleSignOut();
     } else {

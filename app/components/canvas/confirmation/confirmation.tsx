@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { ConfirmationData } from '~/types/annotations';
 import { AuthContext } from '~/contexts/auth.context';
+import { generateConfirmationId } from '~/utils/id-generator';
 import styles from './confirmation.module.css';
 
 interface ConfirmationModalProps {
@@ -10,16 +11,6 @@ interface ConfirmationModalProps {
   company?: string;
   existingConfirmation?: ConfirmationData | null;
 }
-
-// Generate a 10-character alphanumeric ID
-const generateConfirmationId = (): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < 10; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-};
 
 // Format current date and time in readable format
 const formatTimestamp = (): string => {

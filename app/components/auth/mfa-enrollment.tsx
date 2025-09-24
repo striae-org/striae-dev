@@ -189,6 +189,22 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
       
       await multiFactor(user).enroll(multiFactorAssertion, `Phone: ${phoneNumber}`);
       
+      // Log successful MFA enrollment audit event
+      try {
+        await auditService.logMfaEnrollment(
+          user,
+          phoneNumber,
+          'sms',
+          'success',
+          1, // Assuming this is their first successful attempt since we got here
+          undefined, // sessionId not available in enrollment context
+          navigator.userAgent
+        );
+      } catch (auditError) {
+        console.error('Failed to log MFA enrollment success audit:', auditError);
+        // Continue with enrollment success flow even if audit logging fails
+      }
+      
       onSuccess();
     } catch (error: unknown) {
       console.error('Error enrolling MFA:', error);

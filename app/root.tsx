@@ -26,6 +26,7 @@ import { AuthContext } from '~/contexts/auth.context';
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { auditService } from '~/services/audit.service';
+import { generateUniqueId } from '~/utils/id-generator';
 import './reset.module.css';
 
 export const links: LinksFunction = () => [
@@ -133,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Log timeout logout audit before signing out
     if (user) {
       try {
-        const sessionId = `session_${user.uid}_timeout_${Date.now()}`;
+        const sessionId = `session_${user.uid}_timeout_${Date.now()}_${generateUniqueId(8)}`;
         await auditService.logUserLogout(
           user,
           sessionId,

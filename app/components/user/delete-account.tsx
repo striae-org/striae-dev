@@ -141,7 +141,6 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
         undefined, // dataRetentionPeriod
         false, // emailNotificationSent
         undefined, // sessionId
-        undefined, // ipAddress
         [err instanceof Error ? err.message : 'Unknown error during account deletion']
       );
 

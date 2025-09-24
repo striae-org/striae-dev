@@ -1,5 +1,6 @@
 import { auth } from '~/services/firebase';
 import { auditService } from '~/services/audit.service';
+import { generateUniqueId } from '~/utils/id-generator';
 import styles from './signout.module.css';
 
 interface SignOutProps {
@@ -14,7 +15,7 @@ export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {
       // Log logout audit before signing out
       if (user) {
         try {
-          const sessionId = `session_${user.uid}_logout_${Date.now()}`;
+          const sessionId = `session_${user.uid}_logout_${Date.now()}_${generateUniqueId(8)}`;
           await auditService.logUserLogout(
             user,
             sessionId,

@@ -12,6 +12,8 @@ export type AuditAction =
   | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
   // User & Session Management
   | 'user-login' | 'user-logout' | 'user-profile-update' | 'user-password-reset' | 'user-account-delete'
+  // NEW: User Registration & Authentication
+  | 'user-registration' | 'email-verification' | 'mfa-enrollment' | 'mfa-authentication'
   // Document Generation
   | 'pdf-generate'
   // Security & Monitoring
@@ -248,6 +250,16 @@ export interface SecurityAuditDetails {
   investigationId?: string;
   reportedToAuthorities?: boolean;
   mitigationSteps?: string[];
+  // MFA specific fields
+  mfaMethod?: 'sms' | 'totp' | 'hardware-key';
+  phoneNumber?: string; // Masked phone number for privacy
+  enrollmentAttempts?: number;
+  enrollmentDate?: string;
+  mandatoryEnrollment?: boolean;
+  backupCodesGenerated?: boolean;
+  verificationAttempts?: number;
+  authenticationDate?: string;
+  loginFlowStep?: 'first-factor' | 'second-factor';
 }
 
 /**
@@ -259,7 +271,7 @@ export interface UserProfileAuditDetails {
   newValue?: string;
   resetMethod?: 'email' | 'sms' | 'security-questions' | 'admin-reset';
   resetToken?: string; // Partial token for tracking (last 4 chars)
-  verificationMethod?: 'email-link' | 'sms-code' | 'totp' | 'backup-codes';
+  verificationMethod?: 'email-link' | 'sms-code' | 'totp' | 'backup-codes' | 'admin-verification';
   verificationAttempts?: number;
   passwordComplexityMet?: boolean;
   previousPasswordReused?: boolean;
@@ -269,5 +281,15 @@ export interface UserProfileAuditDetails {
   confirmationMethod?: 'uid-email' | 'password' | 'admin-override';
   casesCount?: number; // Number of cases deleted with account
   filesCount?: number; // Number of files deleted with account
+  // NEW: User registration specific fields
+  registrationMethod?: 'email-password' | 'sso' | 'admin-created' | 'api';
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  emailVerificationRequired?: boolean;
+  mfaEnrollmentRequired?: boolean;
+  // NEW: Email verification specific fields
+  verificationDate?: string;
+  emailVerified?: boolean;
   emailNotificationSent?: boolean;
 }

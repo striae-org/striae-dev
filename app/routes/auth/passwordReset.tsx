@@ -48,7 +48,6 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
         undefined, // password complexity not relevant here
         undefined, // previous password reuse not relevant here
         undefined, // no session ID
-        undefined, // no IP address available
         [message] // error details
       );
       

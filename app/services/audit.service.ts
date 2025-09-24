@@ -669,7 +669,6 @@ export class AuditService {
     newValue: string,
     result: AuditResult,
     sessionId?: string,
-    ipAddress?: string,
     errors: string[] = []
   ): Promise<void> {
     await this.logEvent({
@@ -705,7 +704,6 @@ export class AuditService {
     passwordComplexityMet?: boolean,
     previousPasswordReused?: boolean,
     sessionId?: string,
-    ipAddress?: string,
     errors: string[] = []
   ): Promise<void> {
     // For password resets, we might not have the full user object yet
@@ -747,30 +745,22 @@ export class AuditService {
     dataRetentionPeriod?: number,
     emailNotificationSent?: boolean,
     sessionId?: string,
-    ipAddress?: string,
     errors: string[] = []
   ): Promise<void> {
-    await this.logEvent({
-      userId: user.uid,
-      userEmail: user.email || '',
-      action: 'user-account-delete',
+    // Wrapper that extracts user data and calls the simplified version
+    return this.logAccountDeletionSimple(
+      user.uid,
+      user.email || '',
       result,
-      fileName: `account-deletion-${user.uid}.log`,
-      fileType: 'log-file',
-      validationErrors: errors,
-      workflowPhase: 'user-management',
-      sessionDetails: sessionId ? {
-        sessionId,
-      } : undefined,
-      userProfileDetails: {
-        deletionReason,
-        confirmationMethod,
-        casesCount,
-        filesCount,
-        dataRetentionPeriod,
-        emailNotificationSent
-      }
-    });
+      deletionReason,
+      confirmationMethod,
+      casesCount,
+      filesCount,
+      dataRetentionPeriod,
+      emailNotificationSent,
+      sessionId,
+      errors
+    );
   }
 
   /**
@@ -787,7 +777,6 @@ export class AuditService {
     dataRetentionPeriod?: number,
     emailNotificationSent?: boolean,
     sessionId?: string,
-    ipAddress?: string,
     errors: string[] = []
   ): Promise<void> {
     await this.logEvent({
@@ -809,6 +798,152 @@ export class AuditService {
         filesCount,
         dataRetentionPeriod,
         emailNotificationSent
+      }
+    });
+  }
+
+  /**
+   * Log user registration/creation event
+   */
+  public async logUserRegistration(
+    user: User,
+    firstName: string,
+    lastName: string,
+    company: string,
+    registrationMethod: 'email-password' | 'sso' | 'admin-created' | 'api',
+    userAgent?: string,
+    sessionId?: string
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'user-registration',
+      result: 'success',
+      fileName: `registration-${user.uid}.log`,
+      fileType: 'log-file',
+      validationErrors: [],
+      workflowPhase: 'user-management',
+      sessionDetails: sessionId ? {
+        sessionId,
+        userAgent
+      } : { userAgent },
+      userProfileDetails: {
+        registrationMethod,
+        firstName,
+        lastName,
+        company,
+        emailVerificationRequired: true,
+        mfaEnrollmentRequired: true
+      }
+    });
+  }
+
+  /**
+   * Log successful MFA enrollment event
+   */
+  public async logMfaEnrollment(
+    user: User,
+    phoneNumber: string,
+    mfaMethod: 'sms' | 'totp' | 'hardware-key',
+    result: AuditResult,
+    enrollmentAttempts?: number,
+    sessionId?: string,
+    userAgent?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    // Mask phone number for privacy (show only last 4 digits)
+    const maskedPhone = phoneNumber.length > 4 
+      ? `***-***-${phoneNumber.slice(-4)}` 
+      : '***-***-****';
+
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'mfa-enrollment',
+      result,
+      fileName: `mfa-enrollment-${user.uid}.log`,
+      fileType: 'log-file',
+      validationErrors: errors,
+      workflowPhase: 'user-management',
+      sessionDetails: sessionId ? {
+        sessionId,
+        userAgent
+      } : { userAgent },
+      securityDetails: {
+        mfaMethod,
+        phoneNumber: maskedPhone,
+        enrollmentAttempts,
+        enrollmentDate: new Date().toISOString(),
+        mandatoryEnrollment: true,
+        backupCodesGenerated: false // SMS doesn't generate backup codes
+      }
+    });
+  }
+
+  /**
+   * Log MFA authentication/verification event
+   */
+  public async logMfaAuthentication(
+    user: User,
+    mfaMethod: 'sms' | 'totp' | 'hardware-key',
+    result: AuditResult,
+    verificationAttempts?: number,
+    sessionId?: string,
+    userAgent?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'mfa-authentication',
+      result,
+      fileName: `mfa-auth-${sessionId || Date.now()}.log`,
+      fileType: 'log-file',
+      validationErrors: errors,
+      workflowPhase: 'user-management',
+      sessionDetails: sessionId ? {
+        sessionId,
+        userAgent
+      } : { userAgent },
+      securityDetails: {
+        mfaMethod,
+        verificationAttempts,
+        authenticationDate: new Date().toISOString(),
+        loginFlowStep: 'second-factor'
+      }
+    });
+  }
+
+  /**
+   * Log email verification event
+   */
+  public async logEmailVerification(
+    user: User,
+    result: AuditResult,
+    verificationMethod: 'email-link' | 'admin-verification',
+    verificationAttempts?: number,
+    sessionId?: string,
+    userAgent?: string,
+    errors: string[] = []
+  ): Promise<void> {
+    await this.logEvent({
+      userId: user.uid,
+      userEmail: user.email || '',
+      action: 'email-verification',
+      result,
+      fileName: `email-verification-${user.uid}.log`,
+      fileType: 'log-file',
+      validationErrors: errors,
+      workflowPhase: 'user-management',
+      sessionDetails: sessionId ? {
+        sessionId,
+        userAgent
+      } : { userAgent },
+      userProfileDetails: {
+        verificationMethod,
+        verificationAttempts,
+        verificationDate: new Date().toISOString(),
+        emailVerified: result === 'success'
       }
     });
   }

@@ -10,6 +10,7 @@ import { auth } from '~/services/firebase';
 import { handleAuthError, getValidationError } from '~/services/firebase-errors';
 import { SignOut } from '~/components/actions/signout';
 import { auditService } from '~/services/audit.service';
+import { generateUniqueId } from '~/utils/id-generator';
 import styles from './mfa-verification.module.css';
 
 interface MFAVerificationProps {
@@ -111,6 +112,23 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
       const multiFactorAssertion = PhoneMultiFactorGenerator.assertion(credential);
       
       const result = await resolver.resolveSignIn(multiFactorAssertion);
+      
+      // Log successful MFA authentication audit event
+      try {
+        const sessionId = `session_${result.user.uid}_${Date.now()}_${generateUniqueId(8)}`;
+        await auditService.logMfaAuthentication(
+          result.user,
+          'sms',
+          'success',
+          1, // Assuming first successful attempt since we got here
+          sessionId,
+          navigator.userAgent
+        );
+      } catch (auditError) {
+        console.error('Failed to log MFA authentication success audit:', auditError);
+        // Continue with success flow even if audit logging fails
+      }
+      
       onSuccess(result);
     } catch (error: unknown) {
       const authError = error as { code?: string; message?: string };
