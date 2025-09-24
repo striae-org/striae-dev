@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-09-24] - *[Release v0.9.24-beta](https://github.com/striae-org/striae/releases/tag/v0.9.24-beta)*
+
+- **Storage Function Centralization** - Unified all data operations into centralized utility modules with built-in permission validation and security controls
+- **Audit Trail System Corrections** - Fixed filtering logic, reorganized activity categories, and consolidated action types for accurate audit tracking  
+- **Enhanced Permission Validation** - Mandatory access control for all case operations preventing security bypasses with comprehensive type safety
+- **Comprehensive Testing & QA** - Extensive pre-release candidate testing ensuring production readiness for October 1, 2025 release candidate
+
 ## [2025-09-22] - *[Release v0.9.22a-beta](https://github.com/striae-org/striae/releases/tag/v0.9.22a-beta)*
 
 - **Comprehensive Audit Trail System** - Complete forensic audit logging providing full visibility into all case-related activities, user actions, and system operations with 5-phase workflow categorization

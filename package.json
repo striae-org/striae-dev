@@ -1,6 +1,6 @@
 {
   "name": "striae",
-  "version": "0.9.22a",
+  "version": "0.9.24",
   "private": true,
   "sideEffects": false,
   "type": "module",
