@@ -123,6 +123,8 @@ export async function importCaseForReview(
     caseNumber: ''
   };
   
+  let checksumValidationPassed = false;
+  
   try {
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
     
@@ -183,6 +185,7 @@ export async function importCaseForReview(
         );
       }
       
+      checksumValidationPassed = true;
       onProgress?.('Complete integrity verified', 18, validation.summary);
       
     } else {
@@ -302,7 +305,7 @@ export async function importCaseForReview(
       result.caseNumber,
       zipFile.name,
       'success',
-      true, // checksum validation passed
+      checksumValidationPassed,
       [],
       caseData.metadata.exportedByUid,
       {
@@ -329,7 +332,7 @@ export async function importCaseForReview(
       result.caseNumber || 'unknown',
       zipFile.name,
       'failure',
-      false, // checksum validation failed
+      checksumValidationPassed, // Use actual checksum validation result even for failures
       result.errors || [],
       undefined,
       {

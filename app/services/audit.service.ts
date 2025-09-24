@@ -1330,6 +1330,14 @@ export class AuditService {
     if (entry.details.securityChecks) {
       const securityIssues = [];
       
+      // Debug logging to help diagnose security check values
+      console.log('   Security Checks Debug:', {
+        selfConfirmationPrevented: entry.details.securityChecks.selfConfirmationPrevented,
+        fileIntegrityValid: entry.details.securityChecks.fileIntegrityValid,
+        exporterUidValidated: entry.details.securityChecks.exporterUidValidated,
+        result: entry.result
+      });
+      
       // selfConfirmationPrevented: true means issue (prevention was needed)
       if (entry.details.securityChecks.selfConfirmationPrevented === true) {
         securityIssues.push('selfConfirmationPrevented');
