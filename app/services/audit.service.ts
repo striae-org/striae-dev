@@ -1338,8 +1338,8 @@ export class AuditService {
         result: entry.result
       });
       
-      // selfConfirmationPrevented: true means issue (prevention was needed)
-      if (entry.details.securityChecks.selfConfirmationPrevented === true) {
+      // selfConfirmationPrevented: false means issue (self-confirmation was NOT prevented, same user importing their own case)
+      if (entry.details.securityChecks.selfConfirmationPrevented === false && entry.details.securityChecks.selfConfirmationPrevented !== undefined) {
         securityIssues.push('selfConfirmationPrevented');
       }
       
