@@ -59,31 +59,54 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 
 ## High-Level Architecture
 
-```
-  EXTERNAL      🔐 AUTHENTICATION LAYER            
-┌─────────────┐    ┌─────────────────┐    
-│ SendLayer   │    │  Firebase Auth  │    
-│   Email     │    └─────────────────┘    
-│             │            │             
-└─────────────┘     JSON Web Tokens        
-       ▲                   │             
-       │                   ▼  📱 APPLICATION LAYER       
-       │               FRONTEND                   BACKEND
-       │ Turnstile  ┌─────────────┐            ┌─────────────┐
-       └─────────── │ React+Remix │  API Keys  │ Cloudflare  │
-                    │ Cloudflare  │◄──────────►│  Workers    │
-                    │   Pages     │            │             │
-                    └─────────────┘            └─────────────┘
-                                                     ▲
-                                                     │ 🗄️ STORAGE LAYER
-                                    ┌────────────────┼────────────────┐
-                                    │                │                │
-                                    ▼                ▼                ▼
-                            ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-                            │ Cloudflare  │   │ Cloudflare  │   │ Cloudflare  │
-                            │     KV      │   │     R2      │   │   Images    │
-                            │  (User DB)  │   │   (Data)    │   │   (Files)   │
-                            └─────────────┘   └─────────────┘   └─────────────┘
+```mermaid
+graph TB
+    %% External Services (Top Level) - Force positioning with subgraph
+    subgraph "External"
+        Turnstile["🛡️ Turnstile<br/>Bot Protection"]
+        SendLayer["📨 SendLayer<br/>Email Service"]
+    end
+    
+    %% Platform Services
+    subgraph "Platform"
+        %% Authentication Layer
+        Firebase["🔐 Firebase Auth<br/>Identity Provider"]
+        
+        %% Application Layer - Frontend
+        Frontend["📱 React + Remix<br/>Cloudflare Pages<br/>(Frontend)"]
+        
+        %% Application Layer - Backend
+        Backend["⚡ Cloudflare Workers<br/>(Backend)"]
+        
+        %% Storage Layer
+        KV["🗃️ Cloudflare KV<br/>(User Database)"]
+        R2["🗄️ Cloudflare R2<br/>(Case & Audit Data)"]
+        Images["🖼️ Cloudflare Images<br/>(File Storage)"]
+    end
+    
+    %% Authentication Flow
+    Firebase -->|JWT Tokens| Frontend
+    Turnstile -->|CAPTCHA| Frontend
+    Frontend -->|API Key| SendLayer
+    
+    %% Application Communication
+    Frontend <-->|API Keys<br />CORS| Backend
+    
+    %% Storage Connections
+    Backend <--> KV
+    Backend <--> R2
+    Backend <--> Images
+    
+    %% Styling
+    classDef external fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef auth fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef app fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef storage fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    class Turnstile,SendLayer external
+    class Firebase auth
+    class Frontend,Backend app
+    class KV,R2,Images storage
 ```
 
 ## Frontend Architecture
