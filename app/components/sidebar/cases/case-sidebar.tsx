@@ -631,8 +631,6 @@ return (
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
             className={styles.caseActionsButton}
-            disabled={isReadOnly}
-            title={isReadOnly ? "Cannot access case actions for read-only cases" : undefined}
           >
             {showCaseActions ? 'Hide Case Actions' : 'Case Actions'}
           </button>
@@ -649,7 +647,17 @@ return (
                 </button>
               </div>
               
-              {/* Rename/Delete Section */}
+              {/* Audit Trail Section - Available for all cases */}
+              <div className={styles.auditTrailSection}>
+                <button
+                  onClick={() => setIsAuditTrailOpen(true)}
+                  className={styles.auditTrailButton}
+                >
+                  Audit Trail
+                </button>
+              </div>
+              
+              {/* Rename/Delete Section - Only for owned cases */}
               {!isReadOnly && (
                 <div className={styles.renameDeleteSection}>
                   <div className={`${styles.caseRename} mb-4`}>
@@ -675,15 +683,6 @@ return (
                     >
                         {isDeletingCase ? 'Deleting...' : 'Delete Case'}
                       </button>
-                  </div>
-                  
-                  <div className={styles.auditTrailSection}>
-                    <button
-                      onClick={() => setIsAuditTrailOpen(true)}
-                      className={styles.auditTrailButton}
-                    >
-                      Audit Trail
-                    </button>
                   </div>
                 </div>
               )}
