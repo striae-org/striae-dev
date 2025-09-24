@@ -86,7 +86,7 @@ graph TB
     end
     
     %% Authentication Flow
-    Firebase -->|JWT Tokens| Frontend
+    Firebase -->|JWT| Frontend
     Turnstile -->|CAPTCHA| Frontend
     Frontend -->|API Key| SendLayer
     
