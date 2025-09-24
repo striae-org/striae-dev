@@ -4,7 +4,7 @@
 # This script deploys the entire Striae application:
 # 1. Configuration setup (copy configs, replace placeholders)
 # 2. Worker dependencies installation
-# 3. Workers (all 6 workers)
+# 3. Workers (all 7 workers)
 # 4. Worker secrets/environment variables
 # 5. Pages (frontend)
 # 6. Pages secrets/environment variables
@@ -52,7 +52,7 @@ Write-Host ""
 # Step 3: Deploy Workers
 Write-Host "${Purple}Step 3/6: Deploying Workers${Reset}"
 Write-Host "----------------------------"
-Write-Host "${Yellow}🔧 Deploying all 6 Cloudflare Workers...${Reset}"
+Write-Host "${Yellow}🔧 Deploying all 7 Cloudflare Workers...${Reset}"
 $workersResult = Start-Process -FilePath "npm" -ArgumentList "run", "deploy-workers" -Wait -PassThru -NoNewWindow
 if ($workersResult.ExitCode -ne 0) {
     Write-Host "${Red}❌ Worker deployment failed!${Reset}"

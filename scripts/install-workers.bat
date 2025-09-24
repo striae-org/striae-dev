@@ -3,12 +3,13 @@ REM ======================================
 REM STRIAE WORKERS NPM INSTALL SCRIPT
 REM ======================================
 REM This script installs npm dependencies for all Striae workers:
-REM 1. data-worker
-REM 2. image-worker
-REM 3. keys-worker
-REM 4. pdf-worker
-REM 5. turnstile-worker
-REM 6. user-worker
+REM 1. audit-worker
+REM 2. data-worker
+REM 3. image-worker
+REM 4. keys-worker
+REM 5. pdf-worker
+REM 6. turnstile-worker
+REM 7. user-worker
 
 echo [94m📦 Striae Workers NPM Install Script[0m
 echo ========================================
@@ -29,9 +30,9 @@ echo [95mInstalling npm dependencies for all workers...[0m
 echo.
 
 REM List of workers
-set WORKERS=data-worker image-worker keys-worker pdf-worker turnstile-worker user-worker
+set WORKERS=audit-worker data-worker image-worker keys-worker pdf-worker turnstile-worker user-worker
 set current=0
-set total=6
+set total=7
 
 REM Install dependencies for each worker
 for %%w in (%WORKERS%) do (

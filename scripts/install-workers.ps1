@@ -2,12 +2,13 @@
 # STRIAE WORKERS NPM INSTALL SCRIPT
 # ======================================
 # This script installs npm dependencies for all Striae workers:
-# 1. data-worker
-# 2. image-worker
-# 3. keys-worker
-# 4. pdf-worker
-# 5. turnstile-worker
-# 6. user-worker
+# 1. audit-worker
+# 2. data-worker
+# 3. image-worker
+# 4. keys-worker
+# 5. pdf-worker
+# 6. turnstile-worker
+# 7. user-worker
 
 Write-Host "📦 Striae Workers NPM Install Script" -ForegroundColor Blue
 Write-Host "========================================" -ForegroundColor Blue
@@ -28,7 +29,7 @@ Write-Host "Installing npm dependencies for all workers..." -ForegroundColor Mag
 Write-Host ""
 
 # List of workers
-$Workers = @("data-worker", "image-worker", "keys-worker", "pdf-worker", "turnstile-worker", "user-worker")
+$Workers = @("audit-worker", "data-worker", "image-worker", "keys-worker", "pdf-worker", "turnstile-worker", "user-worker")
 $Total = $Workers.Count
 $Current = 0
 
