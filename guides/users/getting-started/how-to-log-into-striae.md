@@ -62,6 +62,8 @@ Make sure you have:
 
 * **Lab/Company Name**: Be sure to enter this correctly because it cannot be changed later (contact support if needed)
 
+* **Case Review Account Only** (Optional): Toggle this to "Yes" if you are registering specifically to review and confirm cases from a different Striae instance or agency. This type of account is designed for cross-agency collaboration where confirmations are needed from reviewers who are not part of the primary instance's Firebase Authentication database. See the related [FAQ](https://help.striae.org/striae-users-guide/faqs/striae-frequently-asked-questions#-login--authentication) about this.
+
 ### Step 3: Monitor Password Strength
 
 * Watch the real-time password strength indicator

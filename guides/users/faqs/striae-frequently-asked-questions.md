@@ -31,6 +31,10 @@ A: For maximum security, Striae enforces strong password rules. Your password mu
 
 A: Two-factor authentication (MFA) is crucial because it significantly enhances your account’s security. With MFA enabled, even if someone knows your password, they cannot log in without also having access to your registered phone to receive SMS verification codes. Because Striae handles sensitive forensic information, complying with strict security standards is essential. MFA helps prevent unauthorized access and protects the integrity of your case management.
 
+**Q: What is a "Case Review Account Only" and when should I use it?**
+
+A: A "Case Review Account Only" is a specialized account type designed for cross-agency collaboration and confirmations. This option is essential when you need to review or confirm cases from a different Striae instance or agency that uses a separate Firebase Authentication database. Since confirmations can only be completed by users within the same instance and Firebase database, reviewers from external agencies must create a Case Review Account to successfully complete confirmations. This ensures proper cross-jurisdictional collaboration while maintaining security boundaries between different organizational instances of Striae. When registering, simply toggle the "Case Review Account Only" option to "Yes" if you're specifically joining to review cases from another agency or instance.
+
 ***
 
 ## 📊 Case Management
