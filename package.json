@@ -24,6 +24,7 @@
     "deploy-workers:secrets": "bash ./scripts/deploy-worker-secrets.sh",    
     "deploy-pages": "bash ./scripts/deploy-pages.sh",
     "deploy-pages:secrets": "bash ./scripts/deploy-pages-secrets.sh",
+    "deploy-workers:audit": "cd workers/audit-worker && npm run deploy",
     "deploy-workers:data": "cd workers/data-worker && npm run deploy",
     "deploy-workers:image": "cd workers/image-worker && npm run deploy",
     "deploy-workers:keys": "cd workers/keys-worker && npm run deploy",
