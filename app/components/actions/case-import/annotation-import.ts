@@ -19,7 +19,8 @@ export async function importAnnotations(
         const newFileId = fileMapping.get(fileEntry.fileData.originalFilename);
         if (newFileId) {
           // Save annotations using the existing notes management system
-          await saveNotes(user, caseNumber, newFileId, fileEntry.annotations);
+          // Bypass access validation for read-only case imports
+          await saveNotes(user, caseNumber, newFileId, fileEntry.annotations, { validateAccess: false });
           annotationsImported++;
         }
       }

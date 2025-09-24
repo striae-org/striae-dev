@@ -1,16 +1,17 @@
 import { User } from 'firebase/auth';
 import { AnnotationData } from '~/types/annotations';
-import { saveFileAnnotations, getFileAnnotations } from '~/utils/data-operations';
+import { saveFileAnnotations, getFileAnnotations, DataOperationOptions } from '~/utils/data-operations';
 
 export const saveNotes = async (
   user: User,
   caseNumber: string,
   imageId: string,
-  annotationData: AnnotationData
+  annotationData: AnnotationData,
+  options: DataOperationOptions = {}
 ): Promise<void> => {
   try {
     // Use centralized function with built-in validation and error handling
-    await saveFileAnnotations(user, caseNumber, imageId, annotationData);
+    await saveFileAnnotations(user, caseNumber, imageId, annotationData, options);
   } catch (error) {
     console.error('Error saving notes:', error);
     throw error;

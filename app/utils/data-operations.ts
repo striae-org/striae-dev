@@ -274,12 +274,14 @@ export const getFileAnnotations = async (
  * @param caseNumber - Case identifier
  * @param fileId - File identifier
  * @param annotationData - Annotation data to save
+ * @param options - Optional configuration
  */
 export const saveFileAnnotations = async (
   user: User,
   caseNumber: string,
   fileId: string,
-  annotationData: AnnotationData
+  annotationData: AnnotationData,
+  options: DataOperationOptions = {}
 ): Promise<void> => {
   try {
     // Validate user session
@@ -288,10 +290,12 @@ export const saveFileAnnotations = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Modification denied: ${modifyCheck.reason}`);
+    // Check modification permissions if requested
+    if (options.validateAccess !== false) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Modification denied: ${modifyCheck.reason}`);
+      }
     }
 
     // Validate inputs
