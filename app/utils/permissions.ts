@@ -464,27 +464,42 @@ export const withUserDataOperation = <T>(
  */
 export const addUserCase = async (user: User, caseData: CaseMetadata): Promise<void> => {
   try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Get current user data to check for duplicates
     const userData = await getUserData(user);
     if (!userData) {
       throw new Error('Cannot add case: User data not found');
     }
 
-    // Initialize cases array if it doesn't exist
-    if (!userData.cases) {
-      userData.cases = [];
-    }
-
     // Check for duplicate case numbers
-    const existingCase = userData.cases.find(c => c.caseNumber === caseData.caseNumber);
+    const existingCases = userData.cases || [];
+    const existingCase = existingCases.find(c => c.caseNumber === caseData.caseNumber);
     if (existingCase) {
       throw new Error(`Case ${caseData.caseNumber} already exists`);
     }
 
-    // Add the new case
-    userData.cases.push(caseData);
+    // Use the dedicated /cases endpoint to add the case
+    const apiKey = await getUserApiKey();
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}/cases`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      },
+      body: JSON.stringify({
+        cases: [caseData]
+      })
+    });
 
-    // Update user data
-    await updateUserData(user, { cases: userData.cases });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to add case to user: ${response.status} - ${errorText}`);
+    }
     
   } catch (error) {
     console.error('Error adding case to user:', error);
@@ -497,20 +512,41 @@ export const addUserCase = async (user: User, caseData: CaseMetadata): Promise<v
  */
 export const removeUserCase = async (user: User, caseNumber: string): Promise<void> => {
   try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Get current user data to check if case exists
     const userData = await getUserData(user);
     if (!userData || !userData.cases) {
       throw new Error('Cannot remove case: No cases found');
     }
 
-    // Find and remove the case
-    const filteredCases = userData.cases.filter(c => c.caseNumber !== caseNumber);
-    
-    if (filteredCases.length === userData.cases.length) {
+    // Check if the case exists
+    const existingCase = userData.cases.find(c => c.caseNumber === caseNumber);
+    if (!existingCase) {
       throw new Error(`Case ${caseNumber} not found`);
     }
 
-    // Update user data
-    await updateUserData(user, { cases: filteredCases });
+    // Use the dedicated /cases DELETE endpoint to remove the case
+    const apiKey = await getUserApiKey();
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}/cases`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      },
+      body: JSON.stringify({
+        casesToDelete: [caseNumber]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to remove case from user: ${response.status} - ${errorText}`);
+    }
     
   } catch (error) {
     console.error('Error removing case from user:', error);
