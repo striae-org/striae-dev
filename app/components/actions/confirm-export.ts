@@ -16,6 +16,7 @@ export async function storeConfirmation(
   originalImageFileName?: string
 ): Promise<boolean> {
   const startTime = Date.now();
+  let originalImageId: string | undefined; // Declare at function level for error handling
   
   try {
     // Start workflow for confirmation creation
@@ -28,8 +29,6 @@ export async function storeConfirmation(
     }
 
     // Find the original image ID for the current image
-    let originalImageId: string | undefined;
-    
     if (caseData.originalImageIds) {
       // Find the original ID by looking up the current image ID in the mapping
       for (const [origId, currentId] of Object.entries(caseData.originalImageIds)) {
@@ -75,7 +74,7 @@ export async function storeConfirmation(
         processingTimeMs: endTime - startTime,
         fileSizeBytes: 0 // Not applicable for confirmation creation
       },
-      currentImageId,
+      originalImageId,
       originalImageFileName
     );
     
@@ -99,7 +98,7 @@ export async function storeConfirmation(
         processingTimeMs: endTime - startTime,
         fileSizeBytes: 0
       },
-      currentImageId,
+      originalImageId || currentImageId, // Use originalImageId if available, fallback to currentImageId
       originalImageFileName
     );
     
