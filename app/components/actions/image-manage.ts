@@ -11,8 +11,12 @@ import { auditService } from '~/services/audit.service';
 
 const IMAGE_URL = paths.image_worker_url;
 
-export const fetchFiles = async (user: User, caseNumber: string): Promise<FileData[]> => {
-  const caseData = await getCaseData(user, caseNumber);
+export const fetchFiles = async (
+  user: User, 
+  caseNumber: string, 
+  options?: { validateAccess?: boolean }
+): Promise<FileData[]> => {
+  const caseData = await getCaseData(user, caseNumber, { validateAccess: options?.validateAccess });
   return caseData?.files || [];
 };
 

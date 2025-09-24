@@ -169,7 +169,7 @@ export const CaseSidebar = ({
   useEffect(() => {
     if (currentCase) {
       setIsLoading(true);
-      fetchFiles(user, currentCase)
+      fetchFiles(user, currentCase, { validateAccess: false })
         .then(loadedFiles => {
           setFiles(loadedFiles);
         })
@@ -203,7 +203,7 @@ export const CaseSidebar = ({
         // Loading existing case - always allowed
         setCurrentCase(caseNumber);
         onCaseChange(caseNumber);
-        const files = await fetchFiles(user, caseNumber);
+        const files = await fetchFiles(user, caseNumber, { validateAccess: false });
         setFiles(files);
         setCaseNumber('');
         setSuccessAction('loaded');
