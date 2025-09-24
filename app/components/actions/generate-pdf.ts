@@ -130,7 +130,10 @@ export const generatePDF = async ({
           currentCase || 'unknown-case',
           'success',
           processingTime,
-          blob.size
+          blob.size,
+          [],
+          selectedImage, // Source file ID
+          selectedFilename // Source original filename
         );
       } catch (auditError) {
         console.error('Failed to log PDF generation audit:', auditError);
@@ -156,7 +159,9 @@ export const generatePDF = async ({
           'failure',
           processingTime,
           0, // No file size for failed generation
-          [errorText || 'PDF generation failed']
+          [errorText || 'PDF generation failed'],
+          selectedImage, // Source file ID
+          selectedFilename // Source original filename
         );
       } catch (auditError) {
         console.error('Failed to log PDF generation failure audit:', auditError);
@@ -181,7 +186,9 @@ export const generatePDF = async ({
         'failure',
         processingTime,
         0, // No file size for failed generation
-        [error instanceof Error ? error.message : 'Unknown error generating PDF']
+        [error instanceof Error ? error.message : 'Unknown error generating PDF'],
+        selectedImage, // Source file ID
+        selectedFilename // Source original filename
       );
     } catch (auditError) {
       console.error('Failed to log PDF generation error audit:', auditError);

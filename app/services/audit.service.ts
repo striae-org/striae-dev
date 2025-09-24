@@ -958,7 +958,9 @@ export class AuditService {
     result: AuditResult,
     processingTime: number,
     fileSize?: number,
-    errors: string[] = []
+    errors: string[] = [],
+    sourceFileId?: string,
+    sourceFileName?: string
   ): Promise<void> {
     await this.logEvent({
       userId: user.uid,
@@ -973,7 +975,12 @@ export class AuditService {
       performanceMetrics: {
         processingTimeMs: processingTime,
         fileSizeBytes: fileSize || 0
-      }
+      },
+      fileDetails: sourceFileId && sourceFileName ? {
+        fileId: sourceFileId,
+        originalFileName: sourceFileName,
+        fileSize: 0 // PDF generation doesn't modify source file size
+      } : undefined
     });
   }
 
