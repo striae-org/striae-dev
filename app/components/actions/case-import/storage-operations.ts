@@ -138,7 +138,7 @@ export async function listReadOnlyCases(user: User): Promise<ReadOnlyCaseMetadat
   try {
     const apiKey = await getUserApiKey();
     
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
     const apiKey = await getUserApiKey();
     
     // Get current user data
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
     }
     
     // Update user data
-    const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const updateResponse = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
