@@ -324,8 +324,8 @@ enum AuditAction {
 
 **Regulatory Compliance:**
 
-- **NIST Guidelines**: Follows NIST cybersecurity framework for audit logging
-- **Forensic Standards**: Complies with digital forensics evidence handling standards
+- **NIST Guidelines**: Follows NIST cybersecurity framework¹ for audit logging
+- **Forensic Standards**: Aligns with OSAC forensic science standards² for evidence handling
 - **Data Retention**: Configurable retention periods for compliance requirements
 - **Export Capabilities**: Multiple export formats for regulatory reporting
 
@@ -577,3 +577,16 @@ wrangler tail --name striae-images
 - Response time percentiles and performance trends
 - Geographic distribution of requests
 - Cache hit/miss ratios for static assets
+
+---
+
+## References
+
+¹ **NIST Cybersecurity Framework**: Framework for improving critical infrastructure cybersecurity:
+
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+
+² **OSAC Forensic Science Standards**: Organization of Scientific Area Committees for Forensic Science:
+
+- [NIST OSAC Overview](https://www.nist.gov/adlp/spo/organization-scientific-area-committees-forensic-science)
+- [OSAC Registry](https://www.nist.gov/osac/registry)
