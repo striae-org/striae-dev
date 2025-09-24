@@ -70,10 +70,10 @@ graph TB
 
 ### Storage Architecture
 
-- **Primary Storage**: Cloudflare R2 buckets organized by user/case
+- **Primary Storage**: Cloudflare R2 data files organized by user/day
 - **Indexing**: Key-based indexing for efficient queries
-- **Backup**: Automatic replication for data integrity
-- **Retention**: Configurable retention policies for compliance
+- **Durability**: 99.999999999% (eleven 9s) annual durability with automatic replication across Cloudflare's infrastructure³
+- **Data Retention**: Permanent storage - all audit data is retained indefinitely for forensic compliance
 
 ## Core Components
 
@@ -523,7 +523,7 @@ Automatic detection and logging of:
 - **Efficient Indexing**: User ID and timestamp-based indexing
 - **Batch Operations**: Grouping related audit entries
 - **Data Compression**: Optimized storage format
-- **Retention Policies**: Automatic cleanup of old data
+- **Permanent Storage**: All audit data is preserved indefinitely for forensic integrity
 
 ### Query Performance
 
@@ -728,31 +728,61 @@ Generates standardized filenames for exports.
 
 ### Data Worker Endpoints
 
-#### `POST /api/audit`
+#### `POST /audit/`
 
 Creates a new audit entry.
 
+**Query Parameters:**
+
+- `userId` - User identifier (required)
+
+**Request Headers:**
+
+- `X-Custom-Auth-Key` - Data worker authentication key
+- `Content-Type: application/json`
+
 **Request Body:**
+
 ```json
 {
+  "timestamp": "2025-09-23T14:30:15.123Z",
   "userId": "string",
   "userEmail": "string",
   "action": "AuditAction",
   "result": "AuditResult",
-  "details": "AuditDetails"
+  "details": {
+    "workflowPhase": "string",
+    "caseNumber": "string",
+    "fileName": "string",
+    "fileType": "string"
+  }
 }
 ```
 
-#### `GET /api/audit/:userId`
+#### `GET /audit/`
 
 Retrieves audit entries for a user.
 
 **Query Parameters:**
-- `caseNumber` - Filter by case
-- `startDate` - Start date filter
-- `endDate` - End date filter
-- `limit` - Maximum entries to return
-- `offset` - Pagination offset
+
+- `userId` - User identifier (required)
+- `startDate` - Start date filter (ISO 8601 format)
+- `endDate` - End date filter (ISO 8601 format)
+
+**Request Headers:**
+
+- `X-Custom-Auth-Key` - Data worker authentication key
+
+**Response:**
+
+```json
+{
+  "entries": [ValidationAuditEntry],
+  "total": number
+}
+```
+
+**Note:** Client-side filtering is applied for `caseNumber`, `action`, `result`, `workflowPhase`, `limit`, and `offset` parameters after retrieval from the worker.
 
 ## Troubleshooting
 
@@ -813,15 +843,24 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-### Health Checks
+### Service Monitoring
 
-Monitor audit system health:
+Monitor audit system functionality by checking basic operations:
 
 ```typescript
-// Check if audit service is responding
-const healthCheck = await auditService.healthCheck();
-if (!healthCheck.healthy) {
-  console.error('Audit service unhealthy:', healthCheck.issues);
+// Test audit service basic functionality
+try {
+  // Test creating a simple audit entry
+  await auditService.logEvent({
+    userId: user.uid,
+    userEmail: user.email,
+    action: 'system-test',
+    result: 'success',
+    workflowPhase: 'user-management'
+  });
+  console.log('✅ Audit service is responding normally');
+} catch (error) {
+  console.error('🚨 Audit service error:', error);
 }
 ```
 
@@ -836,6 +875,10 @@ if (!healthCheck.healthy) {
 ² Cloudflare KV uses AES-256 encryption with GCM (Galois/Counter Mode) for all stored values:
 
 - [Cloudflare KV Data Security](https://developers.cloudflare.com/kv/reference/data-security/)
+
+³ Cloudflare R2 provides 99.999999999% (eleven 9s) annual durability through automatic replication across their infrastructure:
+
+- [Cloudflare R2 Durability](https://developers.cloudflare.com/r2/reference/durability/)
 
 General Cloudflare security and compliance resources:
 
