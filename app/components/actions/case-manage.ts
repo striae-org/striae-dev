@@ -6,7 +6,13 @@ import {
   getDataApiKey,
   getUserApiKey
 } from '~/utils/auth';
-import { canCreateCase } from '~/utils/permissions';
+import { 
+  canCreateCase, 
+  getUserCases,
+  validateUserSession,
+  addUserCase,
+  removeUserCase
+} from '~/utils/permissions';
 import { CaseData, UserData, CasesToDelete } from '~/types';
 import { auditService } from '~/services/audit.service';
 
@@ -17,29 +23,9 @@ const MAX_CASE_NUMBER_LENGTH = 25;
 
 export const listCases = async (user: User): Promise<string[]> => {
   try {
-    const apiKey = await getUserApiKey();
-    
-    // Get user data from KV store
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch user data:', response.status);
-      return [];
-    }
-
-    const userData: UserData = await response.json();
-    
-    if (!userData?.cases) {
-      return [];
-    }
-
-    const caseNumbers = userData.cases.map(c => c.caseNumber);
+    // Use centralized function to get user cases
+    const userCases = await getUserCases(user);
+    const caseNumbers = userCases.map(c => c.caseNumber);
     return sortCaseNumbers(caseNumbers);
     
   } catch (error) {
@@ -146,6 +132,12 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
   const startTime = Date.now();
   
   try {
+    // Validate user session first
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
     // Check if user can create a new case
     const permission = await canCreateCase(user);
     if (!permission.canCreate) {
@@ -153,7 +145,6 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     }
 
     const dataApiKey = await getDataApiKey();
-    const userApiKey = await getUserApiKey();
 
     const newCase: CaseData = {
       createdAt: new Date().toISOString(),
@@ -161,7 +152,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       files: []
     };
 
-    const rootCaseData: Omit<CaseData, 'files'> = {
+    const caseMetadata = {
       createdAt: newCase.createdAt,
       caseNumber: newCase.caseNumber
     };
@@ -180,19 +171,8 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       throw new Error('Failed to create case file');
     }
 
-    // Add case to user data in KV store
-    const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}/cases`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': userApiKey
-      },
-      body: JSON.stringify({ cases: [rootCaseData] })
-    });
-
-    if (!updateResponse.ok) {
-      throw new Error('Failed to update user data');
-    }
+    // Add case to user data using centralized function
+    await addUserCase(user, caseMetadata);
 
     // Log successful case creation
     const endTime = Date.now();
@@ -417,8 +397,13 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
       throw new Error('Invalid case number');
     }
 
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
     const dataApiKey = await getDataApiKey();
-    const userApiKey = await getUserApiKey();
 
     // Get case data from data worker
     const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
@@ -450,19 +435,8 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
       headers: { 'X-Custom-Auth-Key': dataApiKey }
     });
 
-    // Delete case from KV store
-    const deleteResponse = await fetch(`${USER_WORKER_URL}/${user.uid}/cases`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': userApiKey
-      },
-      body: JSON.stringify({ casesToDelete: [caseNumber] } as CasesToDelete)
-    });
-
-    if (!deleteResponse.ok) {
-      throw new Error('Failed to delete case from user data');
-    }
+    // Delete case from user data using centralized function
+    await removeUserCase(user, caseNumber);
 
     // Log successful case deletion
     const endTime = Date.now();

@@ -7,7 +7,7 @@ import { DeleteAccount } from './delete-account';
 import { UserAuditViewer } from '../audit/user-audit-viewer';
 import { AuthContext } from '~/contexts/auth.context';
 import { getUserApiKey } from '~/utils/auth';
-import { getUserData } from '~/utils/permissions';
+import { getUserData, updateUserData } from '~/utils/permissions';
 import { auditService } from '~/services/audit.service';
 import paths from '~/config/config.json';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
@@ -87,25 +87,14 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
         displayName
       });
 
-      const apiKey = await getUserApiKey();
       const [firstName, lastName] = displayName.split(' ');
       
-      const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Custom-Auth-Key': apiKey
-        },
-        body: JSON.stringify({
-          email: user.email,
-          firstName: firstName || '',
-          lastName: lastName || '',          
-        })
+      // Use centralized updateUserData function
+      await updateUserData(user, {
+        email: user.email,
+        firstName: firstName || '',
+        lastName: lastName || '',          
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile in database');
-      }
 
       // Log successful profile update
       await auditService.logUserProfileUpdate(

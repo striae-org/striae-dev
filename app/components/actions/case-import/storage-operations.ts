@@ -4,6 +4,11 @@ import {
   getDataApiKey,
   getUserApiKey
 } from '~/utils/auth';
+import {
+  getUserReadOnlyCases,
+  updateUserData,
+  validateUserSession
+} from '~/utils/permissions';
 import { 
   CaseExportData, 
   UserData, 
@@ -24,29 +29,9 @@ export async function checkReadOnlyCaseExists(
   caseNumber: string
 ): Promise<ReadOnlyCaseMetadata | null> {
   try {
-    const apiKey = await getUserApiKey();
-    
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!response.ok) {
-      console.error('Failed to fetch user data:', response.status);
-      return null;
-    }
-
-    const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
-    
-    if (!userData.readOnlyCases) {
-      return null;
-    }
-
-    const found = userData.readOnlyCases.find(c => c.caseNumber === caseNumber) || null;
-    return found;
+    // Use centralized function to get read-only cases
+    const readOnlyCases = await getUserReadOnlyCases(user);
+    return readOnlyCases.find(c => c.caseNumber === caseNumber) || null;
     
   } catch (error) {
     console.error('Error checking read-only case existence:', error);
@@ -64,55 +49,28 @@ export async function addReadOnlyCaseToUser(
   caseMetadata: ReadOnlyCaseMetadata
 ): Promise<void> {
   try {
-    const apiKey = await getUserApiKey();
-    
-    // Get current user data
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user data: ${response.status}`);
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
-    
-    // Initialize readOnlyCases array if it doesn't exist
-    if (!userData.readOnlyCases) {
-      userData.readOnlyCases = [];
-    }
+    // Get current read-only cases
+    const currentReadOnlyCases = await getUserReadOnlyCases(user);
     
     // IMPORTANT: Only allow one read-only case at a time
     // Clear any existing read-only cases before adding the new one
-    if (userData.readOnlyCases.length > 0) {
-      const existingCaseNumbers = userData.readOnlyCases.map(c => c.caseNumber).join(', ');
-      console.log(`Clearing ${userData.readOnlyCases.length} existing read-only case(s) (${existingCaseNumbers}) before importing new case: ${caseMetadata.caseNumber}`);
-      userData.readOnlyCases = [];
+    if (currentReadOnlyCases.length > 0) {
+      const existingCaseNumbers = currentReadOnlyCases.map(c => c.caseNumber).join(', ');
+      console.log(`Clearing ${currentReadOnlyCases.length} existing read-only case(s) (${existingCaseNumbers}) before importing new case: ${caseMetadata.caseNumber}`);
     }
     
-    // Add the new read-only case (now the only one)
-    userData.readOnlyCases.push(caseMetadata);
-    console.log(`Added new read-only case to user profile: ${caseMetadata.caseNumber}`);
-    
-    // Update user data
-    const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      },
-      body: JSON.stringify(userData)
+    // Update user data with the new read-only case (replacing any existing ones)
+    await updateUserData(user, { 
+      readOnlyCases: [caseMetadata] // Only the new case
     });
-
-    if (!updateResponse.ok) {
-      const errorText = await updateResponse.text();
-      console.error('User data update failed:', updateResponse.status, errorText);
-      throw new Error(`Failed to update user data: ${updateResponse.status} - ${errorText}`);
-    }
+    
+    console.log(`Added new read-only case to user profile: ${caseMetadata.caseNumber}`);
     
   } catch (error) {
     console.error('Error adding read-only case to user:', error);
