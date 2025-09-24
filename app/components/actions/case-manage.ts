@@ -141,8 +141,9 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       caseNumber: newCase.caseNumber
     };
 
-    // Create case file using centralized function
-    await updateCaseData(user, caseNumber, newCase);
+    // Create case file using centralized function with access validation disabled
+    // (case hasn't been added to user's list yet)
+    await updateCaseData(user, caseNumber, newCase, { validateAccess: false });
 
     // Add case to user data using centralized function
     await addUserCase(user, caseMetadata);
