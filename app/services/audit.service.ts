@@ -117,12 +117,38 @@ export class AuditService {
     fileName: string,
     result: AuditResult,
     errors: string[] = [],
-    performanceMetrics?: PerformanceMetrics
+    performanceMetrics?: PerformanceMetrics,
+    exportFormat?: 'json' | 'csv' | 'xlsx' | 'zip',
+    protectionEnabled?: boolean
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: false, // Not applicable for exports
       fileIntegrityValid: result === 'success'
     };
+
+    // Determine file type based on format or fallback to filename
+    let fileType: AuditFileType = 'case-package';
+    if (exportFormat) {
+      switch (exportFormat) {
+        case 'json':
+          fileType = 'json-data';
+          break;
+        case 'csv':
+        case 'xlsx':
+          fileType = 'csv-export';
+          break;
+        case 'zip':
+          fileType = 'case-package';
+          break;
+        default:
+          fileType = 'case-package';
+      }
+    } else {
+      // Fallback: extract from filename
+      if (fileName.includes('.json')) fileType = 'json-data';
+      else if (fileName.includes('.csv') || fileName.includes('.xlsx')) fileType = 'csv-export';
+      else fileType = 'case-package';
+    }
 
     await this.logEvent({
       userId: user.uid,
@@ -130,7 +156,7 @@ export class AuditService {
       action: 'export',
       result,
       fileName,
-      fileType: 'case-package',
+      fileType,
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'case-export',
