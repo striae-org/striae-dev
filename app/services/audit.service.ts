@@ -16,7 +16,7 @@ import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
 import { generateWorkflowId } from '../utils/id-generator';
 
-const DATA_WORKER_URL = paths.data_worker_url;
+const AUDIT_WORKER_URL = paths.audit_worker_url;
 
 /**
  * Audit Service for ValidationAuditEntry system
@@ -1188,7 +1188,7 @@ export class AuditService {
       // If userId is provided, fetch from server
       if (params.userId) {
         const apiKey = await getDataApiKey();
-        const url = new URL(`${DATA_WORKER_URL}/audit/`);
+        const url = new URL(`${AUDIT_WORKER_URL}/audit/`);
         url.searchParams.set('userId', params.userId);
         
         if (params.startDate) {
@@ -1285,9 +1285,9 @@ export class AuditService {
    */
   private async persistAuditEntry(entry: ValidationAuditEntry): Promise<void> {
     try {
-      // Store to data worker with audit endpoint
+      // Store to audit worker
       const apiKey = await getDataApiKey();
-      const url = new URL(`${DATA_WORKER_URL}/audit/`);
+      const url = new URL(`${AUDIT_WORKER_URL}/audit/`);
       url.searchParams.set('userId', entry.userId);
       
       const response = await fetch(url.toString(), {
