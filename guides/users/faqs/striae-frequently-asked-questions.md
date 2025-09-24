@@ -1,4 +1,3 @@
-
 ## Table of Contents
 
 1. [🔐 Login & Authentication](#-login--authentication)
@@ -8,10 +7,11 @@
 5. [🎯 Image Annotation](#-image-annotation)
 6. [✅ Authenticated Confirmations System](#-authenticated-confirmations-system)
 7. [📄 PDF Generation](#-pdf-generation)
-8. [👤 Account Deletion](#-account-deletion)
-9. [🔧 Troubleshooting](#-troubleshooting)
-10. [🛡️ Security & Best Practices](#️-security--best-practices)
-11. [🚀 Getting Started Quickly](#-getting-started-quickly)
+8. [🕵️ Audit Trail System](#️-audit-trail-system)
+9. [👤 Account Deletion](#-account-deletion)
+10. [🔧 Troubleshooting](#-troubleshooting)
+11. [🛡️ Security & Best Practices](#️-security--best-practices)
+12. [🚀 Getting Started Quickly](#-getting-started-quickly)
 
 ***
 
@@ -314,6 +314,38 @@ A: Filenames are automatically generated to keep reports well-organized and easy
 **Q: What information is included in the PDF reports?**
 
 A: Striae’s PDFs are professionally formatted to include everything necessary for thorough case documentation. You’ll find the current date and case details in the header. The main image is shown in full resolution, overlaid with selected annotations like case numbers, class characteristics, index marks, and your support level conclusion. Additional notes and observations appear if provided. For identifications, a confirmation signature area is included to meet documentation standards for technical review.
+
+***
+
+## 🕵️ Audit Trail System
+
+**Q: What is the audit trail system in Striae?**
+
+A: Striae automatically tracks all your actions to create a comprehensive audit trail for forensic accountability. The system logs everything you do - from uploading files to creating annotations - ensuring complete traceability for legal compliance. This includes case management activities, file operations, annotation work, user activities, case export/import, document generation, and security events. All data is encrypted with AES-256 and stored securely in Cloudflare infrastructure with 99.999999999% durability.
+
+**Q: How do I access my audit trail data?**
+
+A: You can view your audit trail in two ways: from your "Manage Profile" page, look for the "View My Audit Trail" button, or from the Case Actions Menu, click the purple "Audit Trail" button. The audit viewer opens in a modal window where you can see all your activities with timestamps, filter by date ranges, case numbers, action types, and result status. You can also export your audit data in CSV, JSON, or summary report formats for compliance purposes.
+
+**Q: What types of activities are tracked in my audit trail?**
+
+A: The audit trail captures comprehensive forensic activities including case creation, renaming, and deletion; file uploads, access, and deletion; annotation creation, editing, and deletion; user login/logout and profile updates; case export/import operations; confirmation activities; PDF report generation; and security events like failed logins or blocked actions. Each entry includes detailed information such as timestamps, file details, performance metrics, and security validation results.
+
+**Q: Can I filter and search my audit trail data?**
+
+A: Yes! The audit viewer provides powerful filtering options. You can filter by date ranges using presets (Last 24 hours, Last 7 days, Last 30 days) or custom date ranges, search by specific case numbers, filter by action types (file-upload, annotation-create, case-create, etc.), and filter by result status (success, failure, blocked, warning). You can also combine multiple filters to find exactly the activities you need to review.
+
+**Q: How do I export my audit trail for compliance or legal purposes?**
+
+A: Striae offers three export formats for different purposes. CSV export is best for spreadsheet analysis and includes timestamps, action details, case numbers, and file information. JSON export is ideal for technical analysis and system integration with complete metadata. Summary reports provide human-readable compliance reports with activity statistics and timeline summaries. All exports can be filtered before download and include comprehensive audit information with automatic filename generation including timestamps.
+
+**Q: How long is my audit trail data kept and who can access it?**
+
+A: All audit data is kept permanently to meet forensic compliance and legal evidence requirements. Your audit data is completely isolated from other users - only you can access your own audit trail. System administrators may have access for system maintenance or compliance audits, and data may be accessed if required by law. All data is encrypted at rest with AES-256 encryption and stored in secure Cloudflare infrastructure with automatic tamper-proof protections.
+
+**Q: What should I do if my audit trail seems incomplete or I can't find expected entries?**
+
+A: If audit entries appear missing, first check that your date range filter includes when you performed the work. Clear any case number or action type filters that might be hiding entries. Try refreshing by closing and reopening the audit viewer. Ensure case number filters are spelled correctly if used. For slow loading, use shorter date ranges like "Last 7 days" or apply case-specific filters. For export issues, check that your browser allows downloads and try different export formats if one fails.
 
 ***
 

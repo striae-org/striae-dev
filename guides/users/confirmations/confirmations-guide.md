@@ -556,7 +556,7 @@ The UI provides immediate feedback during validation:
 
 - **File Validation**: All file processing in isolated sandbox environment
 - **Access Control**: Role-based permissions and laboratory restrictions
-- **Compliance**: NIST and FBI standards adherence with complete audit trails
+- **Compliance**: OSAC forensic standards alignment¹ with complete audit trails
 
 ## Security Features
 
@@ -592,7 +592,7 @@ The UI provides immediate feedback during validation:
 - **Examiner Credential Logging**: Full authentication details in audit trail
 - **Chain of Custody**: Validation events maintain complete custody records
 - **Digital Signatures**: Cryptographic verification of authenticity and integrity
-- **Regulatory Compliance**: Adherence to NIST and FBI forensic standards
+- **Regulatory Compliance**: Alignment with OSAC forensic science standards¹
 - **Validation Event Logging**: All import/export/confirmation actions recorded with details
 
 ## Best Practices
@@ -653,6 +653,23 @@ The UI provides immediate feedback during validation:
 - **Export History**: Maintain records of all case transfers
 - **Audit Trail**: Use confirmation IDs to track specific confirmations
 - **Version Control**: Track file versions for troubleshooting
+
+---
+
+## References
+
+¹ **OSAC Forensic Science Standards**: The Organization of Scientific Area Committees (OSAC) for Forensic Science, administered by NIST, develops technically sound standards and guidelines for forensic disciplines:
+
+- [NIST OSAC Overview](https://www.nist.gov/adlp/spo/organization-scientific-area-committees-forensic-science) - Organization of Scientific Area Committees for Forensic Science
+- [OSAC Registry](https://www.nist.gov/osac/registry) - Registry of approved forensic science standards  
+- [NIST Firearms and Toolmarks](https://www.nist.gov/firearms-and-toolmarks) - NIST research and standards for firearms examination
+- [OSAC Standards Library](https://www.nist.gov/osac/standards-library) - Complete library of forensic science standards
+
+**Additional Forensic Standards Resources**:
+
+- [NIST Forensic Science Program](https://www.nist.gov/forensic-science) - General forensic science standards and research
+- [ASTM Forensic Sciences Standards & Publications](https://store.astm.org/products-services/standards-and-publications.html) - Industry standards for forensic practices
+- [ISO/IEC 17025](https://www.iso.org/ISO-IEC-17025-testing-and-calibration-laboratories.html) - General requirements for testing and calibration laboratories
 
 ---
 

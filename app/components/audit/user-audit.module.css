@@ -191,6 +191,48 @@
   font-weight: var(--fontWeightBold);
 }
 
+.warning {
+  color: var(--error);
+  font-weight: var(--fontWeightBold);
+}
+
+/* Standalone classes for dynamic assignment */
+.success {
+  border-color: color-mix(in lab, var(--success) 40%, transparent);
+  background: color-mix(in lab, var(--success) 3%, transparent);
+}
+
+.failure {
+  border-color: color-mix(in lab, var(--error) 40%, transparent);
+  background: color-mix(in lab, var(--error) 3%, transparent);
+}
+
+.blocked {
+  border-color: color-mix(in lab, var(--error) 60%, transparent);
+  background: color-mix(in lab, var(--error) 5%, transparent);
+}
+
+.low {
+  background: color-mix(in lab, var(--success) 15%, transparent);
+  color: var(--success);
+}
+
+.medium {
+  background: color-mix(in lab, var(--warning) 15%, transparent);
+  color: var(--warning);
+}
+
+.high {
+  background: color-mix(in lab, var(--error) 15%, transparent);
+  color: var(--error);
+}
+
+.critical {
+  background: color-mix(in lab, var(--error) 25%, transparent);
+  color: var(--error);
+  font-weight: var(--fontWeightBold);
+}
+
 /* User Information Section */
 .userInfoContent {
   display: flex;
@@ -410,7 +452,11 @@
   align-items: center;
 }
 
-.actionIcon, .statusIcon {
+.actionIcon {
+  font-size: 1rem;
+}
+
+.statusIcon {
   font-size: 1rem;
 }
 
@@ -508,6 +554,13 @@
 }
 
 .noEntries {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--textLight);
+  font-style: italic;
+}
+
+.noData {
   text-align: center;
   padding: 32px 16px;
   color: var(--textLight);

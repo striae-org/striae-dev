@@ -94,6 +94,21 @@
   margin-bottom: var(--space2XL);
 }
 
+.section p small {
+  font-size: var(--fontSizeBodyS);
+  color: var(--textLight);
+  opacity: 0.9;
+}
+
+.section a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.section a:hover {
+  color: var(--accent);
+}
+
 @media (max-width: 768px) {
   .logo {
     display: none;

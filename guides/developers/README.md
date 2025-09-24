@@ -23,6 +23,7 @@ New to Striae? Start here:
 
 - **[Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)** - Complete development workflow, commit guidelines, and contribution standards
 - **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security architecture and best practices
+- **[Audit Trail Guide](https://developers.striae.org/striae-dev/guides/audit-trail)** - Comprehensive audit trail system for forensic accountability and compliance
 - **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
 - **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
 

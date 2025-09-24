@@ -26,6 +26,8 @@
      - [Get File Data](#get-file-data)
      - [Save File Data](#save-file-data)
      - [Delete File](#delete-file)
+     - [Store Audit Entry](#store-audit-entry)
+     - [Get User Audit Entries](#get-user-audit-entries)
 7. [Keys Worker API](#keys-worker-api)
    - [Endpoints](#endpoints-4)
      - [Get Environment Key](#get-environment-key)
@@ -53,6 +55,7 @@
       - [CaseImportProps Interface](#caseimportprops-interface)
       - [ImportOptions Interface](#importoptions-interface)
       - [ImportResult Interface](#importresult-interface)
+      - [ConfirmationImportResult Interface](#confirmationimportresult-interface)
       - [ReadOnlyCaseMetadata Interface](#readonlycasemetadata-interface)
       - [CaseImportPreview Interface](#caseimportpreview-interface)
     - [File Management Types](#file-management-types)
@@ -535,6 +538,117 @@ DELETE /{filename}.json
 - `403`: Forbidden
 - `500`: Server error
 
+#### Store Audit Entry
+
+```http
+POST /audit/
+```
+
+**Description**: Create a new audit trail entry for compliance tracking
+
+**Query Parameters**:
+- `userId` (required): User identifier
+
+**Request Body**:
+```json
+{
+  "timestamp": "2025-09-23T14:30:15.123Z",
+  "userId": "string",
+  "userEmail": "string",
+  "action": "AuditAction",
+  "result": "AuditResult", 
+  "details": {
+    "fileName": "string",
+    "fileType": "AuditFileType",
+    "caseNumber": "string",
+    "checksumValid": "boolean",
+    "validationErrors": ["string"],
+    "workflowPhase": "WorkflowPhase",
+    "performanceMetrics": {
+      "processingTimeMs": "number",
+      "fileSizeBytes": "number"
+    },
+    "fileDetails": {
+      "fileId": "string",
+      "originalFileName": "string",
+      "fileSize": "number",
+      "mimeType": "string",
+      "uploadMethod": "string"
+    },
+    "annotationDetails": {
+      "annotationType": "string",
+      "tool": "string",
+      "canvasPosition": {"x": "number", "y": "number"}
+    }
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "entryCount": 15,
+  "filename": "audit-trails/aDzwq3G6IBVRJVCEFijdg7B0fwq2-2025-09-23.json"
+}
+```
+
+**Status Codes**:
+- `200`: Audit entry stored successfully
+- `400`: userId parameter required or invalid request data
+- `403`: Forbidden
+- `500`: Server error
+
+#### Get User Audit Entries
+
+```http
+GET /audit/
+```
+
+**Description**: Retrieve audit trail entries for a specific user
+
+**Query Parameters**:
+- `userId` (required): User identifier
+- `startDate` (optional): Start date filter (YYYY-MM-DD format)
+- `endDate` (optional): End date filter (YYYY-MM-DD format)
+
+**Example**:
+```http
+GET /audit/?userId=aDzwq3G6IBVRJVCEFijdg7B0fwq2&startDate=2025-09-01&endDate=2025-09-30
+```
+
+**Response**:
+```json
+{
+  "entries": [
+    {
+      "timestamp": "2025-09-23T14:30:15.123Z",
+      "userId": "aDzwq3G6IBVRJVCEFijdg7B0fwq2",
+      "userEmail": "user@example.com",
+      "action": "export",
+      "result": "success",
+      "details": {
+        "fileName": "CASE-2025-001-annotations.json",
+        "fileType": "json-data",
+        "caseNumber": "CASE-2025-001",
+        "checksumValid": true,
+        "validationErrors": [],
+        "workflowPhase": "case-export"
+      }
+    }
+  ],
+  "total": 15
+}
+```
+
+**Status Codes**:
+- `200`: Success
+- `400`: userId parameter required
+- `403`: Forbidden
+- `500`: Server error
+
+**Note**: If no date range is specified, returns entries for the current date only. Date range queries read multiple daily files and aggregate results.
+
 ## Keys Worker API
 
 **Base URL**: `{KEYS_WORKER_URL}`
@@ -638,6 +752,137 @@ POST /
 - `500`: Internal Server Error
 
 ## Type Definitions
+
+### Audit Trail Types
+
+#### ValidationAuditEntry Interface
+
+Core audit entry structure for all validation events:
+
+```typescript
+interface ValidationAuditEntry {
+  timestamp: string;           // ISO 8601 timestamp
+  userId: string;             // User identifier  
+  userEmail: string;          // User email for identification
+  action: AuditAction;        // What action was performed
+  result: AuditResult;        // Success/failure/warning/blocked
+  details: AuditDetails;      // Action-specific details
+}
+```
+
+#### AuditAction Type
+
+All supported audit actions:
+
+```typescript
+type AuditAction = 
+  // Case Management Actions
+  | 'case-create' | 'case-rename' | 'case-delete'
+  // Confirmation Workflow Actions  
+  | 'case-export' | 'case-import' | 'confirmation-create' 
+  | 'confirmation-export' | 'confirmation-import'
+  // File Operations
+  | 'file-upload' | 'file-delete' | 'file-access'
+  // Annotation Operations
+  | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
+  // User & Session Management
+  | 'user-login' | 'user-logout' | 'user-profile-update' 
+  | 'user-password-reset' | 'user-account-delete'
+  // Document Generation
+  | 'pdf-generate'
+  // Security & Monitoring
+  | 'security-violation'
+  // Legacy actions (for backward compatibility)
+  | 'import' | 'export' | 'confirm' | 'validate';
+```
+
+#### AuditResult Type
+
+Result types for audit operations:
+
+```typescript
+type AuditResult = 'success' | 'failure' | 'warning' | 'blocked' | 'pending';
+```
+
+#### AuditDetails Interface
+
+Detailed information for each audit entry:
+
+```typescript
+interface AuditDetails {
+  // Core identification
+  fileName?: string;
+  fileType?: AuditFileType;
+  caseNumber?: string;
+  confirmationId?: string;
+  
+  // Validation & Security
+  checksumValid?: boolean;
+  validationErrors: string[];
+  securityChecks?: SecurityCheckResults;
+  
+  // Context & Workflow
+  originalExaminerUid?: string;
+  reviewingExaminerUid?: string;
+  workflowPhase?: WorkflowPhase;
+  
+  // Performance & Metrics
+  performanceMetrics?: PerformanceMetrics;
+  
+  // Specialized details
+  caseDetails?: CaseAuditDetails;
+  fileDetails?: FileAuditDetails;
+  annotationDetails?: AnnotationAuditDetails;
+  sessionDetails?: SessionAuditDetails;
+  securityDetails?: SecurityAuditDetails;
+  userProfileDetails?: UserProfileAuditDetails;
+}
+```
+
+#### AuditTrail Interface
+
+Complete audit trail for a case or workflow:
+
+```typescript
+interface AuditTrail {
+  caseNumber: string;
+  workflowId: string;           // Unique identifier linking related entries
+  entries: ValidationAuditEntry[];
+  summary: AuditSummary;
+}
+```
+
+#### AuditSummary Interface
+
+Summary of audit trail for reporting and compliance:
+
+```typescript
+interface AuditSummary {
+  totalEvents: number;
+  successfulEvents: number;
+  failedEvents: number;
+  warningEvents: number;
+  workflowPhases: WorkflowPhase[];
+  participatingUsers: string[];     // User IDs
+  startTimestamp: string;
+  endTimestamp: string;
+  complianceStatus: 'compliant' | 'non-compliant' | 'pending';
+  securityIncidents: number;
+}
+```
+
+#### WorkflowPhase Type
+
+Workflow phases for tracking different types of forensic activities:
+
+```typescript
+type WorkflowPhase = 
+  | 'casework'           // Case, notes, image, and pdf related actions
+  | 'case-export'        // Only case exporting
+  | 'case-import'        // Only case importing  
+  | 'confirmation'       // Only confirmation-related activity
+  | 'user-management';   // User login, logout, profile management, account activities
+```
 
 ### Core Annotation Types
 
@@ -902,7 +1147,7 @@ Props interface for the main case import component:
 interface CaseImportProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportComplete: (caseNumber: string, success: boolean) => void;
+  onImportComplete?: (result: ImportResult | ConfirmationImportResult) => void;
 }
 ```
 
@@ -929,6 +1174,21 @@ interface ImportResult {
   isReadOnly: boolean;
   filesImported: number;
   annotationsImported: number;
+  errors?: string[];
+  warnings?: string[];
+}
+```
+
+#### ConfirmationImportResult Interface
+
+Result structure returned from confirmation import operations:
+
+```typescript
+interface ConfirmationImportResult {
+  success: boolean;
+  caseNumber: string;
+  confirmationsImported: number;
+  imagesUpdated: number;
   errors?: string[];
   warnings?: string[];
 }

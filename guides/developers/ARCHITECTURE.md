@@ -27,7 +27,8 @@
      - [1. Cloudflare KV (User Data Store)](#1-cloudflare-kv-user-data-store)
      - [2. Cloudflare R2 (Case and Annotation Data Store)](#2-cloudflare-r2-case-and-annotation-data-store)
      - [3. Cloudflare Images (File Storage)](#3-cloudflare-images-file-storage)
-     - [4. Firebase Authentication (Identity Provider)](#4-firebase-authentication-identity-provider)
+     - [4. Audit Trail System (R2 Storage)](#4-audit-trail-system-r2-storage)
+     - [5. Firebase Authentication (Identity Provider)](#5-firebase-authentication-identity-provider)
 6. [Security Architecture](#security-architecture)
    - [Authentication Flow](#authentication-flow)
    - [Security Measures](#security-measures)
@@ -58,31 +59,54 @@ Striae follows a modern cloud-native architecture built on Cloudflare's edge com
 
 ## High-Level Architecture
 
-```
-  EXTERNAL      🔐 AUTHENTICATION LAYER            
-┌─────────────┐    ┌─────────────────┐    
-│ SendLayer   │    │  Firebase Auth  │    
-│   Email     │    └─────────────────┘    
-│             │            │             
-└─────────────┘     JSON Web Tokens        
-       ▲                   │             
-       │                   ▼  📱 APPLICATION LAYER       
-       │               FRONTEND                   BACKEND
-       │ Turnstile  ┌─────────────┐            ┌─────────────┐
-       └─────────── │ React+Remix │  API Keys  │ Cloudflare  │
-                    │ Cloudflare  │◄──────────►│  Workers    │
-                    │   Pages     │            │             │
-                    └─────────────┘            └─────────────┘
-                                                     ▲
-                                                     │ 🗄️ STORAGE LAYER
-                                    ┌────────────────┼────────────────┐
-                                    │                │                │
-                                    ▼                ▼                ▼
-                            ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-                            │ Cloudflare  │   │ Cloudflare  │   │ Cloudflare  │
-                            │     KV      │   │     R2      │   │   Images    │
-                            │  (User DB)  │   │   (Data)    │   │   (Files)   │
-                            └─────────────┘   └─────────────┘   └─────────────┘
+```mermaid
+graph TB
+    %% External Services (Top Level) - Force positioning with subgraph
+    subgraph "External"
+        Turnstile["🛡️ Turnstile<br/>Bot Protection"]
+        SendLayer["📨 SendLayer<br/>Email Service"]
+    end
+    
+    %% Platform Services
+    subgraph "Platform"
+        %% Authentication Layer
+        Firebase["🔐 Firebase Auth<br/>Identity Provider"]
+        
+        %% Application Layer - Frontend
+        Frontend["📱 React + Remix<br/>Cloudflare Pages<br/>(Frontend)"]
+        
+        %% Application Layer - Backend
+        Backend["⚡ Cloudflare Workers<br/>(Backend)"]
+        
+        %% Storage Layer
+        KV["🗃️ Cloudflare KV<br/>(User Database)"]
+        R2["🗄️ Cloudflare R2<br/>(Case & Audit Data)"]
+        Images["🖼️ Cloudflare Images<br/>(File Storage)"]
+    end
+    
+    %% Authentication Flow
+    Firebase -->|JWT Tokens| Frontend
+    Turnstile -->|CAPTCHA| Frontend
+    Frontend -->|API Key| SendLayer
+    
+    %% Application Communication
+    Frontend <-->|API Keys<br />CORS| Backend
+    
+    %% Storage Connections
+    Backend <--> KV
+    Backend <--> R2
+    Backend <--> Images
+    
+    %% Styling
+    classDef external fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef auth fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef app fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef storage fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    class Turnstile,SendLayer external
+    class Firebase auth
+    class Frontend,Backend app
+    class KV,R2,Images storage
 ```
 
 ## Frontend Architecture
@@ -459,22 +483,6 @@ interface UserData {
   createdAt: string;
   updatedAt?: string;
 }
-
-// Case Reference (nested in UserData)
-interface CaseReference {
-  caseNumber: string;
-  createdAt: string;
-}
-
-// Read-Only Case Reference (nested in UserData)
-interface ReadOnlyCaseReference {
-  caseNumber: string;
-  importedAt: string;
-  originalExportDate: string;
-  originalExportedBy: string;
-  sourceChecksum?: string;
-  isReadOnly: true;
-}
 ```
 
 #### 2. Cloudflare R2 (Case and Annotation Data Store)
@@ -546,7 +554,81 @@ interface BoxAnnotation {
 - Signed URL security
 - Metadata preservation (if enabled)
 
-#### 4. Firebase Authentication (Identity Provider)
+#### 4. Audit Trail System (R2 Storage)
+
+**Purpose**: Comprehensive forensic accountability and compliance tracking
+
+**Storage Location**: Cloudflare R2 bucket (`striae-data`) with audit-specific paths
+
+**Data Structure**:
+
+```typescript
+// Audit Entry (R2 Storage)
+interface ValidationAuditEntry {
+  timestamp: string;           // ISO 8601 timestamp
+  userId: string;             // User identifier
+  userEmail: string;          // User email for identification
+  action: AuditAction;        // What action was performed
+  result: AuditResult;        // Success/failure/warning/blocked
+  details: AuditDetails;      // Action-specific details
+}
+
+// Audit Trail (Complete workflow tracking)
+interface AuditTrail {
+  caseNumber: string;
+  workflowId: string;         // Unique identifier linking related entries
+  entries: ValidationAuditEntry[];
+  summary: AuditSummary;
+}
+
+// Audit Summary (Compliance reporting)
+interface AuditSummary {
+  totalEvents: number;
+  successfulEvents: number;
+  failedEvents: number;
+  warningEvents: number;
+  workflowPhases: WorkflowPhase[];
+  participatingUsers: string[];
+  startTimestamp: string;
+  endTimestamp: string;
+  complianceStatus: 'compliant' | 'non-compliant' | 'pending';
+  securityIncidents: number;
+}
+```
+
+**Storage Organization**:
+
+```
+striae-data/
+└── audit-trails/
+    └── {userId}-{YYYY-MM-DD}.json    # Daily audit entries per user
+```
+
+**File Structure**: Each file contains a JSON array of `ValidationAuditEntry` objects:
+
+```json
+[
+  {
+    "timestamp": "2025-09-23T10:30:00.000Z",
+    "userId": "aDzwq3G6IBVRJVCEFijdg7B0fwq2",
+    "userEmail": "user@example.com",
+    "action": "export",
+    "result": "success",
+    "details": { ... }
+  }
+]
+```
+
+**Key Features**:
+
+- **Daily File Organization**: Separate audit files per user per day for efficient storage and retrieval
+- **Immutable Entries**: Audit entries cannot be modified once created
+- **Forensic Chain of Custody**: Complete traceability for legal compliance  
+- **Export Capabilities**: CSV and JSON format generation via audit export service
+- **Date Range Queries**: Support for retrieving entries across multiple days
+- **Append-Only Storage**: New entries appended to existing daily files
+
+#### 5. Firebase Authentication (Identity Provider)
 
 **Purpose**: User authentication and identity management
 
@@ -579,7 +661,7 @@ interface BoxAnnotation {
 - All data transmission over HTTPS/TLS
 - Signed URLs for image access
 - No plaintext storage of sensitive data
-- AES-256 encryption for stored data
+- AES-256 encryption for stored data in R2 and KV storage¹
 
 #### 3. Access Controls
 
@@ -677,3 +759,12 @@ const corsHeaders = {
 
 - Role-based access control and operations
 - Agency-based report formatting
+
+---
+
+## References
+
+¹ Cloudflare uses AES-256 encryption with GCM (Galois/Counter Mode) for data at rest:
+
+- [Cloudflare R2 Data Security](https://developers.cloudflare.com/r2/reference/data-security/)
+- [Cloudflare KV Data Security](https://developers.cloudflare.com/kv/reference/data-security/)

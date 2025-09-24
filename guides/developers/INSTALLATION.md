@@ -466,6 +466,7 @@ Expected response should include:
 - [ ] HTTPS is enforced
 - [ ] All custom domains are configured
 - [ ] Worker authentication tokens are unique and secure
+- [ ] Data encryption is enabled (AES-256 automatic on Cloudflare R2 & KV)¹
 
 ---
 
@@ -576,3 +577,12 @@ wrangler pages deployment list
 # Test local development
 npm run dev
 ```
+
+---
+
+## References
+
+¹ Cloudflare uses AES-256 encryption with GCM (Galois/Counter Mode) for data at rest:
+
+- [Cloudflare R2 Data Security](https://developers.cloudflare.com/r2/reference/data-security/)
+- [Cloudflare KV Data Security](https://developers.cloudflare.com/kv/reference/data-security/)

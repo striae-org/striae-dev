@@ -68,6 +68,7 @@ striae/
 - **Cloud-native architecture** for global accessibility and scalability
 - **ZIP export functionality** for complete case packaging with images and data files
 - **Read-only case protection** for secure peer review and collaboration workflows
+- **Comprehensive audit trail system** for forensic accountability and compliance tracking
 
 ## Development Philosophy
 
