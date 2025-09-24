@@ -112,7 +112,7 @@ export async function storeCaseDataInR2(
     };
     
     // Store in R2
-    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    const response = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export async function listReadOnlyCases(user: User): Promise<ReadOnlyCaseMetadat
   try {
     const apiKey = await getUserApiKey();
     
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
     const apiKey = await getUserApiKey();
     
     // Get current user data
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
     }
     
     // Update user data
-    const updateResponse = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const updateResponse = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
     const dataApiKey = await getDataApiKey();
     
     // Get case data first to get file IDs for deletion
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       headers: { 'X-Custom-Auth-Key': dataApiKey }
     });
 
@@ -242,7 +242,7 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
       }
 
       // Delete case file using data worker
-      await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
+      await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(caseNumber)}/data.json`, {
         method: 'DELETE',
         headers: { 'X-Custom-Auth-Key': dataApiKey }
       });

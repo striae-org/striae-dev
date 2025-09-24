@@ -33,7 +33,7 @@ export interface CaseMetadata {
 export const getUserData = async (user: User): Promise<UserData | null> => {
   try {
     const apiKey = await getUserApiKey();
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'GET',
       headers: {
         'X-Custom-Auth-Key': apiKey
@@ -122,7 +122,7 @@ export const createUser = async (
     };
 
     const apiKey = await getUserApiKey();
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -283,7 +283,7 @@ export const updateUserData = async (user: User, updates: Partial<UserData>): Pr
 
     // Perform the update with API key management
     const apiKey = await getUserApiKey();
-    const response = await fetch(`${USER_WORKER_URL}/${user.uid}`, {
+    const response = await fetch(`${USER_WORKER_URL}/${encodeURIComponent(user.uid)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

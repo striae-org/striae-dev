@@ -71,7 +71,7 @@ export async function importConfirmationData(
 
     // Get case data to find image IDs
     const apiKey = await getDataApiKey();
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/data.json`, {
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(result.caseNumber)}/data.json`, {
       method: 'GET',
       headers: {
         'X-Custom-Auth-Key': apiKey
@@ -116,7 +116,7 @@ export async function importConfirmationData(
       const displayFilename = currentFile?.originalFilename || currentImageId;
 
       // Get current annotation data for this image
-      const annotationResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
+      const annotationResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(result.caseNumber)}/${encodeURIComponent(currentImageId)}/data.json`, {
         method: 'GET',
         headers: {
           'X-Custom-Auth-Key': apiKey
@@ -173,7 +173,7 @@ export async function importConfirmationData(
       };
 
       // Save updated annotation data
-      const saveResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${result.caseNumber}/${currentImageId}/data.json`, {
+      const saveResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(user.uid)}/${encodeURIComponent(result.caseNumber)}/${encodeURIComponent(currentImageId)}/data.json`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

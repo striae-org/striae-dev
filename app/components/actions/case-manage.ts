@@ -72,8 +72,9 @@ export const validateCaseNumber = (caseNumber: string): boolean => {
 
 export const checkExistingCase = async (user: User, caseNumber: string): Promise<CaseData | null> => {
   try {
-    // Use centralized function with built-in validation
-    const caseData = await getCaseData(user, caseNumber);
+    // Use centralized function with access validation disabled
+    // This prevents timing issues where case exists in storage but not yet in user's access list
+    const caseData = await getCaseData(user, caseNumber, { validateAccess: false });
     
     if (!caseData) {
       return null;

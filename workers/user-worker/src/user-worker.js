@@ -1,13 +1,13 @@
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
+  'Access-Control-Allow-Origin': 'https://www.striae.org',
   'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
 // Worker URLs - configure these for deployment
-const DATA_WORKER_URL = 'DATA_WORKER_DOMAIN';
-const IMAGE_WORKER_URL = 'IMAGES_WORKER_DOMAIN';
+const DATA_WORKER_URL = 'https://origin2.striae.org';
+const IMAGE_WORKER_URL = 'https://origin3.striae.org';
 
 async function authenticate(request, env) {
   const authKey = request.headers.get('X-Custom-Auth-Key');
@@ -228,7 +228,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
 
   try {
     // Get case data from data worker
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/data.json`, {
+    const caseResponse = await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(userUid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       headers: { 'X-Custom-Auth-Key': dataApiKey }
     });
 
@@ -243,7 +243,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
       for (const file of caseData.files) {
         try {
           // Delete image file - correct endpoint
-          await fetch(`${IMAGE_WORKER_URL}/${file.id}`, {
+          await fetch(`${IMAGE_WORKER_URL}/${encodeURIComponent(file.id)}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${imageApiKey}`
@@ -251,7 +251,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
           });
           
           // Delete notes file if exists
-          await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/${file.id}/data.json`, {
+          await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(userUid)}/${encodeURIComponent(caseNumber)}/${encodeURIComponent(file.id)}/data.json`, {
             method: 'DELETE',
             headers: { 'X-Custom-Auth-Key': dataApiKey }
           });
@@ -262,7 +262,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
     }
 
     // Delete the case data file
-    await fetch(`${DATA_WORKER_URL}/${userUid}/${caseNumber}/data.json`, {
+    await fetch(`${DATA_WORKER_URL}/${encodeURIComponent(userUid)}/${encodeURIComponent(caseNumber)}/data.json`, {
       method: 'DELETE',
       headers: { 'X-Custom-Auth-Key': dataApiKey }
     });
