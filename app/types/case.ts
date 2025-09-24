@@ -11,6 +11,10 @@ export interface CaseData {
   files: FileData[];
 }
 
+export interface ReadOnlyCaseData extends CaseData {
+  isReadOnly?: boolean;
+}
+
 export interface CasesToDelete {
   casesToDelete: string[];
 }

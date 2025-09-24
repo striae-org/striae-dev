@@ -12,6 +12,7 @@ import {
 import { 
   CaseExportData, 
   UserData, 
+  ExtendedUserData,
   FileData,
   CaseData,
   ReadOnlyCaseMetadata
@@ -150,7 +151,7 @@ export async function listReadOnlyCases(user: User): Promise<ReadOnlyCaseMetadat
       return [];
     }
 
-    const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
+    const userData: ExtendedUserData = await response.json();
     
     return userData.readOnlyCases || [];
     
@@ -180,7 +181,7 @@ export async function removeReadOnlyCase(user: User, caseNumber: string): Promis
       throw new Error(`Failed to fetch user data: ${response.status}`);
     }
 
-    const userData: UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] } = await response.json();
+    const userData: ExtendedUserData = await response.json();
     
     if (!userData.readOnlyCases) {
       return false; // Nothing to remove

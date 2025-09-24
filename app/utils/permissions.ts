@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { UserData, UserLimits, ReadOnlyCaseMetadata } from '~/types';
+import { UserData, ExtendedUserData, UserLimits, ReadOnlyCaseMetadata } from '~/types';
 import paths from '~/config/config.json';
 import { getUserApiKey } from './auth';
 
@@ -328,7 +328,7 @@ export const getUserCases = async (user: User): Promise<CaseMetadata[]> => {
  */
 export const getUserReadOnlyCases = async (user: User): Promise<ReadOnlyCaseMetadata[]> => {
   try {
-    const userData = await getUserData(user) as UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] };
+    const userData = await getUserData(user) as ExtendedUserData;
     if (!userData || !userData.readOnlyCases) {
       return [];
     }
@@ -382,7 +382,7 @@ export const canAccessCase = async (user: User, caseNumber: string): Promise<Per
     }
 
     // Check read-only cases
-    const extendedUserData = userData as UserData & { readOnlyCases?: ReadOnlyCaseMetadata[] };
+    const extendedUserData = userData as ExtendedUserData;
     if (extendedUserData.readOnlyCases && extendedUserData.readOnlyCases.some(c => c.caseNumber === caseNumber)) {
       return { allowed: true };
     }

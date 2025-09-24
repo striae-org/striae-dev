@@ -443,6 +443,12 @@ export const duplicateCaseData = async (
   toCaseNumber: string
 ): Promise<void> => {
   try {
+    // Check if user has permission to create/modify the destination case
+    const accessResult = await canModifyCase(user, toCaseNumber);
+    if (!accessResult.allowed) {
+      throw new Error(`User does not have permission to create or modify case ${toCaseNumber}: ${accessResult.reason || 'Access denied'}`);
+    }
+
     // Get source case data
     const sourceCaseData = await getCaseData(user, fromCaseNumber);
     if (!sourceCaseData) {
@@ -456,8 +462,8 @@ export const duplicateCaseData = async (
       updatedAt: new Date().toISOString()
     };
 
-    // Save to new location
-    await updateCaseData(user, toCaseNumber, newCaseData, { validateAccess: false });
+    // Save to new location with proper access validation
+    await updateCaseData(user, toCaseNumber, newCaseData);
 
     // Copy file annotations if they exist
     if (sourceCaseData.files && sourceCaseData.files.length > 0) {

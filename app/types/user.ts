@@ -1,5 +1,7 @@
 // User-related types and interfaces
 
+import { ReadOnlyCaseMetadata } from './import';
+
 export interface UserData {
   uid: string;
   email: string | null;
@@ -21,6 +23,10 @@ export interface UserData {
   }>;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface ExtendedUserData extends UserData {
+  readOnlyCases?: ReadOnlyCaseMetadata[];
 }
 
 export interface UserLimits {

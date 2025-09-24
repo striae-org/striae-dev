@@ -14,10 +14,17 @@ import {
   deleteCaseData,
   duplicateCaseData
 } from '~/utils/data-operations';
-import { CaseData } from '~/types';
+import { CaseData, ReadOnlyCaseData } from '~/types';
 import { auditService } from '~/services/audit.service';
 
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
+
+/**
+ * Type guard to check if case data has isReadOnly property
+ */
+const isReadOnlyCaseData = (caseData: CaseData): caseData is ReadOnlyCaseData => {
+  return 'isReadOnly' in caseData && typeof (caseData as ReadOnlyCaseData).isReadOnly === 'boolean';
+};
 const MAX_CASE_NUMBER_LENGTH = 25;
 
 export const listCases = async (user: User): Promise<string[]> => {
@@ -98,8 +105,8 @@ export const checkCaseIsReadOnly = async (user: User, caseNumber: string): Promi
       return false;
     }
 
-    // Cast to check for isReadOnly property
-    return !!(caseData as any).isReadOnly;
+    // Use type guard to check for isReadOnly property safely
+    return isReadOnlyCaseData(caseData) ? !!caseData.isReadOnly : false;
     
   } catch (error) {
     console.error('Error checking if case is read-only:', error);
@@ -135,7 +142,7 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
     };
 
     // Create case file using centralized function
-    await updateCaseData(user, caseNumber, newCase, { validateAccess: false });
+    await updateCaseData(user, caseNumber, newCase);
 
     // Add case to user data using centralized function
     await addUserCase(user, caseMetadata);
