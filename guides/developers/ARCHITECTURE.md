@@ -22,6 +22,7 @@
    - [4. Data Worker (`workers/data-worker/`)](#4-data-worker-workersdata-worker)
    - [5. Keys Worker (`workers/keys-worker/`)](#5-keys-worker-workerskeys-worker)
    - [6. Turnstile Worker (`workers/turnstile-worker/`)](#6-turnstile-worker-workersturnstile-worker)
+   - [7. Audit Worker (`workers/audit-worker/`)](#7-audit-worker-workersaudit-worker)
 5. [Data Architecture](#data-architecture)
    - [Storage Systems](#storage-systems)
      - [1. Cloudflare KV (User Data Store)](#1-cloudflare-kv-user-data-store)
@@ -300,7 +301,7 @@ graph TB
 
 ### Worker Services Overview
 
-The backend consists of six specialized Cloudflare Workers, each handling specific functionality:
+The backend consists of seven specialized Cloudflare Workers, each handling specific functionality:
 
 #### 1. User Worker (`workers/user-worker/`)
 
@@ -446,6 +447,40 @@ The backend consists of six specialized Cloudflare Workers, each handling specif
 - Token validation with Cloudflare Turnstile service
 - IP address logging for verification
 - JSON response with verification results
+
+#### 7. Audit Worker (`workers/audit-worker/`)
+
+**Purpose**: Forensic audit trail management and compliance logging
+
+**Responsibilities**:
+
+- Comprehensive audit event logging for all system activities
+- Forensic data integrity and accountability tracking
+- User action logging with detailed context and metadata
+- Compliance audit trail generation and management
+- Security incident logging and forensic analysis support
+
+**Storage**: Cloudflare R2 (STRIAE_AUDIT bucket)
+
+**API Endpoints**:
+
+- `POST /audit/?userId={userUid}` - Create new audit log entry for specific user
+- `GET /audit/?userId={userUid}` - Retrieve today's audit logs for specific user
+- `GET /audit/?userId={userUid}&startDate={YYYY-MM-DD}&endDate={YYYY-MM-DD}` - Retrieve audit logs for specific user within date range
+
+**Key Features**:
+
+- Comprehensive event tracking with structured metadata
+- User context preservation for forensic analysis
+- Image file tracking with original IDs for chain of custody
+- Security violation detection and logging
+- Multi-factor authentication event logging
+- Case creation, modification, and deletion audit trails
+- Annotation edit tracking with before/after states
+- Confirmation activity, PDF generation, import, and export activity logging
+- R2 bucket storage for persistent audit trails
+- JSON-based audit event structure with timestamps
+- Compliance-ready audit data format
 
 ## Data Architecture
 

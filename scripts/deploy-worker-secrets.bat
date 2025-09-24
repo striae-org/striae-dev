@@ -34,7 +34,7 @@ echo [94m🔐 Deploying secrets to workers...[0m
 REM Check if workers are configured
 echo [93m🔍 Checking worker configurations...[0m
 set workers_configured=0
-set total_workers=6
+set total_workers=7
 
 for /d %%d in (workers\*) do (
     if exist "%%d\wrangler.jsonc" set /a workers_configured+=1
@@ -146,6 +146,30 @@ if exist "workers\data-worker\wrangler.jsonc" (
     echo [93m⚠️  Skipping Data Worker (not configured)[0m
 )
 
+REM Audit Worker
+echo.
+echo [94m🔧 Setting secrets for Audit Worker...[0m
+if exist "workers\audit-worker\wrangler.jsonc" (
+    cd workers\audit-worker
+    
+    REM Get worker name from config
+    for /f "tokens=2 delims=:" %%a in ('findstr /r "\"name\"" wrangler.jsonc') do (
+        set "worker_name=%%a"
+        set "worker_name=!worker_name: =!"
+        set "worker_name=!worker_name:"=!"
+        set "worker_name=!worker_name:,=!"
+    )
+    
+    echo [93m  Using worker name: !worker_name![0m
+    echo [93m  Setting R2_KEY_SECRET...[0m
+    echo !R2_KEY_SECRET! | wrangler secret put R2_KEY_SECRET --name "!worker_name!"
+    
+    echo [92m✅ Audit Worker secrets configured[0m
+    cd ..\..
+) else (
+    echo [93m⚠️  Skipping Audit Worker (not configured)[0m
+)
+
 REM Images Worker
 echo.
 echo [94m🔧 Setting secrets for Images Worker...[0m
@@ -217,6 +241,7 @@ echo [93m⚠️  WORKER CONFIGURATION REMINDERS:[0m
 echo    - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory
 echo    - Configure KV namespace ID in workers\user-worker\wrangler.jsonc
 echo    - Configure R2 bucket name in workers\data-worker\wrangler.jsonc
+echo    - Configure R2 bucket name in workers\audit-worker\wrangler.jsonc
 echo    - Update ACCOUNT_ID and custom domains in all worker configurations
 
 echo.

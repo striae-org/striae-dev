@@ -6,7 +6,7 @@
 # This script deploys the entire Striae application:
 # 1. Configuration setup (copy configs, replace placeholders)
 # 2. Worker dependencies installation
-# 3. Workers (all 6 workers)
+# 3. Workers (all 7 workers)
 # 4. Worker secrets/environment variables
 # 5. Pages (frontend)
 # 6. Pages secrets/environment variables
@@ -52,7 +52,7 @@ echo ""
 # Step 3: Deploy Workers
 echo -e "${PURPLE}Step 3/6: Deploying Workers${NC}"
 echo "----------------------------"
-echo -e "${YELLOW}🔧 Deploying all 6 Cloudflare Workers...${NC}"
+echo -e "${YELLOW}🔧 Deploying all 7 Cloudflare Workers...${NC}"
 if ! npm run deploy-workers; then
     echo -e "${RED}❌ Worker deployment failed!${NC}"
     exit 1
@@ -100,7 +100,7 @@ echo "=========================================="
 echo ""
 echo -e "${BLUE}Deployed Components:${NC}"
 echo "  ✅ Worker dependencies (npm install)"
-echo "  ✅ 6 Cloudflare Workers"
+echo "  ✅ 7 Cloudflare Workers"
 echo "  ✅ Worker environment variables"
 echo "  ✅ Cloudflare Pages frontend"
 echo "  ✅ Pages environment variables"

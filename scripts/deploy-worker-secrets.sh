@@ -83,7 +83,7 @@ echo -e "\n${BLUE}🔐 Deploying secrets to workers...${NC}"
 # Check if workers are configured
 echo -e "${YELLOW}🔍 Checking worker configurations...${NC}"
 workers_configured=0
-total_workers=6
+total_workers=7
 
 for worker_dir in workers/*/; do
     if [ -f "$worker_dir/wrangler.jsonc" ] || [ -f "$worker_dir/wrangler.toml" ]; then
@@ -99,6 +99,12 @@ if [ $workers_configured -eq 0 ]; then
 elif [ $workers_configured -lt $total_workers ]; then
     echo -e "${YELLOW}⚠️  Warning: Only $workers_configured of $total_workers workers are configured.${NC}"
     echo -e "${YELLOW}   Some workers may not have their secrets deployed.${NC}"
+fi
+
+# Audit Worker
+if ! set_worker_secrets "Audit Worker" "workers/audit-worker" \
+    "R2_KEY_SECRET"; then
+    echo -e "${YELLOW}⚠️  Skipping Audit Worker (not configured)${NC}"
 fi
 
 # Keys Worker
@@ -144,6 +150,7 @@ echo -e "\n${YELLOW}⚠️  WORKER CONFIGURATION REMINDERS:${NC}"
 echo "   - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory"
 echo "   - Configure KV namespace ID in workers/user-worker/wrangler.jsonc"
 echo "   - Configure R2 bucket name in workers/data-worker/wrangler.jsonc"
+echo "   - Configure R2 bucket name in workers/audit-worker/wrangler.jsonc"
 echo "   - Update ACCOUNT_ID and custom domains in all worker configurations"
 
 echo -e "\n${BLUE}📝 For manual deployment, use these commands:${NC}"

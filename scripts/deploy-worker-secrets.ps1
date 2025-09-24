@@ -129,7 +129,7 @@ Write-Host "${Blue}🔐 Deploying secrets to workers...${Reset}"
 # Check if workers are configured
 Write-Host "${Yellow}🔍 Checking worker configurations...${Reset}"
 $workersConfigured = 0
-$totalWorkers = 6
+$totalWorkers = 7
 
 $workerDirs = Get-ChildItem "workers" -Directory
 foreach ($workerDir in $workerDirs) {
@@ -149,6 +149,12 @@ if ($workersConfigured -eq 0) {
 } elseif ($workersConfigured -lt $totalWorkers) {
     Write-Host "${Yellow}⚠️  Warning: Only $workersConfigured of $totalWorkers workers are configured.${Reset}"
     Write-Host "${Yellow}   Some workers may not have their secrets deployed.${Reset}"
+}
+
+# Audit Worker
+$success = Set-WorkerSecrets "Audit Worker" "workers/audit-worker" @("R2_KEY_SECRET")
+if (-not $success) {
+    Write-Host "${Yellow}⚠️  Skipping Audit Worker (not configured)${Reset}"
 }
 
 # Keys Worker
@@ -198,6 +204,7 @@ Write-Host "${Yellow}⚠️  WORKER CONFIGURATION REMINDERS:${Reset}"
 Write-Host "   - Copy wrangler.jsonc.example to wrangler.jsonc in each worker directory"
 Write-Host "   - Configure KV namespace ID in workers/user-worker/wrangler.jsonc"
 Write-Host "   - Configure R2 bucket name in workers/data-worker/wrangler.jsonc"
+Write-Host "   - Configure R2 bucket name in workers/audit-worker/wrangler.jsonc"
 Write-Host "   - Update ACCOUNT_ID and custom domains in all worker configurations"
 
 Write-Host ""

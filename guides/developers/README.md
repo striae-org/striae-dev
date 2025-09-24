@@ -23,7 +23,7 @@ New to Striae? Start here:
 
 - **[Development Protocol Guide](https://developers.striae.org/striae-dev/get-started/development-protocol)** - Complete development workflow, commit guidelines, and contribution standards
 - **[Security Guide](https://developers.striae.org/striae-dev/guides/security)** - Security architecture and best practices
-- **[Audit Trail Guide](https://developers.striae.org/striae-dev/guides/audit-trail)** - Comprehensive audit trail system for forensic accountability and compliance
+- **[Audit Trail Guide](https://developers.striae.org/striae-dev/guides/audit-trail-system)** - Comprehensive audit trail system for forensic accountability and compliance
 - **[Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)** - Comprehensive error handling patterns and best practices
 - **[Environment Setup](https://developers.striae.org/striae-dev/get-started/installation-guide/environment-variables-setup)** - Environment variables and configuration
 
@@ -81,6 +81,9 @@ Complete API documentation for all Cloudflare Workers, including endpoints, auth
 
 ### [Security Guide](https://developers.striae.org/striae-dev/guides/security)
 This guide covers security practices, authentication flows, and security considerations for developers working on the Striae project.
+
+### [Audit Trail Guide](https://developers.striae.org/striae-dev/guides/audit-trail-system)
+Comprehensive documentation covering the forensic audit trail system, including audit event types, data structures, audit worker architecture, compliance features, and integration patterns. Essential for understanding forensic accountability and audit data management in the application.
 
 ### [Error Handling Guide](https://developers.striae.org/striae-dev/guides/error-handling)
 Comprehensive guide covering error handling patterns, centralized error services, UI error display, and best practices for both frontend and backend error management.

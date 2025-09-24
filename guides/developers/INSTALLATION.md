@@ -287,7 +287,7 @@ During the deployment process, the interactive setup will prompt you for values 
 
 **🔑 Worker Names & Domains:**
 
-- All 6 worker names and custom domains
+- All 7 worker names and custom domains
 
 **🗄️ Storage Configuration:**
 
@@ -341,7 +341,7 @@ Before running the configuration script, gather the following information from S
 - **Firebase Project Settings** - Complete configuration from your Firebase project
 - **SendLayer API Key** - For email services (`SL_API_KEY`)
 - **Custom Domain Names** - Your domain and worker subdomains
-- **Worker Names** - Names for all 6 workers in your Cloudflare account
+- **Worker Names** - Names for all 7 workers in your Cloudflare account
 
 **Security Tokens** (generated during setup):
 
@@ -381,7 +381,7 @@ The unified script will execute the complete deployment process in the correct o
 
 1. **Interactive Configuration Setup** - Prompts for all environment variables and configures files
 2. **Install Worker Dependencies** - Install dependencies for all workers  
-3. **Deploy Workers** - All 6 Cloudflare Workers
+3. **Deploy Workers** - All 7 Cloudflare Workers
 4. **Deploy Worker Secrets** - Environment variables for workers
 5. **Deploy Pages** - Frontend application (includes build)
 6. **Deploy Pages Secrets** - Environment variables for Pages

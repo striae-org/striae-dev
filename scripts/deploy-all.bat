@@ -5,7 +5,7 @@ REM ======================================
 REM This script deploys the entire Striae application:
 REM 1. Configuration setup (copy configs, replace placeholders)
 REM 2. Worker dependencies installation
-REM 3. Workers (all 6 workers)
+REM 3. Workers (all 7 workers)
 REM 4. Worker secrets/environment variables
 REM 5. Pages (frontend)
 REM 6. Pages secrets/environment variables
@@ -45,7 +45,7 @@ echo.
 REM Step 3: Deploy Workers
 echo [95mStep 3/6: Deploying Workers[0m
 echo ----------------------------
-echo [93m🔧 Deploying all 6 Cloudflare Workers...[0m
+echo [93m🔧 Deploying all 7 Cloudflare Workers...[0m
 call npm run deploy-workers
 if %ERRORLEVEL% neq 0 (
     echo [91m❌ Worker deployment failed![0m
@@ -98,7 +98,7 @@ echo.
 echo [94mDeployed Components:[0m
 echo   ✅ Configuration setup and placeholder replacement
 echo   ✅ Worker dependencies (npm install)
-echo   ✅ 6 Cloudflare Workers
+echo   ✅ 7 Cloudflare Workers
 echo   ✅ Worker environment variables
 echo   ✅ Cloudflare Pages frontend
 echo   ✅ Pages environment variables
