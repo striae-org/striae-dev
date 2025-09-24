@@ -218,8 +218,8 @@ export class AuditService {
     originalImageFileName?: string
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
-      selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      fileIntegrityValid: true
+      selfConfirmationPrevented: false, // Not applicable for confirmation creation
+      fileIntegrityValid: true // Confirmation creation doesn't involve file integrity validation
     };
 
     await this.logEvent({
@@ -1329,14 +1329,6 @@ export class AuditService {
 
     if (entry.details.securityChecks) {
       const securityIssues = [];
-      
-      // Debug logging to help diagnose security check values
-      console.log('   Security Checks Debug:', {
-        selfConfirmationPrevented: entry.details.securityChecks.selfConfirmationPrevented,
-        fileIntegrityValid: entry.details.securityChecks.fileIntegrityValid,
-        exporterUidValidated: entry.details.securityChecks.exporterUidValidated,
-        result: entry.result
-      });
       
       // selfConfirmationPrevented: false means issue (self-confirmation was NOT prevented, same user importing their own case)
       if (entry.details.securityChecks.selfConfirmationPrevented === false && entry.details.securityChecks.selfConfirmationPrevented !== undefined) {
