@@ -27,7 +27,8 @@
      - [1. Cloudflare KV (User Data Store)](#1-cloudflare-kv-user-data-store)
      - [2. Cloudflare R2 (Case and Annotation Data Store)](#2-cloudflare-r2-case-and-annotation-data-store)
      - [3. Cloudflare Images (File Storage)](#3-cloudflare-images-file-storage)
-     - [4. Firebase Authentication (Identity Provider)](#4-firebase-authentication-identity-provider)
+     - [4. Audit Trail System (R2 Storage)](#4-audit-trail-system-r2-storage)
+     - [5. Firebase Authentication (Identity Provider)](#5-firebase-authentication-identity-provider)
 6. [Security Architecture](#security-architecture)
    - [Authentication Flow](#authentication-flow)
    - [Security Measures](#security-measures)
@@ -546,7 +547,72 @@ interface BoxAnnotation {
 - Signed URL security
 - Metadata preservation (if enabled)
 
-#### 4. Firebase Authentication (Identity Provider)
+#### 4. Audit Trail System (R2 Storage)
+
+**Purpose**: Comprehensive forensic accountability and compliance tracking
+
+**Storage Location**: Cloudflare R2 bucket (`striae-data`) with audit-specific paths
+
+**Data Structure**:
+
+```typescript
+// Audit Entry (R2 Storage)
+interface ValidationAuditEntry {
+  timestamp: string;           // ISO 8601 timestamp
+  userId: string;             // User identifier
+  userEmail: string;          // User email for identification
+  action: AuditAction;        // What action was performed
+  result: AuditResult;        // Success/failure/warning/blocked
+  details: AuditDetails;      // Action-specific details
+}
+
+// Audit Trail (Complete workflow tracking)
+interface AuditTrail {
+  caseNumber: string;
+  workflowId: string;         // Unique identifier linking related entries
+  entries: ValidationAuditEntry[];
+  summary: AuditSummary;
+}
+
+// Audit Summary (Compliance reporting)
+interface AuditSummary {
+  totalEvents: number;
+  successfulEvents: number;
+  failedEvents: number;
+  warningEvents: number;
+  workflowPhases: WorkflowPhase[];
+  participatingUsers: string[];
+  startTimestamp: string;
+  endTimestamp: string;
+  complianceStatus: 'compliant' | 'non-compliant' | 'pending';
+  securityIncidents: number;
+}
+```
+
+**Storage Organization**:
+
+```
+striae-data/
+├── audit/
+│   ├── users/
+│   │   └── {userId}/
+│   │       ├── entries.json          # User's audit entries
+│   │       └── summary.json          # User's audit summary
+│   └── cases/
+│       └── {caseNumber}/
+│           ├── trail.json            # Complete case audit trail
+│           └── compliance.json       # Compliance status
+```
+
+**Key Features**:
+
+- **Immutable Entries**: Audit entries cannot be modified once created
+- **Forensic Chain of Custody**: Complete traceability for legal compliance  
+- **Export Capabilities**: CSV, JSON, and summary report generation
+- **Performance Optimization**: Indexed by user ID and timestamp
+- **Compliance Monitoring**: Real-time compliance status tracking
+
+#### 5. Firebase Authentication (Identity Provider)
 
 **Purpose**: User authentication and identity management
 

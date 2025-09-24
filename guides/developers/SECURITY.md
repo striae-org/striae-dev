@@ -19,24 +19,28 @@
 5. [Data Security](#data-security)
    - [Signed URLs for Images](#signed-urls-for-images)
    - [Environment Variable Security](#environment-variable-security)
-6. [Error Handling](#error-handling)
+6. [Audit Trail System](#audit-trail-system)
+   - [Forensic Accountability](#forensic-accountability)
+   - [Compliance Features](#compliance-features)
+   - [Security Monitoring](#security-monitoring)
+7. [Error Handling](#error-handling)
    - [Secure Error Responses](#secure-error-responses)
    - [HTTP Status Codes](#http-status-codes)
-7. [Security Configuration](#security-configuration)
+8. [Security Configuration](#security-configuration)
    - [Firebase Configuration](#firebase-configuration)
    - [Required Environment Setup](#required-environment-setup)
-8. [Development Security Practices](#development-security-practices)
+9. [Development Security Practices](#development-security-practices)
    - [Local Development](#local-development)
    - [Testing Authentication](#testing-authentication)
    - [Secret Management](#secret-management)
-9. [Security Limitations](#security-limitations)
-   - [Not Currently Implemented](#not-currently-implemented)
-   - [Cloudflare Worker Logging](#cloudflare-worker-logging)
-   - [Known Considerations](#known-considerations)
-10. [Security Checklist for New Features](#security-checklist-for-new-features)
+10. [Security Limitations](#security-limitations)
+    - [Current Limitations](#current-limitations)
+    - [Cloudflare Worker Logging](#cloudflare-worker-logging)
+    - [Known Considerations](#known-considerations)
+11. [Security Checklist for New Features](#security-checklist-for-new-features)
     - [Before Adding New Endpoints](#before-adding-new-endpoints)
     - [Before Deploying](#before-deploying)
-11. [Incident Response](#incident-response)
+12. [Incident Response](#incident-response)
     - [If Security Issue Discovered](#if-security-issue-discovered)
     - [Monitoring](#monitoring)
 
@@ -277,6 +281,109 @@ All sensitive configuration is stored as environment variables across the worker
 - No environment variables are exposed to client-side code
 - Keys Worker acts as a secure distribution point for other worker tokens
 
+## Audit Trail System
+
+### Forensic Accountability
+
+The audit trail system provides comprehensive forensic accountability for all user actions within the application:
+
+**Core Security Features:**
+
+- **Immutable Entries**: Audit entries cannot be modified once created, ensuring forensic integrity
+- **Complete Chain of Custody**: Every user action is tracked with timestamp, user identity, and outcome
+- **Tamper Detection**: Cryptographic integrity verification for audit data
+- **Legal Compliance**: Meets forensic examination standards for evidence handling
+
+**Tracked Actions:**
+
+```typescript
+// All user actions are logged with security context
+enum AuditAction {
+  // Authentication Security
+  USER_LOGIN = 'user_login',
+  USER_LOGOUT = 'user_logout',
+  MFA_ENABLED = 'mfa_enabled',
+  MFA_DISABLED = 'mfa_disabled',
+  PASSWORD_CHANGED = 'password_changed',
+  
+  // Data Access Security
+  CASE_CREATED = 'case_created',
+  CASE_OPENED = 'case_opened',
+  CASE_DELETED = 'case_deleted',
+  IMAGE_UPLOADED = 'image_uploaded',
+  IMAGE_ACCESSED = 'image_accessed',
+  
+  // System Security
+  EXPORT_GENERATED = 'export_generated',
+  UNAUTHORIZED_ACCESS = 'unauthorized_access',
+  SECURITY_VIOLATION = 'security_violation'
+}
+```
+
+### Compliance Features
+
+**Regulatory Compliance:**
+
+- **NIST Guidelines**: Follows NIST cybersecurity framework for audit logging
+- **Forensic Standards**: Complies with digital forensics evidence handling standards
+- **Data Retention**: Configurable retention periods for compliance requirements
+- **Export Capabilities**: Multiple export formats for regulatory reporting
+
+**Compliance Monitoring:**
+
+```typescript
+interface AuditSummary {
+  complianceStatus: 'compliant' | 'non-compliant' | 'pending';
+  securityIncidents: number;
+  unauthorizedAttempts: number;
+  dataAccessEvents: number;
+  systemViolations: SecurityViolation[];
+}
+```
+
+**Automated Compliance Reporting:**
+
+- Daily compliance status assessments
+- Security incident detection and alerting
+- Anomaly detection for suspicious activity patterns
+- Automated export of compliance reports
+
+### Security Monitoring
+
+**Real-time Security Monitoring:**
+
+- **Failed Authentication Tracking**: Multiple failed login attempts trigger security alerts
+- **Unauthorized Access Detection**: Invalid API requests are logged and monitored
+- **Data Access Patterns**: Unusual data access patterns trigger compliance reviews
+- **System Anomalies**: Unexpected system behavior is flagged for investigation
+
+**Security Incident Response:**
+
+```typescript
+interface SecurityIncident {
+  incidentId: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: 'authentication' | 'authorization' | 'data_access' | 'system';
+  timestamp: string;
+  affectedUsers: string[];
+  mitigationStatus: 'open' | 'investigating' | 'resolved';
+}
+```
+
+**Incident Management Features:**
+
+- Automatic incident creation for security violations
+- Severity classification based on threat assessment
+- User notification system for security events
+- Integration with compliance reporting workflow
+
+**Data Protection:**
+
+- Audit data is encrypted at rest in Cloudflare R2
+- User-based data segregation prevents cross-contamination
+- Access control ensures only authorized personnel can view audit trails
+- Automatic backup and redundancy for audit data integrity
+
 ## Error Handling
 
 ### Secure Error Responses
@@ -358,17 +465,16 @@ interface FirebaseConfig {
 
 ## Security Limitations
 
-### Not Currently Implemented
+### Current Limitations
 
 - **Role-Based Permissions**: All authenticated users have same access
 - **Rate Limiting**: No request throttling in workers
-- **Custom Audit Logging**: No application-level audit trail system
 - **API Versioning**: No versioning strategy for breaking changes
 - **Account Lockout**: Relies on Firebase default protections
 
 ### Cloudflare Worker Logging
 
-While custom audit logging is not implemented, Cloudflare provides built-in logging capabilities for Workers:
+In addition to our comprehensive audit trail system, Cloudflare provides built-in logging capabilities for Workers:
 
 **Available Logging Features:**
 
@@ -396,7 +502,7 @@ While custom audit logging is not implemented, Cloudflare provides built-in logg
 
 - No built-in request payload logging for security reasons
 - Console logs are not permanently stored without external log aggregation
-- No user action audit trail beyond HTTP request logs
+- HTTP request logs complement our application-level audit trail system
 - Limited historical log search capabilities
 
 ### Known Considerations

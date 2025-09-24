@@ -44,6 +44,9 @@
      - [User Profile Management](#user-profile-management-appcomponentsusermanage-profiletsx)
      - [Delete Account](#delete-account-appcomponentsuserdelete-accounttsx)
      - [Inactivity Warning](#inactivity-warning-appcomponentsuserinactivity-warningtsx)
+   - [7. Audit Trail Components](#7-audit-trail-components)
+     - [User Audit Viewer](#user-audit-viewer-appcomponentsaudituser-audit-viewertsx)
+     - [Audit Export Service](#audit-export-service-appservicesaudit-exportservicets)
 4. [Component State Management](#component-state-management)
    - [Local State Patterns](#local-state-patterns)
    - [Context Usage](#context-usage)
@@ -1496,6 +1499,197 @@ useEffect(() => {
   // Cleanup
   return cleanup;
 }, [dependencies]);
+```
+
+### 7. Audit Trail Components
+
+#### User Audit Viewer (`app/components/audit/user-audit-viewer.tsx`)
+
+**Purpose**: Comprehensive audit trail viewing and management for forensic accountability
+
+**Features**:
+
+- Real-time audit entry display with automatic refresh
+- Advanced filtering by date range, action type, and result status  
+- Export functionality (CSV, JSON, summary reports)
+- Pagination for large audit datasets
+- User-specific audit trail viewing
+- Compliance status monitoring
+- Security incident tracking
+
+**Type Definition**: Uses `ValidationAuditEntry` from audit types
+
+**Props**:
+
+```typescript
+interface UserAuditViewerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  userId?: string;        // Optional: view specific user's audit trail
+  caseNumber?: string;    // Optional: filter by case number
+  autoRefresh?: boolean;  // Optional: enable auto-refresh
+}
+```
+
+**Key Features**:
+
+**Data Management**:
+- Fetches audit entries from Data Worker API
+- Implements client-side filtering and sorting
+- Handles large datasets with efficient pagination
+- Real-time updates with configurable refresh intervals
+
+**Filtering Capabilities**:
+- Date range filtering (from/to dates)
+- Action type filtering (authentication, case operations, data access, etc.)
+- Result status filtering (success, failure, warning, blocked)
+- User-based filtering for multi-user environments
+- Case-specific filtering for workflow tracking
+
+**Export Functionality**:
+- **CSV Export**: Formatted for spreadsheet analysis
+- **JSON Export**: Complete structured data with metadata
+- **Summary Reports**: Human-readable compliance summaries
+- **Filtered Exports**: Respects current filter settings
+- **Batch Operations**: Export multiple date ranges
+
+**UI Components**:
+- Filter controls with date pickers and dropdowns
+- Export buttons with format selection
+- Pagination controls with configurable page sizes
+- Loading states and error handling
+- Responsive design for various screen sizes
+
+**CSS Classes** (from `user-audit.module.css`):
+
+```css
+.auditViewer          /* Main container */
+.controls             /* Filter and export controls */
+.filterSection        /* Date and type filters */
+.exportSection        /* Export functionality */
+.auditTable          /* Data display table */
+.auditRow            /* Individual audit entries */
+.statusIcon          /* Result status indicators */
+.pagination          /* Navigation controls */
+.loadingState        /* Loading indicators */
+.errorState          /* Error display */
+.noData              /* Empty state display */
+```
+
+**Usage Example**:
+
+```typescript
+import { UserAuditViewer } from '~/components/audit/user-audit-viewer';
+
+// Basic usage - current user's audit trail
+<UserAuditViewer 
+  isOpen={showAudit}
+  onClose={() => setShowAudit(false)}
+  autoRefresh={true}
+/>
+
+// Case-specific audit viewing
+<UserAuditViewer 
+  isOpen={showCaseAudit}
+  onClose={() => setShowCaseAudit(false)}
+  caseNumber="CASE-2024-001"
+/>
+
+// Administrator view - specific user audit
+<UserAuditViewer 
+  isOpen={showUserAudit}
+  onClose={() => setShowUserAudit(false)}
+  userId="user-123"
+  autoRefresh={false}
+/>
+```
+
+#### Audit Export Service (`app/services/audit-export.service.ts`)
+
+**Purpose**: Handles audit data export functionality with multiple format support
+
+**Features**:
+
+- Multiple export formats (CSV, JSON, Summary)
+- Configurable data filtering and formatting
+- Browser-compatible file downloads
+- Batch export operations
+- Custom date range exports
+- Compliance report generation
+
+**Export Methods**:
+
+```typescript
+interface AuditExportService {
+  exportToCsv: (entries: ValidationAuditEntry[], filename?: string) => void;
+  exportToJson: (entries: ValidationAuditEntry[], filename?: string) => void;
+  generateSummaryReport: (entries: ValidationAuditEntry[]) => AuditSummary;
+  exportSummary: (summary: AuditSummary, filename?: string) => void;
+  formatDateRange: (startDate: Date, endDate: Date) => string;
+}
+```
+
+**CSV Export Format**:
+- Headers: Timestamp, User, Action, Result, Details, Case Number
+- ISO 8601 timestamp formatting
+- Escaped special characters for spreadsheet compatibility
+- UTF-8 encoding with BOM for Excel compatibility
+
+**JSON Export Format**:
+- Complete audit entry objects with all metadata
+- Structured hierarchy for programmatic processing
+- Timestamps in ISO 8601 format
+- Includes audit summary metadata
+
+**Summary Report Format**:
+- Executive summary with key metrics
+- Compliance status assessment
+- Security incident reporting
+- User activity breakdown
+- Time-based analysis
+
+**Usage Example**:
+
+```typescript
+import { AuditExportService } from '~/services/audit-export.service';
+
+const exportService = new AuditExportService();
+
+// Export filtered entries to CSV
+const filtered = entries.filter(entry => 
+  entry.action === 'CASE_CREATED' && 
+  entry.result === 'success'
+);
+exportService.exportToCSV(filtered, 'case-creation-audit.csv');
+
+// Generate and export compliance summary
+const summary = exportService.generateSummaryReport(entries);
+// Generate summary report (text format)
+const summary = exportService.generateReportSummary(auditTrail);
+console.log(summary); // Display or use the summary text
+```
+
+**Integration Pattern**:
+
+```typescript
+// Component integration
+const handleExport = async (format: 'csv' | 'json' | 'summary') => {
+  const entries = await fetchAuditEntries(filters);
+  
+  switch (format) {
+    case 'csv':
+      exportService.exportToCSV(entries, 'audit-export.csv');
+      break;
+    case 'json':
+      exportService.exportToJSON(entries, 'audit-export.json');
+      break;
+    case 'summary':
+      // Generate summary report (text format, not file download)
+      const summary = exportService.generateReportSummary(auditTrail);
+      console.log(summary); // Display in UI or process as needed
+      break;
+  }
+};
 ```
 
 ## Accessibility Features

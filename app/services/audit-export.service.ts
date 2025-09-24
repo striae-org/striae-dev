@@ -223,7 +223,7 @@ export class AuditExportService {
   /**
    * Generate filename with timestamp
    */
-  public generateFilename(type: 'case' | 'user', identifier: string, format: 'csv' | 'pdf'): string {
+  public generateFilename(type: 'case' | 'user', identifier: string, format: 'csv' | 'json'): string {
     const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
     const sanitizedId = identifier.replace(/[^a-zA-Z0-9-_]/g, '_');
     return `striae-audit-${type}-${sanitizedId}-${timestamp}.${format}`;

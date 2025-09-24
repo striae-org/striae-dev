@@ -26,6 +26,9 @@
      - [Get File Data](#get-file-data)
      - [Save File Data](#save-file-data)
      - [Delete File](#delete-file)
+     - [Create Audit Entry](#create-audit-entry)
+     - [Get User Audit Entries](#get-user-audit-entries)
+     - [Get Audit Trail Summary](#get-audit-trail-summary)
 7. [Keys Worker API](#keys-worker-api)
    - [Endpoints](#endpoints-4)
      - [Get Environment Key](#get-environment-key)
@@ -535,6 +538,176 @@ DELETE /{filename}.json
 - `403`: Forbidden
 - `500`: Server error
 
+#### Create Audit Entry
+
+```http
+POST /api/audit
+```
+
+**Description**: Create a new audit trail entry for compliance tracking
+
+**Request Body**:
+```json
+{
+  "userId": "string",
+  "userEmail": "string",
+  "action": "AuditAction",
+  "result": "AuditResult",
+  "details": {
+    "fileName": "string",
+    "fileType": "AuditFileType",
+    "caseNumber": "string",
+    "checksumValid": "boolean",
+    "validationErrors": ["string"],
+    "workflowPhase": "WorkflowPhase",
+    "performanceMetrics": {
+      "processingTimeMs": "number",
+      "fileSizeBytes": "number"
+    },
+    "fileDetails": {
+      "fileId": "string",
+      "originalFileName": "string",
+      "fileSize": "number",
+      "mimeType": "string",
+      "uploadMethod": "string"
+    },
+    "annotationDetails": {
+      "annotationType": "string",
+      "tool": "string",
+      "canvasPosition": {"x": "number", "y": "number"}
+    },
+    "sessionDetails": {
+      "sessionId": "string",
+      "userAgent": "string"
+    },
+    "securityDetails": {
+      "incidentType": "string",
+      "severity": "string"
+    }
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "entryId": "string"
+}
+```
+
+**Status Codes**:
+- `200`: Audit entry created successfully
+- `400`: Invalid request data
+- `403`: Forbidden
+- `500`: Server error
+
+#### Get User Audit Entries
+
+```http
+GET /api/audit/{userId}
+```
+
+**Description**: Retrieve audit trail entries for a specific user
+
+**Parameters**:
+- `userId` (path): User identifier
+
+**Query Parameters**:
+- `caseNumber` (optional): Filter by case number
+- `action` (optional): Filter by audit action
+- `result` (optional): Filter by result type
+- `workflowPhase` (optional): Filter by workflow phase
+- `startDate` (optional): Start date filter (ISO 8601)
+- `endDate` (optional): End date filter (ISO 8601)
+- `limit` (optional): Maximum entries to return (default: 100)
+- `offset` (optional): Pagination offset (default: 0)
+
+**Example**:
+```http
+GET /api/audit/user123?caseNumber=CASE-2025-001&limit=50&startDate=2025-01-01T00:00:00Z
+```
+
+**Response**:
+```json
+{
+  "entries": [
+    {
+      "timestamp": "2025-09-23T14:30:15.123Z",
+      "userId": "user123",
+      "userEmail": "user@example.com",
+      "action": "file-upload",
+      "result": "success",
+      "details": {
+        "fileName": "evidence.jpg",
+        "fileType": "image-file",
+        "caseNumber": "CASE-2025-001",
+        "checksumValid": true,
+        "validationErrors": [],
+        "workflowPhase": "casework",
+        "fileDetails": {
+          "fileId": "img_123",
+          "originalFileName": "evidence.jpg",
+          "fileSize": 2048576,
+          "mimeType": "image/jpeg",
+          "uploadMethod": "drag-drop"
+        }
+      }
+    }
+  ],
+  "totalCount": 1,
+  "hasMore": false
+}
+```
+
+**Status Codes**:
+- `200`: Success
+- `400`: Invalid parameters
+- `403`: Forbidden
+- `404`: User not found
+- `500`: Server error
+
+#### Get Audit Trail Summary
+
+```http
+GET /api/audit/{userId}/summary
+```
+
+**Description**: Get audit trail summary statistics for a user
+
+**Parameters**:
+- `userId` (path): User identifier
+
+**Query Parameters**:
+- `caseNumber` (optional): Filter by case number
+- `startDate` (optional): Start date filter (ISO 8601)
+- `endDate` (optional): End date filter (ISO 8601)
+
+**Response**:
+```json
+{
+  "summary": {
+    "totalEvents": 150,
+    "successfulEvents": 145,
+    "failedEvents": 3,
+    "warningEvents": 2,
+    "workflowPhases": ["casework", "confirmation"],
+    "participatingUsers": ["user123"],
+    "startTimestamp": "2025-01-01T00:00:00.000Z",
+    "endTimestamp": "2025-09-23T14:30:15.123Z",
+    "complianceStatus": "compliant",
+    "securityIncidents": 0
+  }
+}
+```
+
+**Status Codes**:
+- `200`: Success
+- `400`: Invalid parameters  
+- `403`: Forbidden
+- `404`: User not found
+- `500`: Server error
+
 ## Keys Worker API
 
 **Base URL**: `{KEYS_WORKER_URL}`
@@ -638,6 +811,137 @@ POST /
 - `500`: Internal Server Error
 
 ## Type Definitions
+
+### Audit Trail Types
+
+#### ValidationAuditEntry Interface
+
+Core audit entry structure for all validation events:
+
+```typescript
+interface ValidationAuditEntry {
+  timestamp: string;           // ISO 8601 timestamp
+  userId: string;             // User identifier  
+  userEmail: string;          // User email for identification
+  action: AuditAction;        // What action was performed
+  result: AuditResult;        // Success/failure/warning/blocked
+  details: AuditDetails;      // Action-specific details
+}
+```
+
+#### AuditAction Type
+
+All supported audit actions:
+
+```typescript
+type AuditAction = 
+  // Case Management Actions
+  | 'case-create' | 'case-rename' | 'case-delete'
+  // Confirmation Workflow Actions  
+  | 'case-export' | 'case-import' | 'confirmation-create' 
+  | 'confirmation-export' | 'confirmation-import'
+  // File Operations
+  | 'file-upload' | 'file-delete' | 'file-access'
+  // Annotation Operations
+  | 'annotation-create' | 'annotation-edit' | 'annotation-delete'
+  // User & Session Management
+  | 'user-login' | 'user-logout' | 'user-profile-update' 
+  | 'user-password-reset' | 'user-account-delete'
+  // Document Generation
+  | 'pdf-generate'
+  // Security & Monitoring
+  | 'security-violation'
+  // Legacy actions (for backward compatibility)
+  | 'import' | 'export' | 'confirm' | 'validate';
+```
+
+#### AuditResult Type
+
+Result types for audit operations:
+
+```typescript
+type AuditResult = 'success' | 'failure' | 'warning' | 'blocked' | 'pending';
+```
+
+#### AuditDetails Interface
+
+Detailed information for each audit entry:
+
+```typescript
+interface AuditDetails {
+  // Core identification
+  fileName?: string;
+  fileType?: AuditFileType;
+  caseNumber?: string;
+  confirmationId?: string;
+  
+  // Validation & Security
+  checksumValid?: boolean;
+  validationErrors: string[];
+  securityChecks?: SecurityCheckResults;
+  
+  // Context & Workflow
+  originalExaminerUid?: string;
+  reviewingExaminerUid?: string;
+  workflowPhase?: WorkflowPhase;
+  
+  // Performance & Metrics
+  performanceMetrics?: PerformanceMetrics;
+  
+  // Specialized details
+  caseDetails?: CaseAuditDetails;
+  fileDetails?: FileAuditDetails;
+  annotationDetails?: AnnotationAuditDetails;
+  sessionDetails?: SessionAuditDetails;
+  securityDetails?: SecurityAuditDetails;
+  userProfileDetails?: UserProfileAuditDetails;
+}
+```
+
+#### AuditTrail Interface
+
+Complete audit trail for a case or workflow:
+
+```typescript
+interface AuditTrail {
+  caseNumber: string;
+  workflowId: string;           // Unique identifier linking related entries
+  entries: ValidationAuditEntry[];
+  summary: AuditSummary;
+}
+```
+
+#### AuditSummary Interface
+
+Summary of audit trail for reporting and compliance:
+
+```typescript
+interface AuditSummary {
+  totalEvents: number;
+  successfulEvents: number;
+  failedEvents: number;
+  warningEvents: number;
+  workflowPhases: WorkflowPhase[];
+  participatingUsers: string[];     // User IDs
+  startTimestamp: string;
+  endTimestamp: string;
+  complianceStatus: 'compliant' | 'non-compliant' | 'pending';
+  securityIncidents: number;
+}
+```
+
+#### WorkflowPhase Type
+
+Workflow phases for tracking different types of forensic activities:
+
+```typescript
+type WorkflowPhase = 
+  | 'casework'           // Case, notes, image, and pdf related actions
+  | 'case-export'        // Only case exporting
+  | 'case-import'        // Only case importing  
+  | 'confirmation'       // Only confirmation-related activity
+  | 'user-management';   // User login, logout, profile management, account activities
+```
 
 ### Core Annotation Types
 
