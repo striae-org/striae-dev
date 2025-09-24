@@ -138,6 +138,9 @@ export const CaseImport = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Clear any existing messages when selecting a new file
+    clearMessages();
+
     if (!isValidImportFile(file)) {
       setError('Only ZIP files (case imports) or JSON files (confirmation imports) are allowed. Please select a valid file.');
       clearImportData();
@@ -157,7 +160,7 @@ export const CaseImport = ({
     } else if (importType === 'confirmation') {
       await loadConfirmationPreview(file);
     }
-  }, [clearImportData, setError, updateImportState, clearPreviews, loadCasePreview, loadConfirmationPreview]);
+  }, [clearMessages, clearImportData, setError, updateImportState, clearPreviews, loadCasePreview, loadConfirmationPreview]);
 
   // Handle import action
   const handleImport = useCallback(() => {
