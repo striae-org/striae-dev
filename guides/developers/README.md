@@ -4,6 +4,8 @@
 
 This documentation provides comprehensive guidance for developers working on Striae, a cloud-native forensic annotation application for firearms examination.
 
+***Important Note: The Striae project is currently in active development. Some documentation may be incomplete or subject to change. Please refer to the [GitHub repository](https://github.com/striae-org/striae) for the latest updates, release notes, and actual codebase.***
+
 ## Quick Start
 
 New to Striae? Start here:
