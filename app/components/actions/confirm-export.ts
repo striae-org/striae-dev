@@ -1,12 +1,9 @@
 import { User } from 'firebase/auth';
-import paths from '~/config/config.json';
-import { getDataApiKey } from '~/utils/auth';
 import { calculateCRC32Secure } from '~/utils/CRC32';
 import { getUserData } from '~/utils/permissions';
+import { getCaseData, updateCaseData } from '~/utils/data-operations';
 import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
 import { auditService } from '~/services/audit.service';
-
-const DATA_WORKER_URL = paths.data_worker_url;
 
 /**
  * Store a confirmation for a specific image, linked to the original image ID
@@ -24,21 +21,11 @@ export async function storeConfirmation(
     // Start workflow for confirmation creation
     auditService.startWorkflow(caseNumber);
     
-    const apiKey = await getDataApiKey();
-    
-    // First, get the current case data
-    const caseResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'GET',
-      headers: {
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!caseResponse.ok) {
-      throw new Error(`Failed to fetch case data: ${caseResponse.status}`);
+    // Get the current case data using centralized function
+    const caseData = await getCaseData(user, caseNumber) as CaseDataWithConfirmations;
+    if (!caseData) {
+      throw new Error('Case not found');
     }
-
-    const caseData: CaseDataWithConfirmations = await caseResponse.json();
 
     // Find the original image ID for the current image
     let originalImageId: string | undefined;
@@ -70,19 +57,8 @@ export async function storeConfirmation(
     // Add the confirmation data directly (already complete from modal)
     caseData.confirmations[originalImageId].push(confirmationData);
 
-    // Store the updated case data
-    const updateResponse = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Custom-Auth-Key': apiKey
-      },
-      body: JSON.stringify(caseData)
-    });
-
-    if (!updateResponse.ok) {
-      throw new Error(`Failed to update case data: ${updateResponse.status}`);
-    }
+    // Store the updated case data using centralized function
+    await updateCaseData(user, caseNumber, caseData);
 
     console.log(`Confirmation stored for original image ${originalImageId}:`, confirmationData);
     
@@ -141,21 +117,12 @@ export async function getCaseConfirmations(
   caseNumber: string
 ): Promise<CaseConfirmations | null> {
   try {
-    const apiKey = await getDataApiKey();
-    
-    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'GET',
-      headers: {
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!response.ok) {
-      console.error(`Failed to fetch case data: ${response.status}`);
+    const caseData = await getCaseData(user, caseNumber) as CaseDataWithConfirmations;
+    if (!caseData) {
+      console.error('Case not found');
       return null;
     }
 
-    const caseData: CaseDataWithConfirmations = await response.json();
     return caseData.confirmations || null;
 
   } catch (error) {
@@ -172,21 +139,11 @@ export async function getCaseDataWithManifest(
   caseNumber: string
 ): Promise<{ confirmations: CaseConfirmations | null; forensicManifestCreatedAt?: string }> {
   try {
-    const apiKey = await getDataApiKey();
-    
-    const response = await fetch(`${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`, {
-      method: 'GET',
-      headers: {
-        'X-Custom-Auth-Key': apiKey
-      }
-    });
-
-    if (!response.ok) {
-      console.error(`Failed to fetch case data: ${response.status}`);
+    const caseData = await getCaseData(user, caseNumber) as CaseDataWithConfirmations & { forensicManifestCreatedAt?: string };
+    if (!caseData) {
+      console.error('Case not found');
       return { confirmations: null };
     }
-
-    const caseData: CaseDataWithConfirmations & { forensicManifestCreatedAt?: string } = await response.json();
     
     return {
       confirmations: caseData.confirmations || null,

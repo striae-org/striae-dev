@@ -1,0 +1,581 @@
+/**
+ * Centralized data worker operations for case and file management
+ * Provides consistent API key management, error handling, and validation
+ * for all interactions with the data worker microservice
+ */
+
+import { User } from 'firebase/auth';
+import { CaseData, AnnotationData } from '~/types';
+import paths from '~/config/config.json';
+import { getDataApiKey } from './auth';
+import { validateUserSession, canAccessCase, canModifyCase } from './permissions';
+
+const DATA_WORKER_URL = paths.data_worker_url;
+
+// ============================================================================
+// INTERFACES AND TYPES
+// ============================================================================
+
+export interface DataAccessResult {
+  allowed: boolean;
+  reason?: string;
+}
+
+export interface FileUpdate {
+  fileId: string;
+  annotations: AnnotationData;
+}
+
+export interface BatchUpdateResult {
+  successful: string[];
+  failed: { fileId: string; error: string }[];
+}
+
+export interface DataOperationOptions {
+  validateAccess?: boolean;
+  includeTimestamp?: boolean;
+  retryCount?: number;
+}
+
+// Higher-order function type for data operations
+export type DataOperation<T> = (user: User, ...args: any[]) => Promise<T>;
+
+// ============================================================================
+// CORE CASE DATA OPERATIONS
+// ============================================================================
+
+/**
+ * Get case data from R2 storage with validation and error handling
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param options - Optional configuration for the operation
+ */
+export const getCaseData = async (
+  user: User, 
+  caseNumber: string, 
+  options: DataOperationOptions = {}
+): Promise<CaseData | null> => {
+  try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Validate case access if requested
+    if (options.validateAccess !== false) {
+      const accessCheck = await canAccessCase(user, caseNumber);
+      if (!accessCheck.allowed) {
+        throw new Error(`Access denied: ${accessCheck.reason}`);
+      }
+    }
+
+    // Validate case number format
+    if (!caseNumber || typeof caseNumber !== 'string' || caseNumber.trim() === '') {
+      throw new Error('Invalid case number provided');
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (response.status === 404) {
+      return null; // Case not found
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch case data: ${response.status} ${response.statusText}`);
+    }
+
+    const caseData = await response.json() as CaseData;
+    return caseData;
+
+  } catch (error) {
+    console.error(`Error fetching case data for ${caseNumber}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Update case data in R2 storage with validation and timestamps
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param caseData - Case data to save
+ * @param options - Optional configuration
+ */
+export const updateCaseData = async (
+  user: User,
+  caseNumber: string,
+  caseData: CaseData,
+  options: DataOperationOptions = {}
+): Promise<void> => {
+  try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Modification denied: ${modifyCheck.reason}`);
+    }
+
+    // Validate inputs
+    if (!caseNumber || typeof caseNumber !== 'string') {
+      throw new Error('Invalid case number provided');
+    }
+
+    if (!caseData || typeof caseData !== 'object') {
+      throw new Error('Invalid case data provided');
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+
+    // Add timestamp if requested (default: true)
+    const dataToSave = options.includeTimestamp !== false ? {
+      ...caseData,
+      updatedAt: new Date().toISOString()
+    } : caseData;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      },
+      body: JSON.stringify(dataToSave)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update case data: ${response.status} ${response.statusText}`);
+    }
+
+  } catch (error) {
+    console.error(`Error updating case data for ${caseNumber}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Delete case data from R2 storage with validation
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ */
+export const deleteCaseData = async (
+  user: User,
+  caseNumber: string
+): Promise<void> => {
+  try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Delete denied: ${modifyCheck.reason}`);
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/data.json`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok && response.status !== 404) {
+      throw new Error(`Failed to delete case data: ${response.status} ${response.statusText}`);
+    }
+
+  } catch (error) {
+    console.error(`Error deleting case data for ${caseNumber}:`, error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// FILE ANNOTATION OPERATIONS
+// ============================================================================
+
+/**
+ * Get file annotation data from R2 storage
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param fileId - File identifier
+ */
+export const getFileAnnotations = async (
+  user: User,
+  caseNumber: string,
+  fileId: string
+): Promise<AnnotationData | null> => {
+  try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Check case access
+    const accessCheck = await canAccessCase(user, caseNumber);
+    if (!accessCheck.allowed) {
+      throw new Error(`Access denied: ${accessCheck.reason}`);
+    }
+
+    // Validate inputs
+    if (!fileId || typeof fileId !== 'string') {
+      throw new Error('Invalid file ID provided');
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (response.status === 404) {
+      return null; // No annotations found
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch file annotations: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json() as AnnotationData;
+
+  } catch (error) {
+    console.error(`Error fetching annotations for ${caseNumber}/${fileId}:`, error);
+    return null; // Return null for graceful handling
+  }
+};
+
+/**
+ * Save file annotation data to R2 storage
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param fileId - File identifier
+ * @param annotationData - Annotation data to save
+ */
+export const saveFileAnnotations = async (
+  user: User,
+  caseNumber: string,
+  fileId: string,
+  annotationData: AnnotationData
+): Promise<void> => {
+  try {
+    // Validate user session
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Modification denied: ${modifyCheck.reason}`);
+    }
+
+    // Validate inputs
+    if (!fileId || typeof fileId !== 'string') {
+      throw new Error('Invalid file ID provided');
+    }
+
+    if (!annotationData || typeof annotationData !== 'object') {
+      throw new Error('Invalid annotation data provided');
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+
+    // Add timestamp to annotation data
+    const dataToSave = {
+      ...annotationData,
+      updatedAt: new Date().toISOString()
+    };
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Custom-Auth-Key': apiKey
+      },
+      body: JSON.stringify(dataToSave)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save file annotations: ${response.status} ${response.statusText}`);
+    }
+
+  } catch (error) {
+    console.error(`Error saving annotations for ${caseNumber}/${fileId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Delete file annotation data from R2 storage
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param fileId - File identifier
+ */
+export const deleteFileAnnotations = async (
+  user: User,
+  caseNumber: string,
+  fileId: string
+): Promise<void> => {
+  try {
+    // Validate user session and permissions
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Delete denied: ${modifyCheck.reason}`);
+    }
+
+    const apiKey = await getDataApiKey();
+    const url = `${DATA_WORKER_URL}/${user.uid}/${caseNumber}/${fileId}/data.json`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'X-Custom-Auth-Key': apiKey
+      }
+    });
+
+    if (!response.ok && response.status !== 404) {
+      throw new Error(`Failed to delete file annotations: ${response.status} ${response.statusText}`);
+    }
+
+  } catch (error) {
+    console.error(`Error deleting annotations for ${caseNumber}/${fileId}:`, error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// BATCH OPERATIONS
+// ============================================================================
+
+/**
+ * Update multiple files with annotation data in a single operation
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param updates - Array of file updates to apply
+ */
+export const batchUpdateFiles = async (
+  user: User,
+  caseNumber: string,
+  updates: FileUpdate[]
+): Promise<BatchUpdateResult> => {
+  const result: BatchUpdateResult = {
+    successful: [],
+    failed: []
+  };
+
+  try {
+    // Validate session and permissions once for the batch
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Session validation failed: ${sessionValidation.reason}`);
+    }
+
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Batch update denied: ${modifyCheck.reason}`);
+    }
+
+    // Process each file update
+    for (const update of updates) {
+      try {
+        await saveFileAnnotations(user, caseNumber, update.fileId, update.annotations);
+        result.successful.push(update.fileId);
+      } catch (error) {
+        result.failed.push({
+          fileId: update.fileId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    return result;
+
+  } catch (error) {
+    // If validation fails, mark all as failed
+    for (const update of updates) {
+      result.failed.push({
+        fileId: update.fileId,
+        error: error instanceof Error ? error.message : 'Batch operation failed'
+      });
+    }
+    return result;
+  }
+};
+
+/**
+ * Duplicate case data from one case to another (for case renaming operations)
+ * @param user - Authenticated user
+ * @param fromCaseNumber - Source case number
+ * @param toCaseNumber - Destination case number
+ */
+export const duplicateCaseData = async (
+  user: User,
+  fromCaseNumber: string,
+  toCaseNumber: string
+): Promise<void> => {
+  try {
+    // Get source case data
+    const sourceCaseData = await getCaseData(user, fromCaseNumber);
+    if (!sourceCaseData) {
+      throw new Error(`Source case ${fromCaseNumber} not found`);
+    }
+
+    // Update case number in the data
+    const newCaseData = {
+      ...sourceCaseData,
+      caseNumber: toCaseNumber,
+      updatedAt: new Date().toISOString()
+    };
+
+    // Save to new location
+    await updateCaseData(user, toCaseNumber, newCaseData, { validateAccess: false });
+
+    // Copy file annotations if they exist
+    if (sourceCaseData.files && sourceCaseData.files.length > 0) {
+      const updates: FileUpdate[] = [];
+      
+      for (const file of sourceCaseData.files) {
+        const annotations = await getFileAnnotations(user, fromCaseNumber, file.id);
+        if (annotations) {
+          updates.push({
+            fileId: file.id,
+            annotations
+          });
+        }
+      }
+
+      if (updates.length > 0) {
+        await batchUpdateFiles(user, toCaseNumber, updates);
+      }
+    }
+
+  } catch (error) {
+    console.error(`Error duplicating case data from ${fromCaseNumber} to ${toCaseNumber}:`, error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// VALIDATION AND UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Validate data access permissions for a user and case
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ */
+export const validateDataAccess = async (
+  user: User,
+  caseNumber: string
+): Promise<DataAccessResult> => {
+  try {
+    // Session validation
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      return { allowed: false, reason: sessionValidation.reason };
+    }
+
+    // Case access validation
+    const accessCheck = await canAccessCase(user, caseNumber);
+    if (!accessCheck.allowed) {
+      return { allowed: false, reason: accessCheck.reason };
+    }
+
+    return { allowed: true };
+
+  } catch (error) {
+    console.error('Error validating data access:', error);
+    return { allowed: false, reason: 'Access validation failed' };
+  }
+};
+
+/**
+ * Higher-order function for consistent data operation patterns
+ * Wraps operations with standard validation and error handling
+ * @param operation - The data operation to wrap
+ */
+export const withDataOperation = <T>(
+  operation: DataOperation<T>
+) => async (user: User, ...args: any[]): Promise<T> => {
+  try {
+    // Standard session validation
+    const sessionValidation = await validateUserSession(user);
+    if (!sessionValidation.valid) {
+      throw new Error(`Operation failed: ${sessionValidation.reason}`);
+    }
+
+    // Execute the operation
+    return await operation(user, ...args);
+
+  } catch (error) {
+    console.error('Data operation failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a case exists in storage
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ */
+export const caseExists = async (
+  user: User,
+  caseNumber: string
+): Promise<boolean> => {
+  try {
+    const caseData = await getCaseData(user, caseNumber, { validateAccess: false });
+    return caseData !== null;
+  } catch (error) {
+    console.error(`Error checking case existence for ${caseNumber}:`, error);
+    return false;
+  }
+};
+
+/**
+ * Check if a file has annotations
+ * @param user - Authenticated user
+ * @param caseNumber - Case identifier
+ * @param fileId - File identifier
+ */
+export const fileHasAnnotations = async (
+  user: User,
+  caseNumber: string,
+  fileId: string
+): Promise<boolean> => {
+  try {
+    const annotations = await getFileAnnotations(user, caseNumber, fileId);
+    return annotations !== null;
+  } catch (error) {
+    console.error(`Error checking annotations for ${caseNumber}/${fileId}:`, error);
+    return false;
+  }
+};
