@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { FileData, AllCasesExportData, CaseExportData, ExportOptions } from '~/types';
 import { getImageUrl } from '../image-manage';
-import { generateForensicManifest } from '~/utils/CRC32';
+import { generateForensicManifestSecure } from '~/utils/CRC32';
 import { ExportFormat, formatDateForFilename, CSV_HEADERS } from './types-constants';
 import { protectExcelWorksheet, addForensicDataWarning } from './metadata-helpers';
 import { generateMetadataRows, generateCSVContent, processFileDataForTabular } from './data-processing';
@@ -335,8 +335,8 @@ export async function downloadCaseAsZip(
         ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : generateCSVContent(exportData, false); // Raw content without warnings
       
-      // Generate comprehensive forensic manifest with individual file checksums
-      const forensicManifest = await generateForensicManifest(contentForChecksum, imageFiles);
+      // Generate comprehensive forensic manifest with individual file checksums using secure CRC32
+      const forensicManifest = await generateForensicManifestSecure(contentForChecksum, imageFiles);
       
       // Add dedicated forensic manifest file for validation
       zip.file('FORENSIC_MANIFEST.json', JSON.stringify(forensicManifest, null, 2));

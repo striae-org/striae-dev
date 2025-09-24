@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
-import { calculateCRC32 } from '~/utils/CRC32';
+import { calculateCRC32Secure } from '~/utils/CRC32';
 import { getUserData } from '~/utils/permissions';
 import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
 import { auditService } from '~/services/audit.service';
@@ -281,8 +281,8 @@ export async function exportConfirmationData(
     // Convert to JSON string for checksum calculation
     const jsonString = JSON.stringify(exportData, null, 2);
     
-    // Calculate CRC32 checksum for data integrity
-    const checksum = calculateCRC32(jsonString);
+    // Calculate CRC32 checksum for data integrity using secure version for forensic data
+    const checksum = calculateCRC32Secure(jsonString);
     
     // Add checksum to final export data
     const finalExportData = {

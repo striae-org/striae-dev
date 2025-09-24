@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { CaseExportData, CaseImportPreview } from '~/types';
 import { validateCaseNumber } from '../case-manage';
-import { validateCaseIntegrity as validateForensicIntegrity } from '~/utils/CRC32';
+import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/utils/CRC32';
 import { validateExporterUid, removeForensicWarning } from './validation';
 
 /**

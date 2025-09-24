@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
 import { CaseExportData } from '~/types';
-import { calculateCRC32 } from '~/utils/CRC32';
+import { calculateCRC32Secure } from '~/utils/CRC32';
 
 const USER_WORKER_URL = paths.user_worker_url;
 
@@ -84,7 +84,7 @@ export function validateConfirmationChecksum(jsonContent: string, expectedChecks
   delete dataWithoutChecksum.metadata.checksum;
   
   const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
-  const actualChecksum = calculateCRC32(contentForChecksum);
+  const actualChecksum = calculateCRC32Secure(contentForChecksum);
   
   return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
 }
