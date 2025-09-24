@@ -416,9 +416,9 @@ const handleImageSelect = (file: FileData) => {
         
         // Download the exported data in the selected format
         if (format === 'json') {
-          downloadCaseAsJSON(exportData);
+          await downloadCaseAsJSON(user, exportData);
         } else {
-          downloadCaseAsCSV(exportData);
+          await downloadCaseAsCSV(user, exportData);
         }
       }
       
@@ -437,9 +437,9 @@ const handleImageSelect = (file: FileData) => {
       
       // Download the exported data in the selected format
       if (format === 'json') {
-        downloadAllCasesAsJSON(exportData);
+        await downloadAllCasesAsJSON(user, exportData);
       } else {
-        await downloadAllCasesAsCSV(exportData);
+        await downloadAllCasesAsCSV(user, exportData);
       }
       
     } catch (error) {

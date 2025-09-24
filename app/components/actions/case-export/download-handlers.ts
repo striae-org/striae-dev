@@ -6,12 +6,18 @@ import { ExportFormat, formatDateForFilename, CSV_HEADERS } from './types-consta
 import { protectExcelWorksheet, addForensicDataWarning } from './metadata-helpers';
 import { generateMetadataRows, generateCSVContent, processFileDataForTabular } from './data-processing';
 import { exportCaseData } from './core-export';
+import { auditService } from '~/services/audit.service';
 
 /**
  * Download all cases data as JSON file
  */
-export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
+export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExportData): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow('all-cases');
+    
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     
@@ -22,8 +28,51 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
     linkElement.setAttribute('download', exportFileName);
     linkElement.click();
     
+    // Log successful export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      exportFileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: dataStr.length,
+        validationStepsCompleted: exportData.cases.length,
+        validationStepsFailed: exportData.cases.filter(c => c.summary?.exportError).length
+      },
+      'json',
+      false // JSON format is not protected
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('Download failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      'striae-all-cases-export.json',
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      },
+      'json',
+      false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error('Failed to download all cases export file');
   }
 }
@@ -31,8 +80,13 @@ export function downloadAllCasesAsJSON(exportData: AllCasesExportData): void {
 /**
  * Download all cases data as Excel file with multiple worksheets
  */
-export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, protectForensicData: boolean = true): Promise<void> {
+export async function downloadAllCasesAsCSV(user: User, exportData: AllCasesExportData, protectForensicData: boolean = true): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow('all-cases');
+    
     // Dynamic import of XLSX to avoid bundle size issues
     const XLSX = await import('xlsx');
     
@@ -210,8 +264,52 @@ export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, prot
     window.URL.revokeObjectURL(url);
     
     const passwordInfo = protectForensicData && exportPassword ? ` (Password: ${exportPassword})` : '';
+    
+    // Log successful export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      exportFileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: blob.size,
+        validationStepsCompleted: exportData.cases.length,
+        validationStepsFailed: exportData.cases.filter(c => c.summary?.exportError).length
+      },
+      'xlsx',
+      protectForensicData
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('Excel export failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      'all-cases',
+      'striae-all-cases-detailed.xlsx',
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      },
+      'xlsx',
+      protectForensicData
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error('Failed to export Excel file');
   }
 }
@@ -219,11 +317,17 @@ export async function downloadAllCasesAsCSV(exportData: AllCasesExportData, prot
 /**
  * Download case data as JSON file with forensic protection options
  */
-export function downloadCaseAsJSON(
+export async function downloadCaseAsJSON(
+  user: User,
   exportData: CaseExportData, 
   options: ExportOptions = { protectForensicData: true }
-): void {
+): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow(exportData.metadata.caseNumber);
+    
     const jsonContent = generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonContent);
     
@@ -240,8 +344,51 @@ export function downloadCaseAsJSON(
     
     linkElement.click();
     
+    // Log successful export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      exportData.metadata.caseNumber,
+      exportFileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: jsonContent.length,
+        validationStepsCompleted: exportData.files?.length || 0,
+        validationStepsFailed: 0
+      },
+      'json',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('JSON export failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      exportData.metadata.caseNumber,
+      `striae-case-${exportData.metadata.caseNumber}-export.json`,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      },
+      'json',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error('Failed to download JSON export file');
   }
 }
@@ -249,11 +396,17 @@ export function downloadCaseAsJSON(
 /**
  * Download case data as comprehensive CSV file with forensic protection options
  */
-export function downloadCaseAsCSV(
+export async function downloadCaseAsCSV(
+  user: User,
   exportData: CaseExportData,
   options: ExportOptions = { protectForensicData: true }
-): void {
+): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow(exportData.metadata.caseNumber);
+    
     const csvContent = generateCSVContent(exportData, options.protectForensicData);
     const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
     
@@ -270,8 +423,51 @@ export function downloadCaseAsCSV(
     
     linkElement.click();
     
+    // Log successful export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      exportData.metadata.caseNumber,
+      exportFileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: csvContent.length,
+        validationStepsCompleted: exportData.files?.length || 0,
+        validationStepsFailed: 0
+      },
+      'csv',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('CSV export failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      exportData.metadata.caseNumber,
+      `striae-case-${exportData.metadata.caseNumber}-detailed.csv`,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      },
+      'csv',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error('Failed to export CSV file');
   }
 }
@@ -286,7 +482,12 @@ export async function downloadCaseAsZip(
   onProgress?: (progress: number) => void,
   options: ExportOptions = { protectForensicData: true }
 ): Promise<void> {
+  const startTime = Date.now();
+  
   try {
+    // Start audit workflow
+    const workflowId = auditService.startWorkflow(caseNumber);
+    
     onProgress?.(10);
     
     // Get case data
@@ -403,6 +604,27 @@ For questions about this export, contact your Striae system administrator.
       URL.revokeObjectURL(url);
       onProgress?.(100);
       
+      // Log successful export audit event (forensic protected case)
+      const endTime = Date.now();
+      await auditService.logCaseExport(
+        user,
+        caseNumber,
+        exportFileName,
+        'success',
+        [],
+        {
+          processingTimeMs: endTime - startTime,
+          fileSizeBytes: zipBlob.size,
+          validationStepsCompleted: exportData.files?.length || 0,
+          validationStepsFailed: 0
+        },
+        'zip',
+        options.protectForensicData || false
+      );
+      
+      // End audit workflow
+      auditService.endWorkflow();
+      
       return; // Exit early as we've handled the forensic case
     }
 
@@ -435,8 +657,51 @@ For questions about this export, contact your Striae system administrator.
     URL.revokeObjectURL(url);
     onProgress?.(100);
     
+    // Log successful export audit event (standard case)
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      caseNumber,
+      exportFileName,
+      'success',
+      [],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: zipBlob.size,
+        validationStepsCompleted: exportData.files?.length || 0,
+        validationStepsFailed: 0
+      },
+      'zip',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
   } catch (error) {
     console.error('ZIP export failed:', error);
+    
+    // Log failed export audit event
+    const endTime = Date.now();
+    await auditService.logCaseExport(
+      user,
+      caseNumber,
+      `striae-case-${caseNumber}-export.zip`,
+      'failure',
+      [error instanceof Error ? error.message : 'Unknown error'],
+      {
+        processingTimeMs: endTime - startTime,
+        fileSizeBytes: 0,
+        validationStepsCompleted: 0,
+        validationStepsFailed: 1
+      },
+      'zip',
+      options.protectForensicData || false
+    );
+    
+    // End audit workflow
+    auditService.endWorkflow();
+    
     throw new Error('Failed to export ZIP file');
   }
 }
