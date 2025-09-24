@@ -460,22 +460,6 @@ interface UserData {
   createdAt: string;
   updatedAt?: string;
 }
-
-// Case Reference (nested in UserData)
-interface CaseReference {
-  caseNumber: string;
-  createdAt: string;
-}
-
-// Read-Only Case Reference (nested in UserData)
-interface ReadOnlyCaseReference {
-  caseNumber: string;
-  importedAt: string;
-  originalExportDate: string;
-  originalExportedBy: string;
-  sourceChecksum?: string;
-  isReadOnly: true;
-}
 ```
 
 #### 2. Cloudflare R2 (Case and Annotation Data Store)
@@ -593,24 +577,33 @@ interface AuditSummary {
 
 ```
 striae-data/
-├── audit/
-│   ├── users/
-│   │   └── {userId}/
-│   │       ├── entries.json          # User's audit entries
-│   │       └── summary.json          # User's audit summary
-│   └── cases/
-│       └── {caseNumber}/
-│           ├── trail.json            # Complete case audit trail
-│           └── compliance.json       # Compliance status
+└── audit-trails/
+    └── {userId}-{YYYY-MM-DD}.json    # Daily audit entries per user
+```
+
+**File Structure**: Each file contains a JSON array of `ValidationAuditEntry` objects:
+
+```json
+[
+  {
+    "timestamp": "2025-09-23T10:30:00.000Z",
+    "userId": "aDzwq3G6IBVRJVCEFijdg7B0fwq2",
+    "userEmail": "user@example.com",
+    "action": "export",
+    "result": "success",
+    "details": { ... }
+  }
+]
 ```
 
 **Key Features**:
 
+- **Daily File Organization**: Separate audit files per user per day for efficient storage and retrieval
 - **Immutable Entries**: Audit entries cannot be modified once created
 - **Forensic Chain of Custody**: Complete traceability for legal compliance  
-- **Export Capabilities**: CSV, JSON, and summary report generation
-- **Performance Optimization**: Indexed by user ID and timestamp
-- **Compliance Monitoring**: Real-time compliance status tracking
+- **Export Capabilities**: CSV and JSON format generation via audit export service
+- **Date Range Queries**: Support for retrieving entries across multiple days
+- **Append-Only Storage**: New entries appended to existing daily files
 
 #### 5. Firebase Authentication (Identity Provider)
 
