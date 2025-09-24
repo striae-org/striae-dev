@@ -194,7 +194,9 @@ export async function importConfirmationData(
             annotationData, // Previous state (without confirmation)
             updatedAnnotationData, // New state (with confirmation)
             result.caseNumber,
-            'confirmation-import'
+            'confirmation-import',
+            currentImageId,
+            displayFilename
           );
         } catch (auditError) {
           console.error('Failed to log confirmation import audit:', auditError);
@@ -210,7 +212,9 @@ export async function importConfirmationData(
             annotationData, // Previous state
             null, // Failed save
             result.caseNumber,
-            'confirmation-import'
+            'confirmation-import',
+            currentImageId,
+            displayFilename
           );
         } catch (auditError) {
           console.error('Failed to log failed confirmation import audit:', auditError);
