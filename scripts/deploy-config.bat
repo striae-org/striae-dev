@@ -26,7 +26,7 @@ if not exist ".env" (
             powershell -Command "(Get-Content '.env') -replace 'your_custom_user_db_auth_token_here', '%USER_DB_AUTH%' | Set-Content '.env'"
             echo [92m✅ USER_DB_AUTH auto-generated[0m
         ) else (
-            echo [93m⚠️  Could not auto-generate USER_DB_AUTH - will prompt later[0m
+            echo [93m⚠️  Could not auto-generate USER_DB_AUTH - please set manually[0m
         )
         
         REM Generate R2_KEY_SECRET  
@@ -35,7 +35,7 @@ if not exist ".env" (
             powershell -Command "(Get-Content '.env') -replace 'your_custom_r2_secret_here', '%R2_KEY_SECRET%' | Set-Content '.env'"
             echo [92m✅ R2_KEY_SECRET auto-generated[0m
         ) else (
-            echo [93m⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later[0m
+            echo [93m⚠️  Could not auto-generate R2_KEY_SECRET - please set manually[0m
         )
         
         REM Generate KEYS_AUTH
@@ -44,10 +44,27 @@ if not exist ".env" (
             powershell -Command "(Get-Content '.env') -replace 'your_custom_keys_auth_token_here', '%KEYS_AUTH%' | Set-Content '.env'"
             echo [92m✅ KEYS_AUTH auto-generated[0m
         ) else (
-            echo [93m⚠️  Could not auto-generate KEYS_AUTH - will prompt later[0m
+            echo [93m⚠️  Could not auto-generate KEYS_AUTH - please set manually[0m
         )
         
-        echo [92m🔐 Authentication secrets auto-generated! Continuing with configuration...[0m
+        echo [94m🔐 Authentication secrets generation complete![0m
+        echo.
+        echo [93m⚠️  Please edit .env file with your other configuration values (Cloudflare Account ID, Firebase config, etc.)[0m
+        echo [94mOpening .env file for editing...[0m
+        
+        REM Try to open in common editors (VS Code preferred)
+        where code >nul 2>&1 && (
+            code ".env"
+        ) || (
+            where notepad >nul 2>&1 && (
+                notepad ".env"
+            ) || (
+                echo [93mPlease manually edit .env with your configuration values[0m
+            )
+        )
+        
+        echo.
+        pause
         echo.
     ) else (
         echo [91m❌ Error: Neither .env nor .env.example file found![0m

@@ -35,7 +35,7 @@ if (-not (Test-Path ".env")) {
             (Get-Content ".env") -replace "your_custom_user_db_auth_token_here", $USER_DB_AUTH | Set-Content ".env"
             Write-Host "${Green}✅ USER_DB_AUTH auto-generated${Reset}"
         } else {
-            Write-Host "${Yellow}⚠️  Could not auto-generate USER_DB_AUTH - will prompt later${Reset}"
+            Write-Host "${Yellow}⚠️  Could not auto-generate USER_DB_AUTH - please set manually${Reset}"
         }
         
         # Generate R2_KEY_SECRET
@@ -49,7 +49,7 @@ if (-not (Test-Path ".env")) {
             (Get-Content ".env") -replace "your_custom_r2_secret_here", $R2_KEY_SECRET | Set-Content ".env"
             Write-Host "${Green}✅ R2_KEY_SECRET auto-generated${Reset}"
         } else {
-            Write-Host "${Yellow}⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later${Reset}"
+            Write-Host "${Yellow}⚠️  Could not auto-generate R2_KEY_SECRET - please set manually${Reset}"
         }
         
         # Generate KEYS_AUTH
@@ -63,10 +63,29 @@ if (-not (Test-Path ".env")) {
             (Get-Content ".env") -replace "your_custom_keys_auth_token_here", $KEYS_AUTH | Set-Content ".env"
             Write-Host "${Green}✅ KEYS_AUTH auto-generated${Reset}"
         } else {
-            Write-Host "${Yellow}⚠️  Could not auto-generate KEYS_AUTH - will prompt later${Reset}"
+            Write-Host "${Yellow}⚠️  Could not auto-generate KEYS_AUTH - please set manually${Reset}"
         }
         
-        Write-Host "${Green}🔐 Authentication secrets auto-generated! Continuing with configuration...${Reset}"
+        Write-Host "${Blue}🔐 Authentication secrets generation complete!${Reset}"
+        Write-Host ""
+        Write-Host "${Yellow}⚠️  Please edit .env file with your other configuration values (Cloudflare Account ID, Firebase config, etc.)${Reset}"
+        Write-Host "${Blue}Opening .env file for editing...${Reset}"
+        
+        # Try to open in common editors (VS Code preferred)
+        try {
+            if (Get-Command "code" -ErrorAction SilentlyContinue) {
+                Start-Process "code" -ArgumentList ".env" -NoNewWindow
+            } elseif (Get-Command "notepad" -ErrorAction SilentlyContinue) {
+                Start-Process "notepad" -ArgumentList ".env" -Wait
+            } else {
+                Write-Host "${Yellow}Please manually edit .env with your configuration values${Reset}"
+            }
+        } catch {
+            Write-Host "${Yellow}Please manually edit .env with your configuration values${Reset}"
+        }
+        
+        Write-Host ""
+        Read-Host "Press Enter after you've updated the .env file with your other configuration values"
         Write-Host ""
     } else {
         Write-Host "${Red}❌ Error: Neither .env nor .env.example file found!${Reset}"
