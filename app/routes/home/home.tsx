@@ -76,7 +76,7 @@ export default function Home() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube-nocookie.com/embed/BPH7-09sUsQ?si=ad3eNJhgjD9i_CPd"
+                src="https://www.youtube-nocookie.com/embed/C95Wl0r3zeM?si=GfEYSQdiJs44uujd"
                 title="YouTube video player"                
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
