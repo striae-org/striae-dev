@@ -665,6 +665,20 @@ echo [94m🔧 Updating configuration files...[0m
 REM Update wrangler configuration files
 echo [93m  Updating wrangler configuration files...[0m
 
+REM Audit Worker
+if exist "workers\audit-worker\wrangler.jsonc" (
+    echo [93m  Updating audit-worker/wrangler.jsonc...[0m
+    powershell -Command "(Get-Content 'workers/audit-worker/wrangler.jsonc') -replace '\"AUDIT_WORKER_NAME\"', '\"%AUDIT_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"AUDIT_WORKER_DOMAIN\"', '\"%AUDIT_WORKER_DOMAIN%\"' -replace '\"BUCKET_NAME\"', '\"%BUCKET_NAME%\"' | Set-Content 'workers/audit-worker/wrangler.jsonc'"
+    echo [92m    ✅ audit-worker configuration updated[0m
+)
+
+REM Update audit-worker source file CORS headers
+if exist "workers\audit-worker\src\audit-worker.js" (
+    echo [93m  Updating audit-worker CORS headers...[0m
+    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.js'"
+    echo [92m    ✅ audit-worker CORS headers updated[0m
+)
+
 REM Data Worker
 if exist "workers\data-worker\wrangler.jsonc" (
     echo [93m  Updating data-worker/wrangler.jsonc...[0m

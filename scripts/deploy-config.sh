@@ -345,6 +345,23 @@ prompt_for_secrets
 update_wrangler_configs() {
     echo -e "\n${BLUE}🔧 Updating wrangler configuration files...${NC}"
     
+    # Audit Worker
+    if [ -f "workers/audit-worker/wrangler.jsonc" ]; then
+        echo -e "${YELLOW}  Updating audit-worker/wrangler.jsonc...${NC}"
+        sed -i "s/\"AUDIT_WORKER_NAME\"/\"$AUDIT_WORKER_NAME\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"ACCOUNT_ID\"/\"$ACCOUNT_ID\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"AUDIT_WORKER_DOMAIN\"/\"$AUDIT_WORKER_DOMAIN\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"BUCKET_NAME\"/\"$BUCKET_NAME\"/g" workers/audit-worker/wrangler.jsonc
+        echo -e "${GREEN}    ✅ audit-worker configuration updated${NC}"
+    fi
+    
+    # Update audit-worker source file CORS headers only
+    if [ -f "workers/audit-worker/src/audit-worker.js" ]; then
+        echo -e "${YELLOW}  Updating audit-worker CORS headers...${NC}"
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/audit-worker/src/audit-worker.js
+        echo -e "${GREEN}    ✅ audit-worker CORS headers updated${NC}"
+    fi
+    
     # Data Worker
     if [ -f "workers/data-worker/wrangler.jsonc" ]; then
         echo -e "${YELLOW}  Updating data-worker/wrangler.jsonc...${NC}"
