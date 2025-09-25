@@ -336,6 +336,54 @@ if exist "wrangler.toml.example" if not exist "wrangler.toml" (
 
 echo [92m✅ Configuration file copying completed[0m
 
+REM Auto-generate authentication secrets
+echo.
+echo [94m🔐 Auto-generating authentication secrets...[0m
+
+REM Generate USER_DB_AUTH if not set or is placeholder
+if "%USER_DB_AUTH%"=="your_custom_user_db_auth_token_here" (
+    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
+    if not "%USER_DB_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace 'your_custom_user_db_auth_token_here', '%USER_DB_AUTH%' -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
+        echo [92m✅ USER_DB_AUTH auto-generated[0m
+    ) else (
+        echo [93m⚠️  Could not auto-generate USER_DB_AUTH - will prompt later[0m
+    )
+)
+
+REM Generate R2_KEY_SECRET if not set or is placeholder  
+if "%R2_KEY_SECRET%"=="your_custom_r2_secret_here" (
+    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
+    if not "%R2_KEY_SECRET%"=="" (
+        powershell -Command "(Get-Content '.env') -replace 'your_custom_r2_secret_here', '%R2_KEY_SECRET%' -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
+        echo [92m✅ R2_KEY_SECRET auto-generated[0m
+    ) else (
+        echo [93m⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later[0m
+    )
+)
+
+REM Generate KEYS_AUTH if not set or is placeholder
+if "%KEYS_AUTH%"=="your_custom_keys_auth_token_here" (
+    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
+    if not "%KEYS_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace 'your_custom_keys_auth_token_here', '%KEYS_AUTH%' -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
+        echo [92m✅ KEYS_AUTH auto-generated[0m
+    ) else (
+        echo [93m⚠️  Could not auto-generate KEYS_AUTH - will prompt later[0m
+    )
+)
+
+REM Reload environment variables from .env
+for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
+    set "line=%%a"
+    if not "!line:~0,1!"=="#" (
+        set "%%a=%%b"
+        REM Remove quotes if present
+        call set "%%a=%%!%%a:"=%%"
+    )
+)
+echo [92m🔐 Authentication secrets generation complete![0m
+
 REM Function to prompt for environment variables and update .env file
 echo.
 echo [94m🔐 Environment Variables Setup[0m
