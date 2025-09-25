@@ -137,7 +137,7 @@ export const Toolbar = ({
         isActive={activeTools.has('box')}
         onClick={() => handleToolClick('box')}
         ariaLabel="Box Annotations"
-        disabled={isNotesOpen || isReadOnly || isConfirmed}
+        disabled={isNotesOpen}
       />
       <Button
         iconId="notes"
