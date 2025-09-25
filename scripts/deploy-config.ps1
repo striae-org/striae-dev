@@ -54,12 +54,14 @@ $required_vars = @(
     "KEYS_WORKER_NAME",
     "USER_WORKER_NAME",
     "DATA_WORKER_NAME",
+    "AUDIT_WORKER_NAME",
     "IMAGES_WORKER_NAME",
     "TURNSTILE_WORKER_NAME",
     "PDF_WORKER_NAME",
     "KEYS_WORKER_DOMAIN",
     "USER_WORKER_DOMAIN",
     "DATA_WORKER_DOMAIN",
+    "AUDIT_WORKER_DOMAIN",
     "IMAGES_WORKER_DOMAIN",
     "TURNSTILE_WORKER_DOMAIN",
     "PDF_WORKER_DOMAIN",
@@ -111,7 +113,7 @@ function Copy-ExampleConfigs {
     # Copy worker configuration files
     Write-Host "${Yellow}  Copying worker configuration files...${Reset}"
     
-    $workers = @("keys-worker", "user-worker", "data-worker", "image-worker", "turnstile-worker", "pdf-worker")
+    $workers = @("keys-worker", "user-worker", "data-worker", "audit-worker", "image-worker", "turnstile-worker", "pdf-worker")
     
     foreach ($worker in $workers) {
         $examplePath = "workers/$worker/wrangler.jsonc.example"
@@ -230,6 +232,8 @@ function Prompt-ForSecrets {
     Prompt-ForVar "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
     Prompt-ForVar "DATA_WORKER_NAME" "Data worker name"
     Prompt-ForVar "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
+    Prompt-ForVar "AUDIT_WORKER_NAME" "Audit worker name"
+    Prompt-ForVar "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
     Prompt-ForVar "IMAGES_WORKER_NAME" "Images worker name"
     Prompt-ForVar "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
     Prompt-ForVar "TURNSTILE_WORKER_NAME" "Turnstile worker name"
@@ -285,6 +289,8 @@ function Update-WranglerConfigs {
     $PAGES_PROJECT_NAME = [Environment]::GetEnvironmentVariable("PAGES_PROJECT_NAME", "Process")
     $DATA_WORKER_NAME = [Environment]::GetEnvironmentVariable("DATA_WORKER_NAME", "Process")
     $DATA_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("DATA_WORKER_DOMAIN", "Process")
+    $AUDIT_WORKER_NAME = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_NAME", "Process")
+    $AUDIT_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_DOMAIN", "Process")
     $BUCKET_NAME = [Environment]::GetEnvironmentVariable("BUCKET_NAME", "Process")
     $IMAGES_WORKER_NAME = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_NAME", "Process")
     $IMAGES_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_DOMAIN", "Process")
@@ -316,6 +322,16 @@ function Update-WranglerConfigs {
                 '"DATA_WORKER_NAME"' = "`"$DATA_WORKER_NAME`""
                 '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
                 '"DATA_WORKER_DOMAIN"' = "`"$DATA_WORKER_DOMAIN`""
+                '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
+            }
+        },
+        @{
+            path = "workers/audit-worker/wrangler.jsonc"
+            name = "audit-worker"
+            replacements = @{
+                '"AUDIT_WORKER_NAME"' = "`"$AUDIT_WORKER_NAME`""
+                '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
+                '"AUDIT_WORKER_DOMAIN"' = "`"$AUDIT_WORKER_DOMAIN`""
                 '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
             }
         },
@@ -425,6 +441,7 @@ function Update-WranglerConfigs {
         $content = Get-Content "app/config/config.json" -Raw
         $content = $content -replace '"PAGES_CUSTOM_DOMAIN"', "`"https://$PAGES_CUSTOM_DOMAIN`""
         $content = $content -replace '"DATA_WORKER_CUSTOM_DOMAIN"', "`"https://$DATA_WORKER_DOMAIN`""
+        $content = $content -replace '"AUDIT_WORKER_CUSTOM_DOMAIN"', "`"https://$AUDIT_WORKER_DOMAIN`""
         $content = $content -replace '"KEYS_WORKER_CUSTOM_DOMAIN"', "`"https://$KEYS_WORKER_DOMAIN`""
         $content = $content -replace '"IMAGE_WORKER_CUSTOM_DOMAIN"', "`"https://$IMAGES_WORKER_DOMAIN`""
         $content = $content -replace '"USER_WORKER_CUSTOM_DOMAIN"', "`"https://$USER_WORKER_DOMAIN`""

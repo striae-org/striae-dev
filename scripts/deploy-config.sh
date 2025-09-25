@@ -57,6 +57,7 @@ required_vars=(
     "KEYS_WORKER_NAME"
     "USER_WORKER_NAME"
     "DATA_WORKER_NAME"
+    "AUDIT_WORKER_NAME"
     "IMAGES_WORKER_NAME"
     "TURNSTILE_WORKER_NAME" 
     "PDF_WORKER_NAME"
@@ -65,6 +66,7 @@ required_vars=(
     "KEYS_WORKER_DOMAIN"
     "USER_WORKER_DOMAIN"
     "DATA_WORKER_DOMAIN"
+    "AUDIT_WORKER_DOMAIN"
     "IMAGES_WORKER_DOMAIN"
     "TURNSTILE_WORKER_DOMAIN"
     "PDF_WORKER_DOMAIN"
@@ -140,6 +142,14 @@ copy_example_configs() {
         echo -e "${GREEN}    ✅ data-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
         echo -e "${YELLOW}    ⚠️  data-worker: wrangler.jsonc already exists, skipping copy${NC}"
+    fi
+
+    cd ../audit-worker
+    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+        cp wrangler.jsonc.example wrangler.jsonc
+        echo -e "${GREEN}    ✅ audit-worker: wrangler.jsonc created from example${NC}"
+    elif [ -f "wrangler.jsonc" ]; then
+        echo -e "${YELLOW}    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy${NC}"
     fi
 
     cd ../image-worker
@@ -267,6 +277,8 @@ prompt_for_secrets() {
     prompt_for_var "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
     prompt_for_var "DATA_WORKER_NAME" "Data worker name"
     prompt_for_var "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
+    prompt_for_var "AUDIT_WORKER_NAME" "Audit worker name"
+    prompt_for_var "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
     prompt_for_var "IMAGES_WORKER_NAME" "Images worker name"
     prompt_for_var "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
     prompt_for_var "TURNSTILE_WORKER_NAME" "Turnstile worker name"
@@ -421,6 +433,7 @@ update_wrangler_configs() {
         echo -e "${YELLOW}    Updating app/config/config.json...${NC}"
         sed -i "s|\"PAGES_CUSTOM_DOMAIN\"|\"https://$PAGES_CUSTOM_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"DATA_WORKER_CUSTOM_DOMAIN\"|\"https://$DATA_WORKER_DOMAIN\"|g" app/config/config.json
+        sed -i "s|\"AUDIT_WORKER_CUSTOM_DOMAIN\"|\"https://$AUDIT_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"KEYS_WORKER_CUSTOM_DOMAIN\"|\"https://$KEYS_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"IMAGE_WORKER_CUSTOM_DOMAIN\"|\"https://$IMAGES_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"USER_WORKER_CUSTOM_DOMAIN\"|\"https://$USER_WORKER_DOMAIN\"|g" app/config/config.json

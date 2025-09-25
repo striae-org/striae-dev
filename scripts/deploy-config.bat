@@ -245,6 +245,16 @@ if exist "workers\data-worker\wrangler.jsonc.example" if not exist "workers\data
     )
 )
 
+REM Audit Worker
+if exist "workers\audit-worker\wrangler.jsonc.example" if not exist "workers\audit-worker\wrangler.jsonc" (
+    copy "workers\audit-worker\wrangler.jsonc.example" "workers\audit-worker\wrangler.jsonc" >nul
+    echo [92m    ✅ audit-worker: wrangler.jsonc created from example[0m
+) else (
+    if exist "workers\audit-worker\wrangler.jsonc" (
+        echo [93m    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy[0m
+    )
+)
+
 REM Image Worker
 if exist "workers\image-worker\wrangler.jsonc.example" if not exist "workers\image-worker\wrangler.jsonc" (
     copy "workers\image-worker\wrangler.jsonc.example" "workers\image-worker\wrangler.jsonc" >nul
@@ -728,7 +738,7 @@ echo [93m  Updating app configuration files...[0m
 REM Update app/config/config.json
 if exist "app\config\config.json" (
     echo [93m    Updating app/config/config.json...[0m
-    powershell -Command "(Get-Content 'app/config/config.json') -replace '\"PAGES_CUSTOM_DOMAIN\"', '\"https://%PAGES_CUSTOM_DOMAIN%\"' -replace '\"DATA_WORKER_CUSTOM_DOMAIN\"', '\"https://%DATA_WORKER_DOMAIN%\"' -replace '\"KEYS_WORKER_CUSTOM_DOMAIN\"', '\"https://%KEYS_WORKER_DOMAIN%\"' -replace '\"IMAGE_WORKER_CUSTOM_DOMAIN\"', '\"https://%IMAGES_WORKER_DOMAIN%\"' -replace '\"USER_WORKER_CUSTOM_DOMAIN\"', '\"https://%USER_WORKER_DOMAIN%\"' -replace '\"PDF_WORKER_CUSTOM_DOMAIN\"', '\"https://%PDF_WORKER_DOMAIN%\"' -replace '\"YOUR_KEYS_AUTH_TOKEN\"', '\"%KEYS_AUTH%\"' | Set-Content 'app/config/config.json'"
+    powershell -Command "(Get-Content 'app/config/config.json') -replace '\"PAGES_CUSTOM_DOMAIN\"', '\"https://%PAGES_CUSTOM_DOMAIN%\"' -replace '\"DATA_WORKER_CUSTOM_DOMAIN\"', '\"https://%DATA_WORKER_DOMAIN%\"' -replace '\"AUDIT_WORKER_CUSTOM_DOMAIN\"', '\"https://%AUDIT_WORKER_DOMAIN%\"' -replace '\"KEYS_WORKER_CUSTOM_DOMAIN\"', '\"https://%KEYS_WORKER_DOMAIN%\"' -replace '\"IMAGE_WORKER_CUSTOM_DOMAIN\"', '\"https://%IMAGES_WORKER_DOMAIN%\"' -replace '\"USER_WORKER_CUSTOM_DOMAIN\"', '\"https://%USER_WORKER_DOMAIN%\"' -replace '\"PDF_WORKER_CUSTOM_DOMAIN\"', '\"https://%PDF_WORKER_DOMAIN%\"' -replace '\"YOUR_KEYS_AUTH_TOKEN\"', '\"%KEYS_AUTH%\"' | Set-Content 'app/config/config.json'"
     echo [92m      ✅ app config.json updated[0m
 )
 
