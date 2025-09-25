@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../button/button';
 import { ToolbarColorSelector } from './toolbar-color-selector';
 import styles from './toolbar.module.css';
@@ -15,6 +15,7 @@ interface ToolbarProps {
   selectedColor?: string;
   isReadOnly?: boolean;
   isConfirmed?: boolean;
+  isNotesOpen?: boolean;
 }
 
 export const Toolbar = ({ 
@@ -26,11 +27,25 @@ export const Toolbar = ({
   onColorChange,
   selectedColor = '#ff0000',
   isReadOnly = false,
-  isConfirmed = false
+  isConfirmed = false,
+  isNotesOpen = false
 }: ToolbarProps) => {
   const [activeTools, setActiveTools] = useState<Set<ToolId>>(new Set());
   const [isVisible, setIsVisible] = useState(true);
   const [showColorSelector, setShowColorSelector] = useState(false);
+
+  // Automatically deactivate box annotations when notes are opened
+  useEffect(() => {
+    if (isNotesOpen && activeTools.has('box')) {
+      setActiveTools(prev => {
+        const next = new Set(prev);
+        next.delete('box');
+        onToolSelect?.('box', false);
+        return next;
+      });
+      setShowColorSelector(false);
+    }
+  }, [isNotesOpen, activeTools, onToolSelect]);
 
   const handleToolClick = (toolId: ToolId) => {
     if (toolId === 'print') {
@@ -44,6 +59,11 @@ export const Toolbar = ({
     if (toolId === 'visibility') {
       setIsVisible(!isVisible);
       onVisibilityChange?.(!isVisible);
+      return;
+    }
+
+    // Prevent box annotations when notes sidebar is open
+    if (toolId === 'box' && isNotesOpen) {
       return;
     }
 
@@ -117,6 +137,7 @@ export const Toolbar = ({
         isActive={activeTools.has('box')}
         onClick={() => handleToolClick('box')}
         ariaLabel="Box Annotations"
+        disabled={isNotesOpen || isReadOnly || isConfirmed}
       />
       <Button
         iconId="notes"

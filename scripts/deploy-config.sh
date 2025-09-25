@@ -19,10 +19,18 @@ echo -e "${BLUE}⚙️  Striae Configuration Setup Script${NC}"
 echo "====================================="
 
 # Check if .env file exists
+env_created_from_example=false
 if [ ! -f ".env" ]; then
-    echo -e "${RED}❌ Error: .env file not found!${NC}"
-    echo "Please copy .env.example to .env and fill in your values."
-    exit 1
+    echo -e "${YELLOW}📄 .env file not found, copying from .env.example...${NC}"
+    if [ -f ".env.example" ]; then
+        cp ".env.example" ".env"
+        echo -e "${GREEN}✅ .env file created from .env.example${NC}"
+        env_created_from_example=true
+    else
+        echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
+        echo "Please create a .env.example file or provide a .env file."
+        exit 1
+    fi
 fi
 
 # Source the .env file
@@ -57,6 +65,7 @@ required_vars=(
     "KEYS_WORKER_NAME"
     "USER_WORKER_NAME"
     "DATA_WORKER_NAME"
+    "AUDIT_WORKER_NAME"
     "IMAGES_WORKER_NAME"
     "TURNSTILE_WORKER_NAME" 
     "PDF_WORKER_NAME"
@@ -65,6 +74,7 @@ required_vars=(
     "KEYS_WORKER_DOMAIN"
     "USER_WORKER_DOMAIN"
     "DATA_WORKER_DOMAIN"
+    "AUDIT_WORKER_DOMAIN"
     "IMAGES_WORKER_DOMAIN"
     "TURNSTILE_WORKER_DOMAIN"
     "PDF_WORKER_DOMAIN"
@@ -142,6 +152,14 @@ copy_example_configs() {
         echo -e "${YELLOW}    ⚠️  data-worker: wrangler.jsonc already exists, skipping copy${NC}"
     fi
 
+    cd ../audit-worker
+    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+        cp wrangler.jsonc.example wrangler.jsonc
+        echo -e "${GREEN}    ✅ audit-worker: wrangler.jsonc created from example${NC}"
+    elif [ -f "wrangler.jsonc" ]; then
+        echo -e "${YELLOW}    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy${NC}"
+    fi
+
     cd ../image-worker
     if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
         cp wrangler.jsonc.example wrangler.jsonc
@@ -209,13 +227,36 @@ prompt_for_secrets() {
         local description=$2
         local current_value="${!var_name}"
         
-        echo -e "${BLUE}$var_name${NC}"
-        echo -e "${YELLOW}$description${NC}"
-        if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
-            echo -e "${GREEN}Current value: $current_value${NC}"
-            read -p "New value (or press Enter to keep current): " new_value
+        # Auto-generate specific authentication secrets
+        if [ "$var_name" = "USER_DB_AUTH" ] || [ "$var_name" = "R2_KEY_SECRET" ] || [ "$var_name" = "KEYS_AUTH" ]; then
+            echo -e "${BLUE}$var_name${NC}"
+            echo -e "${YELLOW}$description${NC}"
+            
+            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ] && [ "$current_value" != "your_custom_user_db_auth_token_here" ] && [ "$current_value" != "your_custom_r2_secret_here" ] && [ "$current_value" != "your_custom_keys_auth_token_here" ]; then
+                echo -e "${GREEN}Current value: [HIDDEN]${NC}"
+                echo -e "${YELLOW}Auto-generating new secret...${NC}"
+            else
+                echo -e "${YELLOW}Auto-generating secret...${NC}"
+            fi
+            
+            # Generate new secret using openssl
+            new_value=$(openssl rand -hex 32 2>/dev/null || echo "")
+            if [ -n "$new_value" ]; then
+                echo -e "${GREEN}✅ $var_name auto-generated${NC}"
+            else
+                echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
+                read -p "Enter value: " new_value
+            fi
         else
-            read -p "Enter value: " new_value
+            # Normal prompt for other variables
+            echo -e "${BLUE}$var_name${NC}"
+            echo -e "${YELLOW}$description${NC}"
+            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+                echo -e "${GREEN}Current value: $current_value${NC}"
+                read -p "New value (or press Enter to keep current): " new_value
+            else
+                read -p "Enter value: " new_value
+            fi
         fi
         
         if [ -n "$new_value" ]; then
@@ -267,6 +308,8 @@ prompt_for_secrets() {
     prompt_for_var "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
     prompt_for_var "DATA_WORKER_NAME" "Data worker name"
     prompt_for_var "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
+    prompt_for_var "AUDIT_WORKER_NAME" "Audit worker name"
+    prompt_for_var "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
     prompt_for_var "IMAGES_WORKER_NAME" "Images worker name"
     prompt_for_var "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
     prompt_for_var "TURNSTILE_WORKER_NAME" "Turnstile worker name"
@@ -295,16 +338,29 @@ prompt_for_secrets() {
     echo -e "${BLUE}📄 All values saved to .env file${NC}"
 }
 
-# Prompt for secrets if .env doesn't exist or user wants to update
-if [ ! -f ".env" ] || [ "$1" = "--update-env" ]; then
-    prompt_for_secrets
-else
-    echo -e "${YELLOW}📝 .env file exists. Use --update-env flag to update environment variables.${NC}"
-fi
+# Always prompt for secrets to ensure configuration
+prompt_for_secrets
 
 # Function to replace variables in wrangler configuration files
 update_wrangler_configs() {
     echo -e "\n${BLUE}🔧 Updating wrangler configuration files...${NC}"
+    
+    # Audit Worker
+    if [ -f "workers/audit-worker/wrangler.jsonc" ]; then
+        echo -e "${YELLOW}  Updating audit-worker/wrangler.jsonc...${NC}"
+        sed -i "s/\"AUDIT_WORKER_NAME\"/\"$AUDIT_WORKER_NAME\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"ACCOUNT_ID\"/\"$ACCOUNT_ID\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"AUDIT_WORKER_DOMAIN\"/\"$AUDIT_WORKER_DOMAIN\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"BUCKET_NAME\"/\"$BUCKET_NAME\"/g" workers/audit-worker/wrangler.jsonc
+        echo -e "${GREEN}    ✅ audit-worker configuration updated${NC}"
+    fi
+    
+    # Update audit-worker source file CORS headers only
+    if [ -f "workers/audit-worker/src/audit-worker.js" ]; then
+        echo -e "${YELLOW}  Updating audit-worker CORS headers...${NC}"
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/audit-worker/src/audit-worker.js
+        echo -e "${GREEN}    ✅ audit-worker CORS headers updated${NC}"
+    fi
     
     # Data Worker
     if [ -f "workers/data-worker/wrangler.jsonc" ]; then
@@ -421,6 +477,7 @@ update_wrangler_configs() {
         echo -e "${YELLOW}    Updating app/config/config.json...${NC}"
         sed -i "s|\"PAGES_CUSTOM_DOMAIN\"|\"https://$PAGES_CUSTOM_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"DATA_WORKER_CUSTOM_DOMAIN\"|\"https://$DATA_WORKER_DOMAIN\"|g" app/config/config.json
+        sed -i "s|\"AUDIT_WORKER_CUSTOM_DOMAIN\"|\"https://$AUDIT_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"KEYS_WORKER_CUSTOM_DOMAIN\"|\"https://$KEYS_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"IMAGE_WORKER_CUSTOM_DOMAIN\"|\"https://$IMAGES_WORKER_DOMAIN\"|g" app/config/config.json
         sed -i "s|\"USER_WORKER_CUSTOM_DOMAIN\"|\"https://$USER_WORKER_DOMAIN\"|g" app/config/config.json

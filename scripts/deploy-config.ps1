@@ -16,9 +16,15 @@ Write-Host "====================================="
 
 # Check if .env file exists
 if (-not (Test-Path ".env")) {
-    Write-Host "${Red}❌ Error: .env file not found!${Reset}"
-    Write-Host "Please copy .env.example to .env and fill in your values."
-    exit 1
+    Write-Host "${Yellow}📄 .env file not found, copying from .env.example...${Reset}"
+    if (Test-Path ".env.example") {
+        Copy-Item ".env.example" ".env"
+        Write-Host "${Green}✅ .env file created from .env.example${Reset}"
+    } else {
+        Write-Host "${Red}❌ Error: Neither .env nor .env.example file found!${Reset}"
+        Write-Host "Please create a .env.example file or provide a .env file."
+        exit 1
+    }
 }
 
 # Load environment variables from .env
@@ -54,12 +60,14 @@ $required_vars = @(
     "KEYS_WORKER_NAME",
     "USER_WORKER_NAME",
     "DATA_WORKER_NAME",
+    "AUDIT_WORKER_NAME",
     "IMAGES_WORKER_NAME",
     "TURNSTILE_WORKER_NAME",
     "PDF_WORKER_NAME",
     "KEYS_WORKER_DOMAIN",
     "USER_WORKER_DOMAIN",
     "DATA_WORKER_DOMAIN",
+    "AUDIT_WORKER_DOMAIN",
     "IMAGES_WORKER_DOMAIN",
     "TURNSTILE_WORKER_DOMAIN",
     "PDF_WORKER_DOMAIN",
@@ -111,7 +119,7 @@ function Copy-ExampleConfigs {
     # Copy worker configuration files
     Write-Host "${Yellow}  Copying worker configuration files...${Reset}"
     
-    $workers = @("keys-worker", "user-worker", "data-worker", "image-worker", "turnstile-worker", "pdf-worker")
+    $workers = @("keys-worker", "user-worker", "data-worker", "audit-worker", "image-worker", "turnstile-worker", "pdf-worker")
     
     foreach ($worker in $workers) {
         $examplePath = "workers/$worker/wrangler.jsonc.example"
@@ -169,14 +177,43 @@ function Prompt-ForSecrets {
         
         $currentValue = [Environment]::GetEnvironmentVariable($VarName, "Process")
         
-        Write-Host "${Blue}$VarName${Reset}"
-        Write-Host "${Yellow}$Description${Reset}"
-        
-        if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
-            Write-Host "${Green}Current value: $currentValue${Reset}"
-            $newValue = Read-Host "New value (or press Enter to keep current)"
+        # Auto-generate specific authentication secrets
+        if ($VarName -eq "USER_DB_AUTH" -or $VarName -eq "R2_KEY_SECRET" -or $VarName -eq "KEYS_AUTH") {
+            Write-Host "${Blue}$VarName${Reset}"
+            Write-Host "${Yellow}$Description${Reset}"
+            
+            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here" -and $currentValue -ne "your_custom_user_db_auth_token_here" -and $currentValue -ne "your_custom_r2_secret_here" -and $currentValue -ne "your_custom_keys_auth_token_here") {
+                Write-Host "${Green}Current value: [HIDDEN]${Reset}"
+                Write-Host "${Yellow}Auto-generating new secret...${Reset}"
+            } else {
+                Write-Host "${Yellow}Auto-generating secret...${Reset}"
+            }
+            
+            # Generate new secret using openssl or PowerShell fallback
+            try {
+                $newValue = & openssl rand -hex 32 2>$null
+                if (-not $newValue) { throw "OpenSSL failed" }
+                Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+            } catch {
+                try {
+                    $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
+                    Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+                } catch {
+                    Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                    $newValue = Read-Host "Enter value"
+                }
+            }
         } else {
-            $newValue = Read-Host "Enter value"
+            # Normal prompt for other variables
+            Write-Host "${Blue}$VarName${Reset}"
+            Write-Host "${Yellow}$Description${Reset}"
+            
+            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+                Write-Host "${Green}Current value: $currentValue${Reset}"
+                $newValue = Read-Host "New value (or press Enter to keep current)"
+            } else {
+                $newValue = Read-Host "Enter value"
+            }
         }
         
         if ($newValue) {
@@ -230,6 +267,8 @@ function Prompt-ForSecrets {
     Prompt-ForVar "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
     Prompt-ForVar "DATA_WORKER_NAME" "Data worker name"
     Prompt-ForVar "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
+    Prompt-ForVar "AUDIT_WORKER_NAME" "Audit worker name"
+    Prompt-ForVar "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
     Prompt-ForVar "IMAGES_WORKER_NAME" "Images worker name"
     Prompt-ForVar "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
     Prompt-ForVar "TURNSTILE_WORKER_NAME" "Turnstile worker name"
@@ -267,12 +306,8 @@ function Prompt-ForSecrets {
     Write-Host "${Blue}📄 All values saved to .env file${Reset}"
 }
 
-# Prompt for secrets if .env doesn't exist or user wants to update
-if ((-not (Test-Path ".env")) -or ($args -contains "--update-env")) {
-    Prompt-ForSecrets
-} else {
-    Write-Host "${Yellow}📝 .env file exists. Use --update-env flag to update environment variables.${Reset}"
-}
+# Always prompt for secrets to ensure configuration
+Prompt-ForSecrets
 
 # Function to replace variables in configuration files
 function Update-WranglerConfigs {
@@ -285,6 +320,8 @@ function Update-WranglerConfigs {
     $PAGES_PROJECT_NAME = [Environment]::GetEnvironmentVariable("PAGES_PROJECT_NAME", "Process")
     $DATA_WORKER_NAME = [Environment]::GetEnvironmentVariable("DATA_WORKER_NAME", "Process")
     $DATA_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("DATA_WORKER_DOMAIN", "Process")
+    $AUDIT_WORKER_NAME = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_NAME", "Process")
+    $AUDIT_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_DOMAIN", "Process")
     $BUCKET_NAME = [Environment]::GetEnvironmentVariable("BUCKET_NAME", "Process")
     $IMAGES_WORKER_NAME = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_NAME", "Process")
     $IMAGES_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_DOMAIN", "Process")
@@ -316,6 +353,16 @@ function Update-WranglerConfigs {
                 '"DATA_WORKER_NAME"' = "`"$DATA_WORKER_NAME`""
                 '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
                 '"DATA_WORKER_DOMAIN"' = "`"$DATA_WORKER_DOMAIN`""
+                '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
+            }
+        },
+        @{
+            path = "workers/audit-worker/wrangler.jsonc"
+            name = "audit-worker"
+            replacements = @{
+                '"AUDIT_WORKER_NAME"' = "`"$AUDIT_WORKER_NAME`""
+                '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
+                '"AUDIT_WORKER_DOMAIN"' = "`"$AUDIT_WORKER_DOMAIN`""
                 '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
             }
         },
@@ -381,6 +428,7 @@ function Update-WranglerConfigs {
     
     # Update worker source files (CORS headers)
     $workerSources = @(
+        "workers/audit-worker/src/audit-worker.js",
         "workers/data-worker/src/data-worker.js",
         "workers/image-worker/src/image-worker.js", 
         "workers/keys-worker/src/keys.js",
@@ -425,6 +473,7 @@ function Update-WranglerConfigs {
         $content = Get-Content "app/config/config.json" -Raw
         $content = $content -replace '"PAGES_CUSTOM_DOMAIN"', "`"https://$PAGES_CUSTOM_DOMAIN`""
         $content = $content -replace '"DATA_WORKER_CUSTOM_DOMAIN"', "`"https://$DATA_WORKER_DOMAIN`""
+        $content = $content -replace '"AUDIT_WORKER_CUSTOM_DOMAIN"', "`"https://$AUDIT_WORKER_DOMAIN`""
         $content = $content -replace '"KEYS_WORKER_CUSTOM_DOMAIN"', "`"https://$KEYS_WORKER_DOMAIN`""
         $content = $content -replace '"IMAGE_WORKER_CUSTOM_DOMAIN"', "`"https://$IMAGES_WORKER_DOMAIN`""
         $content = $content -replace '"USER_WORKER_CUSTOM_DOMAIN"', "`"https://$USER_WORKER_DOMAIN`""

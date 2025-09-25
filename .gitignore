@@ -9,6 +9,7 @@ app/config
 
 *.env
 *.dev.vars
+*.env.backup
 .dns
 .wrangler
 .firebase

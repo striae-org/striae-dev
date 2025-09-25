@@ -12,9 +12,15 @@ echo =====================================
 
 REM Check if .env file exists
 if not exist ".env" (
-    echo [91m❌ Error: .env file not found![0m
-    echo Please copy .env.example to .env and fill in your values.
-    exit /b 1
+    echo [93m📄 .env file not found, copying from .env.example...[0m
+    if exist ".env.example" (
+        copy ".env.example" ".env" >nul 2>&1
+        echo [92m✅ .env file created from .env.example[0m
+    ) else (
+        echo [91m❌ Error: Neither .env nor .env.example file found![0m
+        echo Please create a .env.example file or provide a .env file.
+        exit /b 1
+    )
 )
 
 REM Load environment variables from .env
@@ -245,6 +251,16 @@ if exist "workers\data-worker\wrangler.jsonc.example" if not exist "workers\data
     )
 )
 
+REM Audit Worker
+if exist "workers\audit-worker\wrangler.jsonc.example" if not exist "workers\audit-worker\wrangler.jsonc" (
+    copy "workers\audit-worker\wrangler.jsonc.example" "workers\audit-worker\wrangler.jsonc" >nul
+    echo [92m    ✅ audit-worker: wrangler.jsonc created from example[0m
+) else (
+    if exist "workers\audit-worker\wrangler.jsonc" (
+        echo [93m    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy[0m
+    )
+)
+
 REM Image Worker
 if exist "workers\image-worker\wrangler.jsonc.example" if not exist "workers\image-worker\wrangler.jsonc" (
     copy "workers\image-worker\wrangler.jsonc.example" "workers\image-worker\wrangler.jsonc" >nul
@@ -307,12 +323,7 @@ if not exist ".env" (
     echo [92m📄 Created .env from .env.example[0m
 )
 
-REM Check if user wants to update environment variables
-if "%1"=="--update-env" goto :prompt_secrets
-if not exist ".env" goto :prompt_secrets
-echo [93m📝 .env file exists. Use --update-env flag to update environment variables.[0m
-goto :skip_prompt
-
+REM Always prompt for secrets configuration
 :prompt_secrets
 echo.
 echo [94m📊 CLOUDFLARE CORE CONFIGURATION[0m
@@ -338,18 +349,34 @@ if not "%SL_API_KEY%"=="" (
 
 echo [94mUSER_DB_AUTH[0m
 echo [93mCustom user database authentication token (generate with: openssl rand -hex 16)[0m
-set /p "USER_DB_AUTH=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
 if not "%USER_DB_AUTH%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
-    echo [92m✅ USER_DB_AUTH updated[0m
+    echo [92m✅ USER_DB_AUTH auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "USER_DB_AUTH=Enter value: "
+    if not "%USER_DB_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
+        echo [92m✅ USER_DB_AUTH updated[0m
+    )
 )
 
 echo [94mR2_KEY_SECRET[0m
 echo [93mCustom R2 storage authentication token (generate with: openssl rand -hex 16)[0m
-set /p "R2_KEY_SECRET=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
 if not "%R2_KEY_SECRET%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
-    echo [92m✅ R2_KEY_SECRET updated[0m
+    echo [92m✅ R2_KEY_SECRET auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "R2_KEY_SECRET=Enter value: "
+    if not "%R2_KEY_SECRET%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
+        echo [92m✅ R2_KEY_SECRET updated[0m
+    )
 )
 
 echo [94mIMAGES_API_TOKEN[0m
@@ -563,10 +590,18 @@ echo [94m🔐 SERVICE-SPECIFIC SECRETS[0m
 echo ============================
 echo [94mKEYS_AUTH[0m
 echo [93mKeys worker authentication token (generate with: openssl rand -hex 16)[0m
-set /p "KEYS_AUTH=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
 if not "%KEYS_AUTH%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
-    echo [92m✅ KEYS_AUTH updated[0m
+    echo [92m✅ KEYS_AUTH auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "KEYS_AUTH=Enter value: "
+    if not "%KEYS_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
+        echo [92m✅ KEYS_AUTH updated[0m
+    )
 )
 
 echo [94mACCOUNT_HASH[0m
@@ -613,7 +648,6 @@ echo.
 echo [92m🎉 Environment variables setup completed![0m
 echo [94m📄 All values saved to .env file[0m
 
-:skip_prompt
 REM Reload environment variables from .env file
 for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
     set "line=%%a"
@@ -630,6 +664,20 @@ echo [94m🔧 Updating configuration files...[0m
 
 REM Update wrangler configuration files
 echo [93m  Updating wrangler configuration files...[0m
+
+REM Audit Worker
+if exist "workers\audit-worker\wrangler.jsonc" (
+    echo [93m  Updating audit-worker/wrangler.jsonc...[0m
+    powershell -Command "(Get-Content 'workers/audit-worker/wrangler.jsonc') -replace '\"AUDIT_WORKER_NAME\"', '\"%AUDIT_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"AUDIT_WORKER_DOMAIN\"', '\"%AUDIT_WORKER_DOMAIN%\"' -replace '\"BUCKET_NAME\"', '\"%BUCKET_NAME%\"' | Set-Content 'workers/audit-worker/wrangler.jsonc'"
+    echo [92m    ✅ audit-worker configuration updated[0m
+)
+
+REM Update audit-worker source file CORS headers
+if exist "workers\audit-worker\src\audit-worker.js" (
+    echo [93m  Updating audit-worker CORS headers...[0m
+    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.js'"
+    echo [92m    ✅ audit-worker CORS headers updated[0m
+)
 
 REM Data Worker
 if exist "workers\data-worker\wrangler.jsonc" (
@@ -728,7 +776,7 @@ echo [93m  Updating app configuration files...[0m
 REM Update app/config/config.json
 if exist "app\config\config.json" (
     echo [93m    Updating app/config/config.json...[0m
-    powershell -Command "(Get-Content 'app/config/config.json') -replace '\"PAGES_CUSTOM_DOMAIN\"', '\"https://%PAGES_CUSTOM_DOMAIN%\"' -replace '\"DATA_WORKER_CUSTOM_DOMAIN\"', '\"https://%DATA_WORKER_DOMAIN%\"' -replace '\"KEYS_WORKER_CUSTOM_DOMAIN\"', '\"https://%KEYS_WORKER_DOMAIN%\"' -replace '\"IMAGE_WORKER_CUSTOM_DOMAIN\"', '\"https://%IMAGES_WORKER_DOMAIN%\"' -replace '\"USER_WORKER_CUSTOM_DOMAIN\"', '\"https://%USER_WORKER_DOMAIN%\"' -replace '\"PDF_WORKER_CUSTOM_DOMAIN\"', '\"https://%PDF_WORKER_DOMAIN%\"' -replace '\"YOUR_KEYS_AUTH_TOKEN\"', '\"%KEYS_AUTH%\"' | Set-Content 'app/config/config.json'"
+    powershell -Command "(Get-Content 'app/config/config.json') -replace '\"PAGES_CUSTOM_DOMAIN\"', '\"https://%PAGES_CUSTOM_DOMAIN%\"' -replace '\"DATA_WORKER_CUSTOM_DOMAIN\"', '\"https://%DATA_WORKER_DOMAIN%\"' -replace '\"AUDIT_WORKER_CUSTOM_DOMAIN\"', '\"https://%AUDIT_WORKER_DOMAIN%\"' -replace '\"KEYS_WORKER_CUSTOM_DOMAIN\"', '\"https://%KEYS_WORKER_DOMAIN%\"' -replace '\"IMAGE_WORKER_CUSTOM_DOMAIN\"', '\"https://%IMAGES_WORKER_DOMAIN%\"' -replace '\"USER_WORKER_CUSTOM_DOMAIN\"', '\"https://%USER_WORKER_DOMAIN%\"' -replace '\"PDF_WORKER_CUSTOM_DOMAIN\"', '\"https://%PDF_WORKER_DOMAIN%\"' -replace '\"YOUR_KEYS_AUTH_TOKEN\"', '\"%KEYS_AUTH%\"' | Set-Content 'app/config/config.json'"
     echo [92m      ✅ app config.json updated[0m
 )
 
