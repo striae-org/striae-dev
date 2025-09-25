@@ -323,12 +323,7 @@ if not exist ".env" (
     echo [92m📄 Created .env from .env.example[0m
 )
 
-REM Check if user wants to update environment variables
-if "%1"=="--update-env" goto :prompt_secrets
-if not exist ".env" goto :prompt_secrets
-echo [93m📝 .env file exists. Use --update-env flag to update environment variables.[0m
-goto :skip_prompt
-
+REM Always prompt for secrets configuration
 :prompt_secrets
 echo.
 echo [94m📊 CLOUDFLARE CORE CONFIGURATION[0m
@@ -653,7 +648,6 @@ echo.
 echo [92m🎉 Environment variables setup completed![0m
 echo [94m📄 All values saved to .env file[0m
 
-:skip_prompt
 REM Reload environment variables from .env file
 for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
     set "line=%%a"

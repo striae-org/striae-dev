@@ -19,11 +19,13 @@ echo -e "${BLUE}⚙️  Striae Configuration Setup Script${NC}"
 echo "====================================="
 
 # Check if .env file exists
+env_created_from_example=false
 if [ ! -f ".env" ]; then
     echo -e "${YELLOW}📄 .env file not found, copying from .env.example...${NC}"
     if [ -f ".env.example" ]; then
         cp ".env.example" ".env"
         echo -e "${GREEN}✅ .env file created from .env.example${NC}"
+        env_created_from_example=true
     else
         echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
         echo "Please create a .env.example file or provide a .env file."
@@ -336,12 +338,8 @@ prompt_for_secrets() {
     echo -e "${BLUE}📄 All values saved to .env file${NC}"
 }
 
-# Prompt for secrets if .env doesn't exist or user wants to update
-if [ ! -f ".env" ] || [ "$1" = "--update-env" ]; then
-    prompt_for_secrets
-else
-    echo -e "${YELLOW}📝 .env file exists. Use --update-env flag to update environment variables.${NC}"
-fi
+# Always prompt for secrets to ensure configuration
+prompt_for_secrets
 
 # Function to replace variables in wrangler configuration files
 update_wrangler_configs() {

@@ -306,12 +306,8 @@ function Prompt-ForSecrets {
     Write-Host "${Blue}📄 All values saved to .env file${Reset}"
 }
 
-# Prompt for secrets if .env doesn't exist or user wants to update
-if ((-not (Test-Path ".env")) -or ($args -contains "--update-env")) {
-    Prompt-ForSecrets
-} else {
-    Write-Host "${Yellow}📝 .env file exists. Use --update-env flag to update environment variables.${Reset}"
-}
+# Always prompt for secrets to ensure configuration
+Prompt-ForSecrets
 
 # Function to replace variables in configuration files
 function Update-WranglerConfigs {
