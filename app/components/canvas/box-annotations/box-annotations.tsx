@@ -511,7 +511,7 @@ export const BoxAnnotations = ({
           opacity: isReadOnly ? 0.8 : 1 // Slightly transparent in read-only mode
         }}
         title={isReadOnly 
-          ? annotation.label || 'Unlabeled'
+          ? undefined
           : 'Double-click or right-click to delete'
         }
         onDoubleClick={(e) => {
