@@ -34,7 +34,7 @@ if [ ! -f ".env" ]; then
             sed -i "s/your_custom_user_db_auth_token_here/$USER_DB_AUTH/" ".env"
             echo -e "${GREEN}✅ USER_DB_AUTH auto-generated${NC}"
         else
-            echo -e "${YELLOW}⚠️  Could not auto-generate USER_DB_AUTH - please set manually${NC}"
+            echo -e "${YELLOW}⚠️  Could not auto-generate USER_DB_AUTH - will prompt later${NC}"
         fi
         
         # Generate R2_KEY_SECRET
@@ -43,7 +43,7 @@ if [ ! -f ".env" ]; then
             sed -i "s/your_custom_r2_secret_here/$R2_KEY_SECRET/" ".env"
             echo -e "${GREEN}✅ R2_KEY_SECRET auto-generated${NC}"
         else
-            echo -e "${YELLOW}⚠️  Could not auto-generate R2_KEY_SECRET - please set manually${NC}"
+            echo -e "${YELLOW}⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later${NC}"
         fi
         
         # Generate KEYS_AUTH
@@ -52,27 +52,10 @@ if [ ! -f ".env" ]; then
             sed -i "s/your_custom_keys_auth_token_here/$KEYS_AUTH/" ".env"
             echo -e "${GREEN}✅ KEYS_AUTH auto-generated${NC}"
         else
-            echo -e "${YELLOW}⚠️  Could not auto-generate KEYS_AUTH - please set manually${NC}"
+            echo -e "${YELLOW}⚠️  Could not auto-generate KEYS_AUTH - will prompt later${NC}"
         fi
         
-        echo -e "${BLUE}🔐 Authentication secrets generation complete!${NC}"
-        echo ""
-        echo -e "${YELLOW}⚠️  Please edit .env file with your other configuration values (Cloudflare Account ID, Firebase config, etc.)${NC}"
-        echo -e "${BLUE}Opening .env file for editing...${NC}"
-        
-        # Try to open in common editors (VS Code preferred)
-        if command -v code > /dev/null; then
-            code ".env"
-        elif command -v notepad > /dev/null; then
-            notepad ".env"
-        elif command -v nano > /dev/null; then
-            nano ".env"
-        else
-            echo -e "${YELLOW}Please manually edit .env with your configuration values${NC}"
-        fi
-        
-        echo ""
-        read -p "Press Enter after you've updated the .env file with your other configuration values..."
+        echo -e "${GREEN}🔐 Authentication secrets auto-generated! Continuing with configuration...${NC}"
         echo ""
     else
         echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
