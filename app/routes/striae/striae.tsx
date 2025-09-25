@@ -118,6 +118,13 @@ export const Striae = ({ user }: StriaePage) => {
     checkReadOnlyStatus();
   }, [currentCase, user?.uid]);
 
+  // Disable box annotation mode when notes sidebar is opened
+  useEffect(() => {
+    if (showNotes && isBoxAnnotationMode) {
+      setIsBoxAnnotationMode(false);
+    }
+  }, [showNotes, isBoxAnnotationMode]);
+
   // Handler for toolbar annotation selection
   const handleToolSelect = (toolId: string, active: boolean) => {
     // Always allow visibility toggles (including for read-only cases)
@@ -131,9 +138,9 @@ export const Striae = ({ user }: StriaePage) => {
       return next;
     });
 
-    // Handle box annotation mode (only allow interaction for non-read-only and non-confirmed cases)
+    // Handle box annotation mode (prevent when notes are open, read-only, or confirmed)
     if (toolId === 'box') {
-      setIsBoxAnnotationMode(active && !isReadOnlyCase && !annotationData?.confirmationData);
+      setIsBoxAnnotationMode(active && !showNotes && !isReadOnlyCase && !annotationData?.confirmationData);
     }
   };
 
@@ -343,6 +350,7 @@ export const Striae = ({ user }: StriaePage) => {
               selectedColor={boxAnnotationColor}
               isReadOnly={isReadOnlyCase}
               isConfirmed={!!annotationData?.confirmationData}
+              isNotesOpen={showNotes}
             />
           </div>
           <Canvas 
