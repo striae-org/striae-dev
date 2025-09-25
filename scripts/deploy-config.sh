@@ -24,6 +24,38 @@ if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp ".env.example" ".env"
         echo -e "${GREEN}✅ .env file created from .env.example${NC}"
+        
+        # Automatically generate the three authentication secrets
+        echo -e "${BLUE}🔐 Auto-generating authentication secrets...${NC}"
+        
+        # Generate USER_DB_AUTH
+        USER_DB_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
+        if [ -n "$USER_DB_AUTH" ]; then
+            sed -i "s/your_custom_user_db_auth_token_here/$USER_DB_AUTH/" ".env"
+            echo -e "${GREEN}✅ USER_DB_AUTH auto-generated${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Could not auto-generate USER_DB_AUTH - will prompt later${NC}"
+        fi
+        
+        # Generate R2_KEY_SECRET
+        R2_KEY_SECRET=$(openssl rand -hex 32 2>/dev/null || echo "")
+        if [ -n "$R2_KEY_SECRET" ]; then
+            sed -i "s/your_custom_r2_secret_here/$R2_KEY_SECRET/" ".env"
+            echo -e "${GREEN}✅ R2_KEY_SECRET auto-generated${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later${NC}"
+        fi
+        
+        # Generate KEYS_AUTH
+        KEYS_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
+        if [ -n "$KEYS_AUTH" ]; then
+            sed -i "s/your_custom_keys_auth_token_here/$KEYS_AUTH/" ".env"
+            echo -e "${GREEN}✅ KEYS_AUTH auto-generated${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Could not auto-generate KEYS_AUTH - will prompt later${NC}"
+        fi
+        
+        echo -e "${GREEN}🔐 Authentication secrets auto-generated! Continuing with configuration...${NC}"
         echo ""
     else
         echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
@@ -199,49 +231,6 @@ copy_example_configs() {
 
 # Copy example configuration files
 copy_example_configs
-
-# Auto-generate authentication secrets
-echo -e "\n${BLUE}🔐 Auto-generating authentication secrets...${NC}"
-
-# Generate USER_DB_AUTH if not set or is placeholder
-if [ -z "$USER_DB_AUTH" ] || [ "$USER_DB_AUTH" = "your_custom_user_db_auth_token_here" ]; then
-    USER_DB_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
-    if [ -n "$USER_DB_AUTH" ]; then
-        sed -i "s/your_custom_user_db_auth_token_here/$USER_DB_AUTH/" ".env"
-        sed -i "s/^USER_DB_AUTH=.*/USER_DB_AUTH=$USER_DB_AUTH/" ".env"
-        echo -e "${GREEN}✅ USER_DB_AUTH auto-generated${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Could not auto-generate USER_DB_AUTH - will prompt later${NC}"
-    fi
-fi
-
-# Generate R2_KEY_SECRET if not set or is placeholder
-if [ -z "$R2_KEY_SECRET" ] || [ "$R2_KEY_SECRET" = "your_custom_r2_secret_here" ]; then
-    R2_KEY_SECRET=$(openssl rand -hex 32 2>/dev/null || echo "")
-    if [ -n "$R2_KEY_SECRET" ]; then
-        sed -i "s/your_custom_r2_secret_here/$R2_KEY_SECRET/" ".env"
-        sed -i "s/^R2_KEY_SECRET=.*/R2_KEY_SECRET=$R2_KEY_SECRET/" ".env"
-        echo -e "${GREEN}✅ R2_KEY_SECRET auto-generated${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Could not auto-generate R2_KEY_SECRET - will prompt later${NC}"
-    fi
-fi
-
-# Generate KEYS_AUTH if not set or is placeholder
-if [ -z "$KEYS_AUTH" ] || [ "$KEYS_AUTH" = "your_custom_keys_auth_token_here" ]; then
-    KEYS_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
-    if [ -n "$KEYS_AUTH" ]; then
-        sed -i "s/your_custom_keys_auth_token_here/$KEYS_AUTH/" ".env"
-        sed -i "s/^KEYS_AUTH=.*/KEYS_AUTH=$KEYS_AUTH/" ".env"
-        echo -e "${GREEN}✅ KEYS_AUTH auto-generated${NC}"
-    else
-        echo -e "${YELLOW}⚠️  Could not auto-generate KEYS_AUTH - will prompt later${NC}"
-    fi
-fi
-
-# Reload .env to get the updated values
-source .env
-echo -e "${GREEN}🔐 Authentication secrets generation complete!${NC}"
 
 # Function to prompt for environment variables and update .env file
 prompt_for_secrets() {
