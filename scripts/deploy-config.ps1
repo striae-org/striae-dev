@@ -16,34 +16,9 @@ Write-Host "====================================="
 
 # Check if .env file exists
 if (-not (Test-Path ".env")) {
-    Write-Host "${Yellow}📄 .env file not found, copying from .env.example...${Reset}"
-    if (Test-Path ".env.example") {
-        Copy-Item ".env.example" ".env"
-        Write-Host "${Green}✅ .env file created from .env.example${Reset}"
-        Write-Host "${Yellow}⚠️  Please edit .env file with your actual values before proceeding${Reset}"
-        Write-Host "${Blue}Opening .env file for editing...${Reset}"
-        
-        # Try to open in common editors (VS Code preferred)
-        try {
-            if (Get-Command "code" -ErrorAction SilentlyContinue) {
-                Start-Process "code" -ArgumentList ".env" -NoNewWindow
-            } elseif (Get-Command "notepad" -ErrorAction SilentlyContinue) {
-                Start-Process "notepad" -ArgumentList ".env" -Wait
-            } else {
-                Write-Host "${Yellow}Please manually edit .env with your configuration values${Reset}"
-            }
-        } catch {
-            Write-Host "${Yellow}Please manually edit .env with your configuration values${Reset}"
-        }
-        
-        Write-Host ""
-        Read-Host "Press Enter after you've updated the .env file with your values"
-        Write-Host ""
-    } else {
-        Write-Host "${Red}❌ Error: Neither .env nor .env.example file found!${Reset}"
-        Write-Host "Please create a .env.example file or provide a .env file."
-        exit 1
-    }
+    Write-Host "${Red}❌ Error: .env file not found!${Reset}"
+    Write-Host "Please copy .env.example to .env and fill in your values."
+    exit 1
 }
 
 # Load environment variables from .env
