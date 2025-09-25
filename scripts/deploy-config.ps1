@@ -16,9 +16,15 @@ Write-Host "====================================="
 
 # Check if .env file exists
 if (-not (Test-Path ".env")) {
-    Write-Host "${Red}❌ Error: .env file not found!${Reset}"
-    Write-Host "Please copy .env.example to .env and fill in your values."
-    exit 1
+    Write-Host "${Yellow}📄 .env file not found, copying from .env.example...${Reset}"
+    if (Test-Path ".env.example") {
+        Copy-Item ".env.example" ".env"
+        Write-Host "${Green}✅ .env file created from .env.example${Reset}"
+    } else {
+        Write-Host "${Red}❌ Error: Neither .env nor .env.example file found!${Reset}"
+        Write-Host "Please create a .env.example file or provide a .env file."
+        exit 1
+    }
 }
 
 # Load environment variables from .env

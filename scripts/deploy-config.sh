@@ -20,9 +20,15 @@ echo "====================================="
 
 # Check if .env file exists
 if [ ! -f ".env" ]; then
-    echo -e "${RED}❌ Error: .env file not found!${NC}"
-    echo "Please copy .env.example to .env and fill in your values."
-    exit 1
+    echo -e "${YELLOW}📄 .env file not found, copying from .env.example...${NC}"
+    if [ -f ".env.example" ]; then
+        cp ".env.example" ".env"
+        echo -e "${GREEN}✅ .env file created from .env.example${NC}"
+    else
+        echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
+        echo "Please create a .env.example file or provide a .env file."
+        exit 1
+    fi
 fi
 
 # Source the .env file

@@ -12,9 +12,15 @@ echo =====================================
 
 REM Check if .env file exists
 if not exist ".env" (
-    echo [91m❌ Error: .env file not found![0m
-    echo Please copy .env.example to .env and fill in your values.
-    exit /b 1
+    echo [93m📄 .env file not found, copying from .env.example...[0m
+    if exist ".env.example" (
+        copy ".env.example" ".env" >nul 2>&1
+        echo [92m✅ .env file created from .env.example[0m
+    ) else (
+        echo [91m❌ Error: Neither .env nor .env.example file found![0m
+        echo Please create a .env.example file or provide a .env file.
+        exit /b 1
+    )
 )
 
 REM Load environment variables from .env
