@@ -347,67 +347,19 @@ if not "%SL_API_KEY%"=="" (
 )
 
 echo [94mUSER_DB_AUTH[0m
-echo [93mCustom user database authentication token (64 character hex)[0m
-echo [96mCurrent value from .env:[0m %USER_DB_AUTH%
-echo [95mOptions:[0m
-echo   [96m1[0m - Keep current value
-echo   [96m2[0m - Auto-generate new secret
-echo   [96m3[0m - Enter custom value
-set /p "USER_DB_AUTH_CHOICE=Choose option (1-3): "
-
-if "%USER_DB_AUTH_CHOICE%"=="1" (
-    echo [92m✅ Keeping current USER_DB_AUTH[0m
-) else if "%USER_DB_AUTH_CHOICE%"=="2" (
-    echo [95mAuto-generating USER_DB_AUTH...[0m
-    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
-    if not "%USER_DB_AUTH%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
-        echo [92m✅ USER_DB_AUTH auto-generated and updated[0m
-    ) else (
-        echo [91m❌ Failed to generate USER_DB_AUTH[0m
-    )
-) else if "%USER_DB_AUTH_CHOICE%"=="3" (
-    set /p "USER_DB_AUTH=Enter custom value: "
-    if not "%USER_DB_AUTH%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
-        echo [92m✅ USER_DB_AUTH updated[0m
-    ) else (
-        echo [91m❌ No value entered for USER_DB_AUTH[0m
-    )
-) else (
-    echo [91m❌ Invalid choice for USER_DB_AUTH[0m
+echo [93mCustom user database authentication token (generate with: openssl rand -hex 16)[0m
+set /p "USER_DB_AUTH=Enter value: "
+if not "%USER_DB_AUTH%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
+    echo [92m✅ USER_DB_AUTH updated[0m
 )
 
 echo [94mR2_KEY_SECRET[0m
-echo [93mCustom R2 storage authentication token (64 character hex)[0m
-echo [96mCurrent value from .env:[0m %R2_KEY_SECRET%
-echo [95mOptions:[0m
-echo   [96m1[0m - Keep current value
-echo   [96m2[0m - Auto-generate new secret
-echo   [96m3[0m - Enter custom value
-set /p "R2_KEY_SECRET_CHOICE=Choose option (1-3): "
-
-if "%R2_KEY_SECRET_CHOICE%"=="1" (
-    echo [92m✅ Keeping current R2_KEY_SECRET[0m
-) else if "%R2_KEY_SECRET_CHOICE%"=="2" (
-    echo [95mAuto-generating R2_KEY_SECRET...[0m
-    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
-    if not "%R2_KEY_SECRET%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
-        echo [92m✅ R2_KEY_SECRET auto-generated and updated[0m
-    ) else (
-        echo [91m❌ Failed to generate R2_KEY_SECRET[0m
-    )
-) else if "%R2_KEY_SECRET_CHOICE%"=="3" (
-    set /p "R2_KEY_SECRET=Enter custom value: "
-    if not "%R2_KEY_SECRET%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
-        echo [92m✅ R2_KEY_SECRET updated[0m
-    ) else (
-        echo [91m❌ No value entered for R2_KEY_SECRET[0m
-    )
-) else (
-    echo [91m❌ Invalid choice for R2_KEY_SECRET[0m
+echo [93mCustom R2 storage authentication token (generate with: openssl rand -hex 16)[0m
+set /p "R2_KEY_SECRET=Enter value: "
+if not "%R2_KEY_SECRET%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
+    echo [92m✅ R2_KEY_SECRET updated[0m
 )
 
 echo [94mIMAGES_API_TOKEN[0m
@@ -620,35 +572,11 @@ echo.
 echo [94m🔐 SERVICE-SPECIFIC SECRETS[0m
 echo ============================
 echo [94mKEYS_AUTH[0m
-echo [93mKeys worker authentication token (64 character hex)[0m
-echo [96mCurrent value from .env:[0m %KEYS_AUTH%
-echo [95mOptions:[0m
-echo   [96m1[0m - Keep current value
-echo   [96m2[0m - Auto-generate new secret
-echo   [96m3[0m - Enter custom value
-set /p "KEYS_AUTH_CHOICE=Choose option (1-3): "
-
-if "%KEYS_AUTH_CHOICE%"=="1" (
-    echo [92m✅ Keeping current KEYS_AUTH[0m
-) else if "%KEYS_AUTH_CHOICE%"=="2" (
-    echo [95mAuto-generating KEYS_AUTH...[0m
-    for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
-    if not "%KEYS_AUTH%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
-        echo [92m✅ KEYS_AUTH auto-generated and updated[0m
-    ) else (
-        echo [91m❌ Failed to generate KEYS_AUTH[0m
-    )
-) else if "%KEYS_AUTH_CHOICE%"=="3" (
-    set /p "KEYS_AUTH=Enter custom value: "
-    if not "%KEYS_AUTH%"=="" (
-        powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
-        echo [92m✅ KEYS_AUTH updated[0m
-    ) else (
-        echo [91m❌ No value entered for KEYS_AUTH[0m
-    )
-) else (
-    echo [91m❌ Invalid choice for KEYS_AUTH[0m
+echo [93mKeys worker authentication token (generate with: openssl rand -hex 16)[0m
+set /p "KEYS_AUTH=Enter value: "
+if not "%KEYS_AUTH%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
+    echo [92m✅ KEYS_AUTH updated[0m
 )
 
 echo [94mACCOUNT_HASH[0m
