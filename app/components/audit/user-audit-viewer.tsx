@@ -23,7 +23,7 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
   const [filterResult, setFilterResult] = useState<AuditResult | 'all'>('all');
   const [filterCaseNumber, setFilterCaseNumber] = useState<string>('');
   const [caseNumberInput, setCaseNumberInput] = useState<string>('');
-  const [dateRange, setDateRange] = useState<'1d' | '7d' | '30d' | 'all' | 'custom'>('30d');
+  const [dateRange, setDateRange] = useState<'1d' | '7d' | '30d' | 'all' | 'custom'>('1d');
   const [customStartDate, setCustomStartDate] = useState<string>('');
   const [customEndDate, setCustomEndDate] = useState<string>('');
   const [customStartDateInput, setCustomStartDateInput] = useState<string>('');
@@ -82,11 +82,35 @@ export const UserAuditViewer = ({ isOpen, onClose, caseNumber, title }: UserAudi
         if (customEndDate) {
           endDate = new Date(customEndDate + 'T23:59:59').toISOString();
         }
-      } else if (dateRange !== 'all') {
+        // If only one custom date is provided, handle it appropriately
+        if (customStartDate && !customEndDate) {
+          // If only start date, set end date to now
+          const endDateObj = new Date();
+          endDate = endDateObj.toISOString();
+        } else if (!customStartDate && customEndDate) {
+          // If only end date, set start date to 30 days before end date
+          const startDateObj = new Date(customEndDate + 'T23:59:59');
+          startDateObj.setDate(startDateObj.getDate() - 30);
+          startDate = startDateObj.toISOString();
+        }
+      } else if (dateRange === 'all') {
+        // For 'all' entries, get last 90 days to avoid loading too much data
+        const startDateObj = new Date();
+        startDateObj.setDate(startDateObj.getDate() - 90);
+        startDate = startDateObj.toISOString();
+        
+        const endDateObj = new Date();
+        endDate = endDateObj.toISOString();
+      } else {
+        // Handle predefined ranges like '1d', '7d', '30d'
         const days = parseInt(dateRange.replace('d', ''));
-        const date = new Date();
-        date.setDate(date.getDate() - days);
-        startDate = date.toISOString();
+        const startDateObj = new Date();
+        startDateObj.setDate(startDateObj.getDate() - days);
+        startDate = startDateObj.toISOString();
+        
+        // Always set end date to now for proper range querying
+        const endDateObj = new Date();
+        endDate = endDateObj.toISOString();
       }
 
       // Get audit entries (filtered by case if specified)
