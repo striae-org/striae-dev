@@ -348,18 +348,34 @@ if not "%SL_API_KEY%"=="" (
 
 echo [94mUSER_DB_AUTH[0m
 echo [93mCustom user database authentication token (generate with: openssl rand -hex 16)[0m
-set /p "USER_DB_AUTH=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
 if not "%USER_DB_AUTH%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
-    echo [92m✅ USER_DB_AUTH updated[0m
+    echo [92m✅ USER_DB_AUTH auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "USER_DB_AUTH=Enter value: "
+    if not "%USER_DB_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
+        echo [92m✅ USER_DB_AUTH updated[0m
+    )
 )
 
 echo [94mR2_KEY_SECRET[0m
 echo [93mCustom R2 storage authentication token (generate with: openssl rand -hex 16)[0m
-set /p "R2_KEY_SECRET=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
 if not "%R2_KEY_SECRET%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
-    echo [92m✅ R2_KEY_SECRET updated[0m
+    echo [92m✅ R2_KEY_SECRET auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "R2_KEY_SECRET=Enter value: "
+    if not "%R2_KEY_SECRET%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
+        echo [92m✅ R2_KEY_SECRET updated[0m
+    )
 )
 
 echo [94mIMAGES_API_TOKEN[0m
@@ -573,10 +589,18 @@ echo [94m🔐 SERVICE-SPECIFIC SECRETS[0m
 echo ============================
 echo [94mKEYS_AUTH[0m
 echo [93mKeys worker authentication token (generate with: openssl rand -hex 16)[0m
-set /p "KEYS_AUTH=Enter value: "
+echo [95mAuto-generating secret...[0m
+for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
 if not "%KEYS_AUTH%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
-    echo [92m✅ KEYS_AUTH updated[0m
+    echo [92m✅ KEYS_AUTH auto-generated[0m
+) else (
+    echo [91m❌ Failed to auto-generate, please enter manually:[0m
+    set /p "KEYS_AUTH=Enter value: "
+    if not "%KEYS_AUTH%"=="" (
+        powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
+        echo [92m✅ KEYS_AUTH updated[0m
+    )
 )
 
 echo [94mACCOUNT_HASH[0m

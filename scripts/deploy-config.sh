@@ -219,13 +219,36 @@ prompt_for_secrets() {
         local description=$2
         local current_value="${!var_name}"
         
-        echo -e "${BLUE}$var_name${NC}"
-        echo -e "${YELLOW}$description${NC}"
-        if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
-            echo -e "${GREEN}Current value: $current_value${NC}"
-            read -p "New value (or press Enter to keep current): " new_value
+        # Auto-generate specific authentication secrets
+        if [ "$var_name" = "USER_DB_AUTH" ] || [ "$var_name" = "R2_KEY_SECRET" ] || [ "$var_name" = "KEYS_AUTH" ]; then
+            echo -e "${BLUE}$var_name${NC}"
+            echo -e "${YELLOW}$description${NC}"
+            
+            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ] && [ "$current_value" != "your_custom_user_db_auth_token_here" ] && [ "$current_value" != "your_custom_r2_secret_here" ] && [ "$current_value" != "your_custom_keys_auth_token_here" ]; then
+                echo -e "${GREEN}Current value: [HIDDEN]${NC}"
+                echo -e "${YELLOW}Auto-generating new secret...${NC}"
+            else
+                echo -e "${YELLOW}Auto-generating secret...${NC}"
+            fi
+            
+            # Generate new secret using openssl
+            new_value=$(openssl rand -hex 32 2>/dev/null || echo "")
+            if [ -n "$new_value" ]; then
+                echo -e "${GREEN}✅ $var_name auto-generated${NC}"
+            else
+                echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
+                read -p "Enter value: " new_value
+            fi
         else
-            read -p "Enter value: " new_value
+            # Normal prompt for other variables
+            echo -e "${BLUE}$var_name${NC}"
+            echo -e "${YELLOW}$description${NC}"
+            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+                echo -e "${GREEN}Current value: $current_value${NC}"
+                read -p "New value (or press Enter to keep current): " new_value
+            else
+                read -p "Enter value: " new_value
+            fi
         fi
         
         if [ -n "$new_value" ]; then

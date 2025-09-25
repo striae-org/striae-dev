@@ -171,14 +171,43 @@ function Prompt-ForSecrets {
         
         $currentValue = [Environment]::GetEnvironmentVariable($VarName, "Process")
         
-        Write-Host "${Blue}$VarName${Reset}"
-        Write-Host "${Yellow}$Description${Reset}"
-        
-        if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
-            Write-Host "${Green}Current value: $currentValue${Reset}"
-            $newValue = Read-Host "New value (or press Enter to keep current)"
+        # Auto-generate specific authentication secrets
+        if ($VarName -eq "USER_DB_AUTH" -or $VarName -eq "R2_KEY_SECRET" -or $VarName -eq "KEYS_AUTH") {
+            Write-Host "${Blue}$VarName${Reset}"
+            Write-Host "${Yellow}$Description${Reset}"
+            
+            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here" -and $currentValue -ne "your_custom_user_db_auth_token_here" -and $currentValue -ne "your_custom_r2_secret_here" -and $currentValue -ne "your_custom_keys_auth_token_here") {
+                Write-Host "${Green}Current value: [HIDDEN]${Reset}"
+                Write-Host "${Yellow}Auto-generating new secret...${Reset}"
+            } else {
+                Write-Host "${Yellow}Auto-generating secret...${Reset}"
+            }
+            
+            # Generate new secret using openssl or PowerShell fallback
+            try {
+                $newValue = & openssl rand -hex 32 2>$null
+                if (-not $newValue) { throw "OpenSSL failed" }
+                Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+            } catch {
+                try {
+                    $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
+                    Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+                } catch {
+                    Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                    $newValue = Read-Host "Enter value"
+                }
+            }
         } else {
-            $newValue = Read-Host "Enter value"
+            # Normal prompt for other variables
+            Write-Host "${Blue}$VarName${Reset}"
+            Write-Host "${Yellow}$Description${Reset}"
+            
+            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+                Write-Host "${Green}Current value: $currentValue${Reset}"
+                $newValue = Read-Host "New value (or press Enter to keep current)"
+            } else {
+                $newValue = Read-Host "Enter value"
+            }
         }
         
         if ($newValue) {
