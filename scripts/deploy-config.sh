@@ -243,6 +243,120 @@ prompt_for_secrets() {
         echo ""
     }
     
+    # Function to auto-generate or prompt for secret variables
+    prompt_for_secret() {
+        local var_name=$1
+        local description=$2
+        local current_value="${!var_name}"
+        
+        echo -e "${BLUE}$var_name${NC}"
+        echo -e "${YELLOW}$description${NC}"
+        
+        if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+            echo -e "${GREEN}Current value: $current_value${NC}"
+            echo -e "${BLUE}Options:${NC}"
+            echo -e "  ${YELLOW}1)${NC} Keep current value"
+            echo -e "  ${YELLOW}2)${NC} Auto-generate new secure token (recommended)"
+            echo -e "  ${YELLOW}3)${NC} Enter custom value"
+            read -p "Choose option (1-3) [default: 1]: " choice
+            choice=${choice:-1}
+        else
+            echo -e "${BLUE}Options:${NC}"
+            echo -e "  ${YELLOW}1)${NC} Auto-generate secure token (recommended)"
+            echo -e "  ${YELLOW}2)${NC} Enter custom value"
+            read -p "Choose option (1-2) [default: 1]: " choice
+            choice=${choice:-1}
+        fi
+        
+        case $choice in
+            1)
+                if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+                    echo -e "${GREEN}✅ Keeping current value for $var_name${NC}"
+                else
+                    echo -e "${RED}No current value found, auto-generating...${NC}"
+                    new_value=$(openssl rand -hex 32)
+                    if [ $? -eq 0 ]; then
+                        # Update the .env file
+                        if grep -q "^$var_name=" .env; then
+                            sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                        else
+                            echo "$var_name=$new_value" >> .env
+                        fi
+                        export "$var_name=$new_value"
+                        echo -e "${GREEN}✅ $var_name auto-generated and saved${NC}"
+                    else
+                        echo -e "${RED}❌ Failed to generate token with openssl, please enter manually${NC}"
+                        read -p "Enter value: " new_value
+                        if [ -n "$new_value" ]; then
+                            # Update the .env file
+                            if grep -q "^$var_name=" .env; then
+                                sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                            else
+                                echo "$var_name=$new_value" >> .env
+                            fi
+                            export "$var_name=$new_value"
+                            echo -e "${GREEN}✅ $var_name updated${NC}"
+                        fi
+                    fi
+                fi
+                ;;
+            2)
+                if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+                    new_value=$(openssl rand -hex 32)
+                    if [ $? -eq 0 ]; then
+                        # Update the .env file
+                        if grep -q "^$var_name=" .env; then
+                            sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                        else
+                            echo "$var_name=$new_value" >> .env
+                        fi
+                        export "$var_name=$new_value"
+                        echo -e "${GREEN}✅ $var_name auto-generated and saved${NC}"
+                    else
+                        echo -e "${RED}❌ Failed to generate token with openssl, please enter manually${NC}"
+                        read -p "Enter value: " new_value
+                        if [ -n "$new_value" ]; then
+                            # Update the .env file
+                            if grep -q "^$var_name=" .env; then
+                                sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                            else
+                                echo "$var_name=$new_value" >> .env
+                            fi
+                            export "$var_name=$new_value"
+                            echo -e "${GREEN}✅ $var_name updated${NC}"
+                        fi
+                    fi
+                else
+                    read -p "Enter value: " new_value
+                    if [ -n "$new_value" ]; then
+                        # Update the .env file
+                        if grep -q "^$var_name=" .env; then
+                            sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                        else
+                            echo "$var_name=$new_value" >> .env
+                        fi
+                        export "$var_name=$new_value"
+                        echo -e "${GREEN}✅ $var_name updated${NC}"
+                    fi
+                fi
+                ;;
+            3)
+                read -p "Enter custom value: " new_value
+                if [ -n "$new_value" ]; then
+                    # Update the .env file
+                    if grep -q "^$var_name=" .env; then
+                        sed -i "s|^$var_name=.*|$var_name=$new_value|" .env
+                    else
+                        echo "$var_name=$new_value" >> .env
+                    fi
+                    export "$var_name=$new_value"
+                    echo -e "${GREEN}✅ $var_name updated${NC}"
+                fi
+                ;;
+        esac
+        echo ""
+    }
+    
     echo -e "${BLUE}📊 CLOUDFLARE CORE CONFIGURATION${NC}"
     echo "=================================="
     prompt_for_var "ACCOUNT_ID" "Your Cloudflare Account ID"
@@ -250,8 +364,8 @@ prompt_for_secrets() {
     echo -e "${BLUE}🔐 SHARED AUTHENTICATION & STORAGE${NC}"
     echo "==================================="
     prompt_for_var "SL_API_KEY" "SendLayer API key for email services"
-    prompt_for_var "USER_DB_AUTH" "Custom user database authentication token (generate with: openssl rand -hex 16)"
-    prompt_for_var "R2_KEY_SECRET" "Custom R2 storage authentication token (generate with: openssl rand -hex 16)"
+    prompt_for_secret "USER_DB_AUTH" "Custom user database authentication token"
+    prompt_for_secret "R2_KEY_SECRET" "Custom R2 storage authentication token"
     prompt_for_var "IMAGES_API_TOKEN" "Cloudflare Images API token (shared between workers)"
     
     echo -e "${BLUE}🔥 FIREBASE AUTH CONFIGURATION${NC}"
@@ -293,7 +407,7 @@ prompt_for_secrets() {
     
     echo -e "${BLUE}🔐 SERVICE-SPECIFIC SECRETS${NC}"
     echo "============================"
-    prompt_for_var "KEYS_AUTH" "Keys worker authentication token (generate with: openssl rand -hex 16)"
+    prompt_for_secret "KEYS_AUTH" "Keys worker authentication token"
     prompt_for_var "ACCOUNT_HASH" "Cloudflare Images Account Hash"
     prompt_for_var "API_TOKEN" "Cloudflare Images API token (for Images Worker)"
     prompt_for_var "HMAC_KEY" "Cloudflare Images HMAC signing key"

@@ -198,6 +198,182 @@ function Prompt-ForSecrets {
         Write-Host ""
     }
     
+    # Function to auto-generate or prompt for secret variables
+    function Prompt-ForSecret {
+        param(
+            [string]$VarName,
+            [string]$Description
+        )
+        
+        $currentValue = [Environment]::GetEnvironmentVariable($VarName, "Process")
+        
+        Write-Host "${Blue}$VarName${Reset}"
+        Write-Host "${Yellow}$Description${Reset}"
+        
+        if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+            Write-Host "${Green}Current value: $currentValue${Reset}"
+            Write-Host "${Blue}Options:${Reset}"
+            Write-Host "  ${Yellow}1)${Reset} Keep current value"
+            Write-Host "  ${Yellow}2)${Reset} Auto-generate new secure token (recommended)"
+            Write-Host "  ${Yellow}3)${Reset} Enter custom value"
+            $choice = Read-Host "Choose option (1-3) [default: 1]"
+            if (-not $choice) { $choice = "1" }
+        } else {
+            Write-Host "${Blue}Options:${Reset}"
+            Write-Host "  ${Yellow}1)${Reset} Auto-generate secure token (recommended)"
+            Write-Host "  ${Yellow}2)${Reset} Enter custom value"
+            $choice = Read-Host "Choose option (1-2) [default: 1]"
+            if (-not $choice) { $choice = "1" }
+        }
+        
+        switch ($choice) {
+            "1" {
+                if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+                    Write-Host "${Green}✅ Keeping current value for $VarName${Reset}"
+                } else {
+                    Write-Host "${Red}No current value found, auto-generating...${Reset}"
+                    try {
+                        # Try using openssl first
+                        $newValue = & openssl rand -hex 32 2>$null
+                        if ($LASTEXITCODE -eq 0 -and $newValue) {
+                            # Update the .env file
+                            $content = Get-Content ".env" -Raw
+                            if ($content -match "^$VarName=.*") {
+                                $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                            } else {
+                                $content += "`n$VarName=$newValue"
+                            }
+                            Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                            [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                            Write-Host "${Green}✅ $VarName auto-generated and saved${Reset}"
+                        } else {
+                            throw "OpenSSL failed"
+                        }
+                    } catch {
+                        # Fallback to PowerShell crypto
+                        try {
+                            $bytes = New-Object byte[] 32
+                            ([System.Security.Cryptography.RNGCryptoServiceProvider]::new()).GetBytes($bytes)
+                            $newValue = [System.BitConverter]::ToString($bytes).Replace('-', '').ToLower()
+                            
+                            # Update the .env file
+                            $content = Get-Content ".env" -Raw
+                            if ($content -match "^$VarName=.*") {
+                                $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                            } else {
+                                $content += "`n$VarName=$newValue"
+                            }
+                            Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                            [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                            Write-Host "${Green}✅ $VarName auto-generated and saved (using PowerShell crypto)${Reset}"
+                        } catch {
+                            Write-Host "${Red}❌ Failed to generate token automatically, please enter manually${Reset}"
+                            $newValue = Read-Host "Enter value"
+                            if ($newValue) {
+                                # Update the .env file
+                                $content = Get-Content ".env" -Raw
+                                if ($content -match "^$VarName=.*") {
+                                    $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                                } else {
+                                    $content += "`n$VarName=$newValue"
+                                }
+                                Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                                [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                                Write-Host "${Green}✅ $VarName updated${Reset}"
+                            }
+                        }
+                    }
+                }
+            }
+            "2" {
+                if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+                    try {
+                        # Try using openssl first
+                        $newValue = & openssl rand -hex 32 2>$null
+                        if ($LASTEXITCODE -eq 0 -and $newValue) {
+                            # Update the .env file
+                            $content = Get-Content ".env" -Raw
+                            if ($content -match "^$VarName=.*") {
+                                $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                            } else {
+                                $content += "`n$VarName=$newValue"
+                            }
+                            Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                            [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                            Write-Host "${Green}✅ $VarName auto-generated and saved${Reset}"
+                        } else {
+                            throw "OpenSSL failed"
+                        }
+                    } catch {
+                        # Fallback to PowerShell crypto
+                        try {
+                            $bytes = New-Object byte[] 32
+                            ([System.Security.Cryptography.RNGCryptoServiceProvider]::new()).GetBytes($bytes)
+                            $newValue = [System.BitConverter]::ToString($bytes).Replace('-', '').ToLower()
+                            
+                            # Update the .env file
+                            $content = Get-Content ".env" -Raw
+                            if ($content -match "^$VarName=.*") {
+                                $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                            } else {
+                                $content += "`n$VarName=$newValue"
+                            }
+                            Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                            [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                            Write-Host "${Green}✅ $VarName auto-generated and saved (using PowerShell crypto)${Reset}"
+                        } catch {
+                            Write-Host "${Red}❌ Failed to generate token automatically, please enter manually${Reset}"
+                            $newValue = Read-Host "Enter value"
+                            if ($newValue) {
+                                # Update the .env file
+                                $content = Get-Content ".env" -Raw
+                                if ($content -match "^$VarName=.*") {
+                                    $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                                } else {
+                                    $content += "`n$VarName=$newValue"
+                                }
+                                Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                                [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                                Write-Host "${Green}✅ $VarName updated${Reset}"
+                            }
+                        }
+                    }
+                } else {
+                    $newValue = Read-Host "Enter value"
+                    if ($newValue) {
+                        # Update the .env file
+                        $content = Get-Content ".env" -Raw
+                        if ($content -match "^$VarName=.*") {
+                            $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                        } else {
+                            $content += "`n$VarName=$newValue"
+                        }
+                        Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                        [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                        Write-Host "${Green}✅ $VarName updated${Reset}"
+                    }
+                }
+            }
+            "3" {
+                $newValue = Read-Host "Enter custom value"
+                if ($newValue) {
+                    # Update the .env file
+                    $content = Get-Content ".env" -Raw
+                    if ($content -match "^$VarName=.*") {
+                        $content = $content -replace "^$VarName=.*", "$VarName=$newValue"
+                    } else {
+                        $content += "`n$VarName=$newValue"
+                    }
+                    Set-Content -Path ".env" -Value $content.TrimEnd() -NoNewline
+                    [Environment]::SetEnvironmentVariable($VarName, $newValue, "Process")
+                    Write-Host "${Green}✅ $VarName updated${Reset}"
+                }
+            }
+        }
+        Write-Host ""
+    }
+    
+    
     Write-Host "${Blue}📊 CLOUDFLARE CORE CONFIGURATION${Reset}"
     Write-Host "=================================="
     Prompt-ForVar "ACCOUNT_ID" "Your Cloudflare Account ID"
@@ -205,8 +381,8 @@ function Prompt-ForSecrets {
     Write-Host "${Blue}🔐 SHARED AUTHENTICATION & STORAGE${Reset}"
     Write-Host "==================================="
     Prompt-ForVar "SL_API_KEY" "SendLayer API key for email services"
-    Prompt-ForVar "USER_DB_AUTH" "Custom user database authentication token (generate with: openssl rand -hex 16)"
-    Prompt-ForVar "R2_KEY_SECRET" "Custom R2 storage authentication token (generate with: openssl rand -hex 16)"
+    Prompt-ForSecret "USER_DB_AUTH" "Custom user database authentication token"
+    Prompt-ForSecret "R2_KEY_SECRET" "Custom R2 storage authentication token"
     Prompt-ForVar "IMAGES_API_TOKEN" "Cloudflare Images API token (shared between workers)"
     
     Write-Host "${Blue}🔥 FIREBASE AUTH CONFIGURATION${Reset}"
@@ -248,7 +424,7 @@ function Prompt-ForSecrets {
     
     Write-Host "${Blue}🔐 SERVICE-SPECIFIC SECRETS${Reset}"
     Write-Host "============================"
-    Prompt-ForVar "KEYS_AUTH" "Keys worker authentication token (generate with: openssl rand -hex 16)"
+    Prompt-ForSecret "KEYS_AUTH" "Keys worker authentication token"
     Prompt-ForVar "ACCOUNT_HASH" "Cloudflare Images Account Hash"
     Prompt-ForVar "API_TOKEN" "Cloudflare Images API token (for Images Worker)"
     Prompt-ForVar "HMAC_KEY" "Cloudflare Images HMAC signing key"
