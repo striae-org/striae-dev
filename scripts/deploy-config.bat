@@ -16,40 +16,7 @@ if not exist ".env" (
     if exist ".env.example" (
         copy ".env.example" ".env" >nul 2>&1
         echo [92m✅ .env file created from .env.example[0m
-        
-        REM Automatically generate the three authentication secrets
-        echo [94m🔐 Auto-generating authentication secrets...[0m
-        
-        REM Generate USER_DB_AUTH
-        for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
-        if not "%USER_DB_AUTH%"=="" (
-            powershell -Command "(Get-Content '.env') -replace 'your_custom_user_db_auth_token_here', '%USER_DB_AUTH%' | Set-Content '.env'"
-            echo [92m✅ USER_DB_AUTH auto-generated[0m
-        ) else (
-            echo [93m⚠️  Could not auto-generate USER_DB_AUTH - please set manually[0m
-        )
-        
-        REM Generate R2_KEY_SECRET  
-        for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
-        if not "%R2_KEY_SECRET%"=="" (
-            powershell -Command "(Get-Content '.env') -replace 'your_custom_r2_secret_here', '%R2_KEY_SECRET%' | Set-Content '.env'"
-            echo [92m✅ R2_KEY_SECRET auto-generated[0m
-        ) else (
-            echo [93m⚠️  Could not auto-generate R2_KEY_SECRET - please set manually[0m
-        )
-        
-        REM Generate KEYS_AUTH
-        for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
-        if not "%KEYS_AUTH%"=="" (
-            powershell -Command "(Get-Content '.env') -replace 'your_custom_keys_auth_token_here', '%KEYS_AUTH%' | Set-Content '.env'"
-            echo [92m✅ KEYS_AUTH auto-generated[0m
-        ) else (
-            echo [93m⚠️  Could not auto-generate KEYS_AUTH - please set manually[0m
-        )
-        
-        echo [94m🔐 Authentication secrets generation complete![0m
-        echo.
-        echo [93m⚠️  Please edit .env file with your other configuration values (Cloudflare Account ID, Firebase config, etc.)[0m
+        echo [93m⚠️  Please edit .env file with your actual values before proceeding[0m
         echo [94mOpening .env file for editing...[0m
         
         REM Try to open in common editors (VS Code preferred)

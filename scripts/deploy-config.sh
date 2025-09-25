@@ -24,40 +24,7 @@ if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp ".env.example" ".env"
         echo -e "${GREEN}✅ .env file created from .env.example${NC}"
-        
-        # Automatically generate the three authentication secrets
-        echo -e "${BLUE}🔐 Auto-generating authentication secrets...${NC}"
-        
-        # Generate USER_DB_AUTH
-        USER_DB_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
-        if [ -n "$USER_DB_AUTH" ]; then
-            sed -i "s/your_custom_user_db_auth_token_here/$USER_DB_AUTH/" ".env"
-            echo -e "${GREEN}✅ USER_DB_AUTH auto-generated${NC}"
-        else
-            echo -e "${YELLOW}⚠️  Could not auto-generate USER_DB_AUTH - please set manually${NC}"
-        fi
-        
-        # Generate R2_KEY_SECRET
-        R2_KEY_SECRET=$(openssl rand -hex 32 2>/dev/null || echo "")
-        if [ -n "$R2_KEY_SECRET" ]; then
-            sed -i "s/your_custom_r2_secret_here/$R2_KEY_SECRET/" ".env"
-            echo -e "${GREEN}✅ R2_KEY_SECRET auto-generated${NC}"
-        else
-            echo -e "${YELLOW}⚠️  Could not auto-generate R2_KEY_SECRET - please set manually${NC}"
-        fi
-        
-        # Generate KEYS_AUTH
-        KEYS_AUTH=$(openssl rand -hex 32 2>/dev/null || echo "")
-        if [ -n "$KEYS_AUTH" ]; then
-            sed -i "s/your_custom_keys_auth_token_here/$KEYS_AUTH/" ".env"
-            echo -e "${GREEN}✅ KEYS_AUTH auto-generated${NC}"
-        else
-            echo -e "${YELLOW}⚠️  Could not auto-generate KEYS_AUTH - please set manually${NC}"
-        fi
-        
-        echo -e "${BLUE}🔐 Authentication secrets generation complete!${NC}"
-        echo ""
-        echo -e "${YELLOW}⚠️  Please edit .env file with your other configuration values (Cloudflare Account ID, Firebase config, etc.)${NC}"
+        echo -e "${YELLOW}⚠️  Please edit .env file with your actual values before proceeding${NC}"
         echo -e "${BLUE}Opening .env file for editing...${NC}"
         
         # Try to open in common editors (VS Code preferred)
@@ -72,7 +39,7 @@ if [ ! -f ".env" ]; then
         fi
         
         echo ""
-        read -p "Press Enter after you've updated the .env file with your other configuration values..."
+        read -p "Press Enter after you've updated the .env file with your values..."
         echo ""
     else
         echo -e "${RED}❌ Error: Neither .env nor .env.example file found!${NC}"
@@ -420,11 +387,8 @@ prompt_for_secrets() {
     echo -e "${BLUE}🔐 SHARED AUTHENTICATION & STORAGE${NC}"
     echo "==================================="
     prompt_for_var "SL_API_KEY" "SendLayer API key for email services"
-    # Skip prompting for auto-generated secrets - they're generated during .env creation
-    # USER_DB_AUTH, R2_KEY_SECRET, and KEYS_AUTH are auto-generated
-    
-    # Other interactive prompts can go here if needed
-    echo -e "${GREEN}✅ Configuration secrets are auto-generated, no manual input needed${NC}"
+    prompt_for_secret "USER_DB_AUTH" "Custom user database authentication token"
+    prompt_for_secret "R2_KEY_SECRET" "Custom R2 storage authentication token"
     prompt_for_var "IMAGES_API_TOKEN" "Cloudflare Images API token (shared between workers)"
     
     echo -e "${BLUE}🔥 FIREBASE AUTH CONFIGURATION${NC}"
@@ -466,7 +430,7 @@ prompt_for_secrets() {
     
     echo -e "${BLUE}🔐 SERVICE-SPECIFIC SECRETS${NC}"
     echo "============================"
-    # Skip prompting for KEYS_AUTH - it's auto-generated during .env creation
+    prompt_for_secret "KEYS_AUTH" "Keys worker authentication token"
     prompt_for_var "ACCOUNT_HASH" "Cloudflare Images Account Hash"
     prompt_for_var "API_TOKEN" "Cloudflare Images API token (for Images Worker)"
     prompt_for_var "HMAC_KEY" "Cloudflare Images HMAC signing key"
