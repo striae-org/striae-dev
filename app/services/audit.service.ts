@@ -1330,8 +1330,8 @@ export class AuditService {
     if (entry.details.securityChecks) {
       const securityIssues = [];
       
-      // selfConfirmationPrevented: Only check for import actions (not creation or export)
-      if (entry.action === 'import' && entry.details.securityChecks.selfConfirmationPrevented === false && entry.details.securityChecks.selfConfirmationPrevented !== undefined) {
+      // selfConfirmationPrevented: Only check for import actions when self-confirmation was actually prevented
+      if (entry.action === 'import' && entry.details.securityChecks.selfConfirmationPrevented === true) {
         securityIssues.push('selfConfirmationPrevented');
       }
       
