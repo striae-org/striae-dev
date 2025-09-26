@@ -115,58 +115,56 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
           ) : files.length === 0 ? (
             <div className={styles.emptyState}>No files in this case</div>
           ) : (
-            <>
-              <div className={styles.filesList}>
-                {currentFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className={styles.fileItem}
-                    onClick={() => handleFileSelect(file)}
-                  >
-                    <div className={styles.fileInfo}>
-                      <div className={styles.fileName} title={file.originalFilename}>
-                        {formatFileName(file.originalFilename)}
-                      </div>
-                      <div className={styles.fileDate}>
-                        Uploaded: {formatDate(file.uploadedAt)}
-                      </div>
+            <div className={styles.filesList}>
+              {currentFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className={styles.fileItem}
+                  onClick={() => handleFileSelect(file)}
+                >
+                  <div className={styles.fileInfo}>
+                    <div className={styles.fileName} title={file.originalFilename}>
+                      {formatFileName(file.originalFilename)}
                     </div>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={(e) => handleDeleteFile(file.id, e)}
-                      disabled={isReadOnly || deletingFileId === file.id}
-                      aria-label={`Delete ${file.originalFilename}`}
-                      title={isReadOnly ? "Cannot delete files for read-only cases" : "Delete file"}
-                      style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
-                    >
-                      {deletingFileId === file.id ? '⏳' : '×'}
-                    </button>
+                    <div className={styles.fileDate}>
+                      Uploaded: {formatDate(file.uploadedAt)}
+                    </div>
                   </div>
-                ))}
-              </div>
-              
-              {totalPages > 1 && (
-                <div className={styles.pagination}>
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                    disabled={currentPage === 0}
+                    className={styles.deleteButton}
+                    onClick={(e) => handleDeleteFile(file.id, e)}
+                    disabled={isReadOnly || deletingFileId === file.id}
+                    aria-label={`Delete ${file.originalFilename}`}
+                    title={isReadOnly ? "Cannot delete files for read-only cases" : "Delete file"}
+                    style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                   >
-                    Previous
-                  </button>
-                  <span>
-                    Page {currentPage + 1} of {totalPages} ({files.length} total files)
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-                    disabled={currentPage === totalPages - 1}
-                  >
-                    Next
+                    {deletingFileId === file.id ? '⏳' : '×'}
                   </button>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </div>
+        
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+              disabled={currentPage === 0}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage + 1} of {totalPages} ({files.length} total files)
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+              disabled={currentPage === totalPages - 1}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

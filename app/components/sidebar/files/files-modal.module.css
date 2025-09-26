@@ -17,6 +17,8 @@
   max-height: 80vh;
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
+  display: flex;
+  flex-direction: column;
 }
 
 .modalHeader {
@@ -27,12 +29,14 @@
   padding: var(--spaceL);
   border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   color: var(--textTitle);
+  flex-shrink: 0;
 }
 
 .modalContent {
   padding: var(--spaceL);
   overflow-y: auto;
-  max-height: calc(80vh - var(--space3XL));
+  flex: 1;
+  min-height: 0;
 }
 
 .closeButton {
@@ -134,7 +138,35 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spaceL) 0 0;
-  margin-top: var(--spaceL);
+  padding: var(--spaceL);
   border-top: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  background: var(--backgroundLight);
+  flex-shrink: 0;
+}
+
+.pagination button {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: var(--spaceS) var(--spaceM);
+  border-radius: var(--spaceXS);
+  cursor: pointer;
+  font-size: var(--fontSizeBodyS);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.pagination button:hover:not(:disabled) {
+  background: color-mix(in lab, var(--primary) 85%, var(--black));
+}
+
+.pagination button:disabled {
+  background: color-mix(in lab, var(--text) 20%, transparent);
+  color: var(--textLight);
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: var(--fontSizeBodyS);
+  color: var(--textBody);
+  font-weight: var(--fontWeightMedium);
 }
