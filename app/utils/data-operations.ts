@@ -391,7 +391,8 @@ export const deleteFileAnnotations = async (
 export const batchUpdateFiles = async (
   user: User,
   caseNumber: string,
-  updates: FileUpdate[]
+  updates: FileUpdate[],
+  options: { validateAccess?: boolean } = {}
 ): Promise<BatchUpdateResult> => {
   const result: BatchUpdateResult = {
     successful: [],
@@ -405,9 +406,12 @@ export const batchUpdateFiles = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Batch update denied: ${modifyCheck.reason}`);
+    // Check modification permissions if requested (default: true)
+    if (options.validateAccess !== false) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Batch update denied: ${modifyCheck.reason}`);
+      }
     }
 
     // Process each file update
@@ -472,8 +476,13 @@ export const duplicateCaseData = async (
       updatedAt: new Date().toISOString()
     };
 
-    // Save to new location with proper access validation
-    await updateCaseData(user, toCaseNumber, newCaseData);
+    // Save to new location with conditional access validation
+    await updateCaseData(
+      user, 
+      toCaseNumber, 
+      newCaseData,
+      { validateAccess: !options.skipDestinationCheck }
+    );
 
     // Copy file annotations if they exist
     if (sourceCaseData.files && sourceCaseData.files.length > 0) {
@@ -490,7 +499,12 @@ export const duplicateCaseData = async (
       }
 
       if (updates.length > 0) {
-        await batchUpdateFiles(user, toCaseNumber, updates);
+        await batchUpdateFiles(
+          user, 
+          toCaseNumber, 
+          updates,
+          { validateAccess: !options.skipDestinationCheck }
+        );
       }
     }
 
