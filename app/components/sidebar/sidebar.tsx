@@ -128,6 +128,7 @@ export const Sidebar = ({
             onNotesClick={() => setShowNotes(true)}
             isReadOnly={isReadOnly}
             isConfirmed={isConfirmed}
+            selectedFileId={imageId}
           />
           <div className={styles.importSection}>
             <button 

@@ -265,6 +265,11 @@
   background-color: #f8f9fa;
 }
 
+.fileItem.active {
+  background-color: color-mix(in lab, var(--background) 90%, transparent);
+  font-weight: var(--fontWeightMedium);
+}
+
 .fileItem[role="button"] {
   cursor: pointer;
 }

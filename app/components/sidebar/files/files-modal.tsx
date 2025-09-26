@@ -12,11 +12,12 @@ interface FilesModalProps {
   files: FileData[];
   setFiles: React.Dispatch<React.SetStateAction<FileData[]>>;
   isReadOnly?: boolean;
+  selectedFileId?: string;
 }
 
 const FILES_PER_PAGE = 10;
 
-export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles, isReadOnly = false }: FilesModalProps) => {
+export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles, isReadOnly = false, selectedFileId }: FilesModalProps) => {
   const { user } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -119,7 +120,7 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
               {currentFiles.map((file) => (
                 <div
                   key={file.id}
-                  className={styles.fileItem}
+                  className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''}`}
                   onClick={() => handleFileSelect(file)}
                 >
                   <div className={styles.fileInfo}>

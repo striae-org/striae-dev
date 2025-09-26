@@ -78,6 +78,11 @@
   background-color: color-mix(in lab, var(--background) 95%, transparent);
 }
 
+.fileItem.active {
+  background-color: color-mix(in lab, var(--background) 90%, transparent);
+  font-weight: var(--fontWeightMedium);
+}
+
 .fileInfo {
   flex: 1;
   min-width: 0; /* Allow text truncation */

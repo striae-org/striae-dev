@@ -56,6 +56,7 @@ interface CaseSidebarProps {
   setSuccessAction: (action: CaseActionType) => void;
   isReadOnly?: boolean;
   isConfirmed?: boolean;
+  selectedFileId?: string;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -78,7 +79,8 @@ export const CaseSidebar = ({
   successAction,
   setSuccessAction,
   isReadOnly = false,
-  isConfirmed = false
+  isConfirmed = false,
+  selectedFileId
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -517,6 +519,7 @@ return (
         files={files}
         setFiles={setFiles}
         isReadOnly={isReadOnly}
+        selectedFileId={selectedFileId}
       />
       
         <div className={styles.filesSection}>
@@ -590,7 +593,7 @@ return (
           <ul className={styles.fileList}>
             {files.map((file) => (
               <li key={file.id}
-                className={styles.fileItem}>
+                className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''}`}>
                   <button
                     className={styles.fileButton}
                     onClick={() => handleImageSelect(file)}
