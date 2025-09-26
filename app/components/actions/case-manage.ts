@@ -209,22 +209,21 @@ export const renameCase = async (
       throw new Error('New case number already exists');
     }
 
-    // Use centralized function to duplicate case data (skip destination check for rename)
-    await duplicateCaseData(user, oldCaseNumber, newCaseNumber, { skipDestinationCheck: true });
-
-    // Add new case metadata to user data
+    // 1) Create new case number in USER DB's entry (KV storage)
     const newCaseMetadata = {
       createdAt: new Date().toISOString(),
       caseNumber: newCaseNumber
     };
-
     await addUserCase(user, newCaseMetadata);
 
-    // Remove old case from user data  
-    await removeUserCase(user, oldCaseNumber);
+    // 2) Copy R2 case data from old case number to new case number in R2
+    await duplicateCaseData(user, oldCaseNumber, newCaseNumber, { skipDestinationCheck: true });
 
-    // Delete old case data using centralized function (bypass validation for rename)
+    // 3) Delete R2 case data with old case number
     await deleteCaseData(user, oldCaseNumber, { validateAccess: false });
+
+    // 4) Delete old case number in user's KV entry
+    await removeUserCase(user, oldCaseNumber);
 
     // Log successful case rename
     const endTime = Date.now();
