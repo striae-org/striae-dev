@@ -209,8 +209,8 @@ export const renameCase = async (
       throw new Error('New case number already exists');
     }
 
-    // Use centralized function to duplicate case data
-    await duplicateCaseData(user, oldCaseNumber, newCaseNumber);
+    // Use centralized function to duplicate case data (skip destination check for rename)
+    await duplicateCaseData(user, oldCaseNumber, newCaseNumber, { skipDestinationCheck: true });
 
     // Add new case metadata to user data
     const newCaseMetadata = {
