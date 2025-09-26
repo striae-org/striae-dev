@@ -446,13 +446,17 @@ export const batchUpdateFiles = async (
 export const duplicateCaseData = async (
   user: User,
   fromCaseNumber: string,
-  toCaseNumber: string
+  toCaseNumber: string,
+  options: { skipDestinationCheck?: boolean } = {}
 ): Promise<void> => {
   try {
-    // Check if user has permission to create/modify the destination case
-    const accessResult = await canModifyCase(user, toCaseNumber);
-    if (!accessResult.allowed) {
-      throw new Error(`User does not have permission to create or modify case ${toCaseNumber}: ${accessResult.reason || 'Access denied'}`);
+    // For rename operations, we skip the destination check since the case doesn't exist yet
+    if (!options.skipDestinationCheck) {
+      // Check if user has permission to create/modify the destination case
+      const accessResult = await canModifyCase(user, toCaseNumber);
+      if (!accessResult.allowed) {
+        throw new Error(`User does not have permission to create or modify case ${toCaseNumber}: ${accessResult.reason || 'Access denied'}`);
+      }
     }
 
     // Get source case data
