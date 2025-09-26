@@ -7,7 +7,6 @@
     "/build/*",
     "/*.css",
     "/*.js",
-    "/*.pdf",
-    "/workers/*"
+    "/*.pdf"    
   ]
 }
