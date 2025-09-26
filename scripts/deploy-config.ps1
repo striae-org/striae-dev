@@ -148,7 +148,7 @@ function Copy-ExampleConfigs {
 Copy-ExampleConfigs
 
 # Function to prompt for environment variables and update .env file
-function Prompt-ForSecrets {
+function Read-Secrets {
     Write-Host ""
     Write-Host "${Blue}🔐 Environment Variables Setup${Reset}"
     Write-Host "=============================="
@@ -169,7 +169,7 @@ function Prompt-ForSecrets {
     }
     
     # Function to prompt for a variable
-    function Prompt-ForVar {
+    function Read-EnvVariable {
         param(
             [string]$VarName,
             [string]$Description
@@ -235,60 +235,60 @@ function Prompt-ForSecrets {
     
     Write-Host "${Blue}📊 CLOUDFLARE CORE CONFIGURATION${Reset}"
     Write-Host "=================================="
-    Prompt-ForVar "ACCOUNT_ID" "Your Cloudflare Account ID"
+    Read-EnvVariable "ACCOUNT_ID" "Your Cloudflare Account ID"
     
     Write-Host "${Blue}🔐 SHARED AUTHENTICATION & STORAGE${Reset}"
     Write-Host "==================================="
-    Prompt-ForVar "SL_API_KEY" "SendLayer API key for email services"
-    Prompt-ForVar "USER_DB_AUTH" "Custom user database authentication token (generate with: openssl rand -hex 16)"
-    Prompt-ForVar "R2_KEY_SECRET" "Custom R2 storage authentication token (generate with: openssl rand -hex 16)"
-    Prompt-ForVar "IMAGES_API_TOKEN" "Cloudflare Images API token (shared between workers)"
+    Read-EnvVariable "SL_API_KEY" "SendLayer API key for email services"
+    Read-EnvVariable "USER_DB_AUTH" "Custom user database authentication token (generate with: openssl rand -hex 16)"
+    Read-EnvVariable "R2_KEY_SECRET" "Custom R2 storage authentication token (generate with: openssl rand -hex 16)"
+    Read-EnvVariable "IMAGES_API_TOKEN" "Cloudflare Images API token (shared between workers)"
     
     Write-Host "${Blue}🔥 FIREBASE AUTH CONFIGURATION${Reset}"
     Write-Host "==============================="
-    Prompt-ForVar "API_KEY" "Firebase API key"
-    Prompt-ForVar "AUTH_DOMAIN" "Firebase auth domain (project-id.firebaseapp.com)"
-    Prompt-ForVar "PROJECT_ID" "Firebase project ID"
-    Prompt-ForVar "STORAGE_BUCKET" "Firebase storage bucket"
-    Prompt-ForVar "MESSAGING_SENDER_ID" "Firebase messaging sender ID"
-    Prompt-ForVar "APP_ID" "Firebase app ID"
-    Prompt-ForVar "MEASUREMENT_ID" "Firebase measurement ID (optional)"
+    Read-EnvVariable "API_KEY" "Firebase API key"
+    Read-EnvVariable "AUTH_DOMAIN" "Firebase auth domain (project-id.firebaseapp.com)"
+    Read-EnvVariable "PROJECT_ID" "Firebase project ID"
+    Read-EnvVariable "STORAGE_BUCKET" "Firebase storage bucket"
+    Read-EnvVariable "MESSAGING_SENDER_ID" "Firebase messaging sender ID"
+    Read-EnvVariable "APP_ID" "Firebase app ID"
+    Read-EnvVariable "MEASUREMENT_ID" "Firebase measurement ID (optional)"
     
     Write-Host "${Blue}📄 PAGES CONFIGURATION${Reset}"
     Write-Host "======================"
-    Prompt-ForVar "PAGES_PROJECT_NAME" "Your Cloudflare Pages project name"
-    Prompt-ForVar "PAGES_CUSTOM_DOMAIN" "Your custom domain (e.g., striae.org) - DO NOT include https://"
+    Read-EnvVariable "PAGES_PROJECT_NAME" "Your Cloudflare Pages project name"
+    Read-EnvVariable "PAGES_CUSTOM_DOMAIN" "Your custom domain (e.g., striae.org) - DO NOT include https://"
     
     Write-Host "${Blue}🔑 WORKER NAMES & DOMAINS${Reset}"
     Write-Host "========================="
-    Prompt-ForVar "KEYS_WORKER_NAME" "Keys worker name"
-    Prompt-ForVar "KEYS_WORKER_DOMAIN" "Keys worker domain (e.g., keys.striae.org) - DO NOT include https://"
-    Prompt-ForVar "USER_WORKER_NAME" "User worker name"
-    Prompt-ForVar "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
-    Prompt-ForVar "DATA_WORKER_NAME" "Data worker name"
-    Prompt-ForVar "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
-    Prompt-ForVar "AUDIT_WORKER_NAME" "Audit worker name"
-    Prompt-ForVar "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
-    Prompt-ForVar "IMAGES_WORKER_NAME" "Images worker name"
-    Prompt-ForVar "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
-    Prompt-ForVar "TURNSTILE_WORKER_NAME" "Turnstile worker name"
-    Prompt-ForVar "TURNSTILE_WORKER_DOMAIN" "Turnstile worker domain (e.g., turnstile.striae.org) - DO NOT include https://"
-    Prompt-ForVar "PDF_WORKER_NAME" "PDF worker name"
-    Prompt-ForVar "PDF_WORKER_DOMAIN" "PDF worker domain (e.g., pdf.striae.org) - DO NOT include https://"
+    Read-EnvVariable "KEYS_WORKER_NAME" "Keys worker name"
+    Read-EnvVariable "KEYS_WORKER_DOMAIN" "Keys worker domain (e.g., keys.striae.org) - DO NOT include https://"
+    Read-EnvVariable "USER_WORKER_NAME" "User worker name"
+    Read-EnvVariable "USER_WORKER_DOMAIN" "User worker domain (e.g., users.striae.org) - DO NOT include https://"
+    Read-EnvVariable "DATA_WORKER_NAME" "Data worker name"
+    Read-EnvVariable "DATA_WORKER_DOMAIN" "Data worker domain (e.g., data.striae.org) - DO NOT include https://"
+    Read-EnvVariable "AUDIT_WORKER_NAME" "Audit worker name"
+    Read-EnvVariable "AUDIT_WORKER_DOMAIN" "Audit worker domain (e.g., audit.striae.org) - DO NOT include https://"
+    Read-EnvVariable "IMAGES_WORKER_NAME" "Images worker name"
+    Read-EnvVariable "IMAGES_WORKER_DOMAIN" "Images worker domain (e.g., images.striae.org) - DO NOT include https://"
+    Read-EnvVariable "TURNSTILE_WORKER_NAME" "Turnstile worker name"
+    Read-EnvVariable "TURNSTILE_WORKER_DOMAIN" "Turnstile worker domain (e.g., turnstile.striae.org) - DO NOT include https://"
+    Read-EnvVariable "PDF_WORKER_NAME" "PDF worker name"
+    Read-EnvVariable "PDF_WORKER_DOMAIN" "PDF worker domain (e.g., pdf.striae.org) - DO NOT include https://"
     
     Write-Host "${Blue}🗄️ STORAGE CONFIGURATION${Reset}"
     Write-Host "========================="
-    Prompt-ForVar "BUCKET_NAME" "Your R2 bucket name"
-    Prompt-ForVar "KV_STORE_ID" "Your KV namespace ID (UUID format)"
+    Read-EnvVariable "BUCKET_NAME" "Your R2 bucket name"
+    Read-EnvVariable "KV_STORE_ID" "Your KV namespace ID (UUID format)"
     
     Write-Host "${Blue}🔐 SERVICE-SPECIFIC SECRETS${Reset}"
     Write-Host "============================"
-    Prompt-ForVar "KEYS_AUTH" "Keys worker authentication token (generate with: openssl rand -hex 16)"
-    Prompt-ForVar "ACCOUNT_HASH" "Cloudflare Images Account Hash"
-    Prompt-ForVar "API_TOKEN" "Cloudflare Images API token (for Images Worker)"
-    Prompt-ForVar "HMAC_KEY" "Cloudflare Images HMAC signing key"
-    Prompt-ForVar "CFT_PUBLIC_KEY" "Cloudflare Turnstile public key"
-    Prompt-ForVar "CFT_SECRET_KEY" "Cloudflare Turnstile secret key"
+    Read-EnvVariable "KEYS_AUTH" "Keys worker authentication token (generate with: openssl rand -hex 16)"
+    Read-EnvVariable "ACCOUNT_HASH" "Cloudflare Images Account Hash"
+    Read-EnvVariable "API_TOKEN" "Cloudflare Images API token (for Images Worker)"
+    Read-EnvVariable "HMAC_KEY" "Cloudflare Images HMAC signing key"
+    Read-EnvVariable "CFT_PUBLIC_KEY" "Cloudflare Turnstile public key"
+    Read-EnvVariable "CFT_SECRET_KEY" "Cloudflare Turnstile secret key"
     
     # Reload the updated .env file
     Get-Content ".env" | ForEach-Object {
@@ -307,7 +307,7 @@ function Prompt-ForSecrets {
 }
 
 # Always prompt for secrets to ensure configuration
-Prompt-ForSecrets
+Read-Secrets
 
 # Function to replace variables in configuration files
 function Update-WranglerConfigs {
