@@ -75,43 +75,41 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
           ) : cases.length === 0 ? (
             <p className={styles.emptyState}>No cases found</p>
           ) : (
-            <>
-              <ul className={styles.casesList}>
-                {paginatedCases.map((caseNum) => (
-                  <li key={caseNum}>
-                    <button
-                      className={`${styles.caseItem} ${currentCase === caseNum ? styles.active : ''}`}
-                      onClick={() => {
-                        onSelectCase(caseNum);
-                        onClose();
-                      }}
-                    >
-                      {caseNum}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              
-              {totalPages > 1 && (
-                <div className={styles.pagination}>
+            <ul className={styles.casesList}>
+              {paginatedCases.map((caseNum) => (
+                <li key={caseNum}>
                   <button
-                    onClick={() => setCurrentPage(p => p - 1)}
-                    disabled={currentPage === 0}
+                    className={`${styles.caseItem} ${currentCase === caseNum ? styles.active : ''}`}
+                    onClick={() => {
+                      onSelectCase(caseNum);
+                      onClose();
+                    }}
                   >
-                    Previous
+                    {caseNum}
                   </button>
-                  <span>{currentPage + 1} of {totalPages}</span>
-                  <button
-                    onClick={() => setCurrentPage(p => p + 1)}
-                    disabled={currentPage === totalPages - 1}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
+        
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setCurrentPage(p => p - 1)}
+              disabled={currentPage === 0}
+            >
+              Previous
+            </button>
+            <span>{currentPage + 1} of {totalPages}</span>
+            <button
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={currentPage === totalPages - 1}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
