@@ -15,8 +15,64 @@ import {
   duplicateCaseData,
   deleteFileAnnotations
 } from '~/utils/data-operations';
-import { CaseData, ReadOnlyCaseData } from '~/types';
+import { CaseData, ReadOnlyCaseData, FileData } from '~/types';
 import { auditService } from '~/services/audit.service';
+
+/**
+ * Delete a file without individual audit logging (for bulk operations)
+ * This reduces API calls during bulk deletions
+ */
+const deleteFileWithoutAudit = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
+  // Get the case data to find file info
+  const caseData = await getCaseData(user, caseNumber);
+  if (!caseData) {
+    throw new Error('Case not found');
+  }
+  
+  const fileToDelete = (caseData.files || []).find((f: FileData) => f.id === fileId);
+  if (!fileToDelete) {
+    throw new Error('File not found in case');
+  }
+
+  // Delete the image file from Cloudflare Images (but don't audit this individual operation)
+  try {
+    const { getImageApiKey } = await import('~/utils/auth');
+    const paths = await import('~/config/config.json');
+    const IMAGE_URL = paths.default.image_worker_url;
+    
+    const imagesApiToken = await getImageApiKey();
+    const imageResponse = await fetch(`${IMAGE_URL}/${fileId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${imagesApiToken}`
+      }
+    });
+
+    // Only fail if it's not a 404 (file might already be deleted)
+    if (!imageResponse.ok && imageResponse.status !== 404) {
+      throw new Error(`Failed to delete image: ${imageResponse.statusText}`);
+    }
+  } catch (error) {
+    console.warn(`Image deletion warning for ${fileToDelete.originalFilename}:`, error);
+    // Continue with data cleanup even if image deletion fails
+  }
+
+  // Delete annotation data
+  try {
+    await deleteFileAnnotations(user, caseNumber, fileId);
+  } catch (error) {
+    // Annotation file might not exist, continue
+    console.warn(`Annotation deletion warning for ${fileToDelete.originalFilename}:`, error);
+  }
+
+  // Update case data to remove file reference
+  const updatedData: CaseData = {
+    ...caseData,
+    files: (caseData.files || []).filter((f: FileData) => f.id !== fileId)
+  };
+
+  await updateCaseData(user, caseNumber, updatedData);
+};
 
 const CASE_NUMBER_REGEX = /^[A-Za-z0-9-]+$/;
 
@@ -331,55 +387,86 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     
     // Process file deletions in batches to reduce audit rate limiting
     if (caseData.files && caseData.files.length > 0) {
-      const BATCH_SIZE = 5; // Process files in batches of 5
+      const BATCH_SIZE = 3; // Reduced batch size for better stability
+      const BATCH_DELAY = 300; // Increased delay between batches
       const files = caseData.files;
-      const deletedFiles: Array<{id: string, originalFilename: string}> = [];
+      const deletedFiles: Array<{id: string, originalFilename: string, fileSize: number}> = [];
+      const failedFiles: Array<{id: string, originalFilename: string, error: string}> = [];
+      
+      console.log(`🗑️  Deleting ${files.length} files in batches of ${BATCH_SIZE}...`);
       
       // Process files in batches
       for (let i = 0; i < files.length; i += BATCH_SIZE) {
         const batch = files.slice(i, i + BATCH_SIZE);
+        const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(files.length / BATCH_SIZE);
         
-        // Delete files in this batch
-        await Promise.all(
+        console.log(`📦 Processing batch ${batchNumber}/${totalBatches} (${batch.length} files)...`);
+        
+        // Delete files in this batch with individual error handling
+        await Promise.allSettled(
           batch.map(async file => {
             try {
-              await deleteFile(user, caseNumber, file.id);
-              deletedFiles.push({ id: file.id, originalFilename: file.originalFilename });
+              // Delete file without individual audit logging to reduce API calls
+              // We'll do bulk audit logging at the end
+              await deleteFileWithoutAudit(user, caseNumber, file.id);
+              deletedFiles.push({ 
+                id: file.id, 
+                originalFilename: file.originalFilename,
+                fileSize: 0 // We don't track file size, use 0
+              });
             } catch (error) {
-              console.error(`Failed to delete file ${file.originalFilename}:`, error);
+              const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+              console.error(`❌ Failed to delete file ${file.originalFilename}:`, errorMessage);
+              failedFiles.push({ 
+                id: file.id, 
+                originalFilename: file.originalFilename,
+                error: errorMessage
+              });
             }
           })
         );
         
         // Add delay between batches to reduce rate limiting
         if (i + BATCH_SIZE < files.length) {
-          await new Promise(resolve => setTimeout(resolve, 150));
+          console.log(`⏱️  Waiting ${BATCH_DELAY}ms before next batch...`);
+          await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
         }
       }
       
-      // Log a summary audit entry for all file deletions
+      // Single consolidated audit entry for all file operations
       try {
+        const endTime = Date.now();
+        const successCount = deletedFiles.length;
+        const failureCount = failedFiles.length;
+        
         await auditService.logEvent({
           userId: user.uid,
           userEmail: user.email || '',
           action: 'file-delete',
-          result: 'success',
-          fileName: `Batch deletion: ${deletedFiles.length} files`,
+          result: failureCount === 0 ? 'success' : 'failure',
+          fileName: `Bulk deletion: ${successCount} succeeded, ${failureCount} failed`,
           fileType: 'case-package',
           caseNumber,
           caseDetails: {
-            newCaseName: `${caseNumber} - Batch file deletion`,
-            deleteReason: `Batch deleted ${deletedFiles.length} files during case deletion`,
+            newCaseName: `${caseNumber} - Bulk file deletion`,
+            deleteReason: `Case deletion: processed ${files.length} files (${successCount} deleted, ${failureCount} failed)`,
             backupCreated: false,
             lastModified: new Date().toISOString()
           },
           performanceMetrics: {
-            processingTimeMs: Date.now() - startTime,
-            fileSizeBytes: 0
-          }
+            processingTimeMs: endTime - startTime,
+            fileSizeBytes: deletedFiles.reduce((total, file) => total + file.fileSize, 0)
+          },
+          // Include details of failed files if any
+          ...(failedFiles.length > 0 && {
+            validationErrors: failedFiles.map(f => `${f.originalFilename}: ${f.error}`)
+          })
         });
+        
+        console.log(`✅ Batch deletion complete: ${successCount} files deleted, ${failureCount} failed`);
       } catch (auditError) {
-        console.error('Failed to log batch file deletion:', auditError);
+        console.error('⚠️  Failed to log batch file deletion (continuing with case deletion):', auditError);
       }
     }
 
