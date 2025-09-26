@@ -14,9 +14,9 @@ const IMAGE_URL = paths.image_worker_url;
 export const fetchFiles = async (
   user: User, 
   caseNumber: string, 
-  options?: { validateAccess?: boolean }
+  options?: { skipValidation?: boolean }
 ): Promise<FileData[]> => {
-  const caseData = await getCaseData(user, caseNumber, { validateAccess: options?.validateAccess });
+  const caseData = await getCaseData(user, caseNumber, { skipValidation: options?.skipValidation });
   return caseData?.files || [];
 };
 

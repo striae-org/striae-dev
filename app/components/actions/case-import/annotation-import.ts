@@ -20,7 +20,7 @@ export async function importAnnotations(
         if (newFileId) {
           // Save annotations using the existing notes management system
           // Bypass access validation for read-only case imports
-          await saveNotes(user, caseNumber, newFileId, fileEntry.annotations, { validateAccess: false });
+          await saveNotes(user, caseNumber, newFileId, fileEntry.annotations, { skipValidation: true });
           annotationsImported++;
         }
       }
