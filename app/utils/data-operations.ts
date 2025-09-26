@@ -174,7 +174,8 @@ export const updateCaseData = async (
  */
 export const deleteCaseData = async (
   user: User,
-  caseNumber: string
+  caseNumber: string,
+  options: DataOperationOptions = {}
 ): Promise<void> => {
   try {
     // Validate user session
@@ -183,10 +184,12 @@ export const deleteCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Delete denied: ${modifyCheck.reason}`);
+    // Check modification permissions if requested
+    if (options.validateAccess !== false) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Delete denied: ${modifyCheck.reason}`);
+      }
     }
 
     const apiKey = await getDataApiKey();
