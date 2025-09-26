@@ -337,22 +337,27 @@ export const saveFileAnnotations = async (
  * @param user - Authenticated user
  * @param caseNumber - Case identifier
  * @param fileId - File identifier
+ * @param options - Additional options for the operation
  */
 export const deleteFileAnnotations = async (
   user: User,
   caseNumber: string,
-  fileId: string
+  fileId: string,
+  options: { skipValidation?: boolean } = {}
 ): Promise<void> => {
   try {
-    // Validate user session and permissions
+    // Validate user session
     const sessionValidation = await validateUserSession(user);
     if (!sessionValidation.valid) {
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Delete denied: ${modifyCheck.reason}`);
+    // Check modification permissions if validation is not explicitly disabled
+    if (options.skipValidation !== true) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Delete denied: ${modifyCheck.reason}`);
+      }
     }
 
     const apiKey = await getDataApiKey();

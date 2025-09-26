@@ -12,7 +12,8 @@ import {
   getCaseData,
   updateCaseData,
   deleteCaseData,
-  duplicateCaseData
+  duplicateCaseData,
+  deleteFileAnnotations
 } from '~/utils/data-operations';
 import { CaseData, ReadOnlyCaseData } from '~/types';
 import { auditService } from '~/services/audit.service';
@@ -211,6 +212,12 @@ export const renameCase = async (
       throw new Error('New case number already exists');
     }
 
+    // Get the old case data to find all files that need annotation cleanup
+    const oldCaseData = await getCaseData(user, oldCaseNumber);
+    if (!oldCaseData) {
+      throw new Error('Old case not found');
+    }
+
     // 1) Create new case number in USER DB's entry (KV storage)
     const newCaseMetadata = {
       createdAt: new Date().toISOString(),
@@ -221,10 +228,38 @@ export const renameCase = async (
     // 2) Copy R2 case data from old case number to new case number in R2
     await duplicateCaseData(user, oldCaseNumber, newCaseNumber);
 
-    // 3) Delete R2 case data with old case number
+    // 3) Delete individual file annotations from the old case (before losing access)
+    if (oldCaseData.files && oldCaseData.files.length > 0) {
+      // Process annotation deletions in batches to avoid rate limiting
+      const BATCH_SIZE = 5;
+      const files = oldCaseData.files;
+      
+      for (let i = 0; i < files.length; i += BATCH_SIZE) {
+        const batch = files.slice(i, i + BATCH_SIZE);
+        
+        // Delete annotation files in this batch
+        await Promise.all(
+          batch.map(async file => {
+            try {
+              await deleteFileAnnotations(user, oldCaseNumber, file.id);
+            } catch (error) {
+              // Continue if annotation file doesn't exist or fails to delete
+              console.warn(`Failed to delete annotations for ${file.originalFilename}:`, error);
+            }
+          })
+        );
+        
+        // Add delay between batches to reduce rate limiting
+        if (i + BATCH_SIZE < files.length) {
+          await new Promise(resolve => setTimeout(resolve, 150));
+        }
+      }
+    }
+
+    // 4) Delete R2 case data with old case number
     await deleteCaseData(user, oldCaseNumber);
 
-    // 4) Delete old case number in user's KV entry
+    // 5) Delete old case number in user's KV entry
     await removeUserCase(user, oldCaseNumber);
 
     // Log successful case rename
