@@ -101,7 +101,7 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
             >
               Previous
             </button>
-            <span>{currentPage + 1} of {totalPages}</span>
+            <span>{currentPage + 1} of {totalPages} ({cases.length} total cases)</span>
             <button
               onClick={() => setCurrentPage(p => p + 1)}
               disabled={currentPage === totalPages - 1}
