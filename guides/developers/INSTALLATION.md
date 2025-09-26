@@ -213,6 +213,8 @@ npm run build
 
 ### 2.4 Cloudflare R2 Setup
 
+**Case Data Storage Bucket:**
+
 1. Navigate to Cloudflare Dashboard → R2 Object Storage
 2. Create a new R2 bucket for data storage
 3. Configure CORS settings for your bucket, replacing the allowed origin with your custom domain:
@@ -227,6 +229,34 @@ npm run build
       "GET",
       "PUT",
       "DELETE",
+      "POST"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": [
+      "Content-Type",
+      "Content-Length"
+    ],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+**Audit Trail Storage Bucket:**
+
+1. Create a new R2 bucket for audit storage
+2. Configure CORS settings for your bucket, replacing the allowed origin with your custom domain:
+
+```json
+[
+  {
+    "AllowedOrigins": [
+      "https://your-domain.com"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "PUT",      
       "POST"
     ],
     "AllowedHeaders": [
