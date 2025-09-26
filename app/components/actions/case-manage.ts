@@ -72,9 +72,8 @@ export const validateCaseNumber = (caseNumber: string): boolean => {
 
 export const checkExistingCase = async (user: User, caseNumber: string): Promise<CaseData | null> => {
   try {
-    // Use centralized function with access validation disabled
-    // This prevents timing issues where case exists in storage but not yet in user's access list
-    const caseData = await getCaseData(user, caseNumber, { validateAccess: false });
+    // Try to get case data - if user doesn't have access, it means case doesn't exist for them
+    const caseData = await getCaseData(user, caseNumber);
     
     if (!caseData) {
       return null;
@@ -93,6 +92,10 @@ export const checkExistingCase = async (user: User, caseNumber: string): Promise
     return null;
 
   } catch (error) {
+    // If access denied, treat as case doesn't exist for this user
+    if (error instanceof Error && error.message.includes('Access denied')) {
+      return null;
+    }
     console.error('Error checking existing case:', error);
     return null;
   }
@@ -142,12 +145,11 @@ export const createNewCase = async (user: User, caseNumber: string): Promise<Cas
       caseNumber: newCase.caseNumber
     };
 
-    // Create case file using centralized function with access validation disabled
-    // (case hasn't been added to user's list yet)
-    await updateCaseData(user, caseNumber, newCase, { validateAccess: false });
-
-    // Add case to user data using centralized function
+    // Add case to user data first (so user has permission to create case data)
     await addUserCase(user, caseMetadata);
+
+    // Create case file using centralized function
+    await updateCaseData(user, caseNumber, newCase);
 
     // Log successful case creation
     const endTime = Date.now();
@@ -217,10 +219,10 @@ export const renameCase = async (
     await addUserCase(user, newCaseMetadata);
 
     // 2) Copy R2 case data from old case number to new case number in R2
-    await duplicateCaseData(user, oldCaseNumber, newCaseNumber, { skipDestinationCheck: true });
+    await duplicateCaseData(user, oldCaseNumber, newCaseNumber);
 
     // 3) Delete R2 case data with old case number
-    await deleteCaseData(user, oldCaseNumber, { validateAccess: false });
+    await deleteCaseData(user, oldCaseNumber);
 
     // 4) Delete old case number in user's KV entry
     await removeUserCase(user, oldCaseNumber);

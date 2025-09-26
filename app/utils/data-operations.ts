@@ -32,7 +32,6 @@ export interface BatchUpdateResult {
 }
 
 export interface DataOperationOptions {
-  validateAccess?: boolean;
   includeTimestamp?: boolean;
   retryCount?: number;
 }
@@ -62,12 +61,10 @@ export const getCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Validate case access if requested
-    if (options.validateAccess !== false) {
-      const accessCheck = await canAccessCase(user, caseNumber);
-      if (!accessCheck.allowed) {
-        throw new Error(`Access denied: ${accessCheck.reason}`);
-      }
+    // Validate case access
+    const accessCheck = await canAccessCase(user, caseNumber);
+    if (!accessCheck.allowed) {
+      throw new Error(`Access denied: ${accessCheck.reason}`);
     }
 
     // Validate case number format
@@ -122,12 +119,10 @@ export const updateCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions if requested
-    if (options.validateAccess !== false) {
-      const modifyCheck = await canModifyCase(user, caseNumber);
-      if (!modifyCheck.allowed) {
-        throw new Error(`Modification denied: ${modifyCheck.reason}`);
-      }
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Modification denied: ${modifyCheck.reason}`);
     }
 
     // Validate inputs
@@ -174,8 +169,7 @@ export const updateCaseData = async (
  */
 export const deleteCaseData = async (
   user: User,
-  caseNumber: string,
-  options: DataOperationOptions = {}
+  caseNumber: string
 ): Promise<void> => {
   try {
     // Validate user session
@@ -184,12 +178,10 @@ export const deleteCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions if requested
-    if (options.validateAccess !== false) {
-      const modifyCheck = await canModifyCase(user, caseNumber);
-      if (!modifyCheck.allowed) {
-        throw new Error(`Delete denied: ${modifyCheck.reason}`);
-      }
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Delete denied: ${modifyCheck.reason}`);
     }
 
     const apiKey = await getDataApiKey();
@@ -293,12 +285,10 @@ export const saveFileAnnotations = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions if requested
-    if (options.validateAccess !== false) {
-      const modifyCheck = await canModifyCase(user, caseNumber);
-      if (!modifyCheck.allowed) {
-        throw new Error(`Modification denied: ${modifyCheck.reason}`);
-      }
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Modification denied: ${modifyCheck.reason}`);
     }
 
     // Validate inputs
@@ -395,7 +385,7 @@ export const batchUpdateFiles = async (
   user: User,
   caseNumber: string,
   updates: FileUpdate[],
-  options: { validateAccess?: boolean } = {}
+  options: DataOperationOptions = {}
 ): Promise<BatchUpdateResult> => {
   const result: BatchUpdateResult = {
     successful: [],
@@ -409,12 +399,10 @@ export const batchUpdateFiles = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions if requested (default: true)
-    if (options.validateAccess !== false) {
-      const modifyCheck = await canModifyCase(user, caseNumber);
-      if (!modifyCheck.allowed) {
-        throw new Error(`Batch update denied: ${modifyCheck.reason}`);
-      }
+    // Check modification permissions
+    const modifyCheck = await canModifyCase(user, caseNumber);
+    if (!modifyCheck.allowed) {
+      throw new Error(`Batch update denied: ${modifyCheck.reason}`);
     }
 
     // Process each file update
@@ -479,12 +467,11 @@ export const duplicateCaseData = async (
       updatedAt: new Date().toISOString()
     };
 
-    // Save to new location with conditional access validation
+    // Save to new location
     await updateCaseData(
       user, 
       toCaseNumber, 
-      newCaseData,
-      { validateAccess: !options.skipDestinationCheck }
+      newCaseData
     );
 
     // Copy file annotations if they exist
@@ -505,8 +492,7 @@ export const duplicateCaseData = async (
         await batchUpdateFiles(
           user, 
           toCaseNumber, 
-          updates,
-          { validateAccess: !options.skipDestinationCheck }
+          updates
         );
       }
     }
@@ -585,9 +571,13 @@ export const caseExists = async (
   caseNumber: string
 ): Promise<boolean> => {
   try {
-    const caseData = await getCaseData(user, caseNumber, { validateAccess: false });
+    const caseData = await getCaseData(user, caseNumber);
     return caseData !== null;
   } catch (error) {
+    // If we get an access denied error, the case might exist but user can't access it
+    if (error instanceof Error && error.message.includes('Access denied')) {
+      return false; // For existence checking, treat access denied as "doesn't exist for this user"
+    }
     console.error(`Error checking case existence for ${caseNumber}:`, error);
     return false;
   }
