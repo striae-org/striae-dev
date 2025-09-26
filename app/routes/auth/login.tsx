@@ -18,6 +18,7 @@ import { handleAuthError } from '~/services/firebase-errors';
 import { MFAVerification } from '~/components/auth/mfa-verification';
 import { MFAEnrollment } from '~/components/auth/mfa-enrollment';
 import { Icon } from '~/components/icon/icon';
+import { Notice } from '~/components/notice/notice';
 import styles from './login.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
@@ -48,6 +49,7 @@ export const Login = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [company, setCompany] = useState('');
+  const [showCaseReviewNotice, setShowCaseReviewNotice] = useState(false);
   
   // MFA state
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
@@ -442,7 +444,14 @@ export const Login = () => {
                   
                   {/* Case Review Account Toggle */}
                   <div className={styles.caseReviewToggleSection}>
-                    <span className={styles.caseReviewLabel}>Case Review Account Only:</span>
+                    <button
+                      type="button"
+                      className={styles.caseReviewLabel}
+                      onClick={() => setShowCaseReviewNotice(true)}
+                      title="Click for more information about Case Review Accounts"
+                    >
+                      Case Review Account Only:
+                    </button>
                     <div className={styles.caseReviewToggle}>
                       <button
                         type="button"
@@ -566,6 +575,22 @@ export const Login = () => {
           mandatory={true}
         />
       )}
+      
+      <Notice
+        isOpen={showCaseReviewNotice}
+        onClose={() => setShowCaseReviewNotice(false)}
+        notice={{
+          title: "Case Review Account Information",
+          content: (
+            <div>
+              <h2>What is a Case Review Account?</h2>
+              <p>Toggle this to "Yes" if you are registering specifically to review and confirm cases from a different Striae instance or agency. This type of account is designed for cross-agency collaboration where confirmations are needed from reviewers who are not part of the primary instance's Firebase Authentication database.</p>
+              <p>Since confirmations can only be completed by users within the same instance and Firebase Authentication database, reviewers from external agencies must create a Case Review Account to successfully complete confirmations. This ensures proper cross-jurisdictional collaboration while maintaining security boundaries between different organizational instances of Striae.</p>
+            </div>
+          ),
+          buttonText: "Got it!"
+        }}
+      />
     </>
   );
 };
