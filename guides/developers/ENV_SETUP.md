@@ -78,11 +78,17 @@ This directory (/scripts) contains scripts and configuration files for managing 
 - `USER_WORKER_DOMAIN` - User worker domain
 - `KV_STORE_ID` - Your KV namespace ID
 
+### Audit Worker Environment Variables
+
+- `AUDIT_WORKER_NAME` - Audit worker name
+- `AUDIT_WORKER_DOMAIN` - Audit worker domain
+- `AUDIT_BUCKET_NAME` - Your R2 bucket name for audit logs (separate from data bucket)
+
 ### Data Worker Environment Variables
 
 - `DATA_WORKER_NAME` - Data worker name
 - `DATA_WORKER_DOMAIN` - Data worker domain
-- `BUCKET_NAME` - Your R2 bucket name
+- `DATA_BUCKET_NAME` - Your R2 bucket name for case data storage
 
 ### Images Worker Environment Variables
 

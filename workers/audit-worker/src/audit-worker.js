@@ -52,7 +52,7 @@ export default {
     try {
       const url = new URL(request.url);
       const pathname = url.pathname;
-      const bucket = env.STRIAE_DATA;
+      const bucket = env.STRIAE_AUDIT;
 
       // This worker only handles audit trail endpoints
       if (!pathname.startsWith('/audit/')) {

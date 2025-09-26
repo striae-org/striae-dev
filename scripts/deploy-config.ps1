@@ -71,7 +71,8 @@ $required_vars = @(
     "IMAGES_WORKER_DOMAIN",
     "TURNSTILE_WORKER_DOMAIN",
     "PDF_WORKER_DOMAIN",
-    "BUCKET_NAME",
+    "DATA_BUCKET_NAME",
+    "AUDIT_BUCKET_NAME",
     "KV_STORE_ID",
     "KEYS_AUTH",
     "ACCOUNT_HASH",
@@ -278,7 +279,8 @@ function Read-Secrets {
     
     Write-Host "${Blue}🗄️ STORAGE CONFIGURATION${Reset}"
     Write-Host "========================="
-    Read-EnvVariable "BUCKET_NAME" "Your R2 bucket name"
+    Read-EnvVariable "DATA_BUCKET_NAME" "Your R2 bucket name for case data storage"
+    Read-EnvVariable "AUDIT_BUCKET_NAME" "Your R2 bucket name for audit logs (separate from data bucket)"
     Read-EnvVariable "KV_STORE_ID" "Your KV namespace ID (UUID format)"
     
     Write-Host "${Blue}🔐 SERVICE-SPECIFIC SECRETS${Reset}"
@@ -322,7 +324,8 @@ function Update-WranglerConfigs {
     $DATA_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("DATA_WORKER_DOMAIN", "Process")
     $AUDIT_WORKER_NAME = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_NAME", "Process")
     $AUDIT_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("AUDIT_WORKER_DOMAIN", "Process")
-    $BUCKET_NAME = [Environment]::GetEnvironmentVariable("BUCKET_NAME", "Process")
+    $DATA_BUCKET_NAME = [Environment]::GetEnvironmentVariable("DATA_BUCKET_NAME", "Process")
+    $AUDIT_BUCKET_NAME = [Environment]::GetEnvironmentVariable("AUDIT_BUCKET_NAME", "Process")
     $IMAGES_WORKER_NAME = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_NAME", "Process")
     $IMAGES_WORKER_DOMAIN = [Environment]::GetEnvironmentVariable("IMAGES_WORKER_DOMAIN", "Process")
     $KEYS_WORKER_NAME = [Environment]::GetEnvironmentVariable("KEYS_WORKER_NAME", "Process")
@@ -353,7 +356,7 @@ function Update-WranglerConfigs {
                 '"DATA_WORKER_NAME"' = "`"$DATA_WORKER_NAME`""
                 '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
                 '"DATA_WORKER_DOMAIN"' = "`"$DATA_WORKER_DOMAIN`""
-                '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
+                '"DATA_BUCKET_NAME"' = "`"$DATA_BUCKET_NAME`""
             }
         },
         @{
@@ -363,7 +366,7 @@ function Update-WranglerConfigs {
                 '"AUDIT_WORKER_NAME"' = "`"$AUDIT_WORKER_NAME`""
                 '"ACCOUNT_ID"' = "`"$ACCOUNT_ID`""
                 '"AUDIT_WORKER_DOMAIN"' = "`"$AUDIT_WORKER_DOMAIN`""
-                '"BUCKET_NAME"' = "`"$BUCKET_NAME`""
+                '"AUDIT_BUCKET_NAME"' = "`"$AUDIT_BUCKET_NAME`""
             }
         },
         @{

@@ -334,7 +334,8 @@ Before running the configuration script, gather the following information from S
 
 **From Step 2.4 (R2):**
 
-- R2 Bucket Name (`BUCKET_NAME`)
+- Data R2 Bucket Name (`DATA_BUCKET_NAME`) - For case data storage
+- Audit R2 Bucket Name (`AUDIT_BUCKET_NAME`) - For audit logs (separate bucket recommended)
 
 **Additional Services:**
 
