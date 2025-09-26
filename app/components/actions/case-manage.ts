@@ -306,8 +306,8 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     // Remove case from user data first (so user loses access immediately)
     await removeUserCase(user, caseNumber);
 
-    // Delete case data using centralized function
-    await deleteCaseData(user, caseNumber);
+    // Delete case data using centralized function (skip validation since user no longer has access)
+    await deleteCaseData(user, caseNumber, { skipValidation: true });
 
     // Log successful case deletion
     const endTime = Date.now();

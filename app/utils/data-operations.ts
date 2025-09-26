@@ -34,6 +34,7 @@ export interface BatchUpdateResult {
 export interface DataOperationOptions {
   includeTimestamp?: boolean;
   retryCount?: number;
+  skipValidation?: boolean;
 }
 
 // Higher-order function type for data operations
@@ -61,10 +62,10 @@ export const getCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Validate case access
+    // Validate case access - return null if access denied (normal case)
     const accessCheck = await canAccessCase(user, caseNumber);
     if (!accessCheck.allowed) {
-      throw new Error(`Access denied: ${accessCheck.reason}`);
+      return null; // Case doesn't exist or user doesn't have access
     }
 
     // Validate case number format
@@ -169,7 +170,8 @@ export const updateCaseData = async (
  */
 export const deleteCaseData = async (
   user: User,
-  caseNumber: string
+  caseNumber: string,
+  options: DataOperationOptions = {}
 ): Promise<void> => {
   try {
     // Validate user session
@@ -178,10 +180,12 @@ export const deleteCaseData = async (
       throw new Error(`Session validation failed: ${sessionValidation.reason}`);
     }
 
-    // Check modification permissions
-    const modifyCheck = await canModifyCase(user, caseNumber);
-    if (!modifyCheck.allowed) {
-      throw new Error(`Delete denied: ${modifyCheck.reason}`);
+    // Check modification permissions if validation is not explicitly disabled
+    if (options.skipValidation !== true) {
+      const modifyCheck = await canModifyCase(user, caseNumber);
+      if (!modifyCheck.allowed) {
+        throw new Error(`Delete denied: ${modifyCheck.reason}`);
+      }
     }
 
     const apiKey = await getDataApiKey();
