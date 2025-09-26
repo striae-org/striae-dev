@@ -293,14 +293,59 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     // Store case info for audit logging
     const fileCount = caseData.files?.length || 0;
     const caseName = caseData.caseNumber || caseNumber;
-
-    // Delete all files using centralized function
+    
+    // Process file deletions in batches to reduce audit rate limiting
     if (caseData.files && caseData.files.length > 0) {
-      await Promise.all(
-        caseData.files.map(file => 
-          deleteFile(user, caseNumber, file.id)
-        )
-      );
+      const BATCH_SIZE = 5; // Process files in batches of 5
+      const files = caseData.files;
+      const deletedFiles: Array<{id: string, originalFilename: string}> = [];
+      
+      // Process files in batches
+      for (let i = 0; i < files.length; i += BATCH_SIZE) {
+        const batch = files.slice(i, i + BATCH_SIZE);
+        
+        // Delete files in this batch
+        await Promise.all(
+          batch.map(async file => {
+            try {
+              await deleteFile(user, caseNumber, file.id);
+              deletedFiles.push({ id: file.id, originalFilename: file.originalFilename });
+            } catch (error) {
+              console.error(`Failed to delete file ${file.originalFilename}:`, error);
+            }
+          })
+        );
+        
+        // Add delay between batches to reduce rate limiting
+        if (i + BATCH_SIZE < files.length) {
+          await new Promise(resolve => setTimeout(resolve, 150));
+        }
+      }
+      
+      // Log a summary audit entry for all file deletions
+      try {
+        await auditService.logEvent({
+          userId: user.uid,
+          userEmail: user.email || '',
+          action: 'file-delete',
+          result: 'success',
+          fileName: `Batch deletion: ${deletedFiles.length} files`,
+          fileType: 'case-package',
+          caseNumber,
+          caseDetails: {
+            newCaseName: `${caseNumber} - Batch file deletion`,
+            deleteReason: `Batch deleted ${deletedFiles.length} files during case deletion`,
+            backupCreated: false,
+            lastModified: new Date().toISOString()
+          },
+          performanceMetrics: {
+            processingTimeMs: Date.now() - startTime,
+            fileSizeBytes: 0
+          }
+        });
+      } catch (auditError) {
+        console.error('Failed to log batch file deletion:', auditError);
+      }
     }
 
     // Remove case from user data first (so user loses access immediately)
@@ -309,13 +354,16 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
     // Delete case data using centralized function (skip validation since user no longer has access)
     await deleteCaseData(user, caseNumber, { skipValidation: true });
 
-    // Log successful case deletion
+    // Add a small delay before audit logging to reduce rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Log successful case deletion with file details
     const endTime = Date.now();
     await auditService.logCaseDeletion(
       user,
       caseNumber,
       caseName,
-      'User-requested deletion via case actions',
+      `User-requested deletion via case actions (${fileCount} files deleted)`,
       false // No backup created for standard deletions
     );
 
