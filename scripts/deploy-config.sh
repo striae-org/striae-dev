@@ -80,7 +80,8 @@ required_vars=(
     "PDF_WORKER_DOMAIN"
     
     # Storage Configuration (required for config replacement)
-    "BUCKET_NAME"
+    "DATA_BUCKET_NAME"
+    "AUDIT_BUCKET_NAME"
     "KV_STORE_ID"
     
     # Worker-Specific Secrets (required for deployment)
@@ -319,7 +320,8 @@ prompt_for_secrets() {
     
     echo -e "${BLUE}🗄️ STORAGE CONFIGURATION${NC}"
     echo "========================="
-    prompt_for_var "BUCKET_NAME" "Your R2 bucket name"
+    prompt_for_var "DATA_BUCKET_NAME" "Your R2 bucket name for case data storage"
+    prompt_for_var "AUDIT_BUCKET_NAME" "Your R2 bucket name for audit logs (separate from data bucket)"
     prompt_for_var "KV_STORE_ID" "Your KV namespace ID (UUID format)"
     
     echo -e "${BLUE}🔐 SERVICE-SPECIFIC SECRETS${NC}"
@@ -351,7 +353,7 @@ update_wrangler_configs() {
         sed -i "s/\"AUDIT_WORKER_NAME\"/\"$AUDIT_WORKER_NAME\"/g" workers/audit-worker/wrangler.jsonc
         sed -i "s/\"ACCOUNT_ID\"/\"$ACCOUNT_ID\"/g" workers/audit-worker/wrangler.jsonc
         sed -i "s/\"AUDIT_WORKER_DOMAIN\"/\"$AUDIT_WORKER_DOMAIN\"/g" workers/audit-worker/wrangler.jsonc
-        sed -i "s/\"BUCKET_NAME\"/\"$BUCKET_NAME\"/g" workers/audit-worker/wrangler.jsonc
+        sed -i "s/\"AUDIT_BUCKET_NAME\"/\"$AUDIT_BUCKET_NAME\"/g" workers/audit-worker/wrangler.jsonc
         echo -e "${GREEN}    ✅ audit-worker configuration updated${NC}"
     fi
     
@@ -368,7 +370,7 @@ update_wrangler_configs() {
         sed -i "s/\"DATA_WORKER_NAME\"/\"$DATA_WORKER_NAME\"/g" workers/data-worker/wrangler.jsonc
         sed -i "s/\"ACCOUNT_ID\"/\"$ACCOUNT_ID\"/g" workers/data-worker/wrangler.jsonc
         sed -i "s/\"DATA_WORKER_DOMAIN\"/\"$DATA_WORKER_DOMAIN\"/g" workers/data-worker/wrangler.jsonc
-        sed -i "s/\"BUCKET_NAME\"/\"$BUCKET_NAME\"/g" workers/data-worker/wrangler.jsonc
+        sed -i "s/\"DATA_BUCKET_NAME\"/\"$DATA_BUCKET_NAME\"/g" workers/data-worker/wrangler.jsonc
         echo -e "${GREEN}    ✅ data-worker configuration updated${NC}"
     fi
     

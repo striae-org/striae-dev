@@ -114,6 +114,10 @@ if "%DATA_WORKER_NAME%"=="" (
     echo [91m❌ Error: DATA_WORKER_NAME is not set in .env file[0m
     exit /b 1
 )
+if "%AUDIT_WORKER_NAME%"=="" (
+    echo [91m❌ Error: AUDIT_WORKER_NAME is not set in .env file[0m
+    exit /b 1
+)
 if "%IMAGES_WORKER_NAME%"=="" (
     echo [91m❌ Error: IMAGES_WORKER_NAME is not set in .env file[0m
     exit /b 1
@@ -140,6 +144,10 @@ if "%DATA_WORKER_DOMAIN%"=="" (
     echo [91m❌ Error: DATA_WORKER_DOMAIN is not set in .env file[0m
     exit /b 1
 )
+if "%AUDIT_WORKER_DOMAIN%"=="" (
+    echo [91m❌ Error: AUDIT_WORKER_DOMAIN is not set in .env file[0m
+    exit /b 1
+)
 if "%IMAGES_WORKER_DOMAIN%"=="" (
     echo [91m❌ Error: IMAGES_WORKER_DOMAIN is not set in .env file[0m
     exit /b 1
@@ -154,8 +162,12 @@ if "%PDF_WORKER_DOMAIN%"=="" (
 )
 
 REM Storage Configuration
-if "%BUCKET_NAME%"=="" (
-    echo [91m❌ Error: BUCKET_NAME is not set in .env file[0m
+if "%DATA_BUCKET_NAME%"=="" (
+    echo [91m❌ Error: DATA_BUCKET_NAME is not set in .env file[0m
+    exit /b 1
+)
+if "%AUDIT_BUCKET_NAME%"=="" (
+    echo [91m❌ Error: AUDIT_BUCKET_NAME is not set in .env file[0m
     exit /b 1
 )
 if "%KV_STORE_ID%"=="" (
@@ -518,6 +530,22 @@ if not "%DATA_WORKER_DOMAIN%"=="" (
     echo [92m✅ DATA_WORKER_DOMAIN updated[0m
 )
 
+echo [94mAUDIT_WORKER_NAME[0m
+echo [93mAudit worker name[0m
+set /p "AUDIT_WORKER_NAME=Enter value: "
+if not "%AUDIT_WORKER_NAME%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^AUDIT_WORKER_NAME=.*', 'AUDIT_WORKER_NAME=%AUDIT_WORKER_NAME%' | Set-Content '.env'"
+    echo [92m✅ AUDIT_WORKER_NAME updated[0m
+)
+
+echo [94mAUDIT_WORKER_DOMAIN[0m
+echo [93mAudit worker domain (e.g., audit.striae.org) - DO NOT include https://[0m
+set /p "AUDIT_WORKER_DOMAIN=Enter value: "
+if not "%AUDIT_WORKER_DOMAIN%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^AUDIT_WORKER_DOMAIN=.*', 'AUDIT_WORKER_DOMAIN=%AUDIT_WORKER_DOMAIN%' | Set-Content '.env'"
+    echo [92m✅ AUDIT_WORKER_DOMAIN updated[0m
+)
+
 echo [94mIMAGES_WORKER_NAME[0m
 echo [93mImages worker name[0m
 set /p "IMAGES_WORKER_NAME=Enter value: "
@@ -569,12 +597,20 @@ if not "%PDF_WORKER_DOMAIN%"=="" (
 echo.
 echo [94m🗄️ STORAGE CONFIGURATION[0m
 echo =========================
-echo [94mBUCKET_NAME[0m
-echo [93mYour R2 bucket name[0m
-set /p "BUCKET_NAME=Enter value: "
-if not "%BUCKET_NAME%"=="" (
-    powershell -Command "(Get-Content '.env') -replace '^BUCKET_NAME=.*', 'BUCKET_NAME=%BUCKET_NAME%' | Set-Content '.env'"
-    echo [92m✅ BUCKET_NAME updated[0m
+echo [94mDATA_BUCKET_NAME[0m
+echo [93mYour R2 bucket name for case data storage[0m
+set /p "DATA_BUCKET_NAME=Enter value: "
+if not "%DATA_BUCKET_NAME%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^DATA_BUCKET_NAME=.*', 'DATA_BUCKET_NAME=%DATA_BUCKET_NAME%' | Set-Content '.env'"
+    echo [92m✅ DATA_BUCKET_NAME updated[0m
+)
+
+echo [94mAUDIT_BUCKET_NAME[0m
+echo [93mYour R2 bucket name for audit logs (separate from data bucket)[0m
+set /p "AUDIT_BUCKET_NAME=Enter value: "
+if not "%AUDIT_BUCKET_NAME%"=="" (
+    powershell -Command "(Get-Content '.env') -replace '^AUDIT_BUCKET_NAME=.*', 'AUDIT_BUCKET_NAME=%AUDIT_BUCKET_NAME%' | Set-Content '.env'"
+    echo [92m✅ AUDIT_BUCKET_NAME updated[0m
 )
 
 echo [94mKV_STORE_ID[0m
@@ -668,7 +704,7 @@ echo [93m  Updating wrangler configuration files...[0m
 REM Audit Worker
 if exist "workers\audit-worker\wrangler.jsonc" (
     echo [93m  Updating audit-worker/wrangler.jsonc...[0m
-    powershell -Command "(Get-Content 'workers/audit-worker/wrangler.jsonc') -replace '\"AUDIT_WORKER_NAME\"', '\"%AUDIT_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"AUDIT_WORKER_DOMAIN\"', '\"%AUDIT_WORKER_DOMAIN%\"' -replace '\"BUCKET_NAME\"', '\"%BUCKET_NAME%\"' | Set-Content 'workers/audit-worker/wrangler.jsonc'"
+    powershell -Command "(Get-Content 'workers/audit-worker/wrangler.jsonc') -replace '\"AUDIT_WORKER_NAME\"', '\"%AUDIT_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"AUDIT_WORKER_DOMAIN\"', '\"%AUDIT_WORKER_DOMAIN%\"' -replace '\"AUDIT_BUCKET_NAME\"', '\"%AUDIT_BUCKET_NAME%\"' | Set-Content 'workers/audit-worker/wrangler.jsonc'"
     echo [92m    ✅ audit-worker configuration updated[0m
 )
 
@@ -682,7 +718,7 @@ if exist "workers\audit-worker\src\audit-worker.js" (
 REM Data Worker
 if exist "workers\data-worker\wrangler.jsonc" (
     echo [93m  Updating data-worker/wrangler.jsonc...[0m
-    powershell -Command "(Get-Content 'workers/data-worker/wrangler.jsonc') -replace '\"DATA_WORKER_NAME\"', '\"%DATA_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"DATA_WORKER_DOMAIN\"', '\"%DATA_WORKER_DOMAIN%\"' -replace '\"BUCKET_NAME\"', '\"%BUCKET_NAME%\"' | Set-Content 'workers/data-worker/wrangler.jsonc'"
+    powershell -Command "(Get-Content 'workers/data-worker/wrangler.jsonc') -replace '\"DATA_WORKER_NAME\"', '\"%DATA_WORKER_NAME%\"' -replace '\"ACCOUNT_ID\"', '\"%ACCOUNT_ID%\"' -replace '\"DATA_WORKER_DOMAIN\"', '\"%DATA_WORKER_DOMAIN%\"' -replace '\"DATA_BUCKET_NAME\"', '\"%DATA_BUCKET_NAME%\"' | Set-Content 'workers/data-worker/wrangler.jsonc'"
     echo [92m    ✅ data-worker configuration updated[0m
 )
 
