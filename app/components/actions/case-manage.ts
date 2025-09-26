@@ -223,8 +223,8 @@ export const renameCase = async (
     // Remove old case from user data  
     await removeUserCase(user, oldCaseNumber);
 
-    // Delete old case data using centralized function
-    await deleteCaseData(user, oldCaseNumber);
+    // Delete old case data using centralized function (bypass validation for rename)
+    await deleteCaseData(user, oldCaseNumber, { validateAccess: false });
 
     // Log successful case rename
     const endTime = Date.now();
