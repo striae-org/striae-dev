@@ -303,11 +303,11 @@ export const deleteCase = async (user: User, caseNumber: string): Promise<void> 
       );
     }
 
+    // Remove case from user data first (so user loses access immediately)
+    await removeUserCase(user, caseNumber);
+
     // Delete case data using centralized function
     await deleteCaseData(user, caseNumber);
-
-    // Remove case from user data using centralized function
-    await removeUserCase(user, caseNumber);
 
     // Log successful case deletion
     const endTime = Date.now();
