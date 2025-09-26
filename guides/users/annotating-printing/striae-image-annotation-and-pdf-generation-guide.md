@@ -89,13 +89,13 @@
 
 ## Annotation Tools Overview
 
-* ![Number](https://www.striae.org/assets/admin/number.png) **Number** - Show/hide case and item numbers
-* ![Class](https://www.striae.org/assets/admin/class.png) **Class** - Show/hide class characteristic information
-* ![Index](https://www.striae.org/assets/admin/index.png) **Index** - Show/hide index marks (color or number/letter)
-* ![ID](https://www.striae.org/assets/admin/support.png) **ID** - Show/hide support level conclusion
-* ![Box](https://www.striae.org/assets/admin/box.png) **Box** - Show/hide box annotations with custom colors
-* ![Notes](https://www.striae.org/assets/admin/notes.png) **Notes** - Show/hide additional notes section
-* ![Print](https://www.striae.org/assets/admin/print.png) **Print** - Generate PDF with current annotations
+* **Number** - Show/hide case and item numbers
+* **Class** - Show/hide class characteristic information
+* **Index** - Show/hide index marks (color or number/letter)
+* **ID** - Show/hide support level conclusion
+* **Box** - Show/hide box annotations with custom colors
+* **Notes** - Show/hide additional notes section
+* **Print** - Generate PDF with current annotations
 
 ***
 
@@ -252,18 +252,6 @@
 3. Select Support Level → Add Notes → Save Notes
 
 4. Use Toolbar to enable annotations → Click **Print** → Download PDF
-
-***
-
-## Toolbar Quick Guide
-
-* ![Numbers](https://www.striae.org/assets/admin/number.png) **Numbers** - Toggle case/item number display
-* ![Class](https://www.striae.org/assets/admin/class.png) **Class** - Toggle object type and class notes
-* ![Index](https://www.striae.org/assets/admin/index.png) **Index** - Toggle color border or index label
-* ![ID](https://www.striae.org/assets/admin/support.png) **ID** - Toggle support level conclusion display
-* ![Box](https://www.striae.org/assets/admin/box.png) **Box** - Toggle box annotations with custom colors
-* ![Notes](https://www.striae.org/assets/admin/notes.png) **Notes** - Toggle additional observations section
-* ![Print](https://www.striae.org/assets/admin/print.png) **Print** - Generate professional PDF report
 
 ***
 

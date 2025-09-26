@@ -42,7 +42,7 @@ Set up these Cloudflare services first:
 - **Turnstile** (bot protection) - Note site/secret keys
 - **Images** (file storage) - Note account ID, hash, API token, HMAC key
 - **KV** (user database) - Create namespace, note UUID
-- **R2** (data storage) - Create bucket, configure CORS (see [installation guide](https://developers.striae.org/striae-dev/get-started/installation-guide#24-cloudflare-r2-setup))
+- **R2** (data and audit storage) - Create two buckets, configure CORS (see [installation guide](https://developers.striae.org/striae-dev/get-started/installation-guide#24-cloudflare-r2-setup))
 
 ### Deployment Steps
 
