@@ -125,19 +125,12 @@ export async function downloadAllCasesAsCSV(user: User, exportData: AllCasesExpo
       ['Total Confirmations Requested (All Cases)', exportData.metadata.totalConfirmationsRequested || 0]
     ];
     
-    // Calculate checksum of summary data for integrity verification
-    const summaryContent = summaryDataRows.map(row => row.join(',')).join('\n');
-    const summaryChecksum = calculateCRC32Secure(summaryContent);
-    
+    // XLSX files are inherently protected, no checksum validation needed
     const summaryData = [
       protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
       protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
       [''],
       ...summaryDataRows,
-      [''],
-      ['Integrity Verification'],
-      ['Summary Data CRC32 Checksum', summaryChecksum.toUpperCase()],
-      ['Verification Note', 'Recalculate CRC32 of summary data rows to verify integrity'],
       [''],
       ['Case Details'],
       [

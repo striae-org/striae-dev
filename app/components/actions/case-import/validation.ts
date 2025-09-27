@@ -7,11 +7,11 @@ import { calculateCRC32Secure } from '~/utils/CRC32';
 const USER_WORKER_URL = paths.user_worker_url;
 
 /**
- * Remove forensic warning from JSON content for checksum validation
+ * Remove forensic warning from content for checksum validation (supports both JSON and CSV formats)
  * This function ensures exact match with the content used during export checksum generation
  */
 export function removeForensicWarning(content: string): string {
-  // The forensic warning pattern follows this exact format:
+  // Handle JSON forensic warnings (block comment format)
   // /* CASE DATA WARNING
   //  * This file contains evidence data for forensic examination.
   //  * Any modification may compromise the integrity of the evidence.
@@ -19,20 +19,44 @@ export function removeForensicWarning(content: string): string {
   //  * 
   //  * File generated: YYYY-MM-DDTHH:mm:ss.sssZ
   //  */
+  const jsonForensicWarningRegex = /^\/\*\s*CASE\s+DATA\s+WARNING[\s\S]*?\*\/\s*\r?\n*/;
+  
+  // Handle CSV forensic warnings (quoted string format at the beginning of file)
+  // CRITICAL: The CSV forensic warning is ONLY the first quoted line, followed by two newlines
+  // Format: "CASE DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n
+  // 
+  // After removal, what remains should be the csvWithChecksum content:
+  // # Striae Case Export - Generated: ...
+  // # Case: ...
+  // # Total Files: ...
+  // # CRC32 Checksum: ...
+  // # Verification: ...
   //
-  // Followed by one or more newlines before the actual JSON content
+  // [actual CSV data]
+  // More robust regex to handle various line endings and exact format from generation
+  const csvForensicWarningRegex = /^"CASE DATA WARNING: This file contains evidence data for forensic examination\. Any modification may compromise the integrity of the evidence\. Handle according to your organization's chain of custody procedures\."(?:\r?\n){2}/;
   
-  // More comprehensive regex to handle various edge cases:
-  // - Different line endings (Windows \r\n, Unix \n, old Mac \r)
-  // - Multiple newlines after the comment block
-  // - Potential trailing spaces after the comment close
-  // - Non-greedy matching to stop at the first */ encountered
-  const forensicWarningRegex = /^\/\*\s*CASE\s+DATA\s+WARNING[\s\S]*?\*\/\s*\r?\n*/;
+  let cleaned = content;
   
-  let cleaned = content.replace(forensicWarningRegex, '');
+  // Try JSON format first
+  if (jsonForensicWarningRegex.test(content)) {
+    cleaned = content.replace(jsonForensicWarningRegex, '');
+  }
+  // Try CSV format with exact pattern match
+  else if (csvForensicWarningRegex.test(content)) {
+    cleaned = content.replace(csvForensicWarningRegex, '');
+  }
+  // Fallback: try broader CSV pattern in case of slight format differences
+  else if (content.startsWith('"CASE DATA WARNING:')) {
+    // Find the end of the first quoted string followed by newlines
+    const match = content.match(/^"[^"]*"(?:\r?\n)+/);
+    if (match) {
+      cleaned = content.substring(match[0].length);
+    }
+  }
   
   // Additional cleanup: remove any leading whitespace that might remain
-  // This ensures we match exactly what generateJSONContent() produces with protectForensicData: false
+  // This ensures we match exactly what the generation functions produce with protectForensicData: false
   cleaned = cleaned.replace(/^\s+/, '');
   
   return cleaned;
