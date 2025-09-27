@@ -186,7 +186,7 @@ npm run build
 3. Go to Images → Variants and create a new variant:
    - **Variant Name**: `striae`
    - **Settings**: Use default settings
-   - **Metadata**: Strip all metadata (recommended)
+   - **Metadata**: Keep all metadata (recommended)
 4. Go to Images → Keys and note:
    - **HMAC Key** for signed URLs (HMAC_KEY)
 5. Go to Images → Overview and note:
