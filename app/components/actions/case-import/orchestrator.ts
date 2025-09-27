@@ -307,13 +307,14 @@ export async function importCaseForReview(
       'success',
       checksumValidationPassed,
       [],
-      undefined, // Don't check self-confirmation for read-only case imports
+      undefined, // Don't use for self-confirmation prevention for read-only imports
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: zipFile.size,
         validationStepsCompleted: result.filesImported + result.annotationsImported,
         validationStepsFailed: 0
-      }
+      },
+      true // Exporter UID was validated during zip parsing
     );
     
     auditService.endWorkflow();
@@ -334,11 +335,12 @@ export async function importCaseForReview(
       'failure',
       checksumValidationPassed, // Use actual checksum validation result even for failures
       result.errors || [],
-      undefined, // Don't check self-confirmation for read-only case imports
+      undefined, // Don't use for self-confirmation prevention for read-only imports
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: zipFile.size
-      }
+      },
+      false // If import failed, exporter UID validation may not have completed
     );
     
     auditService.endWorkflow();
