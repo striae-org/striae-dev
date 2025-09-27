@@ -537,7 +537,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         <div className={styles.content}>
           <p className={styles.description}>
             Verify the integrity of Striae export files by checking their embedded checksums. 
-            Upload a JSON, CSV, ZIP, XLSX, or TXT export to validate that the data hasn't been tampered with or corrupted.
+            Upload a JSON, CSV, ZIP, or TXT export to validate that the data hasn't been tampered with or corrupted.
           </p>
 
           <div
@@ -556,7 +556,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
                 {!dragOver && ' or drag and drop a Striae export file'}
               </div>
               <div className={styles.uploadSubtext}>
-                Supports JSON, CSV, ZIP, XLSX, and TXT export files with embedded checksums
+                Supports JSON, CSV, ZIP, and TXT export files with embedded checksums
               </div>
             </div>
             <input
