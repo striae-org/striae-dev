@@ -175,7 +175,7 @@ export const uploadFile = async (
   });
 };
 
-export const deleteFile = async (user: User, caseNumber: string, fileId: string): Promise<void> => {
+export const deleteFile = async (user: User, caseNumber: string, fileId: string, deleteReason: string = 'User-requested deletion via file list'): Promise<void> => {
   const startTime = Date.now();
   
   // Get file info for audit logging (outside try block so it's available in catch)
@@ -246,7 +246,7 @@ export const deleteFile = async (user: User, caseNumber: string, fileId: string)
         user,
         fileName,
         fileSize,
-        'User-requested deletion via file list',
+        deleteReason,
         caseNumber,
         fileId,
         fileToDelete?.originalFilename
