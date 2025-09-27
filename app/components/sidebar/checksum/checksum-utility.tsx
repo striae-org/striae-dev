@@ -13,7 +13,7 @@ interface VerificationResult {
   expectedChecksum: string;
   calculatedChecksum: string;
   fileName: string;
-  fileType: 'json' | 'csv' | 'zip' | 'xlsx' | 'txt' | 'unknown';
+  fileType: 'json' | 'csv' | 'zip' | 'txt' | 'unknown';
   errorMessage?: string;
   details?: {
     manifestValid?: boolean;
@@ -83,7 +83,6 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       const isValidType = file.name.toLowerCase().endsWith('.json') || 
                          file.name.toLowerCase().endsWith('.csv') ||
                          file.name.toLowerCase().endsWith('.zip') ||
-                         file.name.toLowerCase().endsWith('.xlsx') ||
                          file.name.toLowerCase().endsWith('.txt');
       
       if (isValidType) {
@@ -96,7 +95,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
           calculatedChecksum: 'N/A',
           fileName: file.name,
           fileType: 'unknown',
-          errorMessage: 'Invalid file type. Please drop a Striae JSON, CSV, ZIP, XLSX, or TXT export file.'
+          errorMessage: 'Invalid file type. Please drop a Striae JSON, CSV, ZIP, or TXT export file.'
         });
       }
     }
@@ -122,8 +121,6 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
 
       if (fileName.toLowerCase().endsWith('.zip')) {
         result = await verifyZIPFile(file, fileName);
-      } else if (fileName.toLowerCase().endsWith('.xlsx')) {
-        result = await verifyXLSXFile(file, fileName);
       } else if (fileName.toLowerCase().endsWith('.txt')) {
         const content = await file.text();
         result = await verifyTXTFile(content, fileName);
@@ -140,7 +137,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
           calculatedChecksum: '',
           fileName,
           fileType: 'unknown',
-          errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, ZIP, XLSX, or TXT export file.'
+          errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, ZIP, or TXT export file.'
         };
       }
 
@@ -296,38 +293,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     }
   };
 
-  const verifyXLSXFile = async (file: File, fileName: string): Promise<VerificationResult> => {
-    try {
-      // Import XLSX library
-      const XLSX = await import('xlsx');
-      
-      // Read the XLSX file to verify it's valid
-      const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      
-      // XLSX files are protected format exports, so we just verify they can be read
-      // No checksum validation needed since they're inherently protected
-      return {
-        isValid: true,
-        expectedChecksum: 'N/A (Protected format)',
-        calculatedChecksum: 'N/A (Protected format)',
-        fileName,
-        fileType: 'xlsx',
-        errorMessage: undefined
-      };
-    } catch (error) {
-      return {
-        isValid: false,
-        expectedChecksum: '',
-        calculatedChecksum: '',
-        fileName,
-        fileType: 'xlsx',
-        errorMessage: 'Failed to read XLSX file'
-      };
-    }
-  };
 
-  
   const verifyTXTFile = async (content: string, fileName: string): Promise<VerificationResult> => {
     try {
       // Look for the integrity verification section
