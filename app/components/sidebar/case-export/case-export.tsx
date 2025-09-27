@@ -203,7 +203,7 @@ export const CaseExport = ({
                   if (error) setError('');
                 }}
                 placeholder="Enter case number"
-                disabled={isExporting || isExportingAll}
+                disabled={isExporting || isExportingAll || isReadOnly}
               />
             </div>
             
