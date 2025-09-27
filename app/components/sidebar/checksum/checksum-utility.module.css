@@ -2,80 +2,65 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background-color: color-mix(in lab, var(--background) 50%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  animation: fadeIn var(--durationS) var(--bezierFastoutSlowin);
+  z-index: var(--zIndex5);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
 /* Modal Container */
 .modal {
-  background: var(--background);
-  border-radius: var(--spaceS);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
   width: 90%;
-  max-height: 80vh;
-  overflow: hidden;
+  max-width: 600px;
+  max-height: 90vh;
+  box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
+  transition: background-color var(--durationM) var(--bezierFastoutSlowin);
   display: flex;
   flex-direction: column;
-  animation: slideIn var(--durationS) var(--bezierFastoutSlowin);
 }
 
-@keyframes slideIn {
-  from { 
-    transform: scale(0.9) translateY(-20px);
-    opacity: 0;
-  }
-  to { 
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
 
 /* Header */
 .header {
   display: flex;
+  font-size: var(--fontSizeBodyL);
   justify-content: space-between;
   align-items: center;
   padding: var(--spaceL);
-  border-bottom: 1px solid var(--divider);
-  background: var(--backgroundLight);
+  border-bottom: 1px solid color-mix(in lab, var(--text) 10%, transparent);
+  color: var(--textTitle);
+  flex-shrink: 0;
 }
 
 .title {
-  font-size: var(--fontSizeH3);
-  font-weight: var(--fontWeightSemibold);
-  color: var(--textTitle);
   margin: 0;
+  font-size: var(--fontSizeBodyL);
+  font-weight: 600;
+  color: var(--textTitle);
 }
 
 .closeButton {
   background: none;
   border: none;
-  font-size: var(--fontSizeH2);
-  color: var(--textLight);
+  font-size: var(--fontSizeH5);
   cursor: pointer;
-  padding: var(--spaceXS);
-  border-radius: var(--spaceXS);
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: var(--spaceS);
+  color: var(--textLight);
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
 }
 
-.closeButton:hover {
-  background: var(--divider);
+.closeButton:hover:not(:disabled) {
   color: var(--text);
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Content */
@@ -83,6 +68,7 @@
   padding: var(--spaceL);
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
 }
 
 .description {
@@ -94,25 +80,29 @@
 
 /* Upload Area */
 .uploadArea {
-  border: 2px dashed var(--divider);
-  border-radius: var(--spaceS);
+  border: 2px dashed color-mix(in lab, var(--primary) 30%, transparent);
+  border-radius: var(--spaceXS);
+  background: color-mix(in lab, var(--primary) 5%, transparent);
   padding: var(--spaceXL);
   text-align: center;
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  background: var(--backgroundLight);
   margin-bottom: var(--spaceL);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .uploadArea:hover {
   border-color: var(--primary);
-  background: color-mix(in lab, var(--primary) 8%, var(--backgroundLight));
+  background: color-mix(in lab, var(--primary) 10%, transparent);
   transform: translateY(-1px);
 }
 
 .uploadArea.dragOver {
   border-color: var(--accent);
-  background: color-mix(in lab, var(--accent) 15%, var(--backgroundLight));
+  background: color-mix(in lab, var(--accent) 15%, transparent);
   border-style: solid;
   transform: scale(1.02);
   box-shadow: 0 0 0 2px color-mix(in lab, var(--accent) 30%, transparent);
@@ -126,7 +116,7 @@
 }
 
 .uploadIcon {
-  font-size: 3rem;
+  font-size: var(--fontSizeBodyL);
   opacity: 0.7;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
 }
@@ -137,9 +127,11 @@
 }
 
 .uploadText {
-  font-size: var(--fontSizeBodyL);
-  color: var(--text);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  color: var(--textBody);
   transition: all var(--durationS) var(--bezierFastoutSlowin);
+  flex: 1;
 }
 
 .dragOver .uploadText {
@@ -158,7 +150,7 @@
 }
 
 .uploadSubtext {
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   color: var(--textLight);
 }
 
@@ -168,14 +160,15 @@
 
 /* Verification Status */
 .verifyingSection {
+  margin: var(--spaceM) 0;
+  padding: var(--spaceM);
+  background: var(--backgroundLight);
+  border-radius: var(--spaceXS);
+  border: 1px solid color-mix(in lab, var(--text) 10%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spaceM);
-  padding: var(--spaceL);
-  background: var(--backgroundLight);
-  border-radius: var(--spaceS);
-  margin-bottom: var(--spaceL);
 }
 
 .spinner {
@@ -193,48 +186,37 @@
 }
 
 .verifyingText {
-  color: var(--textBody);
+  color: var(--textTitle);
+  font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);
 }
 
 /* Results Section */
 .resultSection {
-  border-radius: var(--spaceS);
-  padding: var(--spaceL);
-  margin-top: var(--spaceL);
-  animation: slideInResult var(--durationM) var(--bezierFastoutSlowin);
-}
-
-@keyframes slideInResult {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  margin-top: var(--spaceM);
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
 }
 
 .resultSection.success {
-  background: color-mix(in lab, var(--success) 10%, var(--background));
-  border: 1px solid color-mix(in lab, var(--success) 30%, transparent);
+  background: color-mix(in lab, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in lab, var(--success) 20%, transparent);
 }
 
 .resultSection.failure {
-  background: color-mix(in lab, var(--error) 10%, var(--background));
-  border: 1px solid color-mix(in lab, var(--error) 30%, transparent);
+  background: color-mix(in lab, var(--error) 10%, transparent);
+  border: 1px solid color-mix(in lab, var(--error) 20%, transparent);
 }
 
 .resultHeader {
   display: flex;
   align-items: center;
-  gap: var(--spaceM);
-  margin-bottom: var(--spaceL);
+  gap: var(--spaceS);
+  margin-bottom: var(--spaceM);
 }
 
 .resultIcon {
-  font-size: var(--fontSizeH2);
+  font-size: var(--fontSizeBodyL);
   line-height: 1;
 }
 
@@ -247,7 +229,7 @@
 }
 
 .resultTitle {
-  font-size: var(--fontSizeH4);
+  font-size: var(--fontSizeBodyL);
   font-weight: var(--fontWeightSemibold);
   margin: 0;
 }
@@ -264,19 +246,19 @@
 .resultDetails {
   display: flex;
   flex-direction: column;
-  gap: var(--spaceS);
-  margin-bottom: var(--spaceL);
-  background: var(--background);
-  padding: var(--spaceM);
+  gap: var(--spaceXS);
+  margin-bottom: var(--spaceM);
+  background: color-mix(in lab, var(--background) 50%, transparent);
+  padding: var(--spaceS);
   border-radius: var(--spaceXS);
-  border: 1px solid var(--divider);
+  border: 1px solid color-mix(in lab, var(--text) 5%, transparent);
 }
 
 .resultRow {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--spaceM);
+  gap: var(--spaceS);
 }
 
 .resultLabel {
@@ -284,32 +266,34 @@
   color: var(--textBody);
   min-width: 80px;
   flex-shrink: 0;
+  font-size: var(--fontSizeBodyXS);
 }
 
 .resultValue {
   color: var(--text);
   font-family: var(--fontFamilyMono);
-  font-size: var(--fontSizeBodyS);
+  font-size: var(--fontSizeBodyXS);
   word-break: break-all;
   text-align: right;
 }
 
 .resultMessage {
-  font-size: var(--fontSizeBodyM);
-  line-height: 1.5;
-  padding: var(--spaceM);
-  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);
+  line-height: 1.5;
+  padding: var(--spaceS);
+  border-radius: var(--spaceXS);
+  margin-top: var(--spaceXS);
 }
 
 .resultSection.success .resultMessage {
-  background: color-mix(in lab, var(--success) 15%, var(--background));
-  color: color-mix(in lab, var(--success) 80%, var(--black));
+  background: color-mix(in lab, var(--success) 8%, transparent);
+  color: var(--success);
 }
 
 .resultSection.failure .resultMessage {
-  background: color-mix(in lab, var(--error) 15%, var(--background));
-  color: color-mix(in lab, var(--error) 80%, var(--black));
+  background: color-mix(in lab, var(--error) 8%, transparent);
+  color: var(--error);
 }
 
 /* Responsive Design */
