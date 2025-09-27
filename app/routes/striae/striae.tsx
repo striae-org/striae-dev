@@ -61,6 +61,13 @@ export const Striae = ({ user }: StriaePage) => {
     setAnnotationData(null);    
     setError(undefined);
     setImageLoaded(false);
+    
+    // Reset annotation and UI states when case is cleared
+    if (!currentCase) {
+      setActiveAnnotations(new Set());
+      setIsBoxAnnotationMode(false);
+      setIsReadOnlyCase(false);
+    }
   }, [currentCase]);
 
   // Fetch user company data when component mounts

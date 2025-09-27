@@ -52,12 +52,35 @@ export const useImportExecution = ({
         // Handle case import
         setImportProgress({ stage: 'Starting case import...', progress: 0 });
         
+        // Track if we're in cleanup phase to trigger UI reset
+        let hasTriggeredCleanupReset = false;
+        
         const result = await importCaseForReview(
           user,
           selectedFile,
           { overwriteExisting: true },
           (stage: string, progress: number, details?: string) => {
             setImportProgress({ stage, progress, details });
+            
+            // Detect cleanup phase and trigger UI reset once
+            if (!hasTriggeredCleanupReset && 
+                (stage.toLowerCase().includes('checking existing read-only cases') || 
+                 stage.toLowerCase().includes('cleaning up existing case') ||
+                 details?.toLowerCase().includes('cleaning up previous imports') ||
+                 details?.toLowerCase().includes('removing existing case data'))) {
+              hasTriggeredCleanupReset = true;
+              
+              // Trigger immediate UI reset during cleanup phase
+              onImportComplete?.({ 
+                success: true,
+                caseNumber: '',
+                isReadOnly: false,
+                filesImported: 0,
+                annotationsImported: 0,
+                errors: [],
+                warnings: []
+              });
+            }
           }
         );
         

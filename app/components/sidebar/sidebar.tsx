@@ -66,10 +66,23 @@ export const Sidebar = ({
       // For case imports, load the imported case automatically
       if ('isReadOnly' in result) {
         // This is an ImportResult (case import)
-        onCaseChange(result.caseNumber);
-        setCurrentCase(result.caseNumber);
-        setCaseNumber(result.caseNumber);
-        setSuccessAction('loaded');
+        if (result.caseNumber && result.isReadOnly) {
+          // Successful read-only case import - load the case
+          onCaseChange(result.caseNumber);
+          setCurrentCase(result.caseNumber);
+          setCaseNumber(result.caseNumber);
+          setSuccessAction('loaded');
+        } else if (!result.caseNumber && !result.isReadOnly) {
+          // Read-only case cleared - reset all UI state
+          setCurrentCase('');
+          setCaseNumber('');
+          setFiles([]);
+          onImageSelect({ id: 'clear', originalFilename: '/clear.jpg', uploadedAt: '' });
+          setImageLoaded(false);
+          onCaseChange(''); // This will trigger canvas/annotation state reset in main component
+          setShowNotes(false); // Close notes sidebar
+          setSuccessAction(null);
+        }
       }
       // For confirmation imports, no action needed - the confirmations are already loaded
     }
