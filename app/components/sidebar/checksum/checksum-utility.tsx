@@ -12,7 +12,7 @@ interface VerificationResult {
   expectedChecksum: string;
   calculatedChecksum: string;
   fileName: string;
-  fileType: 'json' | 'csv' | 'zip' | 'unknown';
+  fileType: 'json' | 'csv' | 'zip' | 'xlsx' | 'unknown';
   errorMessage?: string;
   details?: {
     manifestValid?: boolean;
@@ -100,6 +100,8 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
 
       if (fileName.toLowerCase().endsWith('.zip')) {
         result = await verifyZIPFile(file, fileName);
+      } else if (fileName.toLowerCase().endsWith('.xlsx')) {
+        result = await verifyXLSXFile(file, fileName);
       } else if (fileName.toLowerCase().endsWith('.json') || await isJSONContent(file)) {
         const content = await file.text();
         result = await verifyJSONFile(content, fileName);
@@ -113,7 +115,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
           calculatedChecksum: '',
           fileName,
           fileType: 'unknown',
-          errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, or ZIP export file.'
+          errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, ZIP, or XLSX export file.'
         };
       }
 
@@ -227,6 +229,125 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         fileName,
         fileType: 'zip',
         errorMessage: `Failed to process ZIP file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  };
+
+  const verifyXLSXFile = async (file: File, fileName: string): Promise<VerificationResult> => {
+    try {
+      // Import XLSX library
+      const XLSX = await import('xlsx');
+      
+      // Read the XLSX file
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      
+      // Check if there's a Summary sheet (where checksums are stored)
+      let summarySheet = null;
+      if (workbook.Sheets['Summary']) {
+        summarySheet = workbook.Sheets['Summary'];
+      } else if (workbook.Sheets['Metadata']) {
+        summarySheet = workbook.Sheets['Metadata'];
+      } else {
+        // Look for any sheet that might contain checksum information
+        for (const sheetName of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetName];
+          const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+          
+          // Look for checksum information in the sheet
+          for (const row of sheetData) {
+            if (row && row.length > 0) {
+              const cellValue = String(row[0] || '').toLowerCase();
+              if (cellValue.includes('checksum') || cellValue.includes('crc32')) {
+                summarySheet = sheet;
+                break;
+              }
+            }
+          }
+          if (summarySheet) break;
+        }
+      }
+      
+      if (!summarySheet) {
+        return {
+          isValid: false,
+          expectedChecksum: 'Not found',
+          calculatedChecksum: 'N/A',
+          fileName,
+          fileType: 'xlsx',
+          errorMessage: 'No checksum information found in XLSX file. This may not be a Striae export file.'
+        };
+      }
+      
+      // Extract checksum from the sheet
+      const sheetData = XLSX.utils.sheet_to_json(summarySheet, { header: 1 }) as any[][];
+      let expectedChecksum = '';
+      
+      for (let i = 0; i < sheetData.length; i++) {
+        const row = sheetData[i];
+        if (row && row.length >= 2) {
+          const label = String(row[0] || '').toLowerCase();
+          if (label.includes('checksum') || label.includes('crc32')) {
+            expectedChecksum = String(row[1] || '').trim();
+            break;
+          }
+        }
+      }
+      
+      if (!expectedChecksum) {
+        return {
+          isValid: false,
+          expectedChecksum: 'Not found',
+          calculatedChecksum: 'N/A',
+          fileName,
+          fileType: 'xlsx',
+          errorMessage: 'No checksum value found in XLSX file metadata.'
+        };
+      }
+      
+      // Calculate checksum of the data content (excluding the summary/metadata sheet)
+      let dataContent = '';
+      
+      for (const sheetName of workbook.SheetNames) {
+        // Skip summary/metadata sheets
+        if (sheetName.toLowerCase() === 'summary' || sheetName.toLowerCase() === 'metadata') {
+          continue;
+        }
+        
+        const sheet = workbook.Sheets[sheetName];
+        const csvData = XLSX.utils.sheet_to_csv(sheet);
+        dataContent += csvData;
+      }
+      
+      // If no data sheets found, include all content
+      if (!dataContent) {
+        for (const sheetName of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetName];
+          const csvData = XLSX.utils.sheet_to_csv(sheet);
+          dataContent += csvData;
+        }
+      }
+      
+      const calculatedChecksum = await calculateCRC32Secure(dataContent);
+      const isValid = expectedChecksum === calculatedChecksum;
+      
+      return {
+        isValid,
+        expectedChecksum,
+        calculatedChecksum,
+        fileName,
+        fileType: 'xlsx',
+        errorMessage: isValid ? undefined : 'Checksum mismatch - file may have been modified or corrupted'
+      };
+      
+    } catch (error) {
+      return {
+        isValid: false,
+        expectedChecksum: 'Not found',
+        calculatedChecksum: 'Could not calculate',
+        fileName,
+        fileType: 'xlsx',
+        errorMessage: error instanceof Error ? error.message : 'Error reading XLSX file'
       };
     }
   };
@@ -363,7 +484,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         <div className={styles.content}>
           <p className={styles.description}>
             Verify the integrity of Striae export files by checking their embedded checksums. 
-            Upload a JSON, CSV, or ZIP export to validate that the data hasn't been tampered with or corrupted.
+            Upload a JSON, CSV, ZIP, or XLSX export to validate that the data hasn't been tampered with or corrupted.
           </p>
 
           <div
@@ -379,13 +500,13 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
                 <strong>Click to select</strong> or drag and drop a Striae export file
               </div>
               <div className={styles.uploadSubtext}>
-                Supports JSON, CSV, and ZIP export files with embedded checksums
+                Supports JSON, CSV, ZIP, and XLSX export files with embedded checksums
               </div>
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".json,.csv,.zip"
+              accept=".json,.csv,.zip,.xlsx"
               onChange={handleFileInputChange}
               className={styles.hiddenInput}
               aria-label="Select Striae export file for checksum verification"
