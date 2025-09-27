@@ -236,7 +236,7 @@ export async function deleteReadOnlyCase(user: User, caseNumber: string): Promis
       if (caseData.files && caseData.files.length > 0) {
         await Promise.all(
           caseData.files.map((file: FileData) => 
-            deleteFile(user, caseNumber, file.id)
+            deleteFile(user, caseNumber, file.id, 'Read-only case clearing - API operation')
           )
         );
       }
