@@ -277,6 +277,16 @@
   text-align: right;
 }
 
+/* Special handling for error messages - use normal text wrapping */
+.resultValue.errorMessage {
+  font-family: var(--fontFamilyBody);
+  word-break: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  text-align: left;
+}
+
 .resultMessage {
   font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);

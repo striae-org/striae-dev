@@ -666,7 +666,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
                 {verificationResult.errorMessage && (
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Error:</span>
-                    <span className={styles.resultValue}>{verificationResult.errorMessage}</span>
+                    <span className={`${styles.resultValue} ${styles.errorMessage}`}>{verificationResult.errorMessage}</span>
                   </div>
                 )}
               </div>
