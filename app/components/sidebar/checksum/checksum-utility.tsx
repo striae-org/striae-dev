@@ -224,12 +224,17 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       const imageFiles: { [filename: string]: Blob } = {};
       const imageFolder = zipContent.folder('images');
       if (imageFolder) {
-        for (const [relativePath, zipObject] of Object.entries(imageFolder.files)) {
-          if (!zipObject.dir) {
-            const imageFileName = relativePath.split('/').pop()!;
-            imageFiles[imageFileName] = await zipObject.async('blob');
+        // Use the same logic as the import modal - check for files that start with 'images/' and are not directories
+        await Promise.all(Object.keys(imageFolder.files).map(async (path) => {
+          if (path.startsWith('images/') && !path.endsWith('/')) {
+            const filename = path.replace('images/', '');
+            const file = zipContent.file(path);
+            if (file) {
+              const blob = await file.async('blob');
+              imageFiles[filename] = blob;
+            }
           }
-        }
+        }));
       }
       
       const validation = await validateCaseIntegritySecure(dataContent, imageFiles, manifest);
