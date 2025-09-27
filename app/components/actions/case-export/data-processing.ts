@@ -1,4 +1,5 @@
 import { CaseExportData } from '~/types';
+import { calculateCRC32Secure } from '~/utils/CRC32';
 import { CSV_HEADERS } from './types-constants';
 import { addForensicDataWarning } from './metadata-helpers';
 
@@ -136,17 +137,31 @@ export function generateCSVContent(exportData: CaseExportData, protectForensicDa
     fileRows.push(...processedRows);
   });
 
-  // Combine all data
-  const allRows = [
+  // Combine data rows for checksum calculation (excluding header comments)
+  const dataRows = [
     ...metadataRows,
     CSV_HEADERS,
     ...fileRows
   ];
 
-  const csvContent = allRows.map(row => 
+  const csvDataContent = dataRows.map(row => 
     row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
   ).join('\n');
+  
+  // Calculate checksum for integrity verification
+  const checksum = calculateCRC32Secure(csvDataContent);
+  
+  // Create final CSV with checksum header
+  const csvWithChecksum = [
+    `# Striae Case Export - Generated: ${new Date().toISOString()}`,
+    `# Case: ${exportData.metadata.caseNumber}`,
+    `# Total Files: ${exportData.metadata.totalFiles}`,
+    `# CRC32 Checksum: ${checksum.toUpperCase()}`,
+    '# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)',
+    '',
+    csvDataContent
+  ].join('\n');
 
   // Add forensic protection warning if enabled
-  return protectForensicData ? addForensicDataWarning(csvContent, 'csv') : csvContent;
+  return protectForensicData ? addForensicDataWarning(csvWithChecksum, 'csv') : csvWithChecksum;
 }

@@ -1,4 +1,5 @@
 import { ValidationAuditEntry, AuditTrail } from '~/types';
+import { calculateCRC32Secure } from '~/utils/CRC32';
 
 /**
  * Audit Export Service
@@ -57,9 +58,22 @@ export class AuditExportService {
       'Email Notification Sent'
     ];
 
-    const csvContent = [
+    const csvData = [
       headers.join(','),
       ...entries.map(entry => this.entryToCSVRow(entry))
+    ].join('\n');
+
+    // Calculate checksum for integrity verification
+    const checksum = calculateCRC32Secure(csvData);
+    
+    // Add checksum metadata header
+    const csvContent = [
+      `# Striae Audit Export - Generated: ${new Date().toISOString()}`,
+      `# Total Entries: ${entries.length}`,
+      `# CRC32 Checksum: ${checksum.toUpperCase()}`,
+      `# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)`,
+      '',
+      csvData
     ].join('\n');
 
     this.downloadFile(csvContent, filename, 'text/csv');
@@ -134,14 +148,26 @@ export class AuditExportService {
       'Email Notification Sent'
     ];
 
-    const csvContent = [
-      '# AUDIT TRAIL SUMMARY',
+    const csvData = [
       summaryHeaders.join(','),
       summaryRow,
       '',
-      '# AUDIT ENTRIES',
       entryHeaders.join(','),
       ...auditTrail.entries.map(entry => this.entryToCSVRow(entry))
+    ].join('\n');
+
+    // Calculate checksum for integrity verification
+    const checksum = calculateCRC32Secure(csvData);
+    
+    const csvContent = [
+      '# Striae Audit Trail Export - Generated: ' + new Date().toISOString(),
+      `# Case: ${auditTrail.caseNumber} | Workflow: ${auditTrail.workflowId}`,
+      `# Total Events: ${auditTrail.summary.totalEvents}`,
+      `# CRC32 Checksum: ${checksum.toUpperCase()}`,
+      '# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)',
+      '',
+      '# AUDIT TRAIL SUMMARY',
+      csvData
     ].join('\n');
 
     this.downloadFile(csvContent, filename, 'text/csv');
@@ -264,7 +290,22 @@ export class AuditExportService {
     };
 
     const jsonContent = JSON.stringify(exportData, null, 2);
-    this.downloadFile(jsonContent, filename.replace('.csv', '.json'), 'application/json');
+    
+    // Calculate checksum for integrity verification
+    const checksum = calculateCRC32Secure(jsonContent);
+    
+    // Create final export with checksum included
+    const finalExportData = {
+      metadata: {
+        ...exportData.metadata,
+        checksum: checksum.toUpperCase(),
+        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+      },
+      auditEntries: entries
+    };
+
+    const finalJsonContent = JSON.stringify(finalExportData, null, 2);
+    this.downloadFile(finalJsonContent, filename.replace('.csv', '.json'), 'application/json');
   }
 
   /**
@@ -281,7 +322,22 @@ export class AuditExportService {
     };
 
     const jsonContent = JSON.stringify(exportData, null, 2);
-    this.downloadFile(jsonContent, filename.replace('.csv', '.json'), 'application/json');
+    
+    // Calculate checksum for integrity verification
+    const checksum = calculateCRC32Secure(jsonContent);
+    
+    // Create final export with checksum included
+    const finalExportData = {
+      metadata: {
+        ...exportData.metadata,
+        checksum: checksum.toUpperCase(),
+        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+      },
+      auditTrail
+    };
+
+    const finalJsonContent = JSON.stringify(finalExportData, null, 2);
+    this.downloadFile(finalJsonContent, filename.replace('.csv', '.json'), 'application/json');
   }
 
   /**
