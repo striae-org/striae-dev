@@ -13,8 +13,8 @@
   background: var(--backgroundLight);
   border-radius: var(--spaceXS);
   width: 90%;
-  max-width: 480px;
-  max-height: 90vh;
+  max-width: 600px;
+  max-height: 95vh;
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
   display: flex;
@@ -178,18 +178,25 @@
   display: flex;
   align-items: center;
   gap: var(--spaceS);
-  padding: var(--spaceL);
+  padding: var(--spaceXL);
   border: 2px dashed color-mix(in lab, var(--primary) 30%, transparent);
   border-radius: var(--spaceXS);
   background: color-mix(in lab, var(--primary) 5%, transparent);
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  min-height: 60px;
+  min-height: 120px;
 }
 
 .fileLabel:hover {
   border-color: var(--primary);
   background: color-mix(in lab, var(--primary) 10%, transparent);
+}
+
+.fileLabelDragOver {
+  border-color: var(--accent) !important;
+  background: color-mix(in lab, var(--accent) 15%, transparent) !important;
+  transform: scale(1.02);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--accent) 30%, transparent);
 }
 
 .fileInput:focus + .fileLabel {

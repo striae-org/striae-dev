@@ -162,6 +162,32 @@ export const CaseImport = ({
     }
   }, [clearMessages, clearImportData, setError, updateImportState, clearPreviews, loadCasePreview, loadConfirmationPreview]);
 
+  // Handle direct file selection (for drag and drop)
+  const handleFileSelectDirect = useCallback(async (file: File) => {
+    // Clear any existing messages when selecting a new file
+    clearMessages();
+
+    if (!isValidImportFile(file)) {
+      setError('Only ZIP files (case imports) or JSON files (confirmation imports) are allowed. Please select a valid file.');
+      clearImportData();
+      return;
+    }
+
+    const importType = getImportType(file);
+    updateImportState({ 
+      selectedFile: file, 
+      importType 
+    });
+    clearPreviews();
+    
+    // Load preview based on import type
+    if (importType === 'case') {
+      await loadCasePreview(file);
+    } else if (importType === 'confirmation') {
+      await loadConfirmationPreview(file);
+    }
+  }, [clearMessages, clearImportData, setError, updateImportState, clearPreviews, loadCasePreview, loadConfirmationPreview]);
+
   // Handle import action
   const handleImport = useCallback(() => {
     if (!user || !importState.selectedFile || !importState.importType) return;
@@ -264,6 +290,7 @@ export const CaseImport = ({
             <FileSelector
               selectedFile={importState.selectedFile}
               onFileSelect={handleFileSelect}
+              onFileSelectDirect={handleFileSelectDirect}
               isDisabled={importState.isImporting || importState.isClearing}
               onClear={clearImportData}
             />

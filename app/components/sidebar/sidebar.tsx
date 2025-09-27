@@ -6,6 +6,7 @@ import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import/case-import';
+import { ChecksumUtility } from './checksum/checksum-utility';
 import { FileData } from '~/types';
 import { ImportResult, ConfirmationImportResult } from '~/types';
 
@@ -58,6 +59,7 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isChecksumModalOpen, setIsChecksumModalOpen] = useState(false);
 
   const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
@@ -98,6 +100,10 @@ export const Sidebar = ({
         onClose={() => setIsImportModalOpen(false)}
         onImportComplete={handleImportComplete}
       />
+      <ChecksumUtility 
+        isOpen={isChecksumModalOpen}
+        onClose={() => setIsChecksumModalOpen(false)}
+      />
       {showNotes ? (
         <NotesSidebar 
           currentCase={currentCase}
@@ -136,6 +142,12 @@ export const Sidebar = ({
               className={styles.importButton}
             >
               Import/Clear RO Case
+            </button>
+            <button 
+              onClick={() => setIsChecksumModalOpen(true)}
+              className={styles.checksumButton}
+            >
+              Checksum Utility
             </button>
           </div>
         </>

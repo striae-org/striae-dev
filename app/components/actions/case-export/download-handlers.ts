@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { FileData, AllCasesExportData, CaseExportData, ExportOptions } from '~/types';
 import { getImageUrl } from '../image-manage';
-import { generateForensicManifestSecure } from '~/utils/CRC32';
+import { generateForensicManifestSecure, calculateCRC32Secure } from '~/utils/CRC32';
 import { ExportFormat, formatDateForFilename, CSV_HEADERS } from './types-constants';
 import { protectExcelWorksheet, addForensicDataWarning } from './metadata-helpers';
 import { generateMetadataRows, generateCSVContent, processFileDataForTabular } from './data-processing';
@@ -19,7 +19,22 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
     const workflowId = auditService.startWorkflow('all-cases');
     
     const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    // Calculate checksum for integrity verification
+    const checksum = calculateCRC32Secure(dataStr);
+    
+    // Create final export with checksum included
+    const finalExportData = {
+      ...exportData,
+      metadata: {
+        ...exportData.metadata,
+        checksum: checksum.toUpperCase(),
+        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+      }
+    };
+    
+    const finalDataStr = JSON.stringify(finalExportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(finalDataStr);
     
     const exportFileName = `striae-all-cases-export-${formatDateForFilename(new Date())}.json`;
     
@@ -38,7 +53,7 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
       [],
       {
         processingTimeMs: endTime - startTime,
-        fileSizeBytes: dataStr.length,
+        fileSizeBytes: finalDataStr.length,
         validationStepsCompleted: exportData.cases.length,
         validationStepsFailed: exportData.cases.filter(c => c.summary?.exportError).length
       },
@@ -94,10 +109,7 @@ export async function downloadAllCasesAsCSV(user: User, exportData: AllCasesExpo
     let exportPassword: string | undefined;
 
     // Create summary worksheet
-    const summaryData = [
-      protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
-      protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
-      [''],
+    const summaryDataRows = [
       ['Export Date', new Date().toISOString()],
       ['Exported By (Email)', exportData.metadata.exportedBy || 'N/A'],
       ['Exported By (UID)', exportData.metadata.exportedByUid || 'N/A'],
@@ -110,7 +122,15 @@ export async function downloadAllCasesAsCSV(user: User, exportData: AllCasesExpo
       ['Total Files (All Cases)', exportData.metadata.totalFiles],
       ['Total Annotations (All Cases)', exportData.metadata.totalAnnotations],
       ['Total Confirmations (All Cases)', exportData.metadata.totalConfirmations || 0],
-      ['Total Confirmations Requested (All Cases)', exportData.metadata.totalConfirmationsRequested || 0],
+      ['Total Confirmations Requested (All Cases)', exportData.metadata.totalConfirmationsRequested || 0]
+    ];
+    
+    // XLSX files are inherently protected, no checksum validation needed
+    const summaryData = [
+      protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
+      protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
+      [''],
+      ...summaryDataRows,
       [''],
       ['Case Details'],
       [
@@ -809,10 +829,25 @@ function generateJSONContent(
   
   const jsonString = JSON.stringify(jsonData, null, 2);
   
+  // Calculate checksum for integrity verification
+  const checksum = calculateCRC32Secure(jsonString);
+  
+  // Add checksum to metadata
+  const finalJsonData = {
+    ...jsonData,
+    metadata: {
+      ...jsonData.metadata,
+      checksum: checksum.toUpperCase(),
+      integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+    }
+  };
+  
+  const finalJsonString = JSON.stringify(finalJsonData, null, 2);
+  
   // Add forensic protection warning if enabled
   if (protectForensicData) {
-    return addForensicDataWarning(jsonString, 'json');
+    return addForensicDataWarning(finalJsonString, 'json');
   }
   
-  return jsonString;
+  return finalJsonString;
 }
