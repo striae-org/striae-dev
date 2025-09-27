@@ -58,6 +58,7 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isChecksumModalOpen, setIsChecksumModalOpen] = useState(false);
 
   const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
@@ -136,6 +137,12 @@ export const Sidebar = ({
               className={styles.importButton}
             >
               Import/Clear RO Case
+            </button>
+            <button 
+              onClick={() => setIsChecksumModalOpen(true)}
+              className={styles.checksumButton}
+            >
+              Checksum Utility
             </button>
           </div>
         </>

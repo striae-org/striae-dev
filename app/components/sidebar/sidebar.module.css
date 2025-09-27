@@ -293,4 +293,26 @@
   box-shadow: 0 2px 6px color-mix(in lab, var(--success) 40%, transparent);
 }
 
+/* Checksum Button */
+.checksumButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  box-shadow: 0 1px 3px color-mix(in lab, #6c757d 30%, transparent);
+  box-sizing: border-box;
+  margin-top: 0.5rem;
+}
+
+.checksumButton:hover {
+  background: #5c636a;
+  box-shadow: 0 2px 6px color-mix(in lab, #6c757d 40%, transparent);
+}
+
 
