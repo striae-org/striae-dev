@@ -6,6 +6,7 @@ import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import/case-import';
+import { ChecksumUtility } from './checksum';
 import { FileData } from '~/types';
 import { ImportResult, ConfirmationImportResult } from '~/types';
 
@@ -98,6 +99,10 @@ export const Sidebar = ({
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onImportComplete={handleImportComplete}
+      />
+      <ChecksumUtility 
+        isOpen={isChecksumModalOpen}
+        onClose={() => setIsChecksumModalOpen(false)}
       />
       {showNotes ? (
         <NotesSidebar 
