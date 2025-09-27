@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './checksum-utility.module.css';
 import { calculateCRC32Secure, validateCaseIntegritySecure } from '~/utils/CRC32';
+import { removeForensicWarning } from '~/components/actions/case-import/validation';
 
 interface ChecksumUtilityProps {
   isOpen: boolean;
@@ -215,7 +216,10 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
 
       const dataFileName = dataFiles[0];
       const dataFile = zipContent.file(dataFileName);
-      const dataContent = await dataFile!.async('text');
+      const rawDataContent = await dataFile!.async('text');
+      
+      // Clean the data content by removing forensic warnings (same as import process)
+      const dataContent = removeForensicWarning(rawDataContent);
       
       const imageFiles: { [filename: string]: Blob } = {};
       const imageFolder = zipContent.folder('images');
