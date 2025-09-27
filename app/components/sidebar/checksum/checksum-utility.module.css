@@ -280,10 +280,14 @@
 .resultMessage {
   font-size: var(--fontSizeBodyS);
   font-weight: var(--fontWeightMedium);
-  line-height: 1.5;
+  line-height: 1.6;
   padding: var(--spaceS);
   border-radius: var(--spaceXS);
   margin-top: var(--spaceXS);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap;
 }
 
 .resultSection.success .resultMessage {
