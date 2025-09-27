@@ -178,13 +178,13 @@
   display: flex;
   align-items: center;
   gap: var(--spaceS);
-  padding: var(--spaceL);
+  padding: var(--spaceXL);
   border: 2px dashed color-mix(in lab, var(--primary) 30%, transparent);
   border-radius: var(--spaceXS);
   background: color-mix(in lab, var(--primary) 5%, transparent);
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  min-height: 60px;
+  min-height: 120px;
 }
 
 .fileLabel:hover {
