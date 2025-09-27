@@ -76,7 +76,28 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     
     const files = event.dataTransfer.files;
     if (files.length > 0) {
-      handleFileSelect(files[0]);
+      const file = files[0];
+      
+      // Validate file type before processing
+      const isValidType = file.name.toLowerCase().endsWith('.json') || 
+                         file.name.toLowerCase().endsWith('.csv') ||
+                         file.name.toLowerCase().endsWith('.zip') ||
+                         file.name.toLowerCase().endsWith('.xlsx') ||
+                         file.name.toLowerCase().endsWith('.txt');
+      
+      if (isValidType) {
+        handleFileSelect(file);
+      } else {
+        // Show error for invalid file type
+        setVerificationResult({
+          isValid: false,
+          expectedChecksum: 'N/A',
+          calculatedChecksum: 'N/A',
+          fileName: file.name,
+          fileType: 'unknown',
+          errorMessage: 'Invalid file type. Please drop a Striae JSON, CSV, ZIP, XLSX, or TXT export file.'
+        });
+      }
     }
   };
 
@@ -558,7 +579,10 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
             <div className={styles.uploadContent}>
               <div className={styles.uploadIcon}>📁</div>
               <div className={styles.uploadText}>
-                <strong>Click to select</strong> or drag and drop a Striae export file
+                <strong>
+                  {dragOver ? 'Drop file here...' : 'Click to select'}
+                </strong> 
+                {!dragOver && ' or drag and drop a Striae export file'}
               </div>
               <div className={styles.uploadSubtext}>
                 Supports JSON, CSV, ZIP, XLSX, and TXT export files with embedded checksums

@@ -106,13 +106,16 @@
 
 .uploadArea:hover {
   border-color: var(--primary);
-  background: color-mix(in lab, var(--primary) 5%, var(--backgroundLight));
+  background: color-mix(in lab, var(--primary) 8%, var(--backgroundLight));
+  transform: translateY(-1px);
 }
 
 .uploadArea.dragOver {
-  border-color: var(--primary);
-  background: color-mix(in lab, var(--primary) 10%, var(--backgroundLight));
+  border-color: var(--accent);
+  background: color-mix(in lab, var(--accent) 15%, var(--backgroundLight));
   border-style: solid;
+  transform: scale(1.02);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--accent) 30%, transparent);
 }
 
 .uploadContent {
@@ -125,16 +128,33 @@
 .uploadIcon {
   font-size: 3rem;
   opacity: 0.7;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.dragOver .uploadIcon {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .uploadText {
   font-size: var(--fontSizeBodyL);
   color: var(--text);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.dragOver .uploadText {
+  color: var(--accent);
 }
 
 .uploadText strong {
   color: var(--primary);
   font-weight: var(--fontWeightSemibold);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.dragOver .uploadText strong {
+  color: var(--accent);
+  font-weight: var(--fontWeightBold);
 }
 
 .uploadSubtext {
