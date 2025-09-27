@@ -71,7 +71,16 @@ export default function Home() {
           <div className={styles.subtitle}>
             <p>Release Candidacy Begins October 1, 2025 @ 11:00 AM MST</p>
             <br />
-            <p><a href="https://www.customink.com/fundraising/striae-beta-als-san-diego" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Striae Beta Fundraiser for ALS San Diego in Honor of John Farrell</a></p>
+            <br />
+            <a 
+              href="/docs/striae-white-paper.pdf" 
+              download="Striae - White Paper.pdf"
+              className={styles.signInButton}
+            >
+              Striae White Paper
+            </a>
+            <br />
+            <br />
            <div className={styles.youtubeEmbed}>
               <iframe
                 width="100%"
