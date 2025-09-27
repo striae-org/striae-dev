@@ -401,7 +401,8 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       }
 
       // Extract the report content (everything before the integrity section)
-      const reportContent = content.substring(0, integritySection).trim();
+      // IMPORTANT: Don't trim here - preserve exact whitespace as it was during generation
+      const reportContent = content.substring(0, integritySection);
       
       // Extract the expected checksum from the integrity section
       const checksumMatch = content.match(/Report Content CRC32 Checksum:\s*([A-F0-9]+)/i);
@@ -418,7 +419,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
 
       const expectedChecksum = checksumMatch[1].toUpperCase();
       
-      // Calculate the checksum of the report content
+      // Calculate the checksum of the report content (without trimming to match generation)
       const calculatedChecksum = await calculateCRC32Secure(reportContent);
       const isValid = expectedChecksum === calculatedChecksum.toUpperCase();
 
