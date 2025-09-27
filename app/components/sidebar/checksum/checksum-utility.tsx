@@ -463,7 +463,9 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
 
       for (const line of lines) {
         if (line.includes('# CRC32 Checksum:')) {
-          expectedChecksum = line.split('# CRC32 Checksum:')[1]?.trim() || '';
+          const rawChecksum = line.split('# CRC32 Checksum:')[1]?.trim() || '';
+          // Extract only the hexadecimal part (remove trailing commas or other CSV delimiters)
+          expectedChecksum = rawChecksum.replace(/[^A-Fa-f0-9]/g, '');
           break;
         }
       }
