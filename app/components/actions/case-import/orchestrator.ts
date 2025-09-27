@@ -307,7 +307,7 @@ export async function importCaseForReview(
       'success',
       checksumValidationPassed,
       [],
-      caseData.metadata.exportedByUid,
+      undefined, // Don't check self-confirmation for read-only case imports
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: zipFile.size,
@@ -334,7 +334,7 @@ export async function importCaseForReview(
       'failure',
       checksumValidationPassed, // Use actual checksum validation result even for failures
       result.errors || [],
-      undefined,
+      undefined, // Don't check self-confirmation for read-only case imports
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: zipFile.size
