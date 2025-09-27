@@ -13,8 +13,8 @@
   background: var(--backgroundLight);
   border-radius: var(--spaceXS);
   width: 90%;
-  max-width: 480px;
-  max-height: 90vh;
+  max-width: 600px;
+  max-height: 95vh;
   box-shadow: 0 var(--spaceXS) var(--spaceL) color-mix(in lab, var(--black) 10%, transparent);
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
   display: flex;
