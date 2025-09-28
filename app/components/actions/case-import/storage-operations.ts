@@ -10,8 +10,7 @@ import {
   validateUserSession
 } from '~/utils/permissions';
 import { 
-  CaseExportData, 
-  UserData, 
+  CaseExportData,   
   ExtendedUserData,
   FileData,
   CaseData,
