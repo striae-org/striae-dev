@@ -41,7 +41,7 @@ export async function importConfirmationData(
     onProgress?.('Validating hash', 20, 'Verifying data integrity...');
 
     // Validate hash
-    const hashValid = validateConfirmationHash(fileContent, confirmationData.metadata.hash);
+    const hashValid = await validateConfirmationHash(fileContent, confirmationData.metadata.hash);
     if (!hashValid) {
       throw new Error('Confirmation data hash validation failed. The file may have been tampered with or corrupted.');
     }
