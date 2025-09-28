@@ -21,7 +21,7 @@ export interface ReadOnlyCaseMetadata {
   importedAt: string;
   originalExportDate: string;
   originalExportedBy: string;
-  sourceChecksum?: string;
+  sourceHash?: string;
   isReadOnly: true;
 }
 
@@ -50,7 +50,7 @@ export interface ConfirmationImportData {
     exportedByCompany: string;
     totalConfirmations: number;
     version: string;
-    checksum: string;
+    hash: string;
     originalExportCreatedAt?: string;
   };
   confirmations: {

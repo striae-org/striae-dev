@@ -387,7 +387,7 @@ auditExportService.exportAuditTrailToCSV(auditTrail, 'case-audit.csv');
 - File Details (ID, size, MIME type, etc.)
 - Annotation Details (type, tool, position)
 - Performance Metrics (processing time, validation steps)
-- Security Information (checksum validation, security checks)
+- Security Information (hash validation, security checks)
 
 ### JSON Export
 
@@ -493,7 +493,7 @@ UserAuditViewer/
 ### Data Integrity
 
 - **Immutable Entries**: Audit entries cannot be modified once created
-- **Checksum Validation**: File integrity verification for uploads
+- **Hash Validation**: File integrity verification for uploads
 - **Tamper Detection**: Cryptographic validation of audit data
 
 ### Access Control
@@ -619,7 +619,7 @@ await auditService.logEvent({
   // ... other fields
   securityChecks: {
     selfConfirmationPrevented: !canConfirmOwn,
-    fileIntegrityValid: checksumValid,
+    fileIntegrityValid: hashValid,
     exporterUidValidated: exporterValid
   }
 });
@@ -657,7 +657,7 @@ The service provides specialized methods for common audit scenarios:
 
 Logs case export operations with built-in security checks.
 
-#### `logCaseImport(user, caseNumber, fileName, result, checksumValid, errors?, originalExaminerUid?, performanceMetrics?): Promise<void>`
+#### `logCaseImport(user, caseNumber, fileName, result, hashValid, errors?, originalExaminerUid?, performanceMetrics?): Promise<void>`
 
 Logs case import operations with integrity validation.
 

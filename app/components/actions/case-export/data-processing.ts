@@ -137,7 +137,7 @@ export async function generateCSVContent(exportData: CaseExportData, protectFore
     fileRows.push(...processedRows);
   });
 
-  // Combine data rows for checksum calculation (excluding header comments)
+  // Combine data rows for hash calculation (excluding header comments)
   const dataRows = [
     ...metadataRows,
     CSV_HEADERS,
@@ -149,19 +149,19 @@ export async function generateCSVContent(exportData: CaseExportData, protectFore
   ).join('\n');
   
   // Calculate hash for integrity verification
-  const checksum = await calculateSHA256Secure(csvDataContent);
+  const hash = await calculateSHA256Secure(csvDataContent);
   
   // Create final CSV with hash header
-  const csvWithChecksum = [
+  const csvWithHash = [
     `# Striae Case Export - Generated: ${new Date().toISOString()}`,
     `# Case: ${exportData.metadata.caseNumber}`,
     `# Total Files: ${exportData.metadata.totalFiles}`,
-    `# SHA-256 Hash: ${checksum.toUpperCase()}`,
+    `# SHA-256 Hash: ${hash.toUpperCase()}`,
     '# Verification: Recalculate SHA-256 of data rows only (excluding these comment lines)',
     '',
     csvDataContent
   ].join('\n');
 
   // Add forensic protection warning if enabled
-  return protectForensicData ? addForensicDataWarning(csvWithChecksum, 'csv') : csvWithChecksum;
+  return protectForensicData ? addForensicDataWarning(csvWithHash, 'csv') : csvWithHash;
 }

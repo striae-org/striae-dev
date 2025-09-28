@@ -62,8 +62,8 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
         
         if (forensicManifest) {
           // Enhanced validation with forensic manifest (includes individual file hashes)
-          // Handle backward compatibility: old manifests use "checksum" terminology, new ones use "hash"
-          expectedHash = forensicManifest.manifestHash || forensicManifest.manifestChecksum;
+          // Handle backward compatibility: old manifests use "hash" terminology, new ones use "hash"
+          expectedHash = forensicManifest.manifestHash || forensicManifest.manifestHash;
           
           // Extract image files for comprehensive validation
           const imageFiles: { [filename: string]: Blob } = {};
@@ -83,11 +83,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           
           // Convert old format to new format for validation if needed
           let manifestForValidation = forensicManifest;
-          if (forensicManifest.dataChecksum && !forensicManifest.dataHash) {
+          if (forensicManifest.dataHash && !forensicManifest.dataHash) {
             manifestForValidation = {
-              dataHash: forensicManifest.dataChecksum,
-              imageHashes: forensicManifest.imageChecksums || {},
-              manifestHash: forensicManifest.manifestChecksum,
+              dataHash: forensicManifest.dataHash,
+              imageHashes: forensicManifest.imageHashes || {},
+              manifestHash: forensicManifest.manifestHash,
               totalFiles: forensicManifest.totalFiles,
               createdAt: forensicManifest.createdAt
             };
@@ -215,7 +215,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
   caseData: CaseExportData;
   imageFiles: { [filename: string]: Blob };
   metadata?: any;
-  cleanedContent?: string; // Add cleaned content for checksum validation
+  cleanedContent?: string; // Add cleaned content for hash validation
 }> {
   // Dynamic import of JSZip to avoid bundle size issues
   const JSZip = (await import('jszip')).default;

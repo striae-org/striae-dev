@@ -7,8 +7,8 @@ import { calculateSHA256Secure } from '~/utils/SHA256';
 const USER_WORKER_URL = paths.user_worker_url;
 
 /**
- * Remove forensic warning from content for checksum validation (supports both JSON and CSV formats)
- * This function ensures exact match with the content used during export checksum generation
+ * Remove forensic warning from content for hash validation (supports both JSON and CSV formats)
+ * This function ensures exact match with the content used during export hash generation
  */
 export function removeForensicWarning(content: string): string {
   // Handle JSON forensic warnings (block comment format)
@@ -25,11 +25,11 @@ export function removeForensicWarning(content: string): string {
   // CRITICAL: The CSV forensic warning is ONLY the first quoted line, followed by two newlines
   // Format: "CASE DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n
   // 
-  // After removal, what remains should be the csvWithChecksum content:
+  // After removal, what remains should be the csvWithHash content:
   // # Striae Case Export - Generated: ...
   // # Case: ...
   // # Total Files: ...
-  // # SHA256 Checksum: ...
+  // # SHA256 Hash: ...
   // # Verification: ...
   //
   // [actual CSV data]
@@ -93,24 +93,24 @@ export function isConfirmationDataFile(filename: string): boolean {
 }
 
 /**
- * Validate confirmation data file checksum
+ * Validate confirmation data file hash
  */
-export async function validateConfirmationChecksum(jsonContent: string, expectedChecksum: string): Promise<boolean> {
-  // Create data without checksum for validation
+export async function validateConfirmationHash(jsonContent: string, expectedHash: string): Promise<boolean> {
+  // Create data without hash for validation
   const data = JSON.parse(jsonContent);
-  const dataWithoutChecksum = {
+  const dataWithoutHash = {
     ...data,
     metadata: {
       ...data.metadata,
-      checksum: undefined
+      hash: undefined
     }
   };
-  delete dataWithoutChecksum.metadata.checksum;
+  delete dataWithoutHash.metadata.hash;
   
-  const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
-  const actualChecksum = await calculateSHA256Secure(contentForChecksum);
+  const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
+  const actualHash = await calculateSHA256Secure(contentForHash);
   
-  return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
+  return actualHash.toUpperCase() === expectedHash.toUpperCase();
 }
 
 /**

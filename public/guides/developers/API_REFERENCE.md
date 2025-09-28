@@ -561,7 +561,7 @@ POST /audit/
     "fileName": "string",
     "fileType": "AuditFileType",
     "caseNumber": "string",
-    "checksumValid": "boolean",
+    "hashValid": "boolean",
     "validationErrors": ["string"],
     "workflowPhase": "WorkflowPhase",
     "performanceMetrics": {
@@ -631,7 +631,7 @@ GET /audit/?userId=aDzwq3G6IBVRJVCEFijdg7B0fwq2&startDate=2025-09-01&endDate=202
         "fileName": "CASE-2025-001-annotations.json",
         "fileType": "json-data",
         "caseNumber": "CASE-2025-001",
-        "checksumValid": true,
+        "hashValid": true,
         "validationErrors": [],
         "workflowPhase": "case-export"
       }
@@ -817,7 +817,7 @@ interface AuditDetails {
   confirmationId?: string;
   
   // Validation & Security
-  checksumValid?: boolean;
+  hashValid?: boolean;
   validationErrors: string[];
   securityChecks?: SecurityCheckResults;
   
@@ -952,7 +952,7 @@ interface UserData {
     importedAt: string;
     originalExportDate: string;
     originalExportedBy: string;
-    sourceChecksum?: string;
+    sourceHash?: string;
     isReadOnly: true;
   }>;
   createdAt: string;
@@ -1204,7 +1204,7 @@ interface ReadOnlyCaseMetadata {
   importedAt: string;
   originalExportDate: string;
   originalExportedBy: string;
-  sourceChecksum?: string;
+  sourceHash?: string;
   isReadOnly: true;
 }
 ```

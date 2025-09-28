@@ -293,8 +293,8 @@
   box-shadow: 0 2px 6px color-mix(in lab, var(--success) 40%, transparent);
 }
 
-/* Checksum Button */
-.checksumButton {
+/* Hash Button */
+.hashButton {
   width: 100%;
   padding: 0.75rem 1rem;
   background: #6c757d;
@@ -310,7 +310,7 @@
   margin-top: 0.5rem;
 }
 
-.checksumButton:hover {
+.hashButton:hover {
   background: #5c636a;
   box-shadow: 0 2px 6px color-mix(in lab, #6c757d 40%, transparent);
 }

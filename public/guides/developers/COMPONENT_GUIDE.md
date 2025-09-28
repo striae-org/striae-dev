@@ -710,7 +710,7 @@ case-import/
 **Modular Components**:
 
 - **Orchestrator**: Main import workflow coordination (`importCaseForReview`)
-- **Validation**: Security checks, exporter UID validation, checksum verification
+- **Validation**: Security checks, exporter UID validation, hash verification
 - **ZIP Processing**: Archive parsing, case data extraction, preview generation
 - **Storage Operations**: R2 case storage, read-only case management, user profile updates
 - **Image Operations**: Blob processing and upload to image worker
@@ -730,7 +730,7 @@ export const importCaseForReview = async (
 
 // Validation functions
 export const validateExporterUid = async (exporterUid: string, currentUser: User): Promise<{ exists: boolean; isSelf: boolean }>
-export const validateConfirmationChecksum = (jsonContent: string, expectedChecksum: string): boolean
+export const validateConfirmationHash = (jsonContent: string, expectedHash: string): boolean
 export const validateCaseIntegrity = (caseData: CaseExportData, imageFiles: { [filename: string]: Blob }): { isValid: boolean; issues: string[] }
 
 // ZIP processing
@@ -774,7 +774,7 @@ export interface ReadOnlyCaseMetadata {
   importedAt: string;
   originalExportDate: string;
   originalExportedBy: string;
-  sourceChecksum?: string;
+  sourceHash?: string;
   isReadOnly: true;
 }
 
@@ -799,7 +799,7 @@ export interface CaseImportPreview {
 - **Image Integration**: Automatic upload and association of all case images
 - **Metadata Preservation**: Complete preservation of original export metadata and timestamps
 - **Data Integrity**: Comprehensive validation of ZIP contents and case data structure
-- **Forensic Warning Handling**: Proper removal of forensic warnings for checksum validation
+- **Forensic Warning Handling**: Proper removal of forensic warnings for hash validation
 - **Confirmation Data Support**: Specialized import handling for confirmation data files
 - **Error Recovery**: Graceful handling of import failures with detailed error reporting
 - **Security Validation**: Prevents modification of imported cases and restricts access appropriately

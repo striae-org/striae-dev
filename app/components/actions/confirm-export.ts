@@ -234,18 +234,18 @@ export async function exportConfirmationData(
       confirmations: caseConfirmations
     };
 
-    // Convert to JSON string for checksum calculation
+    // Convert to JSON string for hash calculation
     const jsonString = JSON.stringify(exportData, null, 2);
     
     // Calculate SHA-256 hash for data integrity using secure version for forensic data
-    const checksum = await calculateSHA256Secure(jsonString);
+    const hash = await calculateSHA256Secure(jsonString);
     
-    // Add checksum to final export data
+    // Add hash to final export data
     const finalExportData = {
       ...exportData,
       metadata: {
         ...exportData.metadata,
-        checksum: checksum.toUpperCase()
+        hash: hash.toUpperCase()
       }
     };
 
@@ -274,7 +274,7 @@ export async function exportConfirmationData(
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    console.log(`Confirmation data exported for case ${caseNumber} with checksum ${checksum.toUpperCase()}`);
+    console.log(`Confirmation data exported for case ${caseNumber} with hash ${hash.toUpperCase()}`);
     
     // Log successful confirmation export
     const endTime = Date.now();

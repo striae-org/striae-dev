@@ -6,7 +6,7 @@ import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import/case-import';
-import { ChecksumUtility } from './checksum/checksum-utility';
+import { HashUtility } from './hash/hash-utility';
 import { FileData } from '~/types';
 import { ImportResult, ConfirmationImportResult } from '~/types';
 
@@ -59,7 +59,7 @@ export const Sidebar = ({
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isChecksumModalOpen, setIsChecksumModalOpen] = useState(false);
+  const [isHashModalOpen, setIsHashModalOpen] = useState(false);
 
   const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
@@ -113,9 +113,9 @@ export const Sidebar = ({
         onClose={() => setIsImportModalOpen(false)}
         onImportComplete={handleImportComplete}
       />
-      <ChecksumUtility 
-        isOpen={isChecksumModalOpen}
-        onClose={() => setIsChecksumModalOpen(false)}
+      <HashUtility 
+        isOpen={isHashModalOpen}
+        onClose={() => setIsHashModalOpen(false)}
       />
       {showNotes ? (
         <NotesSidebar 
@@ -157,10 +157,10 @@ export const Sidebar = ({
               Import/Clear RO Case
             </button>
             <button 
-              onClick={() => setIsChecksumModalOpen(true)}
-              className={styles.checksumButton}
+              onClick={() => setIsHashModalOpen(true)}
+              className={styles.hashButton}
             >
-              Checksum Utility
+              Hash Utility
             </button>
           </div>
         </>

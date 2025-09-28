@@ -3,7 +3,7 @@ import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
 import { ConfirmationImportResult, ConfirmationImportData } from '~/types';
 import { checkExistingCase } from '../case-manage';
-import { validateExporterUid, validateConfirmationChecksum } from './validation';
+import { validateExporterUid, validateConfirmationHash } from './validation';
 import { auditService } from '~/services/audit.service';
 
 const DATA_WORKER_URL = paths.data_worker_url;
@@ -38,12 +38,12 @@ export async function importConfirmationData(
     // Start audit workflow
     auditService.startWorkflow(result.caseNumber);
 
-    onProgress?.('Validating checksum', 20, 'Verifying data integrity...');
+    onProgress?.('Validating hash', 20, 'Verifying data integrity...');
 
-    // Validate checksum
-    const checksumValid = validateConfirmationChecksum(fileContent, confirmationData.metadata.checksum);
-    if (!checksumValid) {
-      throw new Error('Confirmation data checksum validation failed. The file may have been tampered with or corrupted.');
+    // Validate hash
+    const hashValid = validateConfirmationHash(fileContent, confirmationData.metadata.hash);
+    if (!hashValid) {
+      throw new Error('Confirmation data hash validation failed. The file may have been tampered with or corrupted.');
     }
 
     onProgress?.('Validating exporter', 30, 'Checking exporter credentials...');
@@ -247,7 +247,7 @@ export async function importConfirmationData(
       result.caseNumber,
       confirmationFile.name,
       result.success ? (result.errors && result.errors.length > 0 ? 'warning' : 'success') : 'failure',
-      checksumValid,
+      hashValid,
       result.confirmationsImported,
       result.errors || [],
       confirmationData.metadata.exportedByUid,

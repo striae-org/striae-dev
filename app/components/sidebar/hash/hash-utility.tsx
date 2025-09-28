@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './checksum-utility.module.css';
+import styles from './hash-utility.module.css';
 import { calculateSHA256Secure, validateCaseIntegritySecure } from '~/utils/SHA256';
 import { removeForensicWarning } from '~/components/actions/case-import/validation';
 
-interface ChecksumUtilityProps {
+interface HashUtilityProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 interface VerificationResult {
   isValid: boolean;
-  expectedChecksum: string;
+  expectedHash: string;
   calculatedHash: string;
   fileName: string;
   fileType: 'json' | 'csv' | 'zip' | 'txt' | 'unknown';
@@ -24,7 +24,7 @@ interface VerificationResult {
   };
 }
 
-export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClose }) => {
+export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -91,7 +91,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         // Show error for invalid file type
         setVerificationResult({
           isValid: false,
-          expectedChecksum: 'N/A',
+          expectedHash: 'N/A',
           calculatedHash: 'N/A',
           fileName: file.name,
           fileType: 'unknown',
@@ -133,7 +133,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       } else {
         result = {
           isValid: false,
-          expectedChecksum: '',
+          expectedHash: '',
           calculatedHash: '',
           fileName,
           fileType: 'unknown',
@@ -146,7 +146,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       console.error('Verification failed:', error);
       setVerificationResult({
         isValid: false,
-        expectedChecksum: '',
+        expectedHash: '',
         calculatedHash: '',
         fileName: file.name,
         fileType: 'unknown',
@@ -185,7 +185,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       if (!manifestFile) {
         return {
           isValid: false,
-          expectedChecksum: '',
+          expectedHash: '',
           calculatedHash: '',
           fileName,
           fileType: 'zip',
@@ -203,7 +203,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       if (dataFiles.length === 0) {
         return {
           isValid: false,
-          expectedChecksum: '',
+          expectedHash: '',
           calculatedHash: '',
           fileName,
           fileType: 'zip',
@@ -244,21 +244,21 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         const dataStartIndex = lines.findIndex((line: string) => !line.startsWith('#') && line.trim() !== '');
         if (dataStartIndex !== -1) {
           const csvDataOnly = lines.slice(dataStartIndex).join('\n');
-          const csvDataOnlyChecksum = await calculateSHA256Secure(csvDataOnly);
+          const csvDataOnlyHash = await calculateSHA256Secure(csvDataOnly);
           
           // Check if CSV internal integrity matches
-          const csvChecksumMatch = dataContent.match(/# SHA-256 Hash:\s*([A-F0-9]+)/i);
-          const embeddedCsvChecksum = csvChecksumMatch ? csvChecksumMatch[1].toLowerCase() : '';
+          const csvHashMatch = dataContent.match(/# SHA-256 Hash:\s*([A-F0-9]+)/i);
+          const embeddedCsvHash = csvHashMatch ? csvHashMatch[1].toLowerCase() : '';
           
-          if (csvDataOnlyChecksum === embeddedCsvChecksum) {
+          if (csvDataOnlyHash === embeddedCsvHash) {
             // CSV internal integrity is valid - create a custom success result
             customValidationResult = {
               isValid: true,
               dataValid: true,
               imageValidation: validation.imageValidation,
-              manifestValid: false, // Manifest has checksum mismatch but data is internally valid
+              manifestValid: false, // Manifest has hash mismatch but data is internally valid
               errors: [`Note: Manifest data hash mismatch (${manifest.dataHash} vs ${await calculateSHA256Secure(dataContent)}) but CSV internal integrity confirmed`],
-              summary: 'CSV data integrity confirmed via embedded checksum'
+              summary: 'CSV data integrity confirmed via embedded hash'
             };
           }
         }
@@ -268,7 +268,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       
       return {
         isValid: finalValidation.isValid,
-        expectedChecksum: manifest.manifestChecksum || '',
+        expectedHash: manifest.manifestHash || '',
         calculatedHash: '',
         fileName,
         fileType: 'zip',
@@ -284,7 +284,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     } catch (error) {
       return {
         isValid: false,
-        expectedChecksum: '',
+        expectedHash: '',
         calculatedHash: '',
         fileName,
         fileType: 'zip',
@@ -301,7 +301,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       if (integritySection === -1) {
         return {
           isValid: false,
-          expectedChecksum: 'Not found',
+          expectedHash: 'Not found',
           calculatedHash: 'N/A',
           fileName,
           fileType: 'txt',
@@ -324,7 +324,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         reportContent = content.substring(0, integritySection);
       }
       
-      // Clean up any trailing whitespace that shouldn't be part of the checksum calculation
+      // Clean up any trailing whitespace that shouldn't be part of the hash calculation
       // But be careful - we need to match exactly what was used during generation
       // Based on the generation code, it should end with "Generated by Striae\n"
       // The regex replacement removed all trailing newlines, but we need exactly one
@@ -332,12 +332,12 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         reportContent += '\n';
       }
       
-      // Extract the expected checksum from the integrity section
-      const checksumMatch = content.match(/Report Content SHA-256 Hash:\s*([A-F0-9]+)/i);
-      if (!checksumMatch) {
+      // Extract the expected hash from the integrity section
+      const hashMatch = content.match(/Report Content SHA-256 Hash:\s*([A-F0-9]+)/i);
+      if (!hashMatch) {
         return {
           isValid: false,
-          expectedChecksum: 'Not found',
+          expectedHash: 'Not found',
           calculatedHash: 'N/A',
           fileName,
           fileType: 'txt',
@@ -345,22 +345,22 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         };
       }
 
-      const expectedChecksum = checksumMatch[1].toUpperCase();
+      const expectedHash = hashMatch[1].toUpperCase();
       
-      // Calculate checksums for both trimmed and untrimmed content
+      // Calculate hashes for both trimmed and untrimmed content
       const calculatedHashUntrimmed = await calculateSHA256Secure(reportContent);
       const calculatedHashTrimmed = await calculateSHA256Secure(reportContent.trim());
       
       // Check all possible matches (handle both generation methods)
-      const isValidUntrimmedHex = expectedChecksum === calculatedHashUntrimmed.toUpperCase();
-      const isValidTrimmedHex = expectedChecksum === calculatedHashTrimmed.toUpperCase();
+      const isValidUntrimmedHex = expectedHash === calculatedHashUntrimmed.toUpperCase();
+      const isValidTrimmedHex = expectedHash === calculatedHashTrimmed.toUpperCase();
       
       const isValid = isValidUntrimmedHex || isValidTrimmedHex;
       const calculatedHash = isValidTrimmedHex ? calculatedHashTrimmed : calculatedHashUntrimmed;
 
       return {
         isValid,
-        expectedChecksum,
+        expectedHash,
         calculatedHash: calculatedHash.toUpperCase(),
         fileName,
         fileType: 'txt',
@@ -370,7 +370,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     } catch (error) {
       return {
         isValid: false,
-        expectedChecksum: 'Not found',
+        expectedHash: 'Not found',
         calculatedHash: 'Could not calculate',
         fileName,
         fileType: 'txt',
@@ -385,42 +385,42 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       const cleanedContent = removeForensicWarning(content);
       
       const data = JSON.parse(cleanedContent);
-      let expectedChecksum = '';
+      let expectedHash = '';
       
-      if (data.metadata?.checksum) {
-        expectedChecksum = data.metadata.checksum;
-      } else if (data.auditTrail?.metadata?.checksum) {
-        expectedChecksum = data.auditTrail.metadata.checksum;
+      if (data.metadata?.hash) {
+        expectedHash = data.metadata.hash;
+      } else if (data.auditTrail?.metadata?.hash) {
+        expectedHash = data.auditTrail.metadata.hash;
       } else {
         return {
           isValid: false,
-          expectedChecksum: '',
+          expectedHash: '',
           calculatedHash: '',
           fileName,
           fileType: 'json',
-          errorMessage: 'No checksum found in file. This may not be a Striae export with integrity protection.'
+          errorMessage: 'No hash found in file. This may not be a Striae export with integrity protection.'
         };
       }
 
-      // CRITICAL FIX: Create the original data structure by removing checksum and integrityNote
-      // This recreates the state BEFORE the checksum was added during generation
+      // CRITICAL FIX: Create the original data structure by removing hash and integrityNote
+      // This recreates the state BEFORE the hash was added during generation
       const originalData = { ...data };
       if (originalData.metadata) {
-        const { checksum, integrityNote, ...metadataWithoutChecksum } = originalData.metadata;
-        originalData.metadata = metadataWithoutChecksum;
+        const { hash, integrityNote, ...metadataWithoutHash } = originalData.metadata;
+        originalData.metadata = metadataWithoutHash;
       }
       if (originalData.auditTrail?.metadata) {
-        const { checksum, integrityNote, ...metadataWithoutChecksum } = originalData.auditTrail.metadata;
-        originalData.auditTrail.metadata = metadataWithoutChecksum;
+        const { hash, integrityNote, ...metadataWithoutHash } = originalData.auditTrail.metadata;
+        originalData.auditTrail.metadata = metadataWithoutHash;
       }
 
-      // Stringify the original data structure (without checksum fields)
+      // Stringify the original data structure (without hash fields)
       const contentForVerification = JSON.stringify(originalData, null, 2);
       const calculatedHash = await calculateSHA256Secure(contentForVerification);
 
       return {
-        isValid: calculatedHash.toUpperCase() === expectedChecksum.toUpperCase(),
-        expectedChecksum: expectedChecksum.toUpperCase(),
+        isValid: calculatedHash.toUpperCase() === expectedHash.toUpperCase(),
+        expectedHash: expectedHash.toUpperCase(),
         calculatedHash: calculatedHash.toUpperCase(),
         fileName,
         fileType: 'json'
@@ -428,7 +428,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     } catch (error) {
       return {
         isValid: false,
-        expectedChecksum: '',
+        expectedHash: '',
         calculatedHash: '',
         fileName,
         fileType: 'json',
@@ -459,21 +459,21 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       }
       
       const lines = cleanedContent.split('\n');
-      let expectedChecksum = '';
+      let expectedHash = '';
 
       for (const line of lines) {
         if (line.includes('# SHA-256 Hash:')) {
-          const rawChecksum = line.split('# SHA-256 Hash:')[1]?.trim() || '';
+          const rawHash = line.split('# SHA-256 Hash:')[1]?.trim() || '';
           // Extract only the hexadecimal part (remove trailing commas or other CSV delimiters)
-          expectedChecksum = rawChecksum.replace(/[^A-Fa-f0-9]/g, '');
+          expectedHash = rawHash.replace(/[^A-Fa-f0-9]/g, '');
           break;
         }
       }
 
-      if (!expectedChecksum) {
+      if (!expectedHash) {
         return {
           isValid: false,
-          expectedChecksum: '',
+          expectedHash: '',
           calculatedHash: '',
           fileName,
           fileType: 'csv',
@@ -486,7 +486,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       if (dataStartIndex === -1) {
         return {
           isValid: false,
-          expectedChecksum,
+          expectedHash,
           calculatedHash: '',
           fileName,
           fileType: 'csv',
@@ -498,8 +498,8 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
       const calculatedHash = await calculateSHA256Secure(dataContent);
 
       return {
-        isValid: calculatedHash.toUpperCase() === expectedChecksum.toUpperCase(),
-        expectedChecksum: expectedChecksum.toUpperCase(),
+        isValid: calculatedHash.toUpperCase() === expectedHash.toUpperCase(),
+        expectedHash: expectedHash.toUpperCase(),
         calculatedHash: calculatedHash.toUpperCase(),
         fileName,
         fileType: 'csv'
@@ -507,7 +507,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     } catch (error) {
       return {
         isValid: false,
-        expectedChecksum: '',
+        expectedHash: '',
         calculatedHash: '',
         fileName,
         fileType: 'csv',
@@ -526,7 +526,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Checksum Utility</h2>
+          <h2 className={styles.title}>Hash Utility</h2>
           <button 
             className={styles.closeButton}
             onClick={onClose}
@@ -538,7 +538,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
         
         <div className={styles.content}>
           <p className={styles.description}>
-            Verify the integrity of Striae export files by checking their embedded checksums. 
+            Verify the integrity of Striae export files by checking their embedded hashes. 
             Upload a JSON, CSV, ZIP, or TXT export to validate that the data hasn't been tampered with or corrupted.
           </p>
 
@@ -558,7 +558,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
                 {!dragOver && ' or drag and drop a Striae export file'}
               </div>
               <div className={styles.uploadSubtext}>
-                Supports JSON, CSV, ZIP, and TXT export files with embedded checksums
+                Supports JSON, CSV, ZIP, and TXT export files with embedded hashes
               </div>
             </div>
             <input
@@ -567,7 +567,7 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
               accept=".json,.csv,.zip,.xlsx,.txt"
               onChange={handleFileInputChange}
               className={styles.hiddenInput}
-              aria-label="Select Striae export file for checksum verification"
+              aria-label="Select Striae export file for hash verification"
             />
           </div>
 
@@ -614,10 +614,10 @@ export const ChecksumUtility: React.FC<ChecksumUtilityProps> = ({ isOpen, onClos
                     </div>
                   </>
                 )}
-                {verificationResult.expectedChecksum && verificationResult.fileType !== 'zip' && (
+                {verificationResult.expectedHash && verificationResult.fileType !== 'zip' && (
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Expected:</span>
-                    <span className={styles.resultValue}>{verificationResult.expectedChecksum}</span>
+                    <span className={styles.resultValue}>{verificationResult.expectedHash}</span>
                   </div>
                 )}
                 {verificationResult.calculatedHash && verificationResult.fileType !== 'zip' && (

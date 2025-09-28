@@ -295,7 +295,7 @@ graph TB
 - **Separate Storage**: Read-only cases stored with special metadata flags
 - **User Profile Integration**: ReadOnlyCases array in UserData interface
 - **Access Controls**: UI automatically enforces read-only restrictions
-- **Original Metadata**: Preserves original export date, analyst, and checksum data
+- **Original Metadata**: Preserves original export date, analyst, and hash data
 
 ## Backend Architecture (Cloudflare Workers)
 
@@ -512,7 +512,7 @@ interface UserData {
     importedAt: string;
     originalExportDate: string;
     originalExportedBy: string;
-    sourceChecksum?: string;
+    sourceHash?: string;
     isReadOnly: true;
   }>;
   createdAt: string;
