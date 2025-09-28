@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
 import { CaseExportData } from '~/types';
-import { calculateCRC32Secure } from '~/utils/CRC32';
+import { calculateSHA256Secure } from '~/utils/SHA256';
 
 const USER_WORKER_URL = paths.user_worker_url;
 
@@ -95,7 +95,7 @@ export function isConfirmationDataFile(filename: string): boolean {
 /**
  * Validate confirmation data file checksum
  */
-export function validateConfirmationChecksum(jsonContent: string, expectedChecksum: string): boolean {
+export async function validateConfirmationChecksum(jsonContent: string, expectedChecksum: string): Promise<boolean> {
   // Create data without checksum for validation
   const data = JSON.parse(jsonContent);
   const dataWithoutChecksum = {
@@ -108,7 +108,7 @@ export function validateConfirmationChecksum(jsonContent: string, expectedChecks
   delete dataWithoutChecksum.metadata.checksum;
   
   const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
-  const actualChecksum = calculateCRC32Secure(contentForChecksum);
+  const actualChecksum = await calculateSHA256Secure(contentForChecksum);
   
   return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
 }

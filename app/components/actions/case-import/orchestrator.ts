@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { ImportOptions, ImportResult, ReadOnlyCaseMetadata, FileData } from '~/types';
 import { checkExistingCase } from '../case-manage';
-import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/utils/CRC32';
+import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/utils/SHA256';
 import { deleteFile } from '../image-manage';
 import { parseImportZip } from './zip-processing';
 import { 
