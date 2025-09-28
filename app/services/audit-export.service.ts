@@ -1,5 +1,5 @@
 import { ValidationAuditEntry, AuditTrail } from '~/types';
-import { calculateCRC32Secure } from '~/utils/CRC32';
+import { calculateSHA256Secure } from '~/utils/SHA256';
 
 /**
  * Audit Export Service
@@ -20,7 +20,7 @@ export class AuditExportService {
   /**
    * Export audit entries to CSV format
    */
-  public exportToCSV(entries: ValidationAuditEntry[], filename: string): void {
+  public async exportToCSV(entries: ValidationAuditEntry[], filename: string): Promise<void> {
     const headers = [
       'Timestamp',
       'User Email',
@@ -64,14 +64,14 @@ export class AuditExportService {
     ].join('\n');
 
     // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(csvData);
+    const checksum = await calculateSHA256Secure(csvData);
     
     // Add checksum metadata header
     const csvContent = [
       `# Striae Audit Export - Generated: ${new Date().toISOString()}`,
       `# Total Entries: ${entries.length}`,
-      `# CRC32 Checksum: ${checksum.toUpperCase()}`,
-      `# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)`,
+      `# SHA-256 Hash: ${checksum.toUpperCase()}`,
+      `# Verification: Recalculate SHA-256 of data rows only (excluding these comment lines)`,
       '',
       csvData
     ].join('\n');
@@ -82,7 +82,7 @@ export class AuditExportService {
   /**
    * Export audit trail to detailed CSV with summary
    */
-  public exportAuditTrailToCSV(auditTrail: AuditTrail, filename: string): void {
+  public async exportAuditTrailToCSV(auditTrail: AuditTrail, filename: string): Promise<void> {
     const summaryHeaders = [
       'Case Number',
       'Workflow ID',
@@ -157,14 +157,14 @@ export class AuditExportService {
     ].join('\n');
 
     // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(csvData);
+    const checksum = await calculateSHA256Secure(csvData);
     
     const csvContent = [
       '# Striae Audit Trail Export - Generated: ' + new Date().toISOString(),
       `# Case: ${auditTrail.caseNumber} | Workflow: ${auditTrail.workflowId}`,
       `# Total Events: ${auditTrail.summary.totalEvents}`,
-      `# CRC32 Checksum: ${checksum.toUpperCase()}`,
-      '# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)',
+      `# SHA-256 Hash: ${checksum.toUpperCase()}`,
+      '# Verification: Recalculate SHA-256 of data rows only (excluding these comment lines)',
       '',
       '# AUDIT TRAIL SUMMARY',
       csvData
@@ -278,7 +278,7 @@ export class AuditExportService {
   /**
    * Export audit entries to JSON format (for technical analysis)
    */
-  public exportToJSON(entries: ValidationAuditEntry[], filename: string): void {
+  public async exportToJSON(entries: ValidationAuditEntry[], filename: string): Promise<void> {
     const exportData = {
       metadata: {
         exportTimestamp: new Date().toISOString(),
@@ -292,14 +292,14 @@ export class AuditExportService {
     const jsonContent = JSON.stringify(exportData, null, 2);
     
     // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(jsonContent);
+    const checksum = await calculateSHA256Secure(jsonContent);
     
     // Create final export with checksum included
     const finalExportData = {
       metadata: {
         ...exportData.metadata,
         checksum: checksum.toUpperCase(),
-        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+        integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
       },
       auditEntries: entries
     };
@@ -311,7 +311,7 @@ export class AuditExportService {
   /**
    * Export full audit trail to JSON
    */
-  public exportAuditTrailToJSON(auditTrail: AuditTrail, filename: string): void {
+  public async exportAuditTrailToJSON(auditTrail: AuditTrail, filename: string): Promise<void> {
     const exportData = {
       metadata: {
         exportTimestamp: new Date().toISOString(),
@@ -324,14 +324,14 @@ export class AuditExportService {
     const jsonContent = JSON.stringify(exportData, null, 2);
     
     // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(jsonContent);
+    const checksum = await calculateSHA256Secure(jsonContent);
     
     // Create final export with checksum included
     const finalExportData = {
       metadata: {
         ...exportData.metadata,
         checksum: checksum.toUpperCase(),
-        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+        integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
       },
       auditTrail
     };
@@ -343,7 +343,7 @@ export class AuditExportService {
   /**
    * Generate audit report summary text
    */
-  public generateReportSummary(auditTrail: AuditTrail): string {
+  public async generateReportSummary(auditTrail: AuditTrail): Promise<string> {
     const summary = auditTrail.summary;
     const successRate = ((summary.successfulEvents / summary.totalEvents) * 100).toFixed(1);
     
@@ -391,7 +391,7 @@ Generated by Striae
     `.trim();
 
     // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(reportContent);
+    const checksum = await calculateSHA256Secure(reportContent);
     
     // Add checksum section to the report
     return reportContent + `
@@ -399,14 +399,14 @@ Generated by Striae
 ============================
 INTEGRITY VERIFICATION
 ============================
-Report Content CRC32 Checksum: ${checksum.toUpperCase()}
+Report Content SHA-256 Hash: ${checksum.toUpperCase()}
 
 Verification Instructions:
 1. Copy the entire report content above the "INTEGRITY VERIFICATION" section
-2. Calculate CRC32 checksum of that content (excluding this verification section)
-3. Compare with the checksum value above to verify report integrity
+2. Calculate SHA256 hash of that content (excluding this verification section)
+3. Compare with the hash value above to verify report integrity
 
-This checksum ensures the audit report has not been modified since generation.
+This hash ensures the audit report has not been modified since generation.
 Generated by Striae`;
   }
 

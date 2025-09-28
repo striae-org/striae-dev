@@ -1,5 +1,5 @@
 import { CaseExportData } from '~/types';
-import { calculateCRC32Secure } from '~/utils/CRC32';
+import { calculateSHA256Secure } from '~/utils/SHA256';
 import { CSV_HEADERS } from './types-constants';
 import { addForensicDataWarning } from './metadata-helpers';
 
@@ -126,7 +126,7 @@ export function processFileDataForTabular(fileEntry: CaseExportData['files'][0])
 /**
  * Generate CSV content from export data
  */
-export function generateCSVContent(exportData: CaseExportData, protectForensicData: boolean = true): string {
+export async function generateCSVContent(exportData: CaseExportData, protectForensicData: boolean = true): Promise<string> {
   // Case metadata section
   const metadataRows = generateMetadataRows(exportData);
 
@@ -148,16 +148,16 @@ export function generateCSVContent(exportData: CaseExportData, protectForensicDa
     row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
   ).join('\n');
   
-  // Calculate checksum for integrity verification
-  const checksum = calculateCRC32Secure(csvDataContent);
+  // Calculate hash for integrity verification
+  const checksum = await calculateSHA256Secure(csvDataContent);
   
-  // Create final CSV with checksum header
+  // Create final CSV with hash header
   const csvWithChecksum = [
     `# Striae Case Export - Generated: ${new Date().toISOString()}`,
     `# Case: ${exportData.metadata.caseNumber}`,
     `# Total Files: ${exportData.metadata.totalFiles}`,
-    `# CRC32 Checksum: ${checksum.toUpperCase()}`,
-    '# Verification: Recalculate CRC32 of data rows only (excluding these comment lines)',
+    `# SHA-256 Hash: ${checksum.toUpperCase()}`,
+    '# Verification: Recalculate SHA-256 of data rows only (excluding these comment lines)',
     '',
     csvDataContent
   ].join('\n');

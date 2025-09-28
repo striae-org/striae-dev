@@ -75,10 +75,10 @@ export interface CaseImportPreview {
   exportDate: string;
   totalFiles: number;
   caseCreatedDate?: string;
-  checksumValid?: boolean;
-  checksumError?: string;
-  expectedChecksum?: string;
-  actualChecksum?: string;
+  hashValid?: boolean;
+  hashError?: string;
+  expectedHash?: string;
+  actualHash?: string;
   hasAnnotations: boolean;
   validationSummary: string;
   errors?: string[];

@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { calculateCRC32Secure } from '~/utils/CRC32';
+import { calculateSHA256Secure } from '~/utils/SHA256';
 import { getUserData } from '~/utils/permissions';
 import { getCaseData, updateCaseData } from '~/utils/data-operations';
 import { ConfirmationData, CaseConfirmations, CaseDataWithConfirmations } from '~/types';
@@ -173,7 +173,7 @@ export async function getImageConfirmations(
 }
 
 /**
- * Exports confirmation data as a JSON file with CRC32 checksum for forensic integrity
+ * Exports confirmation data as a JSON file with SHA256 hash for forensic integrity
  */
 export async function exportConfirmationData(
   user: User, 
@@ -237,8 +237,8 @@ export async function exportConfirmationData(
     // Convert to JSON string for checksum calculation
     const jsonString = JSON.stringify(exportData, null, 2);
     
-    // Calculate CRC32 checksum for data integrity using secure version for forensic data
-    const checksum = calculateCRC32Secure(jsonString);
+    // Calculate SHA-256 hash for data integrity using secure version for forensic data
+    const checksum = await calculateSHA256Secure(jsonString);
     
     // Add checksum to final export data
     const finalExportData = {

@@ -322,7 +322,7 @@ export const CaseImport = ({
             <ProgressSection importProgress={importProgress} />
 
             {/* Checksum validation warning */}
-            {casePreview?.checksumValid === false && (
+            {casePreview?.hashValid === false && (
               <div className={styles.checksumWarning}>
                 <strong>⚠️ Import Blocked:</strong> Data checksum validation failed. 
                 This file may have been tampered with or corrupted and cannot be imported.
@@ -354,7 +354,7 @@ export const CaseImport = ({
                   importState.isImporting || 
                   importState.isClearing || 
                   importState.isLoadingPreview ||
-                  (importState.importType === 'case' && (!casePreview || casePreview.checksumValid !== true))
+                  (importState.importType === 'case' && (!casePreview || casePreview.hashValid !== true))
                 }
               >
                 {importState.isImporting ? 'Importing...' : 

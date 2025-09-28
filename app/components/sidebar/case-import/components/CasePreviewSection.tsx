@@ -53,15 +53,15 @@ export const CasePreviewSection = ({ casePreview, isLoadingPreview }: CasePrevie
       </div>
 
       {/* Data Integrity Checks - Green/Red Based on Validation */}
-      {casePreview.checksumValid !== undefined && (
-        <div className={`${styles.validationSection} ${casePreview.checksumValid ? styles.validationSectionValid : styles.validationSectionInvalid}`}>
+      {casePreview.hashValid !== undefined && (
+        <div className={`${styles.validationSection} ${casePreview.hashValid ? styles.validationSectionValid : styles.validationSectionInvalid}`}>
           <h3 className={styles.validationTitle}>Data Integrity Validation</h3>
           <div className={styles.validationItem}>            
-            <span className={`${styles.validationValue} ${casePreview.checksumValid ? styles.validationSuccess : styles.validationError}`}>
-              {casePreview.checksumValid ? (
-                <>✓ Verified (Checksum: {casePreview.expectedChecksum})</>
+            <span className={`${styles.validationValue} ${casePreview.hashValid ? styles.validationSuccess : styles.validationError}`}>
+              {casePreview.hashValid ? (
+                <>✓ Verified (SHA-256: {casePreview.expectedHash})</>
               ) : (
-                <>✗ FAILED - {casePreview.checksumError}</>
+                <>✗ FAILED - {casePreview.hashError}</>
               )}
             </span>
           </div>

@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { FileData, AllCasesExportData, CaseExportData, ExportOptions } from '~/types';
 import { getImageUrl } from '../image-manage';
-import { generateForensicManifestSecure, calculateCRC32Secure } from '~/utils/CRC32';
+import { generateForensicManifestSecure, calculateSHA256Secure } from '~/utils/SHA256';
 import { ExportFormat, formatDateForFilename, CSV_HEADERS } from './types-constants';
 import { protectExcelWorksheet, addForensicDataWarning } from './metadata-helpers';
 import { generateMetadataRows, generateCSVContent, processFileDataForTabular } from './data-processing';
@@ -20,8 +20,8 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
     
     const dataStr = JSON.stringify(exportData, null, 2);
     
-    // Calculate checksum for integrity verification
-    const checksum = calculateCRC32Secure(dataStr);
+    // Calculate hash for integrity verification
+    const checksum = await calculateSHA256Secure(dataStr);
     
     // Create final export with checksum included
     const finalExportData = {
@@ -29,7 +29,7 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
       metadata: {
         ...exportData.metadata,
         checksum: checksum.toUpperCase(),
-        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+        integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
       }
     };
     
@@ -348,7 +348,7 @@ export async function downloadCaseAsJSON(
     // Start audit workflow
     const workflowId = auditService.startWorkflow(exportData.metadata.caseNumber);
     
-    const jsonContent = generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
+    const jsonContent = await generateJSONContent(exportData, options.includeUserInfo, options.protectForensicData);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonContent);
     
     const protectionSuffix = options.protectForensicData ? '-protected' : '';
@@ -427,7 +427,7 @@ export async function downloadCaseAsCSV(
     // Start audit workflow
     const workflowId = auditService.startWorkflow(exportData.metadata.caseNumber);
     
-    const csvContent = generateCSVContent(exportData, options.protectForensicData);
+    const csvContent = await generateCSVContent(exportData, options.protectForensicData);
     const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
     
     const protectionSuffix = options.protectForensicData ? '-protected' : '';
@@ -553,10 +553,10 @@ export async function downloadCaseAsZip(
       // This MUST match exactly what gets saved in the actual data file
       // So we use the same includeUserInfo setting for both
       const contentForChecksum = format === 'json' 
-        ? generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
-        : generateCSVContent(exportData, false); // Raw content without warnings
-      
-      // Generate comprehensive forensic manifest with individual file checksums using secure CRC32
+        ? await generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
+        : await generateCSVContent(exportData, false); // Raw content without warnings
+
+      // Generate comprehensive forensic manifest with individual file checksums using secure SHA256
       const forensicManifest = await generateForensicManifestSecure(contentForChecksum, imageFiles);
       
       // Add dedicated forensic manifest file for validation
@@ -804,11 +804,11 @@ https://www.striae.org`;
 /**
  * Generate JSON content for case export with forensic protection options
  */
-function generateJSONContent(
+async function generateJSONContent(
   exportData: CaseExportData, 
   includeUserInfo: boolean = true, 
   protectForensicData: boolean = true
-): string {
+): Promise<string> {
   let jsonData = { ...exportData };
   
   // Remove sensitive user info if not included
@@ -829,8 +829,8 @@ function generateJSONContent(
   
   const jsonString = JSON.stringify(jsonData, null, 2);
   
-  // Calculate checksum for integrity verification
-  const checksum = calculateCRC32Secure(jsonString);
+  // Calculate hash for integrity verification
+  const checksum = await calculateSHA256Secure(jsonString);
   
   // Add checksum to metadata
   const finalJsonData = {
@@ -838,7 +838,7 @@ function generateJSONContent(
     metadata: {
       ...jsonData.metadata,
       checksum: checksum.toUpperCase(),
-      integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+      integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
     }
   };
   

@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import { CaseExportData, CaseImportPreview } from '~/types';
 import { validateCaseNumber } from '../case-manage';
-import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/utils/CRC32';
+import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/utils/SHA256';
 import { validateExporterUid, removeForensicWarning } from './validation';
 
 /**
@@ -13,11 +13,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
   try {
     const zip = await JSZip.loadAsync(zipFile);
     
-    // First, validate checksum if forensic metadata exists
-    let checksumValid: boolean | undefined = undefined;
-    let checksumError: string | undefined = undefined;
-    let expectedChecksum: string | undefined = undefined;
-    let actualChecksum: string | undefined = undefined;
+    // First, validate hash if forensic metadata exists
+    let hashValid: boolean | undefined = undefined;
+    let hashError: string | undefined = undefined;
+    let expectedHash: string | undefined = undefined;
+    let actualHash: string | undefined = undefined;
     let validationDetails: CaseImportPreview['validationDetails'];
     
     // Find the main data file (JSON or CSV)
@@ -61,8 +61,9 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
         forensicManifest = JSON.parse(manifestContent);
         
         if (forensicManifest) {
-          // Enhanced validation with forensic manifest (includes individual file checksums)
-          expectedChecksum = forensicManifest.manifestChecksum;
+          // Enhanced validation with forensic manifest (includes individual file hashes)
+          // Handle backward compatibility: old manifests use "checksum" terminology, new ones use "hash"
+          expectedHash = forensicManifest.manifestHash || forensicManifest.manifestChecksum;
           
           // Extract image files for comprehensive validation
           const imageFiles: { [filename: string]: Blob } = {};
@@ -80,18 +81,30 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
             }));
           }
           
+          // Convert old format to new format for validation if needed
+          let manifestForValidation = forensicManifest;
+          if (forensicManifest.dataChecksum && !forensicManifest.dataHash) {
+            manifestForValidation = {
+              dataHash: forensicManifest.dataChecksum,
+              imageHashes: forensicManifest.imageChecksums || {},
+              manifestHash: forensicManifest.manifestChecksum,
+              totalFiles: forensicManifest.totalFiles,
+              createdAt: forensicManifest.createdAt
+            };
+          }
+          
           // Perform comprehensive validation
           const validation = await validateForensicIntegrity(
             cleanedContent, 
             imageFiles, 
-            forensicManifest
+            manifestForValidation
           );
           
-          checksumValid = validation.isValid;
-          actualChecksum = validation.manifestValid ? forensicManifest.manifestChecksum : 'validation_failed';
+          hashValid = validation.isValid;
+          actualHash = validation.manifestValid ? expectedHash : 'validation_failed';
           
-          if (!checksumValid) {
-            checksumError = `Comprehensive validation failed: ${validation.summary}. Errors: ${validation.errors.join(', ')}`;
+          if (!hashValid) {
+            hashError = `Comprehensive validation failed: ${validation.summary}. Errors: ${validation.errors.join(', ')}`;
           }
           
           // Capture detailed validation information
@@ -106,8 +119,8 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           
         } else {
           // No forensic manifest found - cannot validate
-          checksumValid = false;
-          checksumError = 'No forensic manifest found. This case export does not support comprehensive integrity validation.';
+          hashValid = false;
+          hashError = 'No forensic manifest found. This case export does not support comprehensive integrity validation.';
           
           validationDetails = {
             hasForensicManifest: false,
@@ -117,13 +130,13 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           };
         }
       } catch (error) {
-        checksumError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
-        checksumValid = false;
+        hashError = `Failed to validate forensic metadata: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        hashValid = false;
         
         validationDetails = {
           hasForensicManifest: false,
           validationSummary: 'Validation failed due to metadata parsing error',
-          integrityErrors: [checksumError]
+          integrityErrors: [hashError]
         };
       }
     } else {
@@ -181,11 +194,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
       totalFiles,
       caseCreatedDate: caseData.metadata.caseCreatedDate,
       hasAnnotations: false, // We'll need to determine this during parsing if needed
-      validationSummary: checksumValid ? 'Validation successful' : (checksumError || 'Validation failed'),
-      checksumValid,
-      checksumError,
-      expectedChecksum,
-      actualChecksum,
+      validationSummary: hashValid ? 'Validation successful' : (hashError || 'Validation failed'),
+      hashValid,
+      hashError,
+      expectedHash,
+      actualHash,
       validationDetails
     };
     
