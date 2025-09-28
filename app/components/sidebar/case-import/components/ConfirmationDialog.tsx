@@ -41,11 +41,11 @@ export const ConfirmationDialog = ({
             <div className={styles.confirmationItem}>
               <strong>Total Images:</strong> {casePreview.totalFiles}
             </div>
-            {casePreview.checksumValid !== undefined && (
-              <div className={`${styles.confirmationItem} ${casePreview.checksumValid ? styles.confirmationItemValid : styles.confirmationItemInvalid}`}>
+            {casePreview.hashValid !== undefined && (
+              <div className={`${styles.confirmationItem} ${casePreview.hashValid ? styles.confirmationItemValid : styles.confirmationItemInvalid}`}>
                 <strong>Data Integrity:</strong> 
-                <span className={casePreview.checksumValid ? styles.confirmationSuccess : styles.confirmationError}>
-                  {casePreview.checksumValid ? '✓ Verified' : '✗ Failed'}
+                <span className={casePreview.hashValid ? styles.confirmationSuccess : styles.confirmationError}>
+                  {casePreview.hashValid ? '✓ Verified' : '✗ Failed'}
                 </span>
               </div>
             )}
