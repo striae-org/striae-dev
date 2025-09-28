@@ -751,7 +751,7 @@ if exist "workers\keys-worker\wrangler.jsonc" (
 )
 
 REM Update keys-worker source file CORS headers
-if exist "workers\keys-worker\src\ (
+if exist "workers\keys-worker\src\keys.ts (
     echo [93m  Updating keys-worker CORS headers...[0m
     powershell -Command "(Get-Content 'workers/keys-worker/src/keys.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/keys-worker/src/keys.ts'"
     echo [92m    ✅ keys-worker CORS headers updated[0m
