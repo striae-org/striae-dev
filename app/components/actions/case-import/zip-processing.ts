@@ -63,7 +63,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
         if (forensicManifest) {
           // Enhanced validation with forensic manifest (includes individual file hashes)
           // Handle backward compatibility: old manifests use "checksum" terminology, new ones use "hash"
-          expectedHash = forensicManifest.manifestHash || forensicManifest.manifestChecksum;
+          expectedHash = forensicManifest.manifestHash || forensicManifest.manifestHash;
           
           // Extract image files for comprehensive validation
           const imageFiles: { [filename: string]: Blob } = {};
@@ -83,11 +83,11 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           
           // Convert old format to new format for validation if needed
           let manifestForValidation = forensicManifest;
-          if (forensicManifest.dataChecksum && !forensicManifest.dataHash) {
+          if (forensicManifest.dataHash && !forensicManifest.dataHash) {
             manifestForValidation = {
-              dataHash: forensicManifest.dataChecksum,
-              imageHashes: forensicManifest.imageChecksums || {},
-              manifestHash: forensicManifest.manifestChecksum,
+              dataHash: forensicManifest.dataHash,
+              imageHashes: forensicManifest.imageHashs || {},
+              manifestHash: forensicManifest.manifestHash,
               totalFiles: forensicManifest.totalFiles,
               createdAt: forensicManifest.createdAt
             };

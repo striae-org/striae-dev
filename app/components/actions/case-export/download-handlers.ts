@@ -552,12 +552,12 @@ export async function downloadCaseAsZip(
       // CRITICAL: Get the content that will be used for checksum calculation
       // This MUST match exactly what gets saved in the actual data file
       // So we use the same includeUserInfo setting for both
-      const contentForChecksum = format === 'json' 
+      const contentForHash = format === 'json' 
         ? await generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : await generateCSVContent(exportData, false); // Raw content without warnings
 
       // Generate comprehensive forensic manifest with individual file checksums using secure SHA256
-      const forensicManifest = await generateForensicManifestSecure(contentForChecksum, imageFiles);
+      const forensicManifest = await generateForensicManifestSecure(contentForHash, imageFiles);
       
       // Add dedicated forensic manifest file for validation
       zip.file('FORENSIC_MANIFEST.json', JSON.stringify(forensicManifest, null, 2));

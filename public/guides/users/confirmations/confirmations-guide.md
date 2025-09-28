@@ -39,7 +39,7 @@ The confirmation process maintains chain of custody requirements while providing
 
 - **Digital Authentication**: Each confirmation requires examiner credentials including badge ID and full name
 - **Unique Confirmation IDs**: System-generated identifiers for each confirmation action
-- **Forensic Integrity**: Checksums and validation ensure data hasn't been modified
+- **Forensic Integrity**: Hashs and validation ensure data hasn't been modified
 - **Read-Only Review Environment**: Imported cases are protected from modification
 - **Bidirectional Data Exchange**: Structured export/import process between examiners
 - **PDF Integration**: Confirmations appear in generated reports with full attribution

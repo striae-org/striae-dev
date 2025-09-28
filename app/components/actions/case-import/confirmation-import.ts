@@ -3,7 +3,7 @@ import paths from '~/config/config.json';
 import { getDataApiKey } from '~/utils/auth';
 import { ConfirmationImportResult, ConfirmationImportData } from '~/types';
 import { checkExistingCase } from '../case-manage';
-import { validateExporterUid, validateConfirmationChecksum } from './validation';
+import { validateExporterUid, validateConfirmationHash } from './validation';
 import { auditService } from '~/services/audit.service';
 
 const DATA_WORKER_URL = paths.data_worker_url;
@@ -41,7 +41,7 @@ export async function importConfirmationData(
     onProgress?.('Validating checksum', 20, 'Verifying data integrity...');
 
     // Validate checksum
-    const checksumValid = validateConfirmationChecksum(fileContent, confirmationData.metadata.checksum);
+    const checksumValid = validateConfirmationHash(fileContent, confirmationData.metadata.checksum);
     if (!checksumValid) {
       throw new Error('Confirmation data checksum validation failed. The file may have been tampered with or corrupted.');
     }

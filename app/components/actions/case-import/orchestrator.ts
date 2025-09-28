@@ -287,7 +287,7 @@ export async function importCaseForReview(
       importedAt: new Date().toISOString(),
       originalExportDate: caseData.metadata.exportDate,
       originalExportedBy: caseData.metadata.exportedBy || 'Unknown',
-      sourceChecksum: metadata?.forensicManifest?.manifestChecksum,
+      sourceHash: metadata?.forensicManifest?.manifestHash,
       isReadOnly: true
     };
     

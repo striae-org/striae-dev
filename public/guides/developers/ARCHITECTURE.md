@@ -512,7 +512,7 @@ interface UserData {
     importedAt: string;
     originalExportDate: string;
     originalExportedBy: string;
-    sourceChecksum?: string;
+    sourceHash?: string;
     isReadOnly: true;
   }>;
   createdAt: string;

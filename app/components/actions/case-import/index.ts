@@ -5,7 +5,7 @@
 export { 
   validateExporterUid, 
   isConfirmationDataFile, 
-  validateConfirmationChecksum, 
+  validateConfirmationHash, 
   validateCaseIntegrity 
 } from './validation';
 

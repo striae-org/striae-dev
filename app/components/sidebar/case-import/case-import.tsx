@@ -321,7 +321,7 @@ export const CaseImport = ({
             {/* Import progress */}
             <ProgressSection importProgress={importProgress} />
 
-            {/* Checksum validation warning */}
+            {/* Hash validation warning */}
             {casePreview?.hashValid === false && (
               <div className={styles.checksumWarning}>
                 <strong>⚠️ Import Blocked:</strong> Data checksum validation failed. 

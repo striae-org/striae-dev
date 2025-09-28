@@ -25,11 +25,11 @@ export function removeForensicWarning(content: string): string {
   // CRITICAL: The CSV forensic warning is ONLY the first quoted line, followed by two newlines
   // Format: "CASE DATA WARNING: This file contains evidence data for forensic examination. Any modification may compromise the integrity of the evidence. Handle according to your organization's chain of custody procedures."\n\n
   // 
-  // After removal, what remains should be the csvWithChecksum content:
+  // After removal, what remains should be the csvWithHash content:
   // # Striae Case Export - Generated: ...
   // # Case: ...
   // # Total Files: ...
-  // # SHA256 Checksum: ...
+  // # SHA256 Hash: ...
   // # Verification: ...
   //
   // [actual CSV data]
@@ -95,22 +95,22 @@ export function isConfirmationDataFile(filename: string): boolean {
 /**
  * Validate confirmation data file checksum
  */
-export async function validateConfirmationChecksum(jsonContent: string, expectedChecksum: string): Promise<boolean> {
+export async function validateConfirmationHash(jsonContent: string, expectedHash: string): Promise<boolean> {
   // Create data without checksum for validation
   const data = JSON.parse(jsonContent);
-  const dataWithoutChecksum = {
+  const dataWithoutHash = {
     ...data,
     metadata: {
       ...data.metadata,
       checksum: undefined
     }
   };
-  delete dataWithoutChecksum.metadata.checksum;
+  delete dataWithoutHash.metadata.checksum;
   
-  const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
-  const actualChecksum = await calculateSHA256Secure(contentForChecksum);
+  const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
+  const actualHash = await calculateSHA256Secure(contentForHash);
   
-  return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
+  return actualHash.toUpperCase() === expectedHash.toUpperCase();
 }
 
 /**

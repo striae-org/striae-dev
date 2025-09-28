@@ -730,7 +730,7 @@ export const importCaseForReview = async (
 
 // Validation functions
 export const validateExporterUid = async (exporterUid: string, currentUser: User): Promise<{ exists: boolean; isSelf: boolean }>
-export const validateConfirmationChecksum = (jsonContent: string, expectedChecksum: string): boolean
+export const validateConfirmationHash = (jsonContent: string, expectedHash: string): boolean
 export const validateCaseIntegrity = (caseData: CaseExportData, imageFiles: { [filename: string]: Blob }): { isValid: boolean; issues: string[] }
 
 // ZIP processing
@@ -774,7 +774,7 @@ export interface ReadOnlyCaseMetadata {
   importedAt: string;
   originalExportDate: string;
   originalExportedBy: string;
-  sourceChecksum?: string;
+  sourceHash?: string;
   isReadOnly: true;
 }
 

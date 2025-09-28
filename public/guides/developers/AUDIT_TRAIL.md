@@ -493,7 +493,7 @@ UserAuditViewer/
 ### Data Integrity
 
 - **Immutable Entries**: Audit entries cannot be modified once created
-- **Checksum Validation**: File integrity verification for uploads
+- **Hash Validation**: File integrity verification for uploads
 - **Tamper Detection**: Cryptographic validation of audit data
 
 ### Access Control

@@ -273,7 +273,7 @@ A: No, the system specifically prevents self-confirmation to maintain the indepe
 
 **Q: What if my confirmation import fails with a checksum error?**
 
-A: Checksum validation failures indicate the confirmation file may have been modified since it was exported, which compromises forensic integrity. First, verify you received the correct file and that it wasn't corrupted during transfer. If the problem persists, request a new confirmation export from the reviewing examiner. Never attempt to modify confirmation files as this invalidates the cryptographic protection.
+A: Hash validation failures indicate the confirmation file may have been modified since it was exported, which compromises forensic integrity. First, verify you received the correct file and that it wasn't corrupted during transfer. If the problem persists, request a new confirmation export from the reviewing examiner. Never attempt to modify confirmation files as this invalidates the cryptographic protection.
 
 **Q: What does timestamp validation check during confirmation import?**
 

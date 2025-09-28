@@ -21,7 +21,7 @@ export interface ReadOnlyCaseMetadata {
   importedAt: string;
   originalExportDate: string;
   originalExportedBy: string;
-  sourceChecksum?: string;
+  sourceHash?: string;
   isReadOnly: true;
 }
 
