@@ -86,7 +86,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
           if (forensicManifest.dataHash && !forensicManifest.dataHash) {
             manifestForValidation = {
               dataHash: forensicManifest.dataHash,
-              imageHashes: forensicManifest.imageHashs || {},
+              imageHashes: forensicManifest.imageHashes || {},
               manifestHash: forensicManifest.manifestHash,
               totalFiles: forensicManifest.totalFiles,
               createdAt: forensicManifest.createdAt

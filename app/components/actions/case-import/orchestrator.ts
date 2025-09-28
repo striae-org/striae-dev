@@ -163,7 +163,7 @@ export async function importCaseForReview(
     
     // Step 1.5: Validate hash if forensic metadata exists
     if (metadata?.forensicManifest && cleanedContent) {
-      onProgress?.('Validating comprehensive integrity', 15, 'Checking all file hashs...');
+      onProgress?.('Validating comprehensive integrity', 15, 'Checking all file hashes...');
       
       // Extract image files for comprehensive validation
       const imageBlobs: { [filename: string]: Blob } = {};

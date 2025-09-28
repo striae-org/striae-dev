@@ -556,7 +556,7 @@ export async function downloadCaseAsZip(
         ? await generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : await generateCSVContent(exportData, false); // Raw content without warnings
 
-      // Generate comprehensive forensic manifest with individual file hashs using secure SHA256
+      // Generate comprehensive forensic manifest with individual file hashes using secure SHA256
       const forensicManifest = await generateForensicManifestSecure(contentForHash, imageFiles);
       
       // Add dedicated forensic manifest file for validation

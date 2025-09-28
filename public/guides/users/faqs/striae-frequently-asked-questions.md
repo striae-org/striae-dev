@@ -237,11 +237,11 @@ A: When you check "Include confirmation" in the Image Notes sidebar, you're flag
 
 **Q: How do I export a case for confirmation review?**
 
-A: To export for confirmation review, navigate to Case Export in the sidebar, select "ZIP Package" format with JSON data format, ensure "Include Images" is selected, and click "Export Case." This creates a complete package containing all case data, images, and metadata with cryptographic hashs for integrity verification. Transfer this ZIP file securely to the reviewing examiner along with access to the physical evidence.
+A: To export for confirmation review, navigate to Case Export in the sidebar, select "ZIP Package" format with JSON data format, ensure "Include Images" is selected, and click "Export Case." This creates a complete package containing all case data, images, and metadata with cryptographic hashes for integrity verification. Transfer this ZIP file securely to the reviewing examiner along with access to the physical evidence.
 
 **Q: What happens when I import a case for confirmation review?**
 
-A: When you import a case ZIP package for review, the case is automatically placed in read-only mode to preserve the integrity of the original work. You can view all annotations, images, and case details, but cannot modify any data. The system validates the package integrity using hashs and ensures you weren't the original examiner (preventing self-confirmation). The imported case appears in your read-only cases list for independent review.
+A: When you import a case ZIP package for review, the case is automatically placed in read-only mode to preserve the integrity of the original work. You can view all annotations, images, and case details, but cannot modify any data. The system validates the package integrity using hashes and ensures you weren't the original examiner (preventing self-confirmation). The imported case appears in your read-only cases list for independent review.
 
 **Q: How do I provide a digital confirmation in Striae?**
 
@@ -253,15 +253,15 @@ A: Each confirmation includes comprehensive authentication details: your full na
 
 **Q: How do I export confirmation data back to the original examiner?**
 
-A: After providing confirmations, navigate to Case Export and look for the "Export Confirmations" button (this only appears if confirmation data exists). Click it to download a JSON file named `confirmation-data-[case]-[timestamp].json`. This file contains all confirmation information with cryptographic hashs for integrity verification. Transfer this file securely back to the original examiner.
+A: After providing confirmations, navigate to Case Export and look for the "Export Confirmations" button (this only appears if confirmation data exists). Click it to download a JSON file named `confirmation-data-[case]-[timestamp].json`. This file contains all confirmation information with cryptographic hashes for integrity verification. Transfer this file securely back to the original examiner.
 
 **Q: How do I import confirmation data I received from a reviewing examiner?**
 
-A: Navigate to Case Import in the sidebar and select the confirmation JSON file you received (files named `confirmation-data-...`). The system automatically detects confirmation files and validates the data integrity using hashs. It also performs timestamp validation to ensure confirmations weren't created before the annotations were last modified, preventing confirmations of outdated work.
+A: Navigate to Case Import in the sidebar and select the confirmation JSON file you received (files named `confirmation-data-...`). The system automatically detects confirmation files and validates the data integrity using hashes. It also performs timestamp validation to ensure confirmations weren't created before the annotations were last modified, preventing confirmations of outdated work.
 
 **Q: What security features protect the confirmation process?**
 
-A: The system includes multiple security layers: cryptographic hashs prevent data tampering, self-confirmation prevention blocks original examiners from confirming their own work, timestamp validation ensures confirmations are newer than annotation modifications, unique confirmation IDs provide audit trail tracking, and read-only import mode preserves original work integrity. All validation events are logged for compliance and accountability.
+A: The system includes multiple security layers: cryptographic hashes prevent data tampering, self-confirmation prevention blocks original examiners from confirming their own work, timestamp validation ensures confirmations are newer than annotation modifications, unique confirmation IDs provide audit trail tracking, and read-only import mode preserves original work integrity. All validation events are logged for compliance and accountability.
 
 **Q: What happens after confirmation data is imported?**
 

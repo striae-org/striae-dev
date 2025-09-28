@@ -347,7 +347,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
 
       const expectedHash = hashMatch[1].toUpperCase();
       
-      // Calculate hashs for both trimmed and untrimmed content
+      // Calculate hashes for both trimmed and untrimmed content
       const calculatedHashUntrimmed = await calculateSHA256Secure(reportContent);
       const calculatedHashTrimmed = await calculateSHA256Secure(reportContent.trim());
       
@@ -538,7 +538,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
         
         <div className={styles.content}>
           <p className={styles.description}>
-            Verify the integrity of Striae export files by checking their embedded hashs. 
+            Verify the integrity of Striae export files by checking their embedded hashes. 
             Upload a JSON, CSV, ZIP, or TXT export to validate that the data hasn't been tampered with or corrupted.
           </p>
 
@@ -558,7 +558,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
                 {!dragOver && ' or drag and drop a Striae export file'}
               </div>
               <div className={styles.uploadSubtext}>
-                Supports JSON, CSV, ZIP, and TXT export files with embedded hashs
+                Supports JSON, CSV, ZIP, and TXT export files with embedded hashes
               </div>
             </div>
             <input
