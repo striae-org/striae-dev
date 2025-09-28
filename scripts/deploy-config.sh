@@ -377,7 +377,7 @@ update_wrangler_configs() {
     # Update data-worker source file CORS headers only
     if [ -f "workers/data-worker/src/data-worker.ts" ]; then
         echo -e "${YELLOW}  Updating data-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/data-worker/src/data-worker.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/data-worker/src/data-worker.ts
         echo -e "${GREEN}    ✅ data-worker CORS headers updated${NC}"
     fi
     
@@ -393,7 +393,7 @@ update_wrangler_configs() {
     # Update image-worker source file CORS headers only
     if [ -f "workers/image-worker/src/image-worker.ts" ]; then
         echo -e "${YELLOW}  Updating image-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/image-worker/src/image-worker.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/image-worker/src/image-worker.ts
         echo -e "${GREEN}    ✅ image-worker CORS headers updated${NC}"
     fi
     
@@ -425,7 +425,7 @@ update_wrangler_configs() {
     # Update pdf-worker source file CORS headers only
     if [ -f "workers/pdf-worker/src/pdf-worker.ts" ]; then
         echo -e "${YELLOW}  Updating pdf-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/pdf-worker/src/pdf-worker.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/pdf-worker/src/pdf-worker.ts
         echo -e "${GREEN}    ✅ pdf-worker CORS headers updated${NC}"
     fi
     
@@ -458,9 +458,9 @@ update_wrangler_configs() {
     # Update user-worker source file CORS headers and worker URLs only
     if [ -f "workers/user-worker/src/user-worker.ts" ]; then
         echo -e "${YELLOW}  Updating user-worker CORS headers and worker URLs...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/user-worker/src/user-worker.js
-        sed -i "s|'DATA_WORKER_DOMAIN'|'https://$DATA_WORKER_DOMAIN'|g" workers/user-worker/src/user-worker.js
-        sed -i "s|'IMAGES_WORKER_DOMAIN'|'https://$IMAGES_WORKER_DOMAIN'|g" workers/user-worker/src/user-worker.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/user-worker/src/user-worker.ts
+        sed -i "s|'DATA_WORKER_DOMAIN'|'https://$DATA_WORKER_DOMAIN'|g" workers/user-worker/src/user-worker.ts
+        sed -i "s|'IMAGES_WORKER_DOMAIN'|'https://$IMAGES_WORKER_DOMAIN'|g" workers/user-worker/src/user-worker.ts
         echo -e "${GREEN}    ✅ user-worker CORS headers and worker URLs updated${NC}"
     fi
     

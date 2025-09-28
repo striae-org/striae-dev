@@ -29,7 +29,7 @@ interface AuditRetrievalResponse {
 type APIResponse = SuccessResponse | ErrorResponse | AuditRetrievalResponse;
 
 const corsHeaders: Record<string, string> = {
-  'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
+  'Access-Control-Allow-Origin': 'https://dev.striae.org',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
