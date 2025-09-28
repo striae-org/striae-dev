@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-09-28] - *[Release v0.9.28-beta](https://github.com/striae-org/striae/releases/tag/v0.9.28-beta)*
+
+- **Cryptographic Security Enhancement** - Complete migration from CRC32 to SHA-256 for forensic-grade data integrity validation with tamper-proof hash generation
+- **Infrastructure Modernization** - Full TypeScript conversion of all 7 Cloudflare Workers providing enhanced type safety and error prevention
+- **Performance Optimization** - Batch processing implementation for large case file operations and audit entries preventing timeout issues
+- **Enhanced Documentation** - White paper integration and comprehensive SHA-256 security guides for forensic compliance
+
 ## [2025-09-24] - *[Release v0.9.24-beta](https://github.com/striae-org/striae/releases/tag/v0.9.24-beta)*
 
 - **Storage Function Centralization** - Unified all data operations into centralized utility modules with built-in permission validation and security controls
