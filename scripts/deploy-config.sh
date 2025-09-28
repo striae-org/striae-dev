@@ -360,7 +360,7 @@ update_wrangler_configs() {
     # Update audit-worker source file CORS headers only
     if [ -f "workers/audit-worker/src/audit-worker.ts" ]; then
         echo -e "${YELLOW}  Updating audit-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/audit-worker/src/audit-worker.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/audit-worker/src/audit-worker.ts
         echo -e "${GREEN}    ✅ audit-worker CORS headers updated${NC}"
     fi
     

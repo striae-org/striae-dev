@@ -711,7 +711,7 @@ if exist "workers\audit-worker\wrangler.jsonc" (
 REM Update audit-worker source file CORS headers
 if exist "workers\audit-worker\src\audit-worker.ts" (
     echo [93m  Updating audit-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.js'"
+    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.ts'"
     echo [92m    ✅ audit-worker CORS headers updated[0m
 )
 
