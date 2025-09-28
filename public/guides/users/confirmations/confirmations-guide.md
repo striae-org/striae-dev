@@ -16,7 +16,7 @@
 5. [Technical Implementation](#technical-implementation)
 6. [Validation and Security Framework](#validation-and-security-framework)
    - [User Validation](#user-validation)
-   - [Checksum Validation](#checksum-validation)
+   - [Hash Validation](#hash-validation)
    - [File Validation Framework](#file-validation-framework)
    - [Data Integrity Monitoring](#data-integrity-monitoring)
 7. [Security Features](#security-features)
@@ -110,7 +110,7 @@ The confirmation process maintains chain of custody requirements while providing
    - Complete case data in JSON format with forensic protection warnings
    - All associated evidence images
    - Metadata including export timestamp and examiner information
-   - Cryptographic checksums for integrity verification
+   - Cryptographic SHA-256 hashes for integrity verification
 
 3. **Delivery to Reviewing Examiner**
    - Transfer ZIP package through secure channels
@@ -126,7 +126,7 @@ The confirmation process maintains chain of custody requirements while providing
    - Review import preview showing case details
 
 2. **Import Validation**
-   - System validates package integrity using checksums
+   - System validates package integrity using SHA-256 hashes
    - Confirms reviewing examiner is not the original analyst (security check)
    - Imports case data in read-only mode
    - Case appears in read-only cases list
@@ -190,7 +190,7 @@ The confirmation process maintains chain of custody requirements while providing
        "exportedByCompany": "Federal Crime Laboratory",
        "totalConfirmations": 1,
        "version": "1.0",
-       "checksum": "CRC32_CHECKSUM"
+       "hash": "SHA256_HASH"
      },
      "confirmations": {
        "original_image_id": [{
@@ -271,7 +271,7 @@ interface ConfirmationData {
 
 - **Case Export**: Complete ZIP packages with images and metadata
 - **Confirmation Export**: Specialized JSON files with confirmation data only
-- **Integrity Validation**: CRC32 checksums for data verification
+- **Integrity Validation**: SHA-256 hashes for data verification
 - **Security Checks**: Prevents self-confirmation and duplicate imports
 
 ### UI Integration
@@ -322,27 +322,27 @@ For confirmation capabilities, user profiles must contain:
 - **Email Verification**: Confirmed email address for audit trail
 - **Active Status**: Account must be in good standing
 
-### Checksum Validation
+### Hash Validation
 
 #### Forensic Data Integrity
 
-The system uses CRC32 checksums to ensure data integrity throughout the confirmation process:
+The system uses SHA-256 cryptographic hashes to ensure data integrity throughout the confirmation process:
 
-**Export Checksum Generation**:
+**Export Hash Generation**:
 
 ```typescript
-// Checksum calculated on clean JSON data (without forensic warnings)
+// Hash calculated on clean JSON data (without forensic warnings)
 const cleanedContent = removeForensicWarning(jsonContent);
-const checksum = calculateCRC32(cleanedContent);
+const hash = await calculateSHA256(cleanedContent);
 ```
 
 **Import Validation Process**:
 
-1. Extract expected checksum from file metadata
+1. Extract expected hash from file metadata
 2. Remove forensic protection warnings from content
-3. Calculate actual checksum on cleaned content
-4. Compare expected vs actual checksums
-5. Reject import if checksums don't match
+3. Calculate actual hash on cleaned content
+4. Compare expected vs actual hashes
+5. Reject import if hashes don't match
 
 **Forensic Warning Handling**:
 
@@ -357,39 +357,39 @@ const checksum = calculateCRC32(cleanedContent);
  */
 ```
 
-**Checksum Verification Details**:
+**Hash Verification Details**:
 
-- Checksums validate complete case data packages
-- Confirmation exports include separate checksums for confirmation data only
-- Any modification to exported files invalidates checksums
-- Failed checksum validation prevents import and logs security event
+- SHA-256 hashes validate complete case data packages
+- Confirmation exports include separate hashes for confirmation data only
+- Any modification to exported files invalidates hashes
+- Failed hash validation prevents import and logs security event
 
 #### Implementation Example
 
 ```typescript
-export function validateConfirmationChecksum(
+export async function validateConfirmationHash(
   jsonContent: string, 
-  expectedChecksum: string
-): boolean {
+  expectedHash: string
+): Promise<boolean> {
   // Parse confirmation data
   const data = JSON.parse(jsonContent);
   
-  // Create data without checksum for validation
-  const dataWithoutChecksum = {
+  // Create data without hash for validation
+  const dataWithoutHash = {
     ...data,
     metadata: {
       ...data.metadata,
-      checksum: undefined
+      hash: undefined
     }
   };
-  delete dataWithoutChecksum.metadata.checksum;
+  delete dataWithoutHash.metadata.hash;
   
-  // Calculate checksum on clean data
-  const contentForChecksum = JSON.stringify(dataWithoutChecksum, null, 2);
-  const actualChecksum = calculateCRC32(contentForChecksum);
+  // Calculate hash on clean data
+  const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
+  const actualHash = await calculateSHA256(contentForHash);
   
-  // Compare checksums (case-insensitive)
-  return actualChecksum.toUpperCase() === expectedChecksum.toUpperCase();
+  // Compare hashes (case-insensitive)
+  return actualHash.toUpperCase() === expectedHash.toUpperCase();
 }
 ```
 
@@ -452,7 +452,7 @@ const isConfirmationFile = isConfirmationDataFile(filename);
 // Security checks during import
 const securityChecks = {
   preventSelfConfirmation: validateExporterUid(exporterUid, currentUser),
-  checksumIntegrity: validateChecksum(content, expectedChecksum),
+  hashIntegrity: await validateHash(content, expectedHash),
   userPermissions: validateUserAccess(user, caseData),
   dataIntegrity: validateCaseIntegrity(caseData, imageFiles)
 };
@@ -481,7 +481,7 @@ interface ValidationResult {
 {
   isValid: false,
   errors: [
-    "Checksum validation failed - file may have been modified",
+    "Hash validation failed - file may have been modified",
     "Cannot import case where you were the original examiner",
     "Required confirmation metadata is missing"
   ],
@@ -510,7 +510,7 @@ Every validation step creates audit trail entries:
 
 - User authentication attempts and results
 - File upload and validation attempts
-- Checksum verification results
+- Hash verification results
 - Import success/failure with detailed reasons
 - Confirmation creation and validation
 
@@ -526,7 +526,7 @@ interface ValidationAuditEntry {
   details: {
     fileName: string;
     fileType: 'case-package' | 'confirmation-data';
-    checksumValid: boolean;
+    hashValid: boolean;
     validationErrors: string[];
     caseNumber?: string;
     confirmationId?: string;
@@ -570,7 +570,7 @@ The UI provides immediate feedback during validation:
 
 ### Data Integrity and Protection
 
-- **Cryptographic Checksums**: CRC32 validation prevents tampering and detects corruption
+- **Cryptographic Hashes**: SHA-256 validation prevents tampering and detects corruption
 - **Forensic Data Warnings**: Automatic warnings on exported files about evidence integrity
 - **Immutable Confirmation Records**: Once created, confirmations cannot be modified
 - **File Type Restrictions**: Only allowed file types (ZIP, JSON) accepted for security
@@ -624,7 +624,7 @@ The UI provides immediate feedback during validation:
 
 #### Import Failures
 
-- **Invalid Checksum**: File may have been corrupted during transfer
+- **Invalid Hash**: File may have been corrupted during transfer
 - **Wrong Format**: Ensure correct file type (ZIP for cases, JSON for confirmations)
 - **Self-Confirmation**: System prevents importing cases where user was original examiner
 
@@ -642,7 +642,7 @@ The UI provides immediate feedback during validation:
 
 ### Resolution Steps
 
-1. **Check File Integrity**: Verify checksums match expected values
+1. **Check File Integrity**: Verify hashes match expected values
 2. **Validate User Permissions**: Ensure proper access rights
 3. **Review Error Messages**: System provides specific error details
 4. **Contact Support**: Include error messages and file details when requesting help
