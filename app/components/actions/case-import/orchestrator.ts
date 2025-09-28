@@ -123,7 +123,7 @@ export async function importCaseForReview(
     caseNumber: ''
   };
   
-  let checksumValidationPassed = false;
+  let hashValidationPassed = false;
   
   try {
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
@@ -161,9 +161,9 @@ export async function importCaseForReview(
       // Don't fail the import due to cleanup issues
     }
     
-    // Step 1.5: Validate checksum if forensic metadata exists
+    // Step 1.5: Validate hash if forensic metadata exists
     if (metadata?.forensicManifest && cleanedContent) {
-      onProgress?.('Validating comprehensive integrity', 15, 'Checking all file checksums...');
+      onProgress?.('Validating comprehensive integrity', 15, 'Checking all file hashs...');
       
       // Extract image files for comprehensive validation
       const imageBlobs: { [filename: string]: Blob } = {};
@@ -185,7 +185,7 @@ export async function importCaseForReview(
         );
       }
       
-      checksumValidationPassed = true;
+      hashValidationPassed = true;
       onProgress?.('Complete integrity verified', 18, validation.summary);
       
     } else {
@@ -305,7 +305,7 @@ export async function importCaseForReview(
       result.caseNumber,
       zipFile.name,
       'success',
-      checksumValidationPassed,
+      hashValidationPassed,
       [],
       undefined, // Don't use for self-confirmation prevention for read-only imports
       {
@@ -333,7 +333,7 @@ export async function importCaseForReview(
       result.caseNumber || 'unknown',
       zipFile.name,
       'failure',
-      checksumValidationPassed, // Use actual checksum validation result even for failures
+      hashValidationPassed, // Use actual hash validation result even for failures
       result.errors || [],
       undefined, // Don't use for self-confirmation prevention for read-only imports
       {

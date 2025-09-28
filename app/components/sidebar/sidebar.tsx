@@ -6,7 +6,7 @@ import { SignOut } from '../actions/signout';
 import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import/case-import';
-import { HashUtility } from './checksum/checksum-utility';
+import { HashUtility } from './hash/hash-utility';
 import { FileData } from '~/types';
 import { ImportResult, ConfirmationImportResult } from '~/types';
 
@@ -158,7 +158,7 @@ export const Sidebar = ({
             </button>
             <button 
               onClick={() => setIsHashModalOpen(true)}
-              className={styles.checksumButton}
+              className={styles.hashButton}
             >
               Hash Utility
             </button>

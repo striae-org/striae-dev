@@ -72,7 +72,7 @@ export class AuditService {
         details: {
           fileName: params.fileName,
           fileType: params.fileType,
-          checksumValid: params.checksumValid,
+          hashValid: params.hashValid,
           validationErrors: params.validationErrors || [],
           caseNumber: params.caseNumber,
           confirmationId: params.confirmationId,
@@ -174,7 +174,7 @@ export class AuditService {
     caseNumber: string,
     fileName: string,
     result: AuditResult,
-    checksumValid: boolean,
+    hashValid: boolean,
     errors: string[] = [],
     originalExaminerUid?: string,
     performanceMetrics?: PerformanceMetrics,
@@ -182,7 +182,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: originalExaminerUid ? originalExaminerUid !== user.uid : false,
-      fileIntegrityValid: checksumValid,
+      fileIntegrityValid: hashValid,
       exporterUidValidated: exporterUidValidated !== undefined ? exporterUidValidated : !!originalExaminerUid
     };
 
@@ -193,7 +193,7 @@ export class AuditService {
       result,
       fileName,
       fileType: 'case-package',
-      checksumValid,
+      hashValid,
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'case-import',
@@ -289,7 +289,7 @@ export class AuditService {
     caseNumber: string,
     fileName: string,
     result: AuditResult,
-    checksumValid: boolean,
+    hashValid: boolean,
     confirmationsImported: number,
     errors: string[] = [],
     reviewingExaminerUid?: string,
@@ -297,7 +297,7 @@ export class AuditService {
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid === user.uid : false,
-      fileIntegrityValid: checksumValid,
+      fileIntegrityValid: hashValid,
       exporterUidValidated: !!reviewingExaminerUid
     };
 
@@ -308,7 +308,7 @@ export class AuditService {
       result,
       fileName,
       fileType: 'confirmation-data',
-      checksumValid,
+      hashValid,
       validationErrors: errors,
       caseNumber,
       workflowPhase: 'confirmation',

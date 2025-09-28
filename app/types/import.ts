@@ -50,7 +50,7 @@ export interface ConfirmationImportData {
     exportedByCompany: string;
     totalConfirmations: number;
     version: string;
-    checksum: string;
+    hash: string;
     originalExportCreatedAt?: string;
   };
   confirmations: {

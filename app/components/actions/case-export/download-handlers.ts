@@ -21,14 +21,14 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
     const dataStr = JSON.stringify(exportData, null, 2);
     
     // Calculate hash for integrity verification
-    const checksum = await calculateSHA256Secure(dataStr);
+    const hash = await calculateSHA256Secure(dataStr);
     
-    // Create final export with checksum included
+    // Create final export with hash included
     const finalExportData = {
       ...exportData,
       metadata: {
         ...exportData.metadata,
-        checksum: checksum.toUpperCase(),
+        hash: hash.toUpperCase(),
         integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
       }
     };
@@ -125,7 +125,7 @@ export async function downloadAllCasesAsCSV(user: User, exportData: AllCasesExpo
       ['Total Confirmations Requested (All Cases)', exportData.metadata.totalConfirmationsRequested || 0]
     ];
     
-    // XLSX files are inherently protected, no checksum validation needed
+    // XLSX files are inherently protected, no hash validation needed
     const summaryData = [
       protectForensicData ? ['CASE DATA - PROTECTED EXPORT'] : ['Striae - All Cases Export Summary'],
       protectForensicData ? ['WARNING: This workbook contains evidence data and is protected from editing.'] : [''],
@@ -549,14 +549,14 @@ export async function downloadCaseAsZip(
     
     // Add forensic metadata file if protection is enabled
     if (options.protectForensicData) {
-      // CRITICAL: Get the content that will be used for checksum calculation
+      // CRITICAL: Get the content that will be used for hash calculation
       // This MUST match exactly what gets saved in the actual data file
       // So we use the same includeUserInfo setting for both
       const contentForHash = format === 'json' 
         ? await generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : await generateCSVContent(exportData, false); // Raw content without warnings
 
-      // Generate comprehensive forensic manifest with individual file checksums using secure SHA256
+      // Generate comprehensive forensic manifest with individual file hashs using secure SHA256
       const forensicManifest = await generateForensicManifestSecure(contentForHash, imageFiles);
       
       // Add dedicated forensic manifest file for validation
@@ -830,14 +830,14 @@ async function generateJSONContent(
   const jsonString = JSON.stringify(jsonData, null, 2);
   
   // Calculate hash for integrity verification
-  const checksum = await calculateSHA256Secure(jsonString);
+  const hash = await calculateSHA256Secure(jsonString);
   
-  // Add checksum to metadata
+  // Add hash to metadata
   const finalJsonData = {
     ...jsonData,
     metadata: {
       ...jsonData.metadata,
-      checksum: checksum.toUpperCase(),
+      hash: hash.toUpperCase(),
       integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
     }
   };

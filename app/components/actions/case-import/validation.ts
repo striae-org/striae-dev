@@ -7,8 +7,8 @@ import { calculateSHA256Secure } from '~/utils/SHA256';
 const USER_WORKER_URL = paths.user_worker_url;
 
 /**
- * Remove forensic warning from content for checksum validation (supports both JSON and CSV formats)
- * This function ensures exact match with the content used during export checksum generation
+ * Remove forensic warning from content for hash validation (supports both JSON and CSV formats)
+ * This function ensures exact match with the content used during export hash generation
  */
 export function removeForensicWarning(content: string): string {
   // Handle JSON forensic warnings (block comment format)
@@ -93,19 +93,19 @@ export function isConfirmationDataFile(filename: string): boolean {
 }
 
 /**
- * Validate confirmation data file checksum
+ * Validate confirmation data file hash
  */
 export async function validateConfirmationHash(jsonContent: string, expectedHash: string): Promise<boolean> {
-  // Create data without checksum for validation
+  // Create data without hash for validation
   const data = JSON.parse(jsonContent);
   const dataWithoutHash = {
     ...data,
     metadata: {
       ...data.metadata,
-      checksum: undefined
+      hash: undefined
     }
   };
-  delete dataWithoutHash.metadata.checksum;
+  delete dataWithoutHash.metadata.hash;
   
   const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
   const actualHash = await calculateSHA256Secure(contentForHash);

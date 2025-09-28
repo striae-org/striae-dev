@@ -52,7 +52,7 @@ export interface AuditDetails {
   confirmationId?: string;
   
   // Validation & Security
-  checksumValid?: boolean;
+  hashValid?: boolean;
   validationErrors: string[];
   securityChecks?: SecurityCheckResults;
   
@@ -148,7 +148,7 @@ export interface CreateAuditEntryParams {
   result: AuditResult;
   fileName?: string;
   fileType?: AuditFileType;
-  checksumValid?: boolean;
+  hashValid?: boolean;
   validationErrors?: string[];
   caseNumber?: string;
   confirmationId?: string;
