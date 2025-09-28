@@ -96,21 +96,37 @@ export function isConfirmationDataFile(filename: string): boolean {
  * Validate confirmation data file hash
  */
 export async function validateConfirmationHash(jsonContent: string, expectedHash: string): Promise<boolean> {
-  // Create data without hash for validation
-  const data = JSON.parse(jsonContent);
-  const dataWithoutHash = {
-    ...data,
-    metadata: {
-      ...data.metadata,
-      hash: undefined
+  try {
+    // Validate input parameters
+    if (!expectedHash || typeof expectedHash !== 'string') {
+      console.error('validateConfirmationHash: expectedHash is invalid:', expectedHash);
+      return false;
     }
-  };
-  delete dataWithoutHash.metadata.hash;
-  
-  const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
-  const actualHash = await calculateSHA256Secure(contentForHash);
-  
-  return actualHash.toUpperCase() === expectedHash.toUpperCase();
+
+    // Create data without hash for validation
+    const data = JSON.parse(jsonContent);
+    const dataWithoutHash = {
+      ...data,
+      metadata: {
+        ...data.metadata,
+        hash: undefined
+      }
+    };
+    delete dataWithoutHash.metadata.hash;
+    
+    const contentForHash = JSON.stringify(dataWithoutHash, null, 2);
+    const actualHash = await calculateSHA256Secure(contentForHash);
+    
+    if (!actualHash) {
+      console.error('validateConfirmationHash: failed to calculate hash');
+      return false;
+    }
+    
+    return actualHash.toUpperCase() === expectedHash.toUpperCase();
+  } catch (error) {
+    console.error('validateConfirmationHash: validation failed:', error);
+    return false;
+  }
 }
 
 /**
