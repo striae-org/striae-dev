@@ -15,42 +15,35 @@ export const BlogFeed = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBlogFeed = async () => {
+    const fetchBlogPosts = async () => {
       try {
-        // Use a CORS proxy to fetch the RSS feed
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://blog.striae.org/rss.xml')}`);
-        const data = await response.json() as { contents: string };
+        // Fetch the manifest file
+        const response = await fetch('/blog-posts/manifest.json');
         
-        // Parse the XML
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+        if (!response.ok) {
+          throw new Error('Failed to fetch blog posts manifest');
+        }
         
-        // Extract items
-        const items = xmlDoc.querySelectorAll('item');
-        const blogPosts: BlogPost[] = Array.from(items).slice(0, 3).map(item => {
-          const title = item.querySelector('title')?.textContent || '';
-          const link = item.querySelector('link')?.textContent || '';
-          const description = item.querySelector('description')?.textContent || '';
-          const pubDate = item.querySelector('pubDate')?.textContent || '';
-          
-          return {
-            title: title.trim(),
-            link: link.trim(),
-            description: truncateDescription(description.trim()),
-            pubDate: formatDate(pubDate)
-          };
-        });
+        const allPosts = await response.json() as (BlogPost & { datePublished: string })[];
         
-        setPosts(blogPosts);
+        // Take the latest 3 posts and format them
+        const latestPosts = allPosts.slice(0, 3).map(post => ({
+          title: post.title,
+          link: post.link,
+          description: truncateDescription(post.description),
+          pubDate: formatDate(post.datePublished)
+        }));
+        
+        setPosts(latestPosts);
       } catch (err) {
-        console.error('Error fetching blog feed:', err);
+        console.error('Error fetching blog posts:', err);
         setError('Unable to load blog posts');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBlogFeed();
+    fetchBlogPosts();
   }, []);
 
   const truncateDescription = (text: string): string => {
