@@ -1,20 +1,35 @@
-const corsHeaders = {
+interface Env {
+  R2_KEY_SECRET: string;
+  STRIAE_DATA: R2Bucket;
+}
+
+interface SuccessResponse {
+  success: boolean;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+type APIResponse = SuccessResponse | ErrorResponse | any[] | Record<string, any>;
+
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
-const createResponse = (data, status = 200) => new Response(
+const createResponse = (data: APIResponse, status: number = 200): Response => new Response(
   JSON.stringify(data), 
   { status, headers: corsHeaders }
 );
 
-const hasValidHeader = (request, env) => 
+const hasValidHeader = (request: Request, env: Env): boolean => 
   request.headers.get("X-Custom-Auth-Key") === env.R2_KEY_SECRET;
 
 export default {
-  async fetch(request, env) {       
+  async fetch(request: Request, env: Env): Promise<Response> {       
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -41,7 +56,8 @@ export default {
           if (!file) {
             return createResponse([], 200);
           }
-          const data = JSON.parse(await file.text());
+          const fileText = await file.text();
+          const data = JSON.parse(fileText);
           return createResponse(data);
         }
 
@@ -65,7 +81,8 @@ export default {
       }
     } catch (error) {
       console.error('Worker error:', error);
-      return createResponse({ error: error.message }, 500);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      return createResponse({ error: errorMessage }, 500);
     }
   }
 };

@@ -1,24 +1,23 @@
-/**
- * @typedef {Object} Env
- * @property {string} R2_KEY_SECRET
- * @property {string} ACCOUNT_HASH
- * @property {string} IMAGES_API_TOKEN
- * @property {string} USER_DB_AUTH
- * @property {string} KEYS_AUTH 
- */
+interface Env {
+  R2_KEY_SECRET: string;
+  ACCOUNT_HASH: string;
+  IMAGES_API_TOKEN: string;
+  USER_DB_AUTH: string;
+  KEYS_AUTH: string;
+}
 
-const corsHeaders = {
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'text/plain'
 };
 
-const hasValidHeader = (request, env) => 
+const hasValidHeader = (request: Request, env: Env): boolean => 
   request.headers.get("X-Custom-Auth-Key") === env.KEYS_AUTH;
 
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -51,7 +50,10 @@ export default {
         });
       }
 
-      return new Response(env[keyName], {
+      // Type assertion needed here since TypeScript doesn't know that keyName exists in env
+      const keyValue = env[keyName as keyof Env];
+      
+      return new Response(keyValue, {
         headers: corsHeaders
       });
     }

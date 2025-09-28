@@ -709,9 +709,9 @@ if exist "workers\audit-worker\wrangler.jsonc" (
 )
 
 REM Update audit-worker source file CORS headers
-if exist "workers\audit-worker\src\audit-worker.js" (
+if exist "workers\audit-worker\src\audit-worker.ts" (
     echo [93m  Updating audit-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.js'"
+    powershell -Command "(Get-Content 'workers/audit-worker/src/audit-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/audit-worker/src/audit-worker.ts'"
     echo [92m    ✅ audit-worker CORS headers updated[0m
 )
 
@@ -723,9 +723,9 @@ if exist "workers\data-worker\wrangler.jsonc" (
 )
 
 REM Update data-worker source file CORS headers
-if exist "workers\data-worker\src\data-worker.js" (
+if exist "workers\data-worker\src\data-worker.ts" (
     echo [93m  Updating data-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/data-worker/src/data-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/data-worker/src/data-worker.js'"
+    powershell -Command "(Get-Content 'workers/data-worker/src/data-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/data-worker/src/data-worker.ts'"
     echo [92m    ✅ data-worker CORS headers updated[0m
 )
 
@@ -737,9 +737,9 @@ if exist "workers\image-worker\wrangler.jsonc" (
 )
 
 REM Update image-worker source file CORS headers
-if exist "workers\image-worker\src\image-worker.js" (
+if exist "workers\image-worker\src\image-worker.ts" (
     echo [93m  Updating image-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/image-worker/src/image-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/image-worker/src/image-worker.js'"
+    powershell -Command "(Get-Content 'workers/image-worker/src/image-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/image-worker/src/image-worker.ts'"
     echo [92m    ✅ image-worker CORS headers updated[0m
 )
 
@@ -751,9 +751,9 @@ if exist "workers\keys-worker\wrangler.jsonc" (
 )
 
 REM Update keys-worker source file CORS headers
-if exist "workers\keys-worker\src\keys.js" (
+if exist "workers\keys-worker\src\keys.ts (
     echo [93m  Updating keys-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/keys-worker/src/keys.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/keys-worker/src/keys.js'"
+    powershell -Command "(Get-Content 'workers/keys-worker/src/keys.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/keys-worker/src/keys.ts'"
     echo [92m    ✅ keys-worker CORS headers updated[0m
 )
 
@@ -765,9 +765,9 @@ if exist "workers\pdf-worker\wrangler.jsonc" (
 )
 
 REM Update pdf-worker source file CORS headers
-if exist "workers\pdf-worker\src\pdf-worker.js" (
+if exist "workers\pdf-worker\src\pdf-worker.ts" (
     echo [93m  Updating pdf-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/pdf-worker/src/pdf-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/pdf-worker/src/pdf-worker.js'"
+    powershell -Command "(Get-Content 'workers/pdf-worker/src/pdf-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/pdf-worker/src/pdf-worker.ts'"
     echo [92m    ✅ pdf-worker CORS headers updated[0m
 )
 
@@ -779,9 +779,9 @@ if exist "workers\turnstile-worker\wrangler.jsonc" (
 )
 
 REM Update turnstile-worker source file CORS headers
-if exist "workers\turnstile-worker\src\turnstile.js" (
+if exist "workers\turnstile-worker\src\turnstile.ts" (
     echo [93m  Updating turnstile-worker CORS headers...[0m
-    powershell -Command "(Get-Content 'workers/turnstile-worker/src/turnstile.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/turnstile-worker/src/turnstile.js'"
+    powershell -Command "(Get-Content 'workers/turnstile-worker/src/turnstile.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' | Set-Content 'workers/turnstile-worker/src/turnstile.ts'"
     echo [92m    ✅ turnstile-worker CORS headers updated[0m
 )
 
@@ -793,9 +793,9 @@ if exist "workers\user-worker\wrangler.jsonc" (
 )
 
 REM Update user-worker source file CORS headers and worker URLs
-if exist "workers\user-worker\src\user-worker.js" (
+if exist "workers\user-worker\src\user-worker.ts" (
     echo [93m  Updating user-worker CORS headers and worker URLs...[0m
-    powershell -Command "(Get-Content 'workers/user-worker/src/user-worker.js') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' -replace '''DATA_WORKER_DOMAIN''', '''https://%DATA_WORKER_DOMAIN%''' -replace '''IMAGES_WORKER_DOMAIN''', '''https://%IMAGES_WORKER_DOMAIN%''' | Set-Content 'workers/user-worker/src/user-worker.js'"
+    powershell -Command "(Get-Content 'workers/user-worker/src/user-worker.ts') -replace '''PAGES_CUSTOM_DOMAIN''', '''https://%PAGES_CUSTOM_DOMAIN%''' -replace '''DATA_WORKER_DOMAIN''', '''https://%DATA_WORKER_DOMAIN%''' -replace '''IMAGES_WORKER_DOMAIN''', '''https://%IMAGES_WORKER_DOMAIN%''' | Set-Content 'workers/user-worker/src/user-worker.ts'"
     echo [92m    ✅ user-worker CORS headers and worker URLs updated[0m
 )
 

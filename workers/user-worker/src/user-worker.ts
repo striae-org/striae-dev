@@ -1,4 +1,75 @@
-const corsHeaders = {
+interface Env {
+  USER_DB_AUTH: string;
+  USER_DB: KVNamespace;
+  R2_KEY_SECRET: string;
+  IMAGES_API_TOKEN: string;
+  SL_API_KEY: string;
+}
+
+interface UserData {
+  uid: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  permitted: boolean;
+  cases: CaseItem[];
+  readOnlyCases?: ReadOnlyCaseItem[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface CaseItem {
+  caseNumber: string;
+  caseName?: string;
+  [key: string]: any;
+}
+
+interface ReadOnlyCaseItem {
+  caseNumber: string;
+  caseName?: string;
+  [key: string]: any;
+}
+
+interface UserRequestData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  permitted?: boolean;
+  readOnlyCases?: ReadOnlyCaseItem[];
+}
+
+interface AddCasesRequest {
+  cases: CaseItem[];
+}
+
+interface DeleteCasesRequest {
+  casesToDelete: string[];
+}
+
+interface CaseData {
+  files?: Array<{ id: string; [key: string]: any }>;
+  [key: string]: any;
+}
+
+interface EmailRecipient {
+  name: string;
+  email: string;
+}
+
+interface EmailData {
+  from: EmailRecipient;
+  to: EmailRecipient[];
+  subject: string;
+  ContentType: string;
+  HTMLContent: string;
+  PlainContent: string;
+  Tags: string[];
+  Headers: Record<string, string>;
+}
+
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
@@ -9,12 +80,12 @@ const corsHeaders = {
 const DATA_WORKER_URL = 'DATA_WORKER_DOMAIN';
 const IMAGE_WORKER_URL = 'IMAGES_WORKER_DOMAIN';
 
-async function authenticate(request, env) {
+async function authenticate(request: Request, env: Env): Promise<void> {
   const authKey = request.headers.get('X-Custom-Auth-Key');
   if (authKey !== env.USER_DB_AUTH) throw new Error('Unauthorized');
 }
 
-async function handleGetUser(env, userUid) {
+async function handleGetUser(env: Env, userUid: string): Promise<Response> {
   try {
     const value = await env.USER_DB.get(userUid);
     if (value === null) {
@@ -35,18 +106,18 @@ async function handleGetUser(env, userUid) {
   }
 }
 
-async function handleAddUser(request, env, userUid) {
+async function handleAddUser(request: Request, env: Env, userUid: string): Promise<Response> {
   try {
-    const requestData = await request.json();
+    const requestData: UserRequestData = await request.json();
     const { email, firstName, lastName, company, permitted } = requestData;
     
     // Check for existing user
     const value = await env.USER_DB.get(userUid);
     
-    let userData;
+    let userData: UserData;
     if (value !== null) {
       // Update existing user, preserving cases
-      const existing = JSON.parse(value);
+      const existing: UserData = JSON.parse(value);
       userData = {
         ...existing,
         // Preserve all existing fields
@@ -64,10 +135,10 @@ async function handleAddUser(request, env, userUid) {
       // Create new user
       userData = {
         uid: userUid,
-        email,
-        firstName,
-        lastName,
-        company,
+        email: email || '',
+        firstName: firstName || '',
+        lastName: lastName || '',
+        company: company || '',
         permitted: permitted !== undefined ? permitted : true,
         cases: [],
         createdAt: new Date().toISOString()
@@ -92,47 +163,41 @@ async function handleAddUser(request, env, userUid) {
   }
 }
 
-async function sendDeletionEmails(env, userData) {
+async function sendDeletionEmails(env: Env, userData: UserData): Promise<boolean> {
   try {
     const { uid, email, firstName, lastName, company } = userData;
     const fullName = `${firstName || ''} ${lastName || ''}`.trim() || 'User';
     
     // Email to the user
-    const userEmailResponse = await fetch('https://console.sendlayer.com/api/v1/email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${env.SL_API_KEY}`,
+    const userEmailData: EmailData = {
+      from: {
+        name: "Striae Account Services",
+        email: "no-reply@striae.org"
       },
-      body: JSON.stringify({
-        "from": {
-          "name": "Striae Account Services",
-          "email": "no-reply@striae.org"
-        },
-        "to": [
-          {
-            "name": fullName,
-            "email": email
-          }
-        ],
-        "subject": "Striae Account Deletion Confirmation",
-        "ContentType": "HTML",
-        "HTMLContent": `<html><body>
-          <h2>Account Deletion Confirmation</h2>
-          <p>Dear ${fullName},</p>
-          <p>This email confirms that your Striae account has been successfully deleted.</p>
-          <p><strong>Account Details:</strong></p>
-          <ul>
-            <li><strong>UID:</strong> ${uid}</li>
-            <li><strong>Email:</strong> ${email}</li>
-            <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
-          </ul>
-          <p>All your account information and data have been permanently removed from our systems. The account associated with this email address has been disabled.</p>
-          <p>If you did not request this deletion or believe this was done in error, please contact our support team immediately at info@striae.org.</p>
-          <p>Thank you for using Striae.</p>
-          <p>Best regards,<br>The Striae Team</p>
-        </body></html>`,
-        "PlainContent": `Account Deletion Confirmation
+      to: [
+        {
+          name: fullName,
+          email: email
+        }
+      ],
+      subject: "Striae Account Deletion Confirmation",
+      ContentType: "HTML",
+      HTMLContent: `<html><body>
+        <h2>Account Deletion Confirmation</h2>
+        <p>Dear ${fullName},</p>
+        <p>This email confirms that your Striae account has been successfully deleted.</p>
+        <p><strong>Account Details:</strong></p>
+        <ul>
+          <li><strong>UID:</strong> ${uid}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
+        </ul>
+        <p>All your account information and data have been permanently removed from our systems. The account associated with this email address has been disabled.</p>
+        <p>If you did not request this deletion or believe this was done in error, please contact our support team immediately at info@striae.org.</p>
+        <p>Thank you for using Striae.</p>
+        <p>Best regards,<br>The Striae Team</p>
+      </body></html>`,
+      PlainContent: `Account Deletion Confirmation
 
 Dear ${fullName},
 
@@ -151,47 +216,49 @@ Thank you for using Striae.
 
 Best regards,
 The Striae Team`,
-        "Tags": ["account-deletion"],
-        "Headers": {
-          "X-Mailer": "striae.org"
-        }
-      }),
-    });
+      Tags: ["account-deletion"],
+      Headers: {
+        "X-Mailer": "striae.org"
+      }
+    };
 
-    // Email to support
-    const supportEmailResponse = await fetch('https://console.sendlayer.com/api/v1/email', {
+    const userEmailResponse = await fetch('https://console.sendlayer.com/api/v1/email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${env.SL_API_KEY}`,
       },
-      body: JSON.stringify({
-        "from": {
-          "name": "Striae Account Services",
-          "email": "no-reply@striae.org"
-        },
-        "to": [
-          {
-            "name": "Striae Support",
-            "email": "info@striae.org"
-          }
-        ],
-        "subject": "Account Deletion Notification",
-        "ContentType": "HTML",
-        "HTMLContent": `<html><body>
-          <h2>Account Deletion Notification</h2>
-          <p>A user has deleted their Striae account.</p>
-          <p><strong>Deleted Account Details:</strong></p>
-          <ul>
-            <li><strong>UID:</strong> ${uid}</li>
-            <li><strong>Name:</strong> ${fullName}</li>
-            <li><strong>Email:</strong> ${email}</li>
-            <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
-            <li><strong>Deletion Time:</strong> ${new Date().toISOString()}</li>
-          </ul>
-          <p>The user has been sent a confirmation email.</p>
-        </body></html>`,
-        "PlainContent": `Account Deletion Notification
+      body: JSON.stringify(userEmailData),
+    });
+
+    // Email to support
+    const supportEmailData: EmailData = {
+      from: {
+        name: "Striae Account Services",
+        email: "no-reply@striae.org"
+      },
+      to: [
+        {
+          name: "Striae Support",
+          email: "info@striae.org"
+        }
+      ],
+      subject: "Account Deletion Notification",
+      ContentType: "HTML",
+      HTMLContent: `<html><body>
+        <h2>Account Deletion Notification</h2>
+        <p>A user has deleted their Striae account.</p>
+        <p><strong>Deleted Account Details:</strong></p>
+        <ul>
+          <li><strong>UID:</strong> ${uid}</li>
+          <li><strong>Name:</strong> ${fullName}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
+          <li><strong>Deletion Time:</strong> ${new Date().toISOString()}</li>
+        </ul>
+        <p>The user has been sent a confirmation email.</p>
+      </body></html>`,
+      PlainContent: `Account Deletion Notification
 
 A user has deleted their Striae account.
 
@@ -203,11 +270,19 @@ Deleted Account Details:
 - Deletion Time: ${new Date().toISOString()}
 
 The user has been sent a confirmation email.`,
-        "Tags": ["account-deletion", "admin-notification"],
-        "Headers": {
-          "X-Mailer": "striae.org"
-        }
-      }),
+      Tags: ["account-deletion", "admin-notification"],
+      Headers: {
+        "X-Mailer": "striae.org"
+      }
+    };
+
+    const supportEmailResponse = await fetch('https://console.sendlayer.com/api/v1/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${env.SL_API_KEY}`,
+      },
+      body: JSON.stringify(supportEmailData),
     });
 
     if (!userEmailResponse.ok || !supportEmailResponse.ok) {
@@ -222,7 +297,7 @@ The user has been sent a confirmation email.`,
 }
 
 // Function to delete a single case (similar to case-manage.ts deleteCase)
-async function deleteSingleCase(env, userUid, caseNumber) {
+async function deleteSingleCase(env: Env, userUid: string, caseNumber: string): Promise<void> {
   const dataApiKey = env.R2_KEY_SECRET;
   const imageApiKey = env.IMAGES_API_TOKEN;
 
@@ -236,7 +311,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
       return;
     }
 
-    const caseData = await caseResponse.json();
+    const caseData: CaseData = await caseResponse.json();
 
     // Delete all files associated with this case
     if (caseData.files && caseData.files.length > 0) {
@@ -272,7 +347,7 @@ async function deleteSingleCase(env, userUid, caseNumber) {
   }
 }
 
-async function handleDeleteUser(env, userUid) {
+async function handleDeleteUser(env: Env, userUid: string): Promise<Response> {
   try {
     // First, get the user data to include in the deletion emails
     const userData = await env.USER_DB.get(userUid);
@@ -283,7 +358,7 @@ async function handleDeleteUser(env, userUid) {
       });
     }
 
-    const userObject = JSON.parse(userData);
+    const userObject: UserData = JSON.parse(userData);
     
     // Delete all user's cases using the same logic as case-manage.ts
     if (userObject.cases && userObject.cases.length > 0) {
@@ -307,10 +382,11 @@ async function handleDeleteUser(env, userUid) {
     });
   } catch (error) {
     console.error('Delete user error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     
     // If it's an email error, we might want to still delete the account
     // and just log the email failure, or handle it differently based on requirements
-    if (error.message.includes('email')) {
+    if (errorMessage.includes('email')) {
       return new Response(JSON.stringify({
         success: false,
         message: 'Account deletion failed: Unable to send confirmation emails'
@@ -330,9 +406,9 @@ async function handleDeleteUser(env, userUid) {
   }
 }
 
-async function handleAddCases(request, env, userUid) {
+async function handleAddCases(request: Request, env: Env, userUid: string): Promise<Response> {
   try {
-    const { cases = [] } = await request.json();
+    const { cases = [] }: AddCasesRequest = await request.json();
     
     // Get current user data
     const value = await env.USER_DB.get(userUid);
@@ -344,7 +420,7 @@ async function handleAddCases(request, env, userUid) {
     }
 
     // Update cases
-    const userData = JSON.parse(value);
+    const userData: UserData = JSON.parse(value);
     const existingCases = userData.cases || [];
     
     // Filter out duplicates
@@ -373,9 +449,9 @@ async function handleAddCases(request, env, userUid) {
   }
 }
 
-async function handleDeleteCases(request, env, userUid) {
+async function handleDeleteCases(request: Request, env: Env, userUid: string): Promise<Response> {
   try {
-    const { casesToDelete } = await request.json();
+    const { casesToDelete }: DeleteCasesRequest = await request.json();
     
     // Get current user data
     const value = await env.USER_DB.get(userUid);
@@ -387,7 +463,7 @@ async function handleDeleteCases(request, env, userUid) {
     }
 
     // Update user data
-    const userData = JSON.parse(value);
+    const userData: UserData = JSON.parse(value);
     userData.cases = userData.cases.filter(c => 
       !casesToDelete.includes(c.caseNumber)
     );
@@ -409,41 +485,57 @@ async function handleDeleteCases(request, env, userUid) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
+
+    try {
       await authenticate(request, env);
       
       const url = new URL(request.url);
-    const parts = url.pathname.split('/');
-    const userUid = parts[1];
-    const isCasesEndpoint = parts[2] === 'cases';
-    
-    if (!userUid) {
-      return new Response('Not Found', { status: 404 });
-    }
+      const parts = url.pathname.split('/');
+      const userUid = parts[1];
+      const isCasesEndpoint = parts[2] === 'cases';
+      
+      if (!userUid) {
+        return new Response('Not Found', { status: 404 });
+      }
 
-    // Handle regular cases endpoint
-    if (isCasesEndpoint) {
+      // Handle regular cases endpoint
+      if (isCasesEndpoint) {
+        switch (request.method) {
+          case 'PUT': return handleAddCases(request, env, userUid);
+          case 'DELETE': return handleDeleteCases(request, env, userUid);
+          default: return new Response('Method not allowed', {
+            status: 405,
+            headers: corsHeaders
+          });
+        }
+      }
+
+      // Handle user operations
       switch (request.method) {
-        case 'PUT': return handleAddCases(request, env, userUid);
-        case 'DELETE': return handleDeleteCases(request, env, userUid);
+        case 'GET': return handleGetUser(env, userUid);
+        case 'PUT': return handleAddUser(request, env, userUid);
+        case 'DELETE': return handleDeleteUser(env, userUid);
         default: return new Response('Method not allowed', {
           status: 405,
           headers: corsHeaders
         });
       }
-    }
-
-    // Handle user operations
-    switch (request.method) {
-      case 'GET': return handleGetUser(env, userUid);
-      case 'PUT': return handleAddUser(request, env, userUid);
-      case 'DELETE': return handleDeleteUser(env, userUid);
-      default: return new Response('Method not allowed', {
-        status: 405,
-        headers: corsHeaders
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      if (errorMessage === 'Unauthorized') {
+        return new Response('Forbidden', { 
+          status: 403, 
+          headers: corsHeaders 
+        });
+      }
+      
+      return new Response('Internal Server Error', { 
+        status: 500, 
+        headers: corsHeaders 
       });
     }
   }
