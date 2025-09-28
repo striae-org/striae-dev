@@ -358,7 +358,7 @@ update_wrangler_configs() {
     fi
     
     # Update audit-worker source file CORS headers only
-    if [ -f "workers/audit-worker/src/audit-worker.js" ]; then
+    if [ -f "workers/audit-worker/src/audit-worker.ts" ]; then
         echo -e "${YELLOW}  Updating audit-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/audit-worker/src/audit-worker.js
         echo -e "${GREEN}    ✅ audit-worker CORS headers updated${NC}"
@@ -375,7 +375,7 @@ update_wrangler_configs() {
     fi
     
     # Update data-worker source file CORS headers only
-    if [ -f "workers/data-worker/src/data-worker.js" ]; then
+    if [ -f "workers/data-worker/src/data-worker.ts" ]; then
         echo -e "${YELLOW}  Updating data-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/data-worker/src/data-worker.js
         echo -e "${GREEN}    ✅ data-worker CORS headers updated${NC}"
@@ -391,7 +391,7 @@ update_wrangler_configs() {
     fi
     
     # Update image-worker source file CORS headers only
-    if [ -f "workers/image-worker/src/image-worker.js" ]; then
+    if [ -f "workers/image-worker/src/image-worker.ts" ]; then
         echo -e "${YELLOW}  Updating image-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/image-worker/src/image-worker.js
         echo -e "${GREEN}    ✅ image-worker CORS headers updated${NC}"
@@ -407,7 +407,7 @@ update_wrangler_configs() {
     fi
     
     # Update keys-worker source file CORS headers only
-    if [ -f "workers/keys-worker/src/keys.js" ]; then
+    if [ -f "workers/keys-worker/src/ ]; then
         echo -e "${YELLOW}  Updating keys-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/keys-worker/src/keys.js
         echo -e "${GREEN}    ✅ keys-worker CORS headers updated${NC}"
@@ -423,7 +423,7 @@ update_wrangler_configs() {
     fi
     
     # Update pdf-worker source file CORS headers only
-    if [ -f "workers/pdf-worker/src/pdf-worker.js" ]; then
+    if [ -f "workers/pdf-worker/src/pdf-worker.ts" ]; then
         echo -e "${YELLOW}  Updating pdf-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/pdf-worker/src/pdf-worker.js
         echo -e "${GREEN}    ✅ pdf-worker CORS headers updated${NC}"
@@ -456,7 +456,7 @@ update_wrangler_configs() {
     fi
     
     # Update user-worker source file CORS headers and worker URLs only
-    if [ -f "workers/user-worker/src/user-worker.js" ]; then
+    if [ -f "workers/user-worker/src/user-worker.ts" ]; then
         echo -e "${YELLOW}  Updating user-worker CORS headers and worker URLs...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/user-worker/src/user-worker.js
         sed -i "s|'DATA_WORKER_DOMAIN'|'https://$DATA_WORKER_DOMAIN'|g" workers/user-worker/src/user-worker.js

@@ -1,29 +1,59 @@
-const corsHeaders = {
+interface Env {
+  R2_KEY_SECRET: string;
+  STRIAE_AUDIT: R2Bucket;
+}
+
+interface AuditEntry {
+  timestamp: string;
+  userId: string;
+  action: string;
+  // Optional metadata fields that can be included
+  [key: string]: any;
+}
+
+interface SuccessResponse {
+  success: boolean;
+  entryCount?: number;
+  filename?: string;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+interface AuditRetrievalResponse {
+  entries: AuditEntry[];
+  total: number;
+}
+
+type APIResponse = SuccessResponse | ErrorResponse | AuditRetrievalResponse;
+
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
-const createResponse = (data, status = 200) => new Response(
+const createResponse = (data: APIResponse, status: number = 200): Response => new Response(
   JSON.stringify(data), 
   { status, headers: corsHeaders }
 );
 
-const hasValidHeader = (request, env) => 
+const hasValidHeader = (request: Request, env: Env): boolean => 
   request.headers.get("X-Custom-Auth-Key") === env.R2_KEY_SECRET;
 
 // Helper function to generate audit file names with user and date
-const generateAuditFileName = (userId) => {
+const generateAuditFileName = (userId: string): string => {
   const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   return `audit-trails/${userId}/${date}.json`;
 };
 
 // Helper function to append audit entry to existing file
-const appendAuditEntry = async (bucket, filename, newEntry) => {
+const appendAuditEntry = async (bucket: R2Bucket, filename: string, newEntry: AuditEntry): Promise<number> => {
   try {
     const existingFile = await bucket.get(filename);
-    let entries = [];
+    let entries: AuditEntry[] = [];
     
     if (existingFile) {
       const existingData = await existingFile.text();
@@ -39,8 +69,19 @@ const appendAuditEntry = async (bucket, filename, newEntry) => {
   }
 };
 
+// Type guard to validate audit entry structure
+const isValidAuditEntry = (entry: any): entry is AuditEntry => {
+  return (
+    typeof entry === 'object' &&
+    entry !== null &&
+    typeof entry.timestamp === 'string' &&
+    typeof entry.userId === 'string' &&
+    typeof entry.action === 'string'
+  );
+};
+
 export default {
-  async fetch(request, env) {       
+  async fetch(request: Request, env: Env): Promise<Response> {       
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -69,10 +110,10 @@ export default {
           return createResponse({ error: 'userId parameter is required' }, 400);
         }
         
-        const auditEntry = await request.json();
+        const auditEntry: unknown = await request.json();
         
-        // Validate audit entry structure
-        if (!auditEntry.timestamp || !auditEntry.userId || !auditEntry.action) {
+        // Validate audit entry structure using type guard
+        if (!isValidAuditEntry(auditEntry)) {
           return createResponse({ error: 'Invalid audit entry structure. Required fields: timestamp, userId, action' }, 400);
         }
         
@@ -86,7 +127,8 @@ export default {
             filename 
           });
         } catch (error) {
-          return createResponse({ error: `Failed to store audit entry: ${error.message}` }, 500);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          return createResponse({ error: `Failed to store audit entry: ${errorMessage}` }, 500);
         }
       }
       
@@ -97,7 +139,7 @@ export default {
         }
         
         try {
-          let allEntries = [];
+          let allEntries: AuditEntry[] = [];
           
           if (startDate && endDate) {
             // Get entries for date range
@@ -111,7 +153,8 @@ export default {
               const file = await bucket.get(filename);
               
               if (file) {
-                const entries = JSON.parse(await file.text());
+                const fileText = await file.text();
+                const entries: AuditEntry[] = JSON.parse(fileText);
                 allEntries.push(...entries);
               }
               
@@ -123,19 +166,21 @@ export default {
             const file = await bucket.get(filename);
             
             if (file) {
-              allEntries = JSON.parse(await file.text());
+              const fileText = await file.text();
+              allEntries = JSON.parse(fileText);
             }
           }
           
           // Sort by timestamp (newest first)
-          allEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          allEntries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
           
           return createResponse({
             entries: allEntries,
             total: allEntries.length
           });
         } catch (error) {
-          return createResponse({ error: `Failed to retrieve audit entries: ${error.message}` }, 500);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          return createResponse({ error: `Failed to retrieve audit entries: ${errorMessage}` }, 500);
         }
       }
       
@@ -143,7 +188,8 @@ export default {
 
     } catch (error) {
       console.error('Audit Worker error:', error);
-      return createResponse({ error: error.message }, 500);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      return createResponse({ error: errorMessage }, 500);
     }
   }
 };

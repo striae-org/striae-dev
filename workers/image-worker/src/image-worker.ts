@@ -1,21 +1,49 @@
+interface Env {
+  API_TOKEN: string;
+  ACCOUNT_ID: string;
+  HMAC_KEY: string;
+}
+
+interface CloudflareImagesResponse {
+  success: boolean;
+  errors?: Array<{
+    code: number;
+    message: string;
+  }>;
+  messages?: string[];
+  result?: {
+    id: string;
+    filename: string;
+    uploaded: string;
+    requireSignedURLs: boolean;
+    variants: string[];
+  };
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+type APIResponse = CloudflareImagesResponse | ErrorResponse | string;
+
 const API_BASE = "https://api.cloudflare.com/client/v4/accounts";
 
 /**
  * CORS headers to allow requests from the Striae app
  */
-const corsHeaders = {
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Custom-Auth-Key',
   'Content-Type': 'application/json'
 };
 
-const createResponse = (data, status = 200) => new Response(
+const createResponse = (data: APIResponse, status: number = 200): Response => new Response(
   typeof data === 'string' ? data : JSON.stringify(data), 
   { status, headers: corsHeaders }
 );
 
-const hasValidToken = (request, env) => {
+const hasValidToken = (request: Request, env: Env): boolean => {
   const authHeader = request.headers.get("Authorization");
   const expectedToken = `Bearer ${env.API_TOKEN}`;
   return authHeader === expectedToken;
@@ -24,7 +52,7 @@ const hasValidToken = (request, env) => {
 /**
  * Handle image upload requests
  */
-async function handleImageUpload(request, env) {
+async function handleImageUpload(request: Request, env: Env): Promise<Response> {
   if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
@@ -42,21 +70,26 @@ async function handleImageUpload(request, env) {
     },
     body: formData
   });
-  const data = await response.json();
+  
+  const data: CloudflareImagesResponse = await response.json();
   return createResponse(data, response.status);
 }
 
 /**
  * Handle image delete requests
  */
-
-async function handleImageDelete(request, env) {
+async function handleImageDelete(request: Request, env: Env): Promise<Response> {
   if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const url = new URL(request.url);
   const imageId = url.pathname.split('/').pop();
+  
+  if (!imageId) {
+    return createResponse({ error: 'Image ID is required' }, 400);
+  }
+  
   const endpoint = `${API_BASE}/${env.ACCOUNT_ID}/images/v1/${imageId}`;
   const response = await fetch(endpoint, {
     method: 'DELETE',
@@ -64,20 +97,20 @@ async function handleImageDelete(request, env) {
       'Authorization': `Bearer ${env.API_TOKEN}`,
     }
   });
-  const data = await response.json();
+  
+  const data: CloudflareImagesResponse = await response.json();
   return createResponse(data, response.status);
 }
 
 /**
  * Handle Signed URL generation
  */
-
 const EXPIRATION = 60 * 60; // 1 hour
 
-const bufferToHex = buffer =>
+const bufferToHex = (buffer: ArrayBuffer): string =>
   [...new Uint8Array(buffer)].map(x => x.toString(16).padStart(2, '0')).join('');
 
-async function generateSignedUrl(url, env) {
+async function generateSignedUrl(url: URL, env: Env): Promise<Response> {
   const encoder = new TextEncoder();
   const secretKeyData = encoder.encode(env.HMAC_KEY);
   const key = await crypto.subtle.importKey(
@@ -90,11 +123,11 @@ async function generateSignedUrl(url, env) {
 
   // Add expiration
   const expiry = Math.floor(Date.now() / 1000) + EXPIRATION;
-  url.searchParams.set('exp', expiry);
+  url.searchParams.set('exp', expiry.toString());
 
   const stringToSign = url.pathname + '?' + url.searchParams.toString();
   const mac = await crypto.subtle.sign('HMAC', key, encoder.encode(stringToSign));
-  const sig = bufferToHex(new Uint8Array(mac).buffer);
+  const sig = bufferToHex(mac);
 
   // Add signature
   url.searchParams.set('sig', sig);
@@ -105,24 +138,25 @@ async function generateSignedUrl(url, env) {
   });
 }
 
-async function handleImageServing(request, env) {
+async function handleImageServing(request: Request, env: Env): Promise<Response> {
   if (!hasValidToken(request, env)) {
     return createResponse({ error: 'Unauthorized' }, 403);
   }
 
   const url = new URL(request.url);
+  const pathWithoutSlash = url.pathname.slice(1);
   const imageDeliveryURL = new URL(
-    url.pathname.slice(1).replace('https:/imagedelivery.net', 'https://imagedelivery.net')
+    pathWithoutSlash.replace('https:/imagedelivery.net', 'https://imagedelivery.net')
   );
+  
   return generateSignedUrl(imageDeliveryURL, env);
 }
 
 /**
  * Main worker functions
  */
-
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -139,8 +173,8 @@ export default {
           return createResponse({ error: 'Method not allowed' }, 405);
       }
     } catch (error) {
-      return createResponse({ error: error.message }, 500);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      return createResponse({ error: errorMessage }, 500);
     }
   }
 };
-

@@ -431,13 +431,13 @@ function Update-WranglerConfigs {
     
     # Update worker source files (CORS headers)
     $workerSources = @(
-        "workers/audit-worker/src/audit-worker.js",
-        "workers/data-worker/src/data-worker.js",
-        "workers/image-worker/src/image-worker.js", 
-        "workers/keys-worker/src/keys.js",
-        "workers/pdf-worker/src/pdf-worker.js",
+        "workers/audit-worker/src/audit-worker.ts",
+        "workers/data-worker/src/data-worker.ts",
+        "workers/image-worker/src/image-worker.ts", 
+        "workers/keys-worker/src/,
+        "workers/pdf-worker/src/pdf-worker.ts",
         "workers/turnstile-worker/src/turnstile.js",
-        "workers/user-worker/src/user-worker.js"
+        "workers/user-worker/src/user-worker.ts"
     )
     
     foreach ($sourcePath in $workerSources) {

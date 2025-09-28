@@ -1,21 +1,84 @@
 import puppeteer from "@cloudflare/puppeteer";
 
-const corsHeaders = {
+interface Env {
+  BROWSER: Fetcher;
+}
+
+interface BoxAnnotation {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+}
+
+interface ConfirmationData {
+  fullName: string;
+  badgeId: string;
+  confirmedByCompany?: string;
+  timestamp: string;
+  confirmationId: string;
+}
+
+interface AnnotationData {
+  // Index annotations
+  indexType?: 'number' | 'color';
+  indexNumber?: string;
+  indexColor?: string;
+  
+  // Case/number annotations
+  caseFontColor?: string;
+  leftCase?: string;
+  leftItem?: string;
+  rightCase?: string;
+  rightItem?: string;
+  
+  // Box annotations
+  boxAnnotations?: BoxAnnotation[];
+  
+  // ID/Support level annotations
+  supportLevel?: 'ID' | 'Exclusion' | 'Inconclusive';
+  
+  // Class annotations
+  classType?: string;
+  customClass?: string;
+  classNote?: string;
+  hasSubclass?: boolean;
+  
+  // Confirmation annotations
+  includeConfirmation?: boolean;
+  confirmationData?: ConfirmationData;
+  
+  // Notes
+  additionalNotes?: string;
+}
+
+interface PDFGenerationData {
+  imageUrl?: string;
+  caseNumber?: string;
+  annotationData?: AnnotationData;
+  activeAnnotations?: string[];
+  currentDate?: string;
+  notesUpdatedFormatted?: string;
+  userCompany?: string;
+}
+
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-const generateDocument = (data) => {
+const generateDocument = (data: PDFGenerationData): string => {
   const { imageUrl, caseNumber, annotationData, activeAnnotations, currentDate, notesUpdatedFormatted, userCompany } = data;
   const annotationsSet = new Set(activeAnnotations);
 
   // Programmatically determine if a color is dark and needs a light background
-  const needsLightBackground = (color) => {
+  const needsLightBackground = (color: string | undefined): boolean => {
     if (!color) return false;
     
     // Handle named colors
-    const namedColors = {
+    const namedColors: Record<string, string> = {
       'black': '#000000',
       'white': '#ffffff',
       'red': '#ff0000',
@@ -529,7 +592,7 @@ const generateDocument = (data) => {
 };
 
 export default {
-  async fetch(request, env) {
+  async fetch(request: Request, env: Env): Promise<Response> {
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
@@ -537,7 +600,7 @@ export default {
 
     if (request.method === 'POST') {
       try {
-        const data = await request.json();
+        const data: PDFGenerationData = await request.json();
         
         const browser = await puppeteer.launch(env.BROWSER);
         const page = await browser.newPage();
@@ -547,7 +610,7 @@ export default {
         await page.setContent(document);
 
         // Generate PDF
-        const pdf = await page.pdf({ 
+        const pdfBuffer = await page.pdf({ 
           printBackground: true,
           format: 'letter',
           margin: { top: '0.5in', bottom: '0.5in', left: '0.5in', right: '0.5in' }
@@ -555,14 +618,15 @@ export default {
 
         await browser.close();
 
-        return new Response(pdf, {
+        return new Response(new Uint8Array(pdfBuffer), {
           headers: {
             ...corsHeaders,
             "content-type": "application/pdf"
           },
         });
       } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        return new Response(JSON.stringify({ error: errorMessage }), {
           status: 500,
           headers: { ...corsHeaders, "content-type": "application/json" }
         });

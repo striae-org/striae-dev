@@ -1,7 +1,7 @@
 {
   "name": "PDF_WORKER_NAME",
   "account_id": "ACCOUNT_ID",
-  "main": "src/pdf-worker.js",
+  "main": "src/pdf-worker.ts",
   "compatibility_date": "2023-03-14",
   "compatibility_flags": [
     "nodejs_compat"
