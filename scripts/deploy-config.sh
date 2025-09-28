@@ -407,7 +407,7 @@ update_wrangler_configs() {
     fi
     
     # Update keys-worker source file CORS headers only
-    if [ -f "workers/keys-worker/src/ ]; then
+    if [ -f "workers/keys-worker/src/keys.ts" ]; then
         echo -e "${YELLOW}  Updating keys-worker CORS headers...${NC}"
         sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/keys-worker/src/keys.ts
         echo -e "${GREEN}    ✅ keys-worker CORS headers updated${NC}"
