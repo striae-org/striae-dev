@@ -173,7 +173,7 @@ export async function getImageConfirmations(
 }
 
 /**
- * Exports confirmation data as a JSON file with CRC32 checksum for forensic integrity
+ * Exports confirmation data as a JSON file with SHA256 hash for forensic integrity
  */
 export async function exportConfirmationData(
   user: User, 

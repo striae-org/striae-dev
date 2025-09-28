@@ -29,7 +29,7 @@ export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExp
       metadata: {
         ...exportData.metadata,
         checksum: checksum.toUpperCase(),
-        integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+        integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
       }
     };
     
@@ -555,8 +555,8 @@ export async function downloadCaseAsZip(
       const contentForChecksum = format === 'json' 
         ? await generateJSONContent(exportData, options.includeUserInfo, false) // Raw content without warnings but same includeUserInfo
         : await generateCSVContent(exportData, false); // Raw content without warnings
-      
-      // Generate comprehensive forensic manifest with individual file checksums using secure CRC32
+
+      // Generate comprehensive forensic manifest with individual file checksums using secure SHA256
       const forensicManifest = await generateForensicManifestSecure(contentForChecksum, imageFiles);
       
       // Add dedicated forensic manifest file for validation
@@ -838,7 +838,7 @@ async function generateJSONContent(
     metadata: {
       ...jsonData.metadata,
       checksum: checksum.toUpperCase(),
-      integrityNote: 'Verify by recalculating CRC32 of this entire JSON content'
+      integrityNote: 'Verify by recalculating SHA256 of this entire JSON content'
     }
   };
   
