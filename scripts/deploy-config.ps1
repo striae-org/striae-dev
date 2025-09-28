@@ -436,7 +436,7 @@ function Update-WranglerConfigs {
         "workers/image-worker/src/image-worker.ts", 
         "workers/keys-worker/src/,
         "workers/pdf-worker/src/pdf-worker.ts",
-        "workers/turnstile-worker/src/turnstile.js",
+        "workers/turnstile-worker/src/turnstile.ts",
         "workers/user-worker/src/user-worker.ts"
     )
     

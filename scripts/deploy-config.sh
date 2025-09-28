@@ -409,7 +409,7 @@ update_wrangler_configs() {
     # Update keys-worker source file CORS headers only
     if [ -f "workers/keys-worker/src/ ]; then
         echo -e "${YELLOW}  Updating keys-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/keys-worker/src/keys.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/keys-worker/src/keys.ts
         echo -e "${GREEN}    ✅ keys-worker CORS headers updated${NC}"
     fi
     
@@ -439,9 +439,9 @@ update_wrangler_configs() {
     fi
     
     # Update turnstile-worker source file CORS headers only
-    if [ -f "workers/turnstile-worker/src/turnstile.js" ]; then
+    if [ -f "workers/turnstile-worker/src/turnstile.ts" ]; then
         echo -e "${YELLOW}  Updating turnstile-worker CORS headers...${NC}"
-        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/turnstile-worker/src/turnstile.js
+        sed -i "s|'PAGES_CUSTOM_DOMAIN'|'https://$PAGES_CUSTOM_DOMAIN'|g" workers/turnstile-worker/src/turnstile.ts
         echo -e "${GREEN}    ✅ turnstile-worker CORS headers updated${NC}"
     fi
     
