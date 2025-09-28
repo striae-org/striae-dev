@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { signOut, User } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { auth } from '~/services/firebase';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';

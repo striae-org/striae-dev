@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from 'firebase/auth';
-import { deleteFile } from './image-manage';
 import { 
   canCreateCase, 
   getUserCases,
