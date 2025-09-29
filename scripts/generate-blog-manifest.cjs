@@ -47,6 +47,7 @@ function extractDescription(content, frontmatter) {
   
   // Remove markdown syntax and get first paragraph
   const cleanText = bodyContent
+    .replace(/^>\s*/gm, '') // Remove blockquote markers (> at start of lines)
     .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
     .replace(/\[.*?\]\(.*?\)/g, '') // Remove links
     .replace(/#{1,6}\s/g, '') // Remove headers
