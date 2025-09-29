@@ -9,14 +9,15 @@ export async function importAnnotations(
   user: User,
   caseNumber: string,
   caseData: CaseExportData,
-  fileMapping: Map<string, string> // originalFilename -> newFileId
+  originalImageIdMapping: Map<string, string> // originalImageId -> newFileId
 ): Promise<number> {
   let annotationsImported = 0;
   
   try {
     for (const fileEntry of caseData.files) {
       if (fileEntry.annotations && fileEntry.hasAnnotations) {
-        const newFileId = fileMapping.get(fileEntry.fileData.originalFilename);
+        const originalImageId = fileEntry.fileData.id;
+        const newFileId = originalImageIdMapping.get(originalImageId);
         if (newFileId) {
           // Save annotations using the existing notes management system
           // Bypass access validation for read-only case imports

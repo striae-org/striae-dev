@@ -5,6 +5,69 @@ import { validateCaseIntegritySecure as validateForensicIntegrity } from '~/util
 import { validateExporterUid, removeForensicWarning } from './validation';
 
 /**
+ * Extract original image ID from export filename format
+ * Format: {originalFilename}-{id}.{extension}
+ * Example: "evidence-2b365c5e-0559-4d6a-564f-d40bf1770101.jpg" returns "2b365c5e-0559-4d6a-564f-d40bf1770101"
+ * 
+ * Since IDs can contain hyphens (like UUIDs), we need to find the hyphen that separates
+ * the original filename from the ID. We do this by looking for UUID patterns or taking
+ * a reasonable portion from the end.
+ */
+function extractImageIdFromFilename(exportFilename: string): string | null {
+  // Remove extension first
+  const lastDotIndex = exportFilename.lastIndexOf('.');
+  const filenameWithoutExt = lastDotIndex === -1 ? exportFilename : exportFilename.substring(0, lastDotIndex);
+  
+  // UUID pattern: 8-4-4-4-12 (36 chars including hyphens)
+  // Look for a pattern that matches this at the end
+  const uuidPattern = /^(.+)-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+  const match = filenameWithoutExt.match(uuidPattern);
+  
+  if (match) {
+    return match[2]; // Return the UUID part
+  }
+  
+  // Fallback: if not a UUID, assume the ID is everything after the last hyphen
+  // This maintains backward compatibility with non-UUID IDs
+  const lastHyphenIndex = filenameWithoutExt.lastIndexOf('-');
+  
+  if (lastHyphenIndex === -1 || lastHyphenIndex === filenameWithoutExt.length - 1) {
+    return null; // No hyphen found or hyphen is at the end
+  }
+  
+  return filenameWithoutExt.substring(lastHyphenIndex + 1);
+}
+
+/**
+ * Reconstruct original filename from export filename
+ * Format: {originalFilename}-{id}.{extension} → {originalFilename}.{extension}
+ * Example: "evidence-2b365c5e-0559-4d6a-564f-d40bf1770101.jpg" returns "evidence.jpg"
+ */
+function reconstructOriginalFilename(exportFilename: string): string {
+  const lastDotIndex = exportFilename.lastIndexOf('.');
+  const extension = lastDotIndex === -1 ? '' : exportFilename.substring(lastDotIndex);
+  const filenameWithoutExt = lastDotIndex === -1 ? exportFilename : exportFilename.substring(0, lastDotIndex);
+  
+  // UUID pattern: 8-4-4-4-12 (36 chars including hyphens)
+  const uuidPattern = /^(.+)-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+  const match = filenameWithoutExt.match(uuidPattern);
+  
+  if (match) {
+    return match[1] + extension; // Return the original filename part + extension
+  }
+  
+  // Fallback: remove everything after the last hyphen
+  const lastHyphenIndex = filenameWithoutExt.lastIndexOf('-');
+  
+  if (lastHyphenIndex === -1) {
+    return exportFilename; // No hyphen found, return as-is (backward compatibility)
+  }
+  
+  const originalBasename = filenameWithoutExt.substring(0, lastHyphenIndex);
+  return originalBasename + extension;
+}
+
+/**
  * Preview case information from ZIP file without importing
  */
 export async function previewCaseImport(zipFile: File, currentUser: User): Promise<CaseImportPreview> {
@@ -214,6 +277,7 @@ export async function previewCaseImport(zipFile: File, currentUser: User): Promi
 export async function parseImportZip(zipFile: File, currentUser: User): Promise<{
   caseData: CaseExportData;
   imageFiles: { [filename: string]: Blob };
+  imageIdMapping: { [exportFilename: string]: string }; // exportFilename -> originalImageId
   metadata?: any;
   cleanedContent?: string; // Add cleaned content for hash validation
 }> {
@@ -279,17 +343,24 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
       throw new Error('Case export missing exporter UID information. This case cannot be imported.');
     }
     
-    // Extract image files
+    // Extract image files and create ID mapping
     const imageFiles: { [filename: string]: Blob } = {};
+    const imageIdMapping: { [exportFilename: string]: string } = {};
     const imagesFolder = zip.folder('images');
     
     if (imagesFolder) {
       for (const [, file] of Object.entries(imagesFolder.files)) {
         if (!file.dir && file.name.includes('/')) {
-          const filename = file.name.split('/').pop();
-          if (filename) {
+          const exportFilename = file.name.split('/').pop();
+          if (exportFilename) {
             const blob = await file.async('blob');
-            imageFiles[filename] = blob;
+            imageFiles[exportFilename] = blob;
+            
+            // Extract original image ID from filename
+            const originalImageId = extractImageIdFromFilename(exportFilename);
+            if (originalImageId) {
+              imageIdMapping[exportFilename] = originalImageId;
+            }
           }
         }
       }
@@ -307,6 +378,7 @@ export async function parseImportZip(zipFile: File, currentUser: User): Promise<
     return {
       caseData,
       imageFiles,
+      imageIdMapping,
       metadata,
       cleanedContent
     };

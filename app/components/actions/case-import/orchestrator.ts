@@ -129,7 +129,7 @@ export async function importCaseForReview(
     onProgress?.('Parsing ZIP file', 10, 'Extracting archive contents...');
     
     // Step 1: Parse ZIP file
-    const { caseData, imageFiles, metadata, cleanedContent } = await parseImportZip(zipFile, user);
+    const { caseData, imageFiles, imageIdMapping, metadata, cleanedContent } = await parseImportZip(zipFile, user);
     result.caseNumber = caseData.metadata.caseNumber;
     importState.caseNumber = result.caseNumber;
     
@@ -223,31 +223,38 @@ export async function importCaseForReview(
     
     onProgress?.('Uploading images', 30, 'Processing image files...');
     
-    // Step 3: Upload all image files and create file mapping
-    const fileMapping = new Map<string, string>(); // originalFilename -> newFileId
-    const originalImageIdMapping = new Map<string, string>(); // originalImageId -> newImageId
+    // Step 3: Upload all image files and create original image ID to new file ID mapping
+    const originalImageIdMapping = new Map<string, string>(); // originalImageId -> newFileId
     const importedFiles = [];
     
     let uploadedCount = 0;
     const totalImages = Object.keys(imageFiles).length;
     
-    for (const [filename, blob] of Object.entries(imageFiles)) {
+    for (const [exportFilename, blob] of Object.entries(imageFiles)) {
       try {
-        // Find the original image ID from the case data
-        const originalFileEntry = caseData.files.find(f => f.fileData.originalFilename === filename);
-        const originalImageId = originalFileEntry?.fileData.id;
+        // Get the original image ID from the filename
+        const originalImageId = imageIdMapping[exportFilename];
         
-        const fileData = await uploadImageBlob(blob, filename, (fname, progress) => {
+        if (!originalImageId) {
+          console.warn(`Could not extract image ID from filename: ${exportFilename}`);
+          continue;
+        }
+        
+        // Reconstruct the original filename for display purposes
+        const lastDotIndex = exportFilename.lastIndexOf('.');
+        const filenameWithoutExt = lastDotIndex === -1 ? exportFilename : exportFilename.substring(0, lastDotIndex);
+        const extension = lastDotIndex === -1 ? '' : exportFilename.substring(lastDotIndex);
+        const lastHyphenIndex = filenameWithoutExt.lastIndexOf('-');
+        const displayFilename = lastHyphenIndex === -1 ? exportFilename : 
+          filenameWithoutExt.substring(0, lastHyphenIndex) + extension;
+        
+        const fileData = await uploadImageBlob(blob, displayFilename, (fname, progress) => {
           const overallProgress = 30 + (uploadedCount / totalImages) * 40 + (progress / totalImages) * 0.4;
           onProgress?.('Uploading images', overallProgress, `Uploading ${fname}...`);
         });
         
-        fileMapping.set(filename, fileData.id);
-        
-        // Map original image ID to new image ID
-        if (originalImageId) {
-          originalImageIdMapping.set(originalImageId, fileData.id);
-        }
+        // Map original image ID to new file ID
+        originalImageIdMapping.set(originalImageId, fileData.id);
         
         importedFiles.push(fileData);
         importState.uploadedFiles.push(fileData);
@@ -257,7 +264,7 @@ export async function importCaseForReview(
         onProgress?.('Uploading images', overallProgress, `Uploaded ${uploadedCount}/${totalImages} files`);
         
       } catch (error) {
-        result.errors?.push(`Failed to upload ${filename}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        result.errors?.push(`Failed to upload ${exportFilename}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
     
@@ -277,7 +284,7 @@ export async function importCaseForReview(
     onProgress?.('Importing annotations', 85, 'Processing annotations...');
     
     // Step 5: Import annotations
-    result.annotationsImported = await importAnnotations(user, result.caseNumber, caseData, fileMapping);
+    result.annotationsImported = await importAnnotations(user, result.caseNumber, caseData, originalImageIdMapping);
     
     onProgress?.('Updating user profile', 95, 'Finalizing import...');
     

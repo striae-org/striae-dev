@@ -9,6 +9,25 @@ import { exportCaseData } from './core-export';
 import { auditService } from '~/services/audit.service';
 
 /**
+ * Generate export filename with embedded ID to prevent collisions
+ * Format: {originalFilename}-{id}.{extension}
+ * Example: "evidence.jpg" with ID "abc123" becomes "evidence-abc123.jpg"
+ */
+function generateExportFilename(originalFilename: string, id: string): string {
+  const lastDotIndex = originalFilename.lastIndexOf('.');
+  
+  if (lastDotIndex === -1) {
+    // No extension found
+    return `${originalFilename}-${id}`;
+  }
+  
+  const basename = originalFilename.substring(0, lastDotIndex);
+  const extension = originalFilename.substring(lastDotIndex);
+  
+  return `${basename}-${id}${extension}`;
+}
+
+/**
  * Download all cases data as JSON file
  */
 export async function downloadAllCasesAsJSON(user: User, exportData: AllCasesExportData): Promise<void> {
@@ -537,8 +556,10 @@ export async function downloadCaseAsZip(
         try {
           const imageBlob = await fetchImageAsBlob(user, file.fileData, caseNumber);
           if (imageBlob) {
-            imageFolder.file(file.fileData.originalFilename, imageBlob);
-            imageFiles[file.fileData.originalFilename] = imageBlob;
+            // Generate export filename with embedded ID to prevent collisions
+            const exportFilename = generateExportFilename(file.fileData.originalFilename, file.fileData.id);
+            imageFolder.file(exportFilename, imageBlob);
+            imageFiles[exportFilename] = imageBlob;
           }
         } catch (error) {
           console.warn(`Failed to fetch image ${file.fileData.originalFilename}:`, error);
