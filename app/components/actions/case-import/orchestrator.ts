@@ -240,15 +240,11 @@ export async function importCaseForReview(
           continue;
         }
         
-        // Reconstruct the original filename for display purposes
-        const lastDotIndex = exportFilename.lastIndexOf('.');
-        const filenameWithoutExt = lastDotIndex === -1 ? exportFilename : exportFilename.substring(0, lastDotIndex);
-        const extension = lastDotIndex === -1 ? '' : exportFilename.substring(lastDotIndex);
-        const lastHyphenIndex = filenameWithoutExt.lastIndexOf('-');
-        const displayFilename = lastHyphenIndex === -1 ? exportFilename : 
-          filenameWithoutExt.substring(0, lastHyphenIndex) + extension;
+        // Find the original file entry to get the actual original filename
+        const originalFileEntry = caseData.files.find(f => f.fileData.id === originalImageId);
+        const originalFilename = originalFileEntry?.fileData.originalFilename || exportFilename;
         
-        const fileData = await uploadImageBlob(blob, displayFilename, (fname, progress) => {
+        const fileData = await uploadImageBlob(blob, originalFilename, (fname, progress) => {
           const overallProgress = 30 + (uploadedCount / totalImages) * 40 + (progress / totalImages) * 0.4;
           onProgress?.('Uploading images', overallProgress, `Uploading ${fname}...`);
         });
