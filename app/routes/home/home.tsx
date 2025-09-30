@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 import styles from './home.module.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
@@ -19,35 +19,8 @@ export default function Home() {
 
   const handleNoticeClose = () => {
     setNoticeOpen(false);
-  };  
+  };    
   
-  const [timeLeft, setTimeLeft] = useState<string>('');
-
-  useEffect(() => {
-      const launchDate = new Date('2025-10-01T11:00:00-07:00');
-      const updateTimer = () => {
-      const now = new Date();
-      const diff = launchDate.getTime() - now.getTime();
-      if (diff <= 0) {
-        setTimeLeft('00:00:00:00');
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      setTimeLeft(
-        `${days.toString().padStart(2, '0')}:` +
-        `${hours.toString().padStart(2, '0')}:` +
-        `${minutes.toString().padStart(2, '0')}:` +
-        `${seconds.toString().padStart(2, '0')}`
-      );
-    };
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <>
       <div id="top" className={styles.container}>
@@ -67,34 +40,7 @@ export default function Home() {
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>            
-          </div>
-          <div className={styles.subtitle}>
-            <p>Release Candidacy Begins October 1, 2025 @ 11:00 AM MST</p>
-            <br />
-            <br />
-            <a 
-              href="/docs/striae-white-paper.pdf" 
-              download="Striae - White Paper.pdf"
-              className={styles.signInButton}
-            >
-              Striae White Paper
-            </a>
-            <br />
-            <br />
-           <div className={styles.youtubeEmbed}>
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube-nocookie.com/embed/C95Wl0r3zeM?si=GfEYSQdiJs44uujd"
-                title="YouTube video player"                
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
-            </div>
-            Time until candidate release:
-             <pre style={{ fontFamily: 'monospace', fontSize: '2.5rem', margin: '0.5em 0', color: '#FFF', background: 'none', border: 'none' }}>{timeLeft}</pre>            
-          </div>
+          </div>         
           
           <BlogFeed />
           

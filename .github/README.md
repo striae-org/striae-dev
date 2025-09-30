@@ -85,6 +85,11 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-10-01] - *[Release v1.0.0](https://github.com/striae-org/striae/releases/tag/v1.0.0)*
+
+- **🎉 Stable Production Release** - First stable release of Striae marking production readiness after comprehensive beta development and testing. See release notes for full details.
+- **Critical Bug Fixes** - Resolved filename collision handling during case import and fixed file name display issues in import orchestrator
+
 ## [2025-09-28] - *[Release v0.9.28-beta](https://github.com/striae-org/striae/releases/tag/v0.9.28-beta)*
 
 - **Cryptographic Security Enhancement** - Complete migration from CRC32 to SHA-256 for forensic-grade data integrity validation with tamper-proof hash generation
