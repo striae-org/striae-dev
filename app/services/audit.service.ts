@@ -296,7 +296,7 @@ export class AuditService {
     performanceMetrics?: PerformanceMetrics
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
-      selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid === user.uid : false,
+      selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
       fileIntegrityValid: hashValid,
       exporterUidValidated: !!reviewingExaminerUid
     };
