@@ -297,6 +297,9 @@ export class AuditService {
     exporterUidValidated?: boolean, // Separate flag for validation status
     totalConfirmationsInFile?: number // Total confirmations in the import file
   ): Promise<void> {
+    // Debug logging to check what's being received
+    console.log('🔍 Debug: reviewingExaminerUid received in logConfirmationImport:', reviewingExaminerUid);
+    
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
       fileIntegrityValid: hashValid,

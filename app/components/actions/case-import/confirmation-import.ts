@@ -242,6 +242,11 @@ export async function importConfirmationData(
     
     // Log confirmation import audit event
     const endTime = Date.now();
+    
+    // Debug logging to check what's being passed
+    console.log('🔍 Debug: confirmationData.metadata.exportedByUid:', confirmationData.metadata.exportedByUid);
+    console.log('🔍 Debug: confirmationData.metadata:', confirmationData.metadata);
+    
     await auditService.logConfirmationImport(
       user,
       result.caseNumber,
