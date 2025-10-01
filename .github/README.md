@@ -85,6 +85,12 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-10-01] - *[Release v1.0.1](https://github.com/striae-org/striae/releases/tag/v1.0.1)*
+
+- **🔧 Audit System Enhancements** - Improved audit reporting functionality with enhanced text summaries and hover text
+- **📊 Export System Improvements** - Enhanced CSV export formatting and confirmation workflow fixes
+- **🐛 Critical Bug Fixes** - Resolved self-confirmation flag issues and error logging improvements
+
 ## [2025-10-01] - *[Release v1.0.0](https://github.com/striae-org/striae/releases/tag/v1.0.0)*
 
 - **🎉 Stable Production Release** - First stable release of Striae marking production readiness after comprehensive beta development and testing. See release notes for full details.
