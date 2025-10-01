@@ -326,7 +326,6 @@ enum AuditAction {
 
 - **NIST Guidelines**: Follows NIST cybersecurity framework¹ for audit logging
 - **Forensic Standards**: Aligns with OSAC forensic science standards² for evidence handling
-- **Data Retention**: Configurable retention periods for compliance requirements
 - **Export Capabilities**: Multiple export formats for regulatory reporting
 
 **Compliance Monitoring:**
