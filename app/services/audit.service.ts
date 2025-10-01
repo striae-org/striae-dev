@@ -314,7 +314,16 @@ export class AuditService {
       caseNumber,
       workflowPhase: 'confirmation',
       securityChecks,
-      performanceMetrics,
+      performanceMetrics: performanceMetrics ? {
+        ...performanceMetrics,
+        validationStepsCompleted: confirmationsImported,
+        validationStepsFailed: errors.length
+      } : {
+        processingTimeMs: 0,
+        fileSizeBytes: 0,
+        validationStepsCompleted: confirmationsImported,
+        validationStepsFailed: errors.length
+      },
       originalExaminerUid: user.uid,
     });
   }

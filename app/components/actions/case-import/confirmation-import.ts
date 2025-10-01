@@ -248,13 +248,13 @@ export async function importConfirmationData(
       confirmationFile.name,
       result.success ? (result.errors && result.errors.length > 0 ? 'warning' : 'success') : 'failure',
       hashValid,
-      result.confirmationsImported,
+      confirmationData.metadata.totalConfirmations, // Use total from JSON metadata
       result.errors || [],
       confirmationData.metadata.exportedByUid,
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: confirmationFile.size,
-        validationStepsCompleted: result.confirmationsImported,
+        validationStepsCompleted: confirmationData.metadata.totalConfirmations,
         validationStepsFailed: result.errors ? result.errors.length : 0
       },
       true // exporterUidValidated - true for successful imports
@@ -276,16 +276,24 @@ export async function importConfirmationData(
     let hashValidForAudit = true;
     let exporterUidValidatedForAudit = true;
     let reviewingExaminerUidForAudit: string | undefined = undefined;
+    let totalConfirmationsForAudit = 0; // Default to 0 for failed imports
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     if (errorMessage.includes('hash validation failed')) {
       // Hash failed - only flag file integrity, don't affect other validations
       hashValidForAudit = false;
-      // Don't pass reviewingExaminerUid - we can't trust data from corrupted file
+      // Don't pass reviewingExaminerUid or extract data - we can't trust data from corrupted file
       // exporterUidValidatedForAudit stays true - we didn't test this validation
     } else if (errorMessage.includes('does not exist in the user database')) {
       // Exporter UID validation failed - only flag this check
       exporterUidValidatedForAudit = false;
+      // Hash validation would have passed to get this far, so we can trust the JSON structure
+      try {
+        const confirmationData: any = JSON.parse(await confirmationFile.text());
+        totalConfirmationsForAudit = confirmationData.metadata?.totalConfirmations || 0;
+      } catch {
+        // If we can't parse the file, keep default values
+      }
       // Don't pass reviewingExaminerUid - the UID failed validation
       // Hash validation would have passed to get this far, so hashValidForAudit stays true
     } else if (errorMessage.includes('cannot import confirmation data that you exported yourself')) {
@@ -293,6 +301,7 @@ export async function importConfirmationData(
       try {
         const confirmationData: any = JSON.parse(await confirmationFile.text());
         reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
+        totalConfirmationsForAudit = confirmationData.metadata?.totalConfirmations || 0;
         // This is the only case where we pass the UID because self-confirmation was actually detected
       } catch {
         // If we can't parse the file, keep undefined
@@ -305,7 +314,7 @@ export async function importConfirmationData(
       confirmationFile.name,
       'failure',
       hashValidForAudit,
-      0,
+      totalConfirmationsForAudit, // Use extracted total from JSON metadata
       result.errors || [],
       reviewingExaminerUidForAudit,
       {
