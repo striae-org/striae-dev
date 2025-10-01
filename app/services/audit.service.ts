@@ -326,6 +326,7 @@ export class AuditService {
         validationStepsFailed: errors.length
       },
       originalExaminerUid: user.uid,
+      reviewingExaminerUid: reviewingExaminerUid, // Pass through the reviewing examiner UID
       // Store total confirmations in file using caseDetails
       caseDetails: totalConfirmationsInFile !== undefined ? {
         totalAnnotations: totalConfirmationsInFile // Total confirmations in the import file
