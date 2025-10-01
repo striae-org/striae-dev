@@ -183,12 +183,27 @@ export class AuditExportService {
     const securityChecks = entry.details.securityChecks;
     const userProfileDetails = entry.details.userProfileDetails;
     
-    // Calculate security check status
-    const securityIssues = securityChecks ? 
-      Object.entries(securityChecks)
-        .filter(([_, passed]) => !passed)
-        .map(([check, _]) => check)
-        .join('; ') : '';
+    // Calculate security check status - different checks have different semantics
+    const securityIssues = securityChecks ? (() => {
+      const issues = [];
+      
+      // selfConfirmationPrevented: true means issue (prevention was triggered)
+      if (securityChecks.selfConfirmationPrevented === true) {
+        issues.push('selfConfirmationPrevented');
+      }
+      
+      // fileIntegrityValid: false means issue (file integrity failed)
+      if (securityChecks.fileIntegrityValid === false) {
+        issues.push('fileIntegrityValid');
+      }
+      
+      // exporterUidValidated: false means issue (validation failed)
+      if (securityChecks.exporterUidValidated === false) {
+        issues.push('exporterUidValidated');
+      }
+      
+      return issues.join('; ');
+    })() : '';
 
     const values = [
       this.formatForCSV(entry.timestamp),
