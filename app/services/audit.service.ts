@@ -293,12 +293,13 @@ export class AuditService {
     confirmationsImported: number,
     errors: string[] = [],
     reviewingExaminerUid?: string,
-    performanceMetrics?: PerformanceMetrics
+    performanceMetrics?: PerformanceMetrics,
+    exporterUidValidated?: boolean // Separate flag for validation status
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
       fileIntegrityValid: hashValid,
-      exporterUidValidated: !!reviewingExaminerUid
+      exporterUidValidated: exporterUidValidated !== undefined ? exporterUidValidated : !!reviewingExaminerUid
     };
 
     await this.logEvent({

@@ -256,7 +256,8 @@ export async function importConfirmationData(
         fileSizeBytes: confirmationFile.size,
         validationStepsCompleted: result.confirmationsImported,
         validationStepsFailed: result.errors ? result.errors.length : 0
-      }
+      },
+      true // exporterUidValidated - true for successful imports
     );
     
     auditService.endWorkflow();
@@ -270,19 +271,58 @@ export async function importConfirmationData(
     
     // Log failed confirmation import
     const endTime = Date.now();
+    
+    // Determine what validation failed based on error message - each check is independent
+    let hashValidForAudit = true;
+    let exporterUidValidatedForAudit = true;
+    let reviewingExaminerUidForAudit: string | undefined = undefined;
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    if (errorMessage.includes('hash validation failed')) {
+      // Hash failed - only flag file integrity, don't affect other validations
+      hashValidForAudit = false;
+      // We can still extract the exporter UID from the file for tracking purposes
+      try {
+        const confirmationData: any = JSON.parse(await confirmationFile.text());
+        reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
+        // exporterUidValidatedForAudit stays true - we didn't test this validation
+      } catch {
+        // If we can't parse the file, keep undefined
+      }
+    } else if (errorMessage.includes('does not exist in the user database')) {
+      // Exporter UID validation failed - only flag this check
+      exporterUidValidatedForAudit = false;
+      // Hash validation would have passed to get this far, so hashValidForAudit stays true
+      try {
+        const confirmationData: any = JSON.parse(await confirmationFile.text());
+        reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
+      } catch {
+        // If we can't parse the file, keep undefined
+      }
+    } else if (errorMessage.includes('cannot import confirmation data that you exported yourself')) {
+      // Self-confirmation attempt - all validations technically passed except the self-check
+      try {
+        const confirmationData: any = JSON.parse(await confirmationFile.text());
+        reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
+      } catch {
+        // If we can't parse the file, keep undefined
+      }
+    }
+    
     await auditService.logConfirmationImport(
       user,
       result.caseNumber || 'unknown',
       confirmationFile.name,
       'failure',
-      false,
+      hashValidForAudit,
       0,
       result.errors || [],
-      undefined,
+      reviewingExaminerUidForAudit,
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: confirmationFile.size
-      }
+      },
+      exporterUidValidatedForAudit
     );
     
     auditService.endWorkflow();
