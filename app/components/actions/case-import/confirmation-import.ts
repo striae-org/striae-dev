@@ -248,16 +248,17 @@ export async function importConfirmationData(
       confirmationFile.name,
       result.success ? (result.errors && result.errors.length > 0 ? 'warning' : 'success') : 'failure',
       hashValid,
-      confirmationData.metadata.totalConfirmations, // Use total from JSON metadata
+      result.confirmationsImported, // Successfully imported confirmations
       result.errors || [],
       confirmationData.metadata.exportedByUid,
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: confirmationFile.size,
-        validationStepsCompleted: confirmationData.metadata.totalConfirmations,
+        validationStepsCompleted: result.confirmationsImported, // Successfully imported
         validationStepsFailed: result.errors ? result.errors.length : 0
       },
-      true // exporterUidValidated - true for successful imports
+      true, // exporterUidValidated - true for successful imports
+      confirmationData.metadata.totalConfirmations // Total confirmations in file
     );
     
     auditService.endWorkflow();
@@ -314,14 +315,15 @@ export async function importConfirmationData(
       confirmationFile.name,
       'failure',
       hashValidForAudit,
-      totalConfirmationsForAudit, // Use extracted total from JSON metadata
+      0, // No confirmations successfully imported for failures
       result.errors || [],
       reviewingExaminerUidForAudit,
       {
         processingTimeMs: endTime - startTime,
         fileSizeBytes: confirmationFile.size
       },
-      exporterUidValidatedForAudit
+      exporterUidValidatedForAudit,
+      totalConfirmationsForAudit // Total confirmations in file (when extractable)
     );
     
     auditService.endWorkflow();
