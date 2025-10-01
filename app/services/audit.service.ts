@@ -293,12 +293,14 @@ export class AuditService {
     confirmationsImported: number,
     errors: string[] = [],
     reviewingExaminerUid?: string,
-    performanceMetrics?: PerformanceMetrics
+    performanceMetrics?: PerformanceMetrics,
+    exporterUidValidated?: boolean, // Separate flag for validation status
+    totalConfirmationsInFile?: number // Total confirmations in the import file
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
       selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid === user.uid : false,
       fileIntegrityValid: hashValid,
-      exporterUidValidated: !!reviewingExaminerUid
+      exporterUidValidated: exporterUidValidated !== undefined ? exporterUidValidated : !!reviewingExaminerUid
     };
 
     await this.logEvent({
@@ -313,8 +315,22 @@ export class AuditService {
       caseNumber,
       workflowPhase: 'confirmation',
       securityChecks,
-      performanceMetrics,
+      performanceMetrics: performanceMetrics ? {
+        ...performanceMetrics,
+        validationStepsCompleted: confirmationsImported, // Successfully imported
+        validationStepsFailed: errors.length
+      } : {
+        processingTimeMs: 0,
+        fileSizeBytes: 0,
+        validationStepsCompleted: confirmationsImported, // Successfully imported
+        validationStepsFailed: errors.length
+      },
       originalExaminerUid: user.uid,
+      reviewingExaminerUid: reviewingExaminerUid, // Pass through the reviewing examiner UID
+      // Store total confirmations in file using caseDetails
+      caseDetails: totalConfirmationsInFile !== undefined ? {
+        totalAnnotations: totalConfirmationsInFile // Total confirmations in the import file
+      } : undefined
     });
   }
 

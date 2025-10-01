@@ -367,6 +367,13 @@ async function handleDeleteUser(env: Env, userUid: string): Promise<Response> {
       }
     }
     
+    // Delete all user's read-only cases
+    if (userObject.readOnlyCases && userObject.readOnlyCases.length > 0) {
+      for (const readOnlyCaseItem of userObject.readOnlyCases) {
+        await deleteSingleCase(env, userUid, readOnlyCaseItem.caseNumber);
+      }
+    }
+    
     // Send deletion emails before deleting the account
     await sendDeletionEmails(env, userObject);
     
