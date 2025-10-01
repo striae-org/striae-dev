@@ -298,7 +298,7 @@ export class AuditService {
     totalConfirmationsInFile?: number // Total confirmations in the import file
   ): Promise<void> {
     const securityChecks: SecurityCheckResults = {
-      selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid !== user.uid : false,
+      selfConfirmationPrevented: reviewingExaminerUid ? reviewingExaminerUid === user.uid : false,
       fileIntegrityValid: hashValid,
       exporterUidValidated: exporterUidValidated !== undefined ? exporterUidValidated : !!reviewingExaminerUid
     };
