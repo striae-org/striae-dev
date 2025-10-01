@@ -281,29 +281,19 @@ export async function importConfirmationData(
     if (errorMessage.includes('hash validation failed')) {
       // Hash failed - only flag file integrity, don't affect other validations
       hashValidForAudit = false;
-      // We can still extract the exporter UID from the file for tracking purposes
-      try {
-        const confirmationData: any = JSON.parse(await confirmationFile.text());
-        reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
-        // exporterUidValidatedForAudit stays true - we didn't test this validation
-      } catch {
-        // If we can't parse the file, keep undefined
-      }
+      // Don't pass reviewingExaminerUid - we can't trust data from corrupted file
+      // exporterUidValidatedForAudit stays true - we didn't test this validation
     } else if (errorMessage.includes('does not exist in the user database')) {
       // Exporter UID validation failed - only flag this check
       exporterUidValidatedForAudit = false;
+      // Don't pass reviewingExaminerUid - the UID failed validation
       // Hash validation would have passed to get this far, so hashValidForAudit stays true
-      try {
-        const confirmationData: any = JSON.parse(await confirmationFile.text());
-        reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
-      } catch {
-        // If we can't parse the file, keep undefined
-      }
     } else if (errorMessage.includes('cannot import confirmation data that you exported yourself')) {
       // Self-confirmation attempt - all validations technically passed except the self-check
       try {
         const confirmationData: any = JSON.parse(await confirmationFile.text());
         reviewingExaminerUidForAudit = confirmationData.metadata?.exportedByUid;
+        // This is the only case where we pass the UID because self-confirmation was actually detected
       } catch {
         // If we can't parse the file, keep undefined
       }
