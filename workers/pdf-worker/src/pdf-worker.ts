@@ -609,20 +609,11 @@ export default {
         const document = generateDocument(data);
         await page.setContent(document);
 
-        // Generate PDF with security restrictions - no editing allowed
-        const ownerPassword = `striae-forensic-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        // Generate PDF
         const pdfBuffer = await page.pdf({ 
           printBackground: true,
           format: 'letter',
-          margin: { top: '0.5in', bottom: '0.5in', left: '0.5in', right: '0.5in' },
-          // PDF Security - completely disable editing, only allow viewing and printing
-          userPassword: '', // No password required to open
-          ownerPassword: ownerPassword, // Random password to prevent editing permissions
-          permissions: [
-            'printing' // Only allow printing - no editing, copying, or annotations
-          ],
-          accessibilityExtraction: true, // Allow screen readers for compliance
-          tagged: false // Minimal PDF structure to prevent manipulation
+          margin: { top: '0.5in', bottom: '0.5in', left: '0.5in', right: '0.5in' }
         });
 
         await browser.close();
