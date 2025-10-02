@@ -267,8 +267,8 @@ export const Login = () => {
       }
       
       setError('');
-      setSuccess('Account created successfully! Please check your email to verify your account before signing in.');
-      handleSignOut();
+      setSuccess('Account created successfully! Please check your email to verify your account.');
+      // Don't sign out - let user stay logged in but unverified to see verification screen
     } else {
       // Login
       try {
