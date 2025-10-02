@@ -386,7 +386,8 @@ export const Login = () => {
             error={error}
             success={success}
             onError={setError}
-            onSuccess={setSuccess}            
+            onSuccess={setSuccess}
+            onSignOut={handleSignOut}            
           />
         )
       ) : isResetting ? (

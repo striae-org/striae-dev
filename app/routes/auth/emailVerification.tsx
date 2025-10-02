@@ -6,6 +6,7 @@ import styles from './login.module.css';
 
 interface EmailVerificationProps {
   user: User;  
+  onSignOut: () => void; // This will sign out the user and show the login form
   error?: string;
   success?: string;
   onError: (error: string) => void;
@@ -14,6 +15,7 @@ interface EmailVerificationProps {
 
 export const EmailVerification = ({
   user,  
+  onSignOut,
   error,
   success,
   onError,
@@ -95,12 +97,12 @@ export const EmailVerification = ({
           >
             {isResending ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Verification Email'}
           </button>
-          <Link 
-            to="/auth"
-            className={styles.secondaryButtonLink}
+          <button 
+            onClick={onSignOut}
+            className={styles.secondaryButton}
           >
             Login to Striae
-          </Link>
+          </button>
         </div>
         
         <div className={styles.verificationHints}>
