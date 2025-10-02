@@ -14,6 +14,7 @@ const MAX_NAME_LENGTH = 128;
 
 interface ActionData {
     success?: boolean;
+    message?: string;
     errors?: {
       firstName?: string;
       lastName?: string;
@@ -195,7 +196,10 @@ export async function action({ request, context }: { request: Request, context: 
       throw new Error('Failed to send email');
     }
 
-    return redirect('/auth');
+    return json<ActionData>({
+      success: true,
+      message: 'Your agency registration has been submitted successfully! Please look for a confirmation email once your agency has been registered for access.'
+    });
   } catch (error) {
     console.error('Error:', error);
     return json({ errors: { email: 'Failed to submit. Please try again.' } }, { status: 500 });
@@ -244,6 +248,13 @@ export const Signup = () => {
         notice={signupNotice}
       />
       <Form method="post" className={styles.form}>
+        {actionData?.success ? (
+          <div className={styles.successMessage}>
+            <h2>Registration Submitted!</h2>
+            <p>{actionData.message}</p>            
+          </div>
+        ) : (
+          <>
           <input
             type="text"
             name="firstName"
@@ -350,6 +361,8 @@ export const Signup = () => {
               ? 'Submitting...' 
               : 'Register Agency'}
         </button>
+        </>
+        )}
       </Form>
       </div>
     </div>
