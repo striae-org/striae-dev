@@ -5,10 +5,24 @@ import { verifyTurnstileToken } from '~/utils/turnstile';
 import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { BaseForm, FormField, FormMessage, FormButton } from '~/components/form';
+import freeEmailDomains from 'free-email-domains';
 import styles from './bugs.module.css';
 
 const MAX_NAME_LENGTH = 128;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Email validation with regex and domain checking
+const validateEmailDomain = (email: string): boolean => {
+  // Email regex pattern for basic validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  // First check if email format is valid
+  if (!emailRegex.test(email)) {
+    return false;
+  }
+  
+  const emailDomain = email.toLowerCase().split('@')[1];
+  return !!emailDomain && !freeEmailDomains.includes(emailDomain);
+};
 
 interface ActionData {
     success?: boolean;
@@ -44,8 +58,8 @@ export async function action({ request, context }: { request: Request, context: 
   if (!name || name.length > MAX_NAME_LENGTH) {
     errors.name = 'Please enter a valid name';
   }
-  if (!email || !EMAIL_PATTERN.test(email)) {
-    errors.email = 'Please enter a valid email address';
+  if (!email || !validateEmailDomain(email)) {
+    errors.email = 'Please use a work email address. Personal email providers (Gmail, Yahoo, etc.) are not allowed';
   }
   if (!description || description.length < 10) {
     errors.description = 'Please provide a detailed description';
