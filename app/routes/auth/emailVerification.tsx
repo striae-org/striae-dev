@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from '@remix-run/react';
+import { Link, useNavigate } from '@remix-run/react';
 import { sendEmailVerification, User } from 'firebase/auth';
 import { auditService } from '~/services/audit.service';
 import styles from './login.module.css';
@@ -23,6 +23,7 @@ export const EmailVerification = ({
 }: EmailVerificationProps) => {
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const navigate = useNavigate();
 
   const handleResendVerification = async () => {
     if (!user || resendCooldown > 0 || isResending) return;
@@ -51,6 +52,11 @@ export const EmailVerification = ({
       }
       
       onSuccess('Verification email sent! Please check your inbox and spam folder.');
+      
+      // Redirect to /auth route after successful resend
+      setTimeout(() => {
+        navigate('/auth');
+      }, 2000); // Give user time to see the success message
       
       // Add 60-second cooldown to prevent spam
       setResendCooldown(60);
