@@ -382,12 +382,11 @@ export const Login = () => {
           <Striae user={user} />
         ) : (
           <EmailVerification 
-            user={user}
-            onSignOut={handleSignOut}
+            user={user}            
             error={error}
             success={success}
             onError={setError}
-            onSuccess={setSuccess}
+            onSuccess={setSuccess}            
           />
         )
       ) : isResetting ? (

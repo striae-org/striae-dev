@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Link, useNavigate } from '@remix-run/react';
+import { Link } from '@remix-run/react';
 import { sendEmailVerification, User } from 'firebase/auth';
 import { auditService } from '~/services/audit.service';
 import styles from './login.module.css';
 
 interface EmailVerificationProps {
-  user: User;
-  onSignOut: () => void;
+  user: User;  
   error?: string;
   success?: string;
   onError: (error: string) => void;
@@ -14,16 +13,14 @@ interface EmailVerificationProps {
 }
 
 export const EmailVerification = ({
-  user,
-  onSignOut,
+  user,  
   error,
   success,
   onError,
   onSuccess
 }: EmailVerificationProps) => {
   const [isResending, setIsResending] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const navigate = useNavigate();
+  const [resendCooldown, setResendCooldown] = useState(0);  
 
   const handleResendVerification = async () => {
     if (!user || resendCooldown > 0 || isResending) return;
@@ -71,11 +68,7 @@ export const EmailVerification = ({
     } finally {
       setIsResending(false);
     }
-  };
-
-  const handleLoginRedirect = () => {
-    navigate('/auth');
-  };
+  };  
 
   return (
     <div className={styles.container}>
@@ -102,12 +95,12 @@ export const EmailVerification = ({
           >
             {isResending ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Verification Email'}
           </button>
-          <button 
-            onClick={handleLoginRedirect}
+          <Link 
+            to="/auth"
             className={styles.secondaryButton}
           >
             Login to Striae
-          </button>
+          </Link>
         </div>
         
         <div className={styles.verificationHints}>
