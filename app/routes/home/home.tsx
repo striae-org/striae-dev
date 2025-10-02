@@ -38,7 +38,7 @@ export default function Home() {
               Sign In
             </a>
             <Link 
-              to="/access"
+              to="/access#top"
               viewTransition
               className={styles.actionButton}>
               Register for Access

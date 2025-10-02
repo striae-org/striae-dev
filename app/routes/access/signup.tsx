@@ -186,7 +186,7 @@ export const Signup = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div id="top" className={styles.container}>
       <Link 
         to="/#top"
         viewTransition
