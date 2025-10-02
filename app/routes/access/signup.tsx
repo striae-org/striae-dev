@@ -250,8 +250,8 @@ export const Signup = () => {
       <Form method="post" className={styles.form}>
         {actionData?.success ? (
           <div className={styles.successMessage}>
-            <h2>Registration Submitted!</h2>
-            <p>{actionData.message}</p>            
+            <h2><strong>Registration Submitted!</strong></h2>
+            <p>{actionData.message}</p>
           </div>
         ) : (
           <>

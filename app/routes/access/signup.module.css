@@ -185,6 +185,50 @@
   margin: 0;
 }
 
+.successMessage {
+  text-align: center;
+  padding: var(--spaceXL);
+  margin-top: var(--spaceM);
+  background: color-mix(in lab, var(--success) 10%, transparent);
+  border: 1px solid color-mix(in lab, var(--success) 25%, transparent);
+  border-radius: var(--spaceS);
+  color: var(--success);
+  animation: fadeIn var(--durationM) var(--bezierFastoutSlowin);
+  box-shadow: 0 2px 8px color-mix(in lab, var(--success) 15%, transparent);
+}
+
+.successMessage h2 {
+  font-size: var(--fontSizeH4);
+  font-weight: var(--fontWeightSemibold);
+  margin: 0 0 var(--spaceM) 0;
+  color: var(--success);
+}
+
+.successMessage p {
+  font-size: var(--fontSizeBodyS);
+  line-height: var(--lineHeightBody);
+  margin: 0 0 var(--spaceL) 0;
+  color: color-mix(in lab, var(--success) 85%, var(--black));
+}
+
+.successMessage .button {
+  background-color: var(--success);
+  color: var(--white);
+  border: none;
+  padding: var(--spaceM) var(--spaceXL);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.successMessage .button:hover {
+  background-color: color-mix(in lab, var(--success) 85%, var(--black));
+}
+
 .noticeButton {
   display: block;
   width: fit-content;
