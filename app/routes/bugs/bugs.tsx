@@ -85,7 +85,7 @@ export async function action({ request, context }: { request: Request, context: 
       body: JSON.stringify({
         "from": {
           "name": "Striae Bug Report",
-          "email": "no-reply@striae.org"
+          "email": "info@striae.org"
         },
         "to": [
           {

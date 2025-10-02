@@ -172,7 +172,7 @@ async function sendDeletionEmails(env: Env, userData: UserData): Promise<boolean
     const userEmailData: EmailData = {
       from: {
         name: "Striae Account Services",
-        email: "no-reply@striae.org"
+        email: "info@striae.org"
       },
       to: [
         {
@@ -235,7 +235,7 @@ The Striae Team`,
     const supportEmailData: EmailData = {
       from: {
         name: "Striae Account Services",
-        email: "no-reply@striae.org"
+        email: "info@striae.org"
       },
       to: [
         {
