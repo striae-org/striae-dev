@@ -12,6 +12,7 @@ import { handleAuthError, getValidationError } from '~/services/firebase-errors'
 import { SignOut } from '~/components/actions/signout';
 import { auditService } from '~/services/audit.service';
 import styles from './mfa-enrollment.module.css';
+import formStyles from '~/components/form/form.module.css';
 
 interface MFAEnrollmentProps {
   user: User;
@@ -272,8 +273,8 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={formStyles.modalOverlay}>
+      <div className={formStyles.modal}>
         <div className={styles.header}>
           <h2>Security Setup Required</h2>
           <p>
@@ -286,7 +287,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
 
         <div className={styles.content}>
           {errorMessage && (
-            <div className={styles.errorMessage}>
+            <div className={formStyles.error}>
               {errorMessage}
             </div>
           )}
@@ -302,7 +303,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                   if (errorMessage) setErrorMessage(''); // Clear error on input
                 }}
                 placeholder="ex. +15551234567"
-                className={styles.input}
+                className={formStyles.input}
                 disabled={isLoading}
               />
               <p className={styles.note}>
@@ -311,7 +312,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
               <button
                 onClick={sendVerificationCode}
                 disabled={isLoading || !phoneNumber.trim()}
-                className={styles.primaryButton}
+                className={`${formStyles.button} ${formStyles.buttonPrimary}`}
               >
                 {isLoading ? 'Sending...' : 'Send Verification Code'}
               </button>
@@ -331,7 +332,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                 }}
                 placeholder="123456"
                 maxLength={6}
-                className={styles.input}
+                className={formStyles.input}
                 disabled={isLoading}
               />
               
@@ -339,7 +340,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                 <button
                   onClick={enrollMFA}
                   disabled={isLoading || verificationCode.length !== 6}
-                  className={styles.primaryButton}
+                  className={`${formStyles.button} ${formStyles.buttonPrimary}`}
                 >
                   {isLoading ? 'Verifying...' : 'Complete Setup'}
                 </button>
@@ -351,7 +352,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                     setErrorMessage(''); // Clear errors when changing phone number
                   }}
                   disabled={isLoading}
-                  className={styles.secondaryButton}
+                  className={`${formStyles.button} ${formStyles.buttonSecondary}`}
                 >
                   Change Phone Number
                 </button>
@@ -360,7 +361,7 @@ export const MFAEnrollment: React.FC<MFAEnrollmentProps> = ({
                   <button
                     onClick={sendVerificationCode}
                     disabled={isLoading}
-                    className={styles.secondaryButton}
+                    className={`${formStyles.button} ${formStyles.buttonSecondary}`}
                   >
                     Resend Code
                   </button>

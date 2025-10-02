@@ -5,6 +5,7 @@ import { auth } from '~/services/firebase';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
 import { auditService } from '~/services/audit.service';
 import styles from './passwordReset.module.css';
+import formStyles from '~/components/form/form.module.css';
 
 interface PasswordResetProps {
   isModal?: boolean;
@@ -58,24 +59,24 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
   };
 
   const FormContent = (
-    <form ref={formRef} onSubmit={handleReset} className={styles.form}>
+    <form ref={formRef} onSubmit={handleReset} className={formStyles.form}>
       <h2 className={styles.title}>Reset Password</h2>
       <input
         type="email"
         name="email"
         placeholder="Email"
         autoComplete="email"
-        className={styles.input}
+        className={formStyles.input}
         required
       />
-      {error && <p className={styles.error}>{error}</p>}
-      <button type="submit" className={styles.button} disabled={isLoading}>
+      {error && <p className={formStyles.error}>{error}</p>}
+      <button type="submit" className={`${formStyles.button} ${formStyles.buttonPrimary}`} disabled={isLoading}>
         {isLoading ? 'Sending...' : 'Send Reset Link'}
       </button>
       <button 
         type="button" 
         onClick={onBack}
-        className={styles.secondaryButton}
+        className={`${formStyles.button} ${formStyles.buttonSecondary}`}
       >
         Back
       </button>
@@ -84,8 +85,8 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
 
   if (isModal) {
     return (
-      <div className={styles.modalOverlay}>
-        <div className={styles.modal}>          
+      <div className={formStyles.modalOverlay}>
+        <div className={formStyles.modal}>          
           {FormContent}
         </div>
       </div>

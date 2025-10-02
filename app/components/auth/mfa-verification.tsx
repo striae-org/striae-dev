@@ -12,6 +12,7 @@ import { SignOut } from '~/components/actions/signout';
 import { auditService } from '~/services/audit.service';
 import { generateUniqueId } from '~/utils/id-generator';
 import styles from './mfa-verification.module.css';
+import formStyles from '~/components/form/form.module.css';
 
 interface MFAVerificationProps {
   resolver: MultiFactorResolver;
@@ -178,12 +179,12 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.modal}>
+    <div className={formStyles.modalOverlay}>
+      <div className={formStyles.modal}>
         <h2 className={styles.title}>Two-Factor Authentication Required</h2>
         
         {errorMessage && (
-          <div className={styles.errorMessage}>
+          <div className={formStyles.error}>
             {errorMessage}
           </div>
         )}
@@ -218,7 +219,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
             <button 
               onClick={sendVerificationCode} 
               disabled={loading}
-              className={styles.button}
+              className={`${formStyles.button} ${formStyles.buttonPrimary}`}
             >
               {loading ? 'Sending...' : 'Send Verification Code'}
             </button>
@@ -236,14 +237,14 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
                 setVerificationCode(e.target.value);
                 if (errorMessage) setErrorMessage(''); // Clear error on input
               }}
-              className={styles.input}
+              className={formStyles.input}
               maxLength={6}
             />
             <div className={styles.buttons}>
               <button 
                 onClick={verifyCode} 
                 disabled={loading || verificationCode.length !== 6}
-                className={styles.button}
+                className={`${formStyles.button} ${formStyles.buttonPrimary}`}
               >
                 {loading ? 'Verifying...' : 'Verify Code'}
               </button>
@@ -254,7 +255,7 @@ export const MFAVerification = ({ resolver, onSuccess, onError, onCancel }: MFAV
                   setVerificationId('');
                   setErrorMessage(''); // Clear errors when requesting new code
                 }}
-                className={styles.secondaryButton}
+                className={`${formStyles.button} ${formStyles.buttonSecondary}`}
               >
                 Send New Code
               </button>

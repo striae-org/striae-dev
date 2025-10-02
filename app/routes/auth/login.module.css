@@ -42,30 +42,9 @@
   font-size: var(--fontSizeH4);
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spaceM);
-}
+/* Use form component .form class */
 
-.input {
-  padding: var(--spaceM);
-  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
-  border-radius: var(--spaceXS);
-  font-size: var(--fontSizeBodyM);
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
-}
-
-.input:disabled {
-  background-color: color-mix(in lab, var(--background) 95%, transparent);
-  cursor: not-allowed;
-}
+/* Use form component styles - see form.module.css */
 
 .passwordField {
   position: relative;
@@ -74,9 +53,27 @@
   width: 100%;
 }
 
-.passwordField .input {
+/* Password input that extends form component styling */
+.passwordInput {
+  padding: var(--spaceM);
   padding-right: var(--space2XL);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  font-family: inherit;
   width: 100%;
+}
+
+.passwordInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
+}
+
+.passwordInput:disabled {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  cursor: not-allowed;
 }
 
 .passwordToggle {
@@ -106,56 +103,9 @@
   outline-offset: 2px;
 }
 
-.button {
-  padding: var(--spaceM) var(--spaceL);
-  border-radius: var(--spaceXS);
-  font-size: var(--fontSizeBodyS);
-  cursor: pointer;
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-}
+/* Use form component .button and .buttonPrimary classes */
 
-.button:hover:not(:disabled) {
-  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
-}
-
-.button:disabled {
-  background-color: color-mix(in lab, var(--background) 95%, transparent);
-  color: var(--textLight);
-  cursor: not-allowed;
-}
-
-.error {
-  color: color-mix(in lab, var(--error) 90%, var(--black));
-  text-align: left;
-  margin: var(--spaceXS) 0 var(--spaceS) 0;
-  font-size: var(--fontSizeBodyXS);
-  padding: var(--spaceS) var(--spaceM);
-  background: linear-gradient(135deg, 
-    color-mix(in lab, var(--error) 12%, transparent),
-    color-mix(in lab, var(--error) 8%, transparent)
-  );
-  border-radius: var(--spaceXS);
-  border: 1px solid color-mix(in lab, var(--error) 30%, transparent);
-  border-left: 3px solid var(--error);
-  animation: slideInError var(--durationS) var(--bezierFastoutSlowin);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 8px color-mix(in lab, var(--text) 8%, transparent);
-}
-
-.error::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--error);
-  animation: errorPulse 1.5s ease-in-out infinite;
-}
+/* Use form component .error class */
 
 .hint {
   color: var(--textLight);
@@ -318,13 +268,4 @@
   }
 }
 
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .error {
-    animation: none;
-  }
-  
-  .error::before {
-    animation: none;
-  }
-}
+/* Use form component animations - see form.module.css */
