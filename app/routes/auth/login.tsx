@@ -20,7 +20,6 @@ import { MFAEnrollment } from '~/components/auth/mfa-enrollment';
 import { Icon } from '~/components/icon/icon';
 import { Notice } from '~/components/notice/notice';
 import styles from './login.module.css';
-import formStyles from '~/components/form/form.module.css';
 import { baseMeta } from '~/utils/meta';
 import { Striae } from '~/routes/striae/striae';
 import { getUserData, createUser } from '~/utils/permissions';
@@ -377,7 +376,7 @@ export const Login = () => {
             <p>Please check your email and verify your account before continuing.</p>
             <button 
               onClick={handleSignOut}
-              className={`${formStyles.button} ${formStyles.buttonSecondary}`}
+              className={styles.button}
             >
               Sign Out
             </button>
@@ -397,13 +396,13 @@ export const Login = () => {
           <div className={styles.formWrapper}>
             <h1 className={styles.title}>{isLogin ? 'Login to Striae' : 'Register a Striae Account'}</h1>
             
-            <form onSubmit={handleSubmit} className={formStyles.form}>
+            <form onSubmit={handleSubmit} className={styles.form}>
               <input
                 type="email"
                 name="email"
                 placeholder={isLogin ? "Email" : "Work Email Address"}
                 autoComplete="email"
-                className={formStyles.input}
+                className={styles.input}
                 required
                 disabled={isLoading}
               />
@@ -416,7 +415,7 @@ export const Login = () => {
                   name="password"
                   placeholder="Password"
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  className={styles.passwordInput}
+                  className={styles.input}
                   required
                   disabled={isLoading}
                   onChange={(e) => !isLogin && checkPasswordStrength(e.target.value, confirmPasswordValue)}
@@ -437,8 +436,9 @@ export const Login = () => {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
-                      placeholder="Confirm Password"                      
-                      className={styles.passwordInput}
+                      placeholder="Confirm Password"
+                      autoComplete="new-password"
+                      className={styles.input}
                       required
                       disabled={isLoading}
                       value={confirmPasswordValue}
@@ -496,7 +496,7 @@ export const Login = () => {
                     required
                     placeholder="First Name (required)"
                     autoComplete="given-name"
-                    className={formStyles.input}
+                    className={styles.input}
                     disabled={isLoading}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
@@ -507,7 +507,7 @@ export const Login = () => {
                     required
                     placeholder="Last Name (required)"
                     autoComplete="family-name"
-                    className={formStyles.input}
+                    className={styles.input}
                     disabled={isLoading}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
@@ -518,7 +518,7 @@ export const Login = () => {
                     required
                     placeholder="Lab/Company Name (required)"
                     autoComplete="organization"
-                    className={formStyles.input}
+                    className={styles.input}
                     disabled={isLoading}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
@@ -541,11 +541,11 @@ export const Login = () => {
                 </button>
               )}
               
-              {error && <p className={formStyles.error}>{error}</p>}
+              {error && <p className={styles.error}>{error}</p>}
               
               <button 
                 type="submit" 
-                className={`${formStyles.button} ${formStyles.buttonPrimary}`}
+                className={styles.button}
                 disabled={isLoading || isCheckingUser}
               >
                 {isCheckingUser ? 'Verifying account...' : isLoading ? 'Loading...' : isLogin ? 'Login' : 'Register'}

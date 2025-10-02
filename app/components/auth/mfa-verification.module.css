@@ -1,6 +1,24 @@
-/* Use form component .modalOverlay class */
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-/* Use form component .modal class */
+.modal {
+  background: white;
+  border-radius: var(--spaceXS);
+  padding: var(--space2XL);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 var(--spaceM) var(--spaceXL) rgba(0, 0, 0, 0.2);
+}
 
 .title {
   text-align: center;
@@ -79,9 +97,49 @@
   display: none;
 }
 
-/* Use form component .input class */
+.input {
+  width: 100%;
+  padding: var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyM);
+  text-align: center;
+  font-family: monospace;
+  letter-spacing: 2px;
+  margin-bottom: var(--spaceL);
+  transition: border-color var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box;
+}
 
-/* Use form component .button .buttonPrimary classes */
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
+}
+
+.button {
+  width: 100%;
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  cursor: pointer;
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  margin-bottom: var(--spaceM);
+  box-sizing: border-box;
+}
+
+.button:hover:not(:disabled) {
+  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
+}
+
+.button:disabled {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  color: var(--textLight);
+  cursor: not-allowed;
+}
 
 .buttons {
   display: flex;
@@ -89,7 +147,23 @@
   gap: var(--spaceS);
 }
 
-/* Use form component .button .buttonSecondary classes */
+.secondaryButton {
+  padding: var(--spaceS) var(--spaceM);
+  border: 1.5px solid color-mix(in lab, var(--text) 20%, transparent);
+  border-radius: var(--spaceXS);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--fontSizeBodyS);
+  color: var(--textBody);
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  border-color: color-mix(in lab, var(--text) 30%, transparent);
+}
 
 .actions {
   margin-top: var(--spaceL);
