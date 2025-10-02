@@ -53,11 +53,6 @@ export const EmailVerification = ({
       
       onSuccess('Verification email sent! Please check your inbox and spam folder.');
       
-      // Redirect to /auth route after successful resend
-      setTimeout(() => {
-        navigate('/auth');
-      }, 2000); // Give user time to see the success message
-      
       // Add 60-second cooldown to prevent spam
       setResendCooldown(60);
       const interval = setInterval(() => {
@@ -76,6 +71,10 @@ export const EmailVerification = ({
     } finally {
       setIsResending(false);
     }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/auth');
   };
 
   return (
@@ -104,10 +103,10 @@ export const EmailVerification = ({
             {isResending ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Verification Email'}
           </button>
           <button 
-            onClick={onSignOut}
+            onClick={handleLoginRedirect}
             className={styles.secondaryButton}
           >
-            Sign Out
+            Login to Striae
           </button>
         </div>
         
