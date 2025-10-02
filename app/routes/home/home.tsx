@@ -30,13 +30,24 @@ export default function Home() {
             <p>Striae: A Firearms Examiner&apos;s Comparison Companion</p>
           </div>
           <div className={styles.buttonGroup}>            
-            <Link 
-              viewTransition
-              prefetch="intent"
-              to="/auth" 
+            <a 
+              href="https://www.striae.org/auth"
+              target="_blank"
+              rel="noopener noreferrer"
               className={styles.signInButton}>
               Sign In
+            </a>
+            <Link 
+              to="/access"
+              viewTransition
+              className={styles.actionButton}>
+              Register for Access
             </Link>            
+          </div>
+          <div className={styles.noticeSection}>
+            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory.
+              <br />
+              <strong>Personal email addresses are not permitted.</strong></p>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>            

@@ -55,6 +55,29 @@
   margin-top: var(--spaceL);
 }
 
+.noticeSection {
+  width: 100%;
+  max-width: 900px;
+  margin-top: var(--spaceL);
+  padding: var(--spaceXL);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--spaceM);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spaceM);
+}
+
+.noticeText {
+  font-size: var(--fontSizeBodyM);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: var(--lineHeightBody);
+  text-align: center;
+  margin: 0;
+}
+
 .actionButton {
   padding: var(--spaceM) var(--spaceL);
   border-radius: var(--spaceXS);
