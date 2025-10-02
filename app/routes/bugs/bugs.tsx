@@ -2,8 +2,9 @@
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
 import { verifyTurnstileToken } from '~/utils/turnstile';
-import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
+import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
+import { BaseForm, FormField, FormMessage, FormButton } from '~/components/form';
 import styles from './bugs.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -151,77 +152,74 @@ export const Bugs = () => {
           To avoid redundancy, please check the <a href="https://github.com/striae-org/striae/issues" target="_blank" rel="noopener noreferrer">current list of issues</a> first
         </p>
 
-        <Form method="post" className={styles.form}>
-          <input
+        {actionData?.success ? (
+          <FormMessage 
+            type="success"
+            title="Bug Report Submitted!"
+            message="Thank you for your report! We'll investigate and get back to you if we need more information."
+          />
+        ) : (
+        <BaseForm>
+          <FormField
             type="text"
             name="name"
             placeholder="Your Name"
             autoComplete="name"
-            className={styles.input}            
+            error={actionData?.errors?.name}
+            disabled={sending}
           />
-          {actionData?.errors?.name && (
-            <p className={styles.error}>{actionData.errors.name}</p>
-          )}          
-          <input
+          
+          <FormField
             type="email"
             name="email"
             placeholder="Your Email"
             autoComplete="email"
-            className={styles.input}          
-          />          
-          {actionData?.errors?.email && (
-            <p className={styles.error}>{actionData.errors.email}</p>
-          )}
-          <textarea
-            name="description"
-            placeholder="Describe the bug in detail"
-            className={styles.textarea}            
-          />
-          {actionData?.errors?.description && (
-            <p className={styles.error}>{actionData.errors.description}</p>
-          )}
-          <textarea
-            name="steps"
-            placeholder="Steps to reproduce the bug"
-            className={styles.textarea}            
-          />
-          {actionData?.errors?.steps && (
-            <p className={styles.error}>{actionData.errors.steps}</p>
-          )}
-          <textarea
-            name="expected"
-            placeholder="What did you expect to happen?"
-            className={styles.textarea}            
-          />
-          {actionData?.errors?.expected && (
-            <p className={styles.error}>{actionData.errors.expected}</p>
-          )}
-          <textarea
-            name="actual"
-            placeholder="What actually happened?"
-            className={styles.textarea}            
-          />
-          {actionData?.errors?.actual && (
-            <p className={styles.error}>{actionData.errors.actual}</p>
-          )}
-          <Turnstile
-            className={styles.turnstile}            
+            error={actionData?.errors?.email}
+            disabled={sending}
           />
           
-          <button 
-            type="submit" 
-            className={styles.button}
+          <FormField
+            component="textarea"
+            name="description"
+            placeholder="Describe the bug in detail"
+            error={actionData?.errors?.description}
             disabled={sending}
+          />
+          
+          <FormField
+            component="textarea"
+            name="steps"
+            placeholder="Steps to reproduce the bug"
+            error={actionData?.errors?.steps}
+            disabled={sending}
+          />
+          
+          <FormField
+            component="textarea"
+            name="expected"
+            placeholder="What did you expect to happen?"
+            error={actionData?.errors?.expected}
+            disabled={sending}
+          />
+          
+          <FormField
+            component="textarea"
+            name="actual"
+            placeholder="What actually happened?"
+            error={actionData?.errors?.actual}
+            disabled={sending}
+          />
+          
+          <Turnstile className={styles.turnstile} />
+          
+          <FormButton 
+            type="submit"
+            isLoading={sending}
+            loadingText="Submitting..."
           >
-            {sending ? 'Submitting...' : 'Submit Bug Report'}
-          </button>
-        </Form>
-        
-        {actionData?.success && (
-          <div className={styles.success}>
-            <p>Thank you for your report!</p>
-            <p>We&apos;ll investigate and get back to you if we need more information.</p>
-          </div>
+            Submit Bug Report
+          </FormButton>
+        </BaseForm>
         )}
       </div>
     </div>

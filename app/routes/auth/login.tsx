@@ -213,7 +213,7 @@ export const Login = () => {
       });
 
       // Create user data using centralized function
-      const userData = await createUser(
+      await createUser(
         createCredential.user,
         formFirstName,
         formLastName,

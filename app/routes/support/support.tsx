@@ -2,8 +2,9 @@
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
 import { verifyTurnstileToken } from '~/utils/turnstile';
-import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
+import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
+import { BaseForm, FormField, FormButton, FormMessage } from '~/components/form';
 import styles from './support.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -141,75 +142,84 @@ export const Support = () => {
         <h1 className={styles.title}>Contact Striae Support</h1>
         <p className={styles.subtitle}>Need help with Striae? Submit a ticket and we&apos;ll assist you.</p>
         
-        <Form method="post" className={styles.form}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Your Name"
-            autoComplete="name"
-            className={styles.input}            
+        {actionData?.success ? (
+          <FormMessage
+            type="success"
+            title="Support Ticket Submitted!"
+            message="Thank you for contacting support! We'll review your ticket and respond as soon as possible."
           />
-          {actionData?.errors?.name && (
-            <p className={styles.error}>{actionData.errors.name}</p>
-          )}
-          <input
-            type="email"
-            name="email"
-            placeholder="Your Email"
-            autoComplete="email"
-            className={styles.input}            
-          />
-          {actionData?.errors?.email && (
-            <p className={styles.error}>{actionData.errors.email}</p>
-          )}
-         <select 
-            name="category"
-            className={styles.input}
-            aria-label="Issue Category"            
-          >
-            <option value="">Select Issue Category</option>
-            <option value="technical">Technical Issue</option>
-            <option value="account">Account Issue</option>
-            <option value="feature">Feature Request</option>
-            <option value="other">Other</option>
-          </select>          
-          {actionData?.errors?.category && (
-            <p className={styles.error}>{actionData.errors.category}</p>
-          )}
-          <textarea
-            name="description"
-            placeholder="Describe what you need help with or a feature request"
-            className={styles.textarea}            
-          />
-          {actionData?.errors?.description && (
-            <p className={styles.error}>{actionData.errors.description}</p>
-          )}
-          <textarea
-            name="steps"
-            placeholder="What have you tried so far? (Optional)"
-            className={styles.textarea}
-          />          
-          <textarea
-            name="expected"
-            placeholder="What are you trying to accomplish? (Optional)"
-            className={styles.textarea}
-          />
-          <Turnstile
-            className={styles.turnstile}            
-          />          
-          <button 
-            type="submit" 
-            className={styles.button}
-            disabled={sending}
-          >
-            {sending ? 'Submitting...' : 'Submit Support Ticket'}
-          </button>
-        </Form>        
-        {actionData?.success && (
-          <div className={styles.success}>
-            <p>Thank you for contacting support!</p>
-            <p>We&apos;ll review your ticket and respond as soon as possible.</p>
-          </div>
+        ) : (
+          <BaseForm>
+            <FormField
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              autoComplete="name"
+              error={actionData?.errors?.name}
+              disabled={sending}
+            />
+            
+            <FormField
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              autoComplete="email"
+              error={actionData?.errors?.email && !actionData.errors.email.includes('CAPTCHA') ? actionData.errors.email : undefined}
+              disabled={sending}
+            />
+            
+            <FormField
+              type="select"
+              name="category"
+              placeholder="Select Issue Category"
+              error={actionData?.errors?.category}
+              disabled={sending}
+            >
+              <option value="">Select Issue Category</option>
+              <option value="technical">Technical Issue</option>
+              <option value="account">Account Issue</option>
+              <option value="feature">Feature Request</option>
+              <option value="other">Other</option>
+            </FormField>
+            
+            <FormField
+              type="textarea"
+              name="description"
+              placeholder="Describe what you need help with or a feature request"
+              error={actionData?.errors?.description}
+              disabled={sending}
+            />
+            
+            <FormField
+              type="textarea"
+              name="steps"
+              placeholder="What have you tried so far? (Optional)"
+              disabled={sending}
+            />
+            
+            <FormField
+              type="textarea"
+              name="expected"
+              placeholder="What are you trying to accomplish? (Optional)"
+              disabled={sending}
+            />
+            
+            <Turnstile
+              className={styles.turnstile}
+            />
+            
+            {actionData?.errors?.email && actionData.errors.email.includes('CAPTCHA') && (
+              <p className={styles.error}>{actionData.errors.email}</p>
+            )}
+            
+            <FormButton
+              type="submit"
+              isLoading={sending}
+              loadingText="Submitting..."
+            >
+              Submit Support Ticket
+            </FormButton>
+          </BaseForm>
         )}
       </div>
     </div>

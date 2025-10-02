@@ -6,8 +6,9 @@ import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
 import freeEmailDomains from 'free-email-domains';
 import { verifyTurnstileToken } from '~/utils/turnstile';
-import { Form, useActionData, useNavigation, Link } from '@remix-run/react';
-import { json, redirect } from '@remix-run/cloudflare';
+import { useActionData, useNavigation, Link } from '@remix-run/react';
+import { json } from '@remix-run/cloudflare';
+import { BaseForm, FormField, FormButton, FormMessage, FormToggle } from '~/components/form';
 import styles from './signup.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -247,123 +248,108 @@ export const Signup = () => {
         onClose={handleNoticeClose}
         notice={signupNotice}
       />
-      <Form method="post" className={styles.form}>
-        {actionData?.success ? (
-          <div className={styles.successMessage}>
-            <h2><strong>Registration Submitted!</strong></h2>
-            <p>{actionData.message}</p>
-          </div>
-        ) : (
-          <>
-          <input
+      {actionData?.success ? (
+        <FormMessage
+          type="success"
+          title="Registration Submitted!"
+          message={actionData.message || 'Your agency registration has been submitted successfully!'}
+        />
+      ) : (
+        <BaseForm>
+          <FormField
             type="text"
             name="firstName"
             placeholder="First Name"
             autoComplete="given-name"
-            className={styles.input}            
+            error={actionData?.errors?.firstName}
             disabled={sending}
           />
-          {actionData?.errors?.firstName && (
-            <p className={styles.error}>{actionData.errors.firstName}</p>
-          )}
-          <input
+          
+          <FormField
             type="text"
             name="lastName"
             placeholder="Last Name"
             autoComplete="family-name"
-            className={styles.input}            
+            error={actionData?.errors?.lastName}
             disabled={sending}
           />
-          {actionData?.errors?.lastName && (
-            <p className={styles.error}>{actionData.errors.lastName}</p>
-          )}
-          <input
+          
+          <FormField
             type="email"
             name="email"
             placeholder="Email Address (must match agency domain)"
             autoComplete="email"
-            className={styles.input}            
+            error={actionData?.errors?.email && !actionData.errors.email.includes('CAPTCHA') ? actionData.errors.email : undefined}
             disabled={sending}
           />
-          {actionData?.errors?.email && !actionData.errors.email.includes('CAPTCHA') && (
-            <p className={styles.error}>{actionData.errors.email}</p>
-          )}          
-          <input
+          
+          <FormField
             type="text"
             name="company"
             placeholder="Agency Name"
             autoComplete="organization"
-            className={styles.input}            
-            disabled={sending}            
+            error={actionData?.errors?.company}
+            disabled={sending}
           />
-          {actionData?.errors?.company && (
-            <p className={styles.error}>{actionData.errors.company}</p>
-          )}
-          <input
+          
+          <FormField
             type="text"
             name="agencyDomain"
             placeholder="Agency Domain (e.g., @agency.gov)"
-            className={styles.input}            
-            disabled={sending}            
+            error={actionData?.errors?.agencyDomain}
+            disabled={sending}
           />
-          {actionData?.errors?.agencyDomain && (
-            <p className={styles.error}>{actionData.errors.agencyDomain}</p>
-          )}
-          <label className={styles.toggle}>
-            <input
-              type="checkbox"
-              name="emailConsent"
-              required
-              disabled={sending}
-            />
-            <span>I agree to receive emails from striae.org</span>
-          </label>
+          
+          <FormToggle
+            name="emailConsent"
+            label="I agree to receive emails from striae.org"
+            required
+            disabled={sending}
+          />
 
-          <label className={styles.toggle}>
-            <input
-              type="checkbox"
-              name="codeAgreement"
-              required
-              disabled={sending}
-            />
-            <span>I have read the <a href="https://help.striae.org/striae-users-guide/getting-started/code-of-responsible-use" target="_blank" rel="noopener noreferrer">Code of Responsible Use</a> and agree to abide by its terms.</span>
-          </label>
+          <FormToggle
+            name="codeAgreement"
+            label={
+              <span>
+                I have read the{' '}
+                <a href="https://help.striae.org/striae-users-guide/getting-started/code-of-responsible-use" target="_blank" rel="noopener noreferrer">
+                  Code of Responsible Use
+                </a>{' '}
+                and agree to abide by its terms.
+              </span>
+            }
+            required
+            disabled={sending}
+          />
 
-          <label className={styles.toggle}>
-            <input
-              type="checkbox"
-              name="agencyConsent"
-              required
-              disabled={sending}
-            />
-            <span>I warrant that I represent this agency and want to register my agency's domain for Striae access</span>
-          </label>
-          {actionData?.errors?.agencyConsent && (
-            <p className={styles.error}>{actionData.errors.agencyConsent}</p>
-          )}
+          <FormToggle
+            name="agencyConsent"
+            label="I warrant that I represent this agency and want to register my agency's domain for Striae access"
+            required
+            disabled={sending}
+            error={actionData?.errors?.agencyConsent}
+          />
 
           <Turnstile
             className={styles.turnstile}
             theme="light"
           />
+          
           {actionData?.errors?.email && actionData.errors.email.includes('CAPTCHA') && (
             <p className={styles.error}>{actionData.errors.email}</p>
           )}
-          <button 
-          type="submit"                     
-          className={`${styles.button} ${!hasReadNotice ? styles.buttonDisabled : ''}`}          
-          disabled={sending || !hasReadNotice}          
-          title={!hasReadNotice ? 'Please read the notice first' : undefined}
-        >
-          {!hasReadNotice 
-            ? 'Please read the notice first'
-            : sending 
-              ? 'Submitting...' 
-              : 'Register Agency'}
-        </button>
-        </>
-        )}
-      </Form>
+          
+          <FormButton
+            type="submit"
+            isLoading={sending}
+            loadingText="Submitting..."
+            disabled={!hasReadNotice}
+            title={!hasReadNotice ? 'Please read the notice first' : undefined}
+          >
+            {!hasReadNotice ? 'Please read the notice first' : 'Register Agency'}
+          </FormButton>
+        </BaseForm>
+      )}
       </div>
     </div>
   );
