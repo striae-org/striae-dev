@@ -49,6 +49,7 @@ export const Login = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [company, setCompany] = useState('');
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState('');
   const [showCaseReviewNotice, setShowCaseReviewNotice] = useState(false);
   
   // MFA state
@@ -75,19 +76,21 @@ export const Login = () => {
     return !!emailDomain && !freeEmailDomains.includes(emailDomain);
   };
 
-  const checkPasswordStrength = (password: string): boolean => {
+  const checkPasswordStrength = (password: string, confirmPassword?: string): boolean => {
     const hasMinLength = password.length >= 10;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const passwordsMatch = confirmPassword !== undefined ? password === confirmPassword : true;
     
-    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+    const isStrong = hasMinLength && hasUpperCase && hasNumber && hasSpecialChar && passwordsMatch;
     setPasswordStrength(
       `Password must contain:
       ${!hasMinLength ? '❌' : '✅'} At least 10 characters
       ${!hasUpperCase ? '❌' : '✅'} Capital letters
       ${!hasNumber ? '❌' : '✅'} Numbers
-      ${!hasSpecialChar ? '❌' : '✅'} Special characters`
+      ${!hasSpecialChar ? '❌' : '✅'} Special characters${confirmPassword !== undefined ? `
+      ${!passwordsMatch ? '❌' : '✅'} Passwords must match` : ''}`
     );
     
     return isStrong;
@@ -415,7 +418,7 @@ export const Login = () => {
                   className={styles.input}
                   required
                   disabled={isLoading}
-                  onChange={(e) => !isLogin && checkPasswordStrength(e.target.value)}
+                  onChange={(e) => !isLogin && checkPasswordStrength(e.target.value, confirmPasswordValue)}
                 />
                 <button
                   type="button"
@@ -438,6 +441,14 @@ export const Login = () => {
                       className={styles.input}
                       required
                       disabled={isLoading}
+                      value={confirmPasswordValue}
+                      onChange={(e) => {
+                        setConfirmPasswordValue(e.target.value);
+                        const passwordInput = (e.target.form?.elements.namedItem('password') as HTMLInputElement);
+                        if (passwordInput) {
+                          checkPasswordStrength(passwordInput.value, e.target.value);
+                        }
+                      }}
                     />
                     <button
                       type="button"
@@ -554,6 +565,7 @@ export const Login = () => {
                   setFirstName('');
                   setLastName('');
                   setCompany('');
+                  setConfirmPasswordValue('');
                 }}
                 className={styles.toggleButton}
                 disabled={isLoading || isCheckingUser}
