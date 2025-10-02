@@ -98,7 +98,7 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
         viewTransition
         prefetch="intent"
         to="/#top" 
-        className={styles.logoLink}>
+      >
         <div className={styles.logo} />
       </Link>
       <div className={styles.formWrapper}>
