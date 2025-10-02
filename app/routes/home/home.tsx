@@ -45,9 +45,9 @@ export default function Home() {
             </Link>            
           </div>
           <div className={styles.noticeSection}>
-            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory
+            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory or organization.
               <br />
-              <strong>Personal email addresses are not permitted</strong></p>            
+              </p>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
               What is this?
             </button>            
