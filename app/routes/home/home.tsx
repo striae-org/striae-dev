@@ -41,7 +41,7 @@ export default function Home() {
               to="/access#top"
               viewTransition
               className={styles.actionButton}>
-              Register for Access
+              Agency Registration
             </Link>            
           </div>
           <div className={styles.noticeSection}>
