@@ -37,20 +37,20 @@ export default function Home() {
               className={styles.signInButton}>
               Sign In
             </a>
-            <Link 
-              to="/access#top"
-              viewTransition
-              className={styles.actionButton}>
-              Agency Registration
-            </Link>            
+            <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
+              What is this?
+            </button>                       
           </div>
           <div className={styles.noticeSection}>
             <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory or organization
               <br />
               </p>            
-            <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
-              What is this?
-            </button>            
+             <Link 
+              to="/access#top"
+              viewTransition
+              className={styles.actionButton}>
+              Agency Registration
+            </Link>            
           </div>         
           
           <BlogFeed />
