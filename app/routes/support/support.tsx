@@ -151,6 +151,7 @@ export const Support = () => {
         ) : (
           <BaseForm>
             <FormField
+              component="input"
               type="text"
               name="name"
               placeholder="Your Name"
@@ -160,6 +161,7 @@ export const Support = () => {
             />
             
             <FormField
+              component="input"
               type="email"
               name="email"
               placeholder="Your Email"
@@ -182,7 +184,7 @@ export const Support = () => {
             </FormField>
             
             <FormField
-              type="textarea"
+              component="textarea"
               name="description"
               placeholder="Describe what you need help with or a feature request"
               error={actionData?.errors?.description}
@@ -190,14 +192,14 @@ export const Support = () => {
             />
             
             <FormField
-              type="textarea"
+              component="textarea"
               name="steps"
               placeholder="What have you tried so far? (Optional)"
               disabled={sending}
             />
             
             <FormField
-              type="textarea"
+              component="textarea"
               name="expected"
               placeholder="What are you trying to accomplish? (Optional)"
               disabled={sending}

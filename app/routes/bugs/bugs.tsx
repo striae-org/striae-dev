@@ -161,6 +161,7 @@ export const Bugs = () => {
         ) : (
         <BaseForm>
           <FormField
+            component="input"
             type="text"
             name="name"
             placeholder="Your Name"
@@ -170,6 +171,7 @@ export const Bugs = () => {
           />
           
           <FormField
+            component="input"
             type="email"
             name="email"
             placeholder="Your Email"

@@ -257,6 +257,7 @@ export const Signup = () => {
       ) : (
         <BaseForm>
           <FormField
+            component="input"
             type="text"
             name="firstName"
             placeholder="First Name"
@@ -266,6 +267,7 @@ export const Signup = () => {
           />
           
           <FormField
+            component="input"
             type="text"
             name="lastName"
             placeholder="Last Name"
@@ -275,6 +277,7 @@ export const Signup = () => {
           />
           
           <FormField
+            component="input"
             type="email"
             name="email"
             placeholder="Email Address (must match agency domain)"
@@ -284,6 +287,7 @@ export const Signup = () => {
           />
           
           <FormField
+            component="input"
             type="text"
             name="company"
             placeholder="Agency Name"
@@ -293,6 +297,7 @@ export const Signup = () => {
           />
           
           <FormField
+            component="input"
             type="text"
             name="agencyDomain"
             placeholder="Agency Domain (e.g., @agency.gov)"
