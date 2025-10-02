@@ -119,10 +119,15 @@ export const Login = () => {
    useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
    if (user) {
+      // Set user state first so verification prompt can show for unverified users
+      setUser(user);
+      
       if (!user.emailVerified) {
-        handleSignOut();
+        // Don't sign out immediately - let them see the verification prompt
         setError('');
-        setSuccess('Please verify your email before logging in. Check your inbox for the verification link.');
+        setSuccess('Please verify your email before continuing. Check your inbox for the verification link.');
+        setShowMfaEnrollment(false);
+        setIsCheckingUser(false);
         return;
       }      
       
@@ -149,12 +154,10 @@ export const Login = () => {
       if (mfaFactors.length === 0) {
         // User has no MFA factors enrolled - require enrollment
         setShowMfaEnrollment(true);
-        setUser(user); // Still set user so enrollment component can use it
         return;
       }
       
       console.log("User signed in:", user.email);
-      setUser(user);
       setShowMfaEnrollment(false);
       
       // Log successful login audit
