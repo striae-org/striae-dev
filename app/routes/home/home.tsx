@@ -45,7 +45,7 @@ export default function Home() {
             </Link>            
           </div>
           <div className={styles.noticeSection}>
-            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory or organization.
+            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory or organization
               <br />
               </p>            
             <button onClick={() => setNoticeOpen(true)} className={styles.actionButton}>
