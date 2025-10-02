@@ -128,10 +128,33 @@
 }
 
 .error {
-  color: var(--error);
-  text-align: center;
-  margin: var(--spaceS) 0;
+  color: color-mix(in lab, var(--error) 90%, var(--black));
+  text-align: left;
+  margin: var(--spaceXS) 0 var(--spaceS) 0;
   font-size: var(--fontSizeBodyXS);
+  padding: var(--spaceS) var(--spaceM);
+  background: linear-gradient(135deg, 
+    color-mix(in lab, var(--error) 12%, transparent),
+    color-mix(in lab, var(--error) 8%, transparent)
+  );
+  border-radius: var(--spaceXS);
+  border: 1px solid color-mix(in lab, var(--error) 30%, transparent);
+  border-left: 3px solid var(--error);
+  animation: slideInError var(--durationS) var(--bezierFastoutSlowin);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px color-mix(in lab, var(--text) 8%, transparent);
+}
+
+.error::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--error);
+  animation: errorPulse 1.5s ease-in-out infinite;
 }
 
 .hint {
@@ -260,4 +283,48 @@
 
 .caseReviewOptionActive:hover:not(:disabled) {
   background: color-mix(in lab, var(--primary) 85%, var(--black)) !important;
+}
+
+/* Animations */
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--spaceM))) scaleY(0.8);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    max-height: 200px;
+    padding-top: var(--spaceS);
+    padding-bottom: var(--spaceS);
+    margin-top: var(--spaceXS);
+    margin-bottom: var(--spaceS);
+  }
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in lab, var(--error) 40%, transparent);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 4px color-mix(in lab, var(--error) 20%, transparent);
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .error {
+    animation: none;
+  }
+  
+  .error::before {
+    animation: none;
+  }
 }
