@@ -59,7 +59,6 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
 
   const FormContent = (
     <form ref={formRef} onSubmit={handleReset} className={styles.form}>
-      <h2 className={styles.title}>Reset Password</h2>
       <input
         type="email"
         name="email"
@@ -85,7 +84,8 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
   if (isModal) {
     return (
       <div className={styles.modalOverlay}>
-        <div className={styles.modal}>          
+        <div className={styles.modal}>
+          <h2 className={styles.modalTitle}>Reset Password</h2>
           {FormContent}
         </div>
       </div>
@@ -102,7 +102,28 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
         <div className={styles.logo} />
       </Link>
       <div className={styles.formWrapper}>
-        {FormContent}
+        <h1 className={styles.title}>Reset Password</h1>
+        <form ref={formRef} onSubmit={handleReset} className={styles.form}>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            autoComplete="email"
+            className={styles.input}
+            required
+          />
+          {error && <p className={styles.error}>{error}</p>}
+          <button type="submit" className={styles.button} disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send Reset Link'}
+          </button>
+          <button 
+            type="button" 
+            onClick={onBack}
+            className={styles.secondaryButton}
+          >
+            Back
+          </button>
+        </form>
       </div>
     </div>
   );
