@@ -450,6 +450,8 @@
   background: color-mix(in lab, var(--primary) 10%, transparent);
   text-decoration: none;
   color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px color-mix(in lab, currentColor 20%, transparent);
 }
 
 .verificationHints {
