@@ -97,7 +97,7 @@ export const EmailVerification = ({
           </button>
           <Link 
             to="/auth"
-            className={styles.secondaryButton}
+            className={styles.secondaryButtonLink}
           >
             Login to Striae
           </Link>

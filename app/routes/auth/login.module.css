@@ -429,6 +429,29 @@
   cursor: not-allowed;
 }
 
+.secondaryButtonLink {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: var(--spaceM) var(--spaceL);
+  border-radius: var(--spaceXS);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+  text-decoration: none;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.secondaryButtonLink:hover {
+  background: color-mix(in lab, var(--primary) 10%, transparent);
+  text-decoration: none;
+  color: var(--primary);
+}
+
 .verificationHints {
   text-align: left;
   background: color-mix(in lab, var(--backgroundLight) 50%, transparent);
