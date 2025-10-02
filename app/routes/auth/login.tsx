@@ -103,8 +103,8 @@ export const Login = () => {
       return userData !== null;
     } catch (error) {
       console.error('Error checking user existence:', error);
-      // On network/API errors, assume user exists to avoid false positives
-      return true;
+      // On network/API errors, throw error to prevent login
+      throw new Error('System error. Please try logging in at a later time.');
     }
   };  
 
@@ -119,12 +119,19 @@ export const Login = () => {
       
       // Check if user exists in the USER_DB
       setIsCheckingUser(true);
-      const userExists = await checkUserExists(user.uid);
-      setIsCheckingUser(false);
-      
-      if (!userExists) {
+      try {
+        const userExists = await checkUserExists(user.uid);
+        setIsCheckingUser(false);
+        
+        if (!userExists) {
+          handleSignOut();
+          setError('This account does not exist or has been deleted');
+          return;
+        }
+      } catch (error) {
+        setIsCheckingUser(false);
         handleSignOut();
-        setError('This account does not exist or has been deleted');
+        setError(error instanceof Error ? error.message : 'System error. Please try logging in at a later time.');
         return;
       }
       
