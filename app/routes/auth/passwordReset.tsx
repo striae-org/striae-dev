@@ -14,6 +14,7 @@ interface PasswordResetProps {
 export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -22,6 +23,9 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
     if (!email) return;
 
     setIsLoading(true);
+    setError('');
+    setSuccess('');
+    
     try {
       await sendPasswordResetEmail(auth, email);
       
@@ -32,7 +36,7 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
         'success'
       );
       
-      setError(ERROR_MESSAGES.RESET_EMAIL_SENT);
+      setSuccess(ERROR_MESSAGES.RESET_EMAIL_SENT);
       setTimeout(onBack, 2000);
     } catch (err) {
       const { message } = handleAuthError(err);
@@ -68,6 +72,7 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
         required
       />
       {error && <p className={styles.error}>{error}</p>}
+      {success && <p className={styles.success}>{success}</p>}
       <button type="submit" className={styles.button} disabled={isLoading}>
         {isLoading ? 'Sending...' : 'Send Reset Link'}
       </button>
@@ -113,6 +118,7 @@ export const PasswordReset = ({ isModal, onBack }: PasswordResetProps) => {
             required
           />
           {error && <p className={styles.error}>{error}</p>}
+          {success && <p className={styles.success}>{success}</p>}
           <button type="submit" className={styles.button} disabled={isLoading}>
             {isLoading ? 'Sending...' : 'Send Reset Link'}
           </button>
