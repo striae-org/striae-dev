@@ -391,31 +391,12 @@
   }
 }
 
-/* Email Verification Prompt */
-.verificationPrompt {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: var(--space2XL);
-  text-align: center;
-  background: var(--background);
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.verificationPrompt h2 {
-  font-size: var(--fontSizeH3);
-  color: var(--textTitle);
-  margin-bottom: var(--spaceM);
-  font-weight: var(--fontWeightSemibold);
-}
-
-.verificationPrompt > p {
+/* Email Verification Description */
+.verificationDescription {
   font-size: var(--fontSizeBodyM);
   color: var(--textBody);
-  margin-bottom: var(--spaceXL);
+  text-align: center;
+  margin-bottom: var(--spaceL);
   line-height: var(--lineHeightBody);
 }
 
@@ -424,7 +405,7 @@
   flex-direction: column;
   gap: var(--spaceM);
   width: 100%;
-  margin-bottom: var(--spaceXL);
+  margin-bottom: var(--spaceL);
 }
 
 .secondaryButton {

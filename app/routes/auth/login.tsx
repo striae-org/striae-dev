@@ -14,6 +14,7 @@ import {
     multiFactor
 } from 'firebase/auth';
 import { PasswordReset } from '~/routes/auth/passwordReset';
+import { EmailVerification } from '~/routes/auth/emailVerification';
 import { handleAuthError } from '~/services/firebase-errors';
 import { MFAVerification } from '~/components/auth/mfa-verification';
 import { MFAEnrollment } from '~/components/auth/mfa-enrollment';
@@ -52,10 +53,6 @@ export const Login = () => {
   const [company, setCompany] = useState('');
   const [confirmPasswordValue, setConfirmPasswordValue] = useState('');
   const [showCaseReviewNotice, setShowCaseReviewNotice] = useState(false);
-  
-  // Email verification resend state
-  const [isResending, setIsResending] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
   
   // MFA state
   const [mfaResolver, setMfaResolver] = useState<MultiFactorResolver | null>(null);
@@ -376,53 +373,7 @@ export const Login = () => {
     setError(errorMessage);
   };
 
-  const handleResendVerification = async () => {
-    if (!user || resendCooldown > 0 || isResending) return;
-    
-    setIsResending(true);
-    setError('');
-    setSuccess('');
-    
-    try {
-      await sendEmailVerification(user);
-      
-      // Log email verification resend audit event
-      try {
-        await auditService.logEmailVerification(
-          user,
-          'pending',
-          'email-link',
-          1, // Attempt number (could be tracked for multiple resends)
-          undefined, // No sessionId during verification
-          navigator.userAgent,
-          [] // No errors since we successfully sent the email
-        );
-      } catch (auditError) {
-        console.error('Failed to log email verification resend audit:', auditError);
-        // Continue even if audit logging fails
-      }
-      
-      setSuccess('Verification email sent! Please check your inbox and spam folder.');
-      
-      // Add 60-second cooldown to prevent spam
-      setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Failed to resend verification email:', error);
-      setError('Failed to send verification email. Please try again later.');
-    } finally {
-      setIsResending(false);
-    }
-  };  
+  
 
   return (
     <>
@@ -430,39 +381,14 @@ export const Login = () => {
         user.emailVerified ? (
           <Striae user={user} />
         ) : (
-          <div className={styles.verificationPrompt}>
-            <h2>Email Verification Required</h2>
-            <p>Please check your email and verify your account before continuing.</p>
-            
-            {error && <p className={styles.error}>{error}</p>}
-            {success && <p className={styles.success}>{success}</p>}
-            
-            <div className={styles.verificationActions}>
-              <button 
-                onClick={handleResendVerification}
-                className={styles.button}
-                disabled={isResending || resendCooldown > 0}
-                title={resendCooldown > 0 ? `Please wait ${resendCooldown} seconds` : undefined}
-              >
-                {isResending ? 'Sending...' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Verification Email'}
-              </button>
-              <button 
-                onClick={handleSignOut}
-                className={styles.secondaryButton}
-              >
-                Sign Out
-              </button>
-            </div>
-            
-            <div className={styles.verificationHints}>
-              <p className={styles.hint}>Didn't receive the email?</p>
-              <ul className={styles.hintList}>
-                <li>Check your spam or junk folder</li>
-                <li>Make sure {user?.email} is correct</li>
-                <li>Add info@striae.org to your contacts</li>
-              </ul>
-            </div>
-          </div>
+          <EmailVerification 
+            user={user}
+            onSignOut={handleSignOut}
+            error={error}
+            success={success}
+            onError={setError}
+            onSuccess={setSuccess}
+          />
         )
       ) : isResetting ? (
         <PasswordReset onBack={() => setIsResetting(false)}/>
