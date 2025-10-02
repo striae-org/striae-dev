@@ -10,7 +10,7 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement | HT
 
 export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, FormFieldProps>(
   ({ label, error, component = 'input', className, children, ...props }, ref) => {
-    const baseClassName = component === 'textarea' ? styles.textarea : styles.input;
+    const baseClassName = component === 'textarea' ? styles.textarea : component === 'select' ? styles.select : styles.input;
     
     return (
       <div className={styles.fieldWrapper}>

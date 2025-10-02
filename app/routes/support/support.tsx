@@ -169,9 +169,8 @@ export const Support = () => {
             />
             
             <FormField
-              type="select"
+              component="select"
               name="category"
-              placeholder="Select Issue Category"
               error={actionData?.errors?.category}
               disabled={sending}
             >
