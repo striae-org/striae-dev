@@ -298,7 +298,7 @@ You agree that the original English text shall prevail in the case of a dispute.
         <section className={styles.section}>
           <h2 className={styles.heading}>References</h2>
           <p><small>¹ Cloudflare automatically encrypts all data at rest using AES-256 with GCM mode across their R2 and KV storage platforms.</small></p>
-          <p><small>² NIST has approved AES-256 for protecting classified information up to the SECRET level and is widely adopted by the U.S. government.</small></p>
+          <p><small>² NIST has approved AES-256 for protecting classified information and is widely adopted by the U.S. government.</small></p>
           <p><small>³ The mathematical calculation: 2^256 = approximately 1.16 × 10^77 possible key combinations, making brute force attacks computationally infeasible.</small></p>
           <p><small>⁴ Based on cryptographic analysis, even with advanced quantum computing developments, AES-256 would require astronomical amounts of time to break through brute force.</small></p>
           <p><small>⁵ AES-256 is the encryption standard of choice for major banks, healthcare systems, government agencies, and technology companies worldwide.</small></p>
