@@ -1,1 +1,0 @@
-export { PasswordReset as default } from './auth/passwordReset';
