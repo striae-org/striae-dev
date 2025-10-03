@@ -18,9 +18,9 @@ import {
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
 import { AuthProvider } from '~/components/auth/auth-provider';
-import "./tailwind.css";
-import styles from '~/styles/root.module.css';
 import { useEffect } from 'react';
+import styles from '~/styles/root.module.css';
+import "./tailwind.css";
 import './reset.module.css';
 
 export const links: LinksFunction = () => [
