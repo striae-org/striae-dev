@@ -1,0 +1,1 @@
+export { EmailVerification as default } from './auth/emailVerification';
