@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-10-02] - *[Release v1.0.2](https://github.com/striae-org/striae/releases/tag/v1.0.2)*
+
+- **🎨 Enhanced Login/Registration Flow** - Comprehensive UI improvements with better form styling, improved error messaging, and streamlined user experience
+- **🏛️ Agency Registration System** - Complete agency onboarding system with automated email validation and domain verification
+- **🔐 Zero Trust Access Policies** - Implementation of secure agency access controls with domain-based authentication requirements
+- **✨ Form Component Enhancements** - Modernized form styling with improved validation feedback and consistent design patterns
+
 ## [2025-10-01] - *[Release v1.0.1](https://github.com/striae-org/striae/releases/tag/v1.0.1)*
 
 - **🔧 Audit System Enhancements** - Improved audit reporting functionality with enhanced text summaries and hover text
