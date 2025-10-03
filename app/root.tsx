@@ -17,17 +17,10 @@ import {
 } from '~/components/theme-provider/theme-provider';
 import Footer from "~/components/footer/footer";
 import MobileWarning from "~/components/mobile/mobile-warning";
-import { InactivityWarning } from '~/components/user/inactivity-warning';
-import "./tailwind.css";
+import { AuthProvider } from '~/components/auth/auth-provider';
+import { useEffect } from 'react';
 import styles from '~/styles/root.module.css';
-import { auth } from "./services/firebase";
-import { useInactivityTimeout } from '~/hooks/useInactivityTimeout';
-import { INACTIVITY_CONFIG } from '~/config/inactivity';
-import { AuthContext } from '~/contexts/auth.context';
-import { User } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { auditService } from '~/services/audit.service';
-import { generateUniqueId } from '~/utils/id-generator';
+import "./tailwind.css";
 import './reset.module.css';
 
 export const links: LinksFunction = () => [
@@ -97,70 +90,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
       </body>
     </html>
-  );
-}
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [showInactivityWarning, setShowInactivityWarning] = useState(false);
-  const [remainingSeconds, setRemainingSeconds] = useState(0);
-
-  const { extendSession } = useInactivityTimeout({
-    enabled: !!user,
-    onWarning: () => {
-      setRemainingSeconds(INACTIVITY_CONFIG.WARNING_MINUTES * 60);
-      setShowInactivityWarning(true);
-    },
-    onTimeout: () => {
-      setShowInactivityWarning(false);      
-    }
-  });
-
-  useEffect(() => {
-    return auth.onAuthStateChanged((user) => {
-      setUser(user);      
-      if (!user) {
-        setShowInactivityWarning(false);
-      }
-    });
-  }, []);
-
-  const handleExtendSession = () => {
-    setShowInactivityWarning(false);
-    extendSession();
-  };
-
-  const handleSignOutNow = async () => {
-    setShowInactivityWarning(false);
-    
-    // Log timeout logout audit before signing out
-    if (user) {
-      try {
-        const sessionId = `session_${user.uid}_timeout_${Date.now()}_${generateUniqueId(8)}`;
-        await auditService.logUserLogout(
-          user,
-          sessionId,
-          INACTIVITY_CONFIG.TIMEOUT_MINUTES * 60, // sessionDuration in seconds
-          'timeout'
-        );
-      } catch (auditError) {
-        console.error('Failed to log timeout logout audit:', auditError);
-        // Continue with logout even if audit logging fails
-      }
-    }
-    
-    auth.signOut();
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
-      <InactivityWarning
-        isOpen={showInactivityWarning}
-        remainingSeconds={remainingSeconds}
-        onExtendSession={handleExtendSession}
-        onSignOut={handleSignOutNow}
-      />
-    </AuthContext.Provider>
   );
 }
 
