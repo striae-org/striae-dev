@@ -55,10 +55,26 @@
   margin-top: var(--spaceL);
 }
 
+.loginHelp {  
+  text-align: center;
+}
+
+.helpLink {
+  font-size: var(--fontSizeBodyS);
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+  transition: all var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.helpLink:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
 .noticeSection {
   width: 100%;
   max-width: 900px;
-  margin-top: var(--spaceL);
+  margin-top: var(--spaceXS);
   padding: var(--spaceXL);
   background: rgba(0, 0, 0, 0.4);
   border-radius: var(--spaceM);
@@ -245,6 +261,14 @@
   .buttonGroup {
     flex-direction: column;
     width: 100%;
+  }
+
+  .loginHelp {
+    margin-top: var(--spaceS);
+  }
+
+  .helpLink {
+    font-size: var(--fontSizeBodyXS);
   }
 
   .actionButton,

@@ -41,8 +41,17 @@ export default function Home() {
               What is this?
             </button>                       
           </div>
+          <div className={styles.loginHelp}>
+            <a 
+              href="https://help.striae.org/striae-users-guide/getting-started/how-to-log-into-striae"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.helpLink}>
+              How do I login to Striae?
+            </a>
+          </div>
           <div className={styles.noticeSection}>
-            <p className={styles.noticeText}>Access to Striae is free for forensic professionals employed at a forensic laboratory or organization
+            <p className={styles.noticeText}>Access to Striae is free for professionals employed at a forensic laboratory or organization
               <br />
               </p>            
              <Link 
