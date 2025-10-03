@@ -8,7 +8,8 @@ import {
   isRouteErrorResponse,
   useRouteError,
   Link,
-  useLocation
+  useLocation,
+  useMatches
 } from "@remix-run/react";
 import { 
   ThemeProvider,
@@ -164,11 +165,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <AuthProvider>
-      <Outlet />
-    </AuthProvider>
+  const matches = useMatches();
+  const isAuthRoute = matches.some(match => 
+    match.id.includes('auth') || 
+    match.pathname?.includes('/auth')    
   );
+
+  if (isAuthRoute) {
+    return (
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
+    );
+  }
+
+  return <Outlet />;
 }
 
 export function ErrorBoundary() {
