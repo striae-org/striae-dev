@@ -8,8 +8,9 @@ export default function MobileWarning() {
 
   useEffect(() => {
     const checkMobileOrTablet = () => {
-      // Screen size check (up to 1024px to include tablets)
+      // Screen size check - expanded to catch larger tablets like iPad Pro
       const isSmallScreen = window.innerWidth <= 1024;
+      const isTabletSizedScreen = window.innerWidth <= 1366; // iPad Pro 12.9" landscape
       
       // Enhanced user agent detection with more patterns
       const userAgent = navigator.userAgent.toLowerCase();
@@ -31,9 +32,11 @@ export default function MobileWarning() {
       // Device pixel ratio (mobile devices often have high DPI)
       const highDPI = window.devicePixelRatio > 1.5;
       
-      // Screen aspect ratio (mobile devices typically have tall aspect ratios)
+      // Screen aspect ratio - updated to catch both orientations
       const aspectRatio = window.innerHeight / window.innerWidth;
-      const isTallScreen = aspectRatio > 1.3; // Portrait orientation bias
+      const isTallScreen = aspectRatio > 1.3; // Portrait orientation
+      const isWideScreen = aspectRatio < 0.8; // Landscape orientation (like iPad landscape)
+      const isMobileAspectRatio = isTallScreen || (isWideScreen && isTabletSizedScreen);
       
       // Connection type (mobile networks) - optional, might not be available
       const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
@@ -45,14 +48,14 @@ export default function MobileWarning() {
         isMobileUA,
         isTabletUA,
         isTouchDevice && !hasHoverSupport,
-        hasOrientationAPI && isSmallScreen,
+        hasOrientationAPI && isTabletSizedScreen,
         !hasPointerFine && isTouchDevice,
-        highDPI && isSmallScreen,
-        isTallScreen && isSmallScreen,
+        highDPI && isTabletSizedScreen,
+        isMobileAspectRatio,
         isMobileConnection
       ].filter(Boolean).length;
       
-      // Consider it mobile/tablet if multiple indicators suggest so
+      // Consider it mobile/tablet if multiple indicators suggest so OR if it's definitely a tablet
       const isMobileOrTabletDevice = mobileScore >= 2 || isSmallScreen || isMobileUA || isTabletUA;
       
       setIsMobileOrTablet(isMobileOrTabletDevice);
