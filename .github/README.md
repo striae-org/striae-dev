@@ -85,6 +85,13 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2025-10-04] - *[Release v1.0.3](https://github.com/striae-org/striae/releases/tag/v1.0.3)*
+
+- **📱 Enhanced Mobile/Tablet Detection** - Significantly improved iPad landscape detection and multi-method device identification for better desktop-only enforcement
+- **❓ Login Help Integration** - Added user-friendly login assistance and guidance directly on the home page
+- **🏗️ Infrastructure Cleanup** - Streamlined routing architecture and build scripts for better maintainability
+- **🔧 Development Improvements** - Dependency updates and code organization enhancements
+
 ## [2025-10-02] - *[Release v1.0.2](https://github.com/striae-org/striae/releases/tag/v1.0.2)*
 
 - **🎨 Enhanced Login/Registration Flow** - Comprehensive UI improvements with better form styling, improved error messaging, and streamlined user experience
