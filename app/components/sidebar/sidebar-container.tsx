@@ -136,21 +136,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                   Security Policy
                 </Link>
               </div>
-              <div className={styles.badgeContainer}>
-                <div className={styles.openCollectiveWidget}>
-                  <a 
-                    href="https://opencollective.com/striae" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.openCollectiveLink}
-                  >
-                    <img 
-                      src="/open-collective.svg" 
-                      alt="Contribute to our Open Collective" 
-                      className={styles.openCollectiveImage}
-                    />
-                  </a>
-                </div>
+              <div className={styles.badgeContainer}>                
                 <div className={styles.oinBadge}>
                   <a
                     href="https://openinventionnetwork.com/"
