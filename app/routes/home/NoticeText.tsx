@@ -108,27 +108,7 @@ const NoticeText = () => {
       </p>
       <p>
         This protection is particularly important for forensic science applications, where transparency, reproducibility, and peer review are fundamental principles. By participating in the OIN, Striae helps maintain an environment where forensic technology can evolve through collaborative development, free from patent-related barriers that could impede scientific progress or limit access to critical examination tools.
-      </p>
-      <p>
-        <strong>Supporting Continued Development</strong>
-      </p>
-      <p>
-        By supporting Striae, you help cover essential cloud hosting, ongoing development, and improved user support—ensuring continued free access for the forensic community. Your support allows us to maintain this valuable resource while fostering community involvement and accountability for security and privacy.
-      </p>
-      <div className={styles.openCollectiveWidget}>
-        <a 
-          href="https://opencollective.com/striae" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={styles.openCollectiveLink}
-        >
-          <img 
-            src="/open-collective.svg" 
-            alt="Contribute to our Open Collective" 
-            className={styles.openCollectiveImage}
-          />
-        </a>
-      </div>
+      </p>      
       <p>
         We welcome contributions, suggestions, and feedback from users and developers interested in shaping the future of digital annotation tools for forensic firearms examination. Users can adapt and verify the tool for specialized casework or agency-specific needs. If you have ideas for new features or would like to get involved in development, please visit the repository or contact our team. You can submit issues, feature requests, or pull requests directly on the GitHub repository. For non-developers, links are available in the footer to submit bug reports or feature requests, or to contact support directly.
       </p>      

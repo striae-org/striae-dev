@@ -63,26 +63,6 @@
   flex-wrap: wrap;
 }
 
-.openCollectiveWidget {
-  text-align: center;
-}
-
-.openCollectiveLink {
-  display: inline-block;
-  transition: opacity var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.openCollectiveLink:hover {
-  opacity: 0.8;
-  transform: translateY(-1px);
-}
-
-.openCollectiveImage {
-  height: 30px;
-  width: auto;
-  border-radius: 4px;
-}
-
 .oinBadge {
   text-align: center;
 }
