@@ -1,13 +1,5 @@
 # 🔫 Striae - A Firearms Examiner's Comparison Companion
 
-[![Bronze Sponsor](https://opencollective.com/striae/tiers/backers/badge.svg?label=Bronze%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
-&nbsp;&nbsp;
-[![Silver Sponsor](https://opencollective.com/striae/tiers/sponsors/badge.svg?label=Silver%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
-&nbsp;&nbsp;
-[![Gold Sponsor](https://opencollective.com/striae/tiers/gold-sponsor/badge.svg?label=Gold%20Sponsor&color=brightgreen)](https://opencollective.com/striae)
-&nbsp;&nbsp;
-[![Financial Contributors](https://opencollective.com/striae/tiers/badge.svg)](https://opencollective.com/striae)
-
 ## 🌐 Application URL
 
 **[Live App](https://www.striae.org)**
