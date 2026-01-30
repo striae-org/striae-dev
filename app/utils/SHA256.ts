@@ -76,12 +76,26 @@ export async function calculateSHA256Secure(content: string): Promise<string> {
   const hashArray = new Uint8Array(hashBuffer);
   
   // Add a small constant-time delay based on padding to normalize timing
-  // This is a simplified approach - in production, more sophisticated timing
-  // normalization might be needed
+  // This replaces the trivial dummy operation with a non-trivial digest
+  // over the padded data so the work scales with padding and is less
+  // likely to be optimized away.
   const paddingBytes = paddedLength - originalData.length;
-  for (let i = 0; i < paddingBytes; i++) {
-    // Perform a dummy operation that doesn't affect the result
-    const dummy = hashArray[0] ^ 0;
+  if (paddingBytes > 0) {
+    // Compute a digest over the padded data (discard result) to consume
+    // CPU time proportional to the padded length. We then fold the digest
+    // bytes into a volatile variable to avoid being optimized out.
+    const paddingDigestBuffer = await crypto.subtle.digest('SHA-256', paddedData);
+    const paddingDigestArray = new Uint8Array(paddingDigestBuffer);
+    // Fold bytes into a volatile variable
+    let volatile = 0;
+    for (let i = 0; i < paddingDigestArray.length; i++) {
+      volatile = (volatile * 31) ^ paddingDigestArray[i];
+    }
+    // Use volatile in a way the optimizer can't ignore (no-op branch)
+    if (volatile === 0xdeadbeef) {
+      // unreachable, prevents removal of volatile usage
+      console.debug('');
+    }
   }
   
   return Array.from(hashArray)
