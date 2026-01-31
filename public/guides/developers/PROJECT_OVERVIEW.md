@@ -111,7 +111,7 @@ For support and questions:
 
 - **Documentation**: [Striae Documentation](https://developers.striae.org/striae-dev/get-started/document-index)
 - **Support Portal**: [Striae Support](https://www.striae.org/support)
-- **Discord**: [Striae on Discord](https://discord.gg/ESUPhTPwHx)
+- **Email**: [info@striae.org](mailto:info@striae.org)
 
 ---
 

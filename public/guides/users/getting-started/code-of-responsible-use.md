@@ -32,7 +32,7 @@ visibility: PUBLIC
 
 * Regularly review and update your use of Striae’s features as new improvements are released.
 
-* Share constructive feedback and participate in community feature discussions, such as Discord, to help improve Striae’s effectiveness for all users.
+* Share constructive feedback and participate in community feature discussions to help improve Striae’s effectiveness for all users.
 
 ## Fair and Lawful Use
 

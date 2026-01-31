@@ -151,7 +151,6 @@ Comprehensive end-user guide covering account registration, case management, ima
 - [React Documentation](https://react.dev)
 
 ### Community Resources
-- [Striae Discord](https://discord.gg/ESUPhTPwHx)
 - [GitHub Discussions](https://github.com/striae-org/striae/discussions)
 - [Issue Tracker](https://github.com/striae-org/striae/issues)
 
@@ -165,13 +164,11 @@ Comprehensive end-user guide covering account registration, case management, ima
 
 ### For Documentation Issues
 - Create issue in GitHub repository
-- Ask in Discord #documentation channel
 - Contact documentation maintainers directly
 
 ### For Development Issues
 - Check existing documentation first
 - Search GitHub issues
-- Ask in Discord #development channel
 - Create new issue if needed
 
 ### For Security Issues
@@ -189,7 +186,6 @@ If you're interested in becoming an internal developer with enhanced access and 
   - Direct contribution access to `striae-org/striae-dev` repository
   - Access to [https://dev.striae.org](https://dev.striae.org) for direct testing
   - Enhanced development privileges and internal resources
-  - Private communication channels on Discord
 
 Internal developers work closely with the core team and have streamlined access to development infrastructure and testing environments.
 
