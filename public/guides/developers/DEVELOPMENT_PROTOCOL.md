@@ -571,7 +571,6 @@ For questions about these protocols or development practices:
 
 - **GitHub Issues**: [Open an issue](https://github.com/striae-org/striae/issues) with the `question` label
 - **Email**: Contact project administrators at [dev@striae.org](mailto:dev@striae.org)
-- **Discord**: Contact team members on the [Striae Discord](https://discord.gg/ESUPhTPwHx) #development channel (private)
 - **Documentation**: Refer to the project documentation in the `/guides` directory
 
 ### Internal Developer Program
@@ -586,8 +585,7 @@ If you're interested in becoming an internal developer with direct access to the
   - **Configuration Files**: All `config.json`, `firebase.ts`, and `wrangler.jsonc` files ready to use
   - **Direct Repository Access**: Push access to `striae-org/striae-dev`
   - **Development Environment**: Access to [https://dev.striae.org](https://dev.striae.org) for testing
-  - **Enhanced Development Privileges**: Streamlined setup and deployment process
-  - **Private Communication Channels**: Access to Discord #development channel
+  - **Enhanced Development Privileges**: Streamlined setup and deployment process  
   - **Faster Development Cycle**: Skip complex setup steps and focus on coding
 
 **Internal Developer Workflow:**

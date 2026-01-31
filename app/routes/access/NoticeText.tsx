@@ -13,7 +13,7 @@ export default function NoticeText() {
 <ul>
   <li><strong>Free Forever:</strong> All features are available at no cost to users employed by a forensic laboratory or related organization.</li>
   <li><strong>Work Domain Required:</strong> A valid work email domain is needed to register and login.</li>
-  <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better. Please join our <a href="https://discord.gg/ESUPhTPwHx" target="_blank" rel="noopener noreferrer">Discord server</a> for live discussions and updates.</li>
+  <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better.</li>
 </ul>
 
 <h2>Registered Agencies</h2>

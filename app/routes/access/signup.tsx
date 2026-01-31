@@ -156,9 +156,7 @@ export async function action({ request, context }: { request: Request, context: 
           
           <h3>Agency Registration Request Received</h3>
           <p>Your agency registration request has been received and is being processed. Once approved, all users with email addresses from the ${agencyDomain} domain will be able to access Striae. You will receive an email notification once your agency domain has been added to the access list.</p>
-          
-          <p>We encourage you to join our <a href="https://discord.gg/ESUPhTPwHx">Discord channel</a> for updates and community support.</p>
-          
+                             
           <p><strong>Important:</strong> After approval, users from your agency will require a one-time access code that will be emailed to them to access the login screen. This code will be valid for one month from the date of issuance.</p>
           
           <p>Thank you for your interest in registering your agency with Striae!</p>
@@ -178,9 +176,7 @@ export async function action({ request, context }: { request: Request, context: 
         Agency Registration Request Received
 
         Your agency registration request has been received and is being processed. Once approved, all users with email addresses from the ${agencyDomain} domain will be able to access Striae. You will receive an email notification once your agency domain has been added to the access list.
-
-        We encourage you to join our Discord server at https://discord.gg/ESUPhTPwHx for updates and community support.
-
+       
         Important: After approval, users from your agency will require a one-time access code that will be emailed to them to access the login screen. This code will be valid for one month from the date of issuance.
         
         Thank you for your interest in registering your agency with Striae!`,

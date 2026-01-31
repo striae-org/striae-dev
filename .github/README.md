@@ -12,7 +12,7 @@
 
 **[Striae Support](https://www.striae.org/support)**
 
-**[Striae on Discord](https://discord.gg/ESUPhTPwHx)**
+**[Email Support](mailto:info@striae.org)**
 
 ---
 
