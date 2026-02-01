@@ -212,6 +212,7 @@ export const BoxAnnotations = ({
 
     // Only save if box has meaningful size (at least MIN_BOX_SIZE_PERCENT of image)
     if (width > MIN_BOX_SIZE_PERCENT && height > MIN_BOX_SIZE_PERCENT) {
+      const now = new Date().toISOString();
       const newAnnotation: BoxAnnotation = {
         id: generateAnnotationId(),
         x,
@@ -219,13 +220,22 @@ export const BoxAnnotations = ({
         width,
         height,
         color: annotationColor,
-        timestamp: new Date().toISOString()
+        timestamp: now
       };
       
       try {
         // Save the annotation immediately
         const updatedAnnotations = [...annotations, newAnnotation];
         onAnnotationsChange(updatedAnnotations);
+        
+        // Update annotation data with earliest timestamp if not already set
+        if (onAnnotationDataChange && annotationData) {
+          onAnnotationDataChange({
+            ...annotationData,
+            boxAnnotations: updatedAnnotations,
+            earliestAnnotationTimestamp: annotationData.earliestAnnotationTimestamp || now
+          });
+        }
         
         // Log annotation creation audit
         if (user) {
@@ -310,7 +320,8 @@ export const BoxAnnotations = ({
           onAnnotationDataChange({
             ...annotationData,
             additionalNotes: updatedAdditionalNotes,
-            boxAnnotations: updatedAnnotations
+            boxAnnotations: updatedAnnotations,
+            earliestAnnotationTimestamp: annotationData.earliestAnnotationTimestamp // Preserve earliest timestamp
           });
         } else {
           // No preset color, just update annotations
@@ -398,7 +409,8 @@ export const BoxAnnotations = ({
         onAnnotationDataChange({
           ...annotationData,
           additionalNotes: updatedAdditionalNotes,
-          boxAnnotations: updatedAnnotations
+          boxAnnotations: updatedAnnotations,
+          earliestAnnotationTimestamp: annotationData.earliestAnnotationTimestamp // Preserve earliest timestamp
         });
       } else {
         // Fallback to just updating annotations if no combined callback

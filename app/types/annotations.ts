@@ -41,4 +41,5 @@ export interface AnnotationData {
   additionalNotes?: string;
   boxAnnotations?: BoxAnnotation[];
   updatedAt: string;
+  earliestAnnotationTimestamp?: string; // ISO timestamp of first annotation created (notes or box)
 }
