@@ -64,7 +64,7 @@ export const Canvas = ({
   };
 
   // Handle annotation data changes (for additional notes updates)
-  const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => {
+  const handleAnnotationDataChange = (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[]; earliestAnnotationTimestamp?: string }) => {
     if (!onAnnotationUpdate || !annotationData || isReadOnly || annotationData.confirmationData) return;
     
     const updatedAnnotationData: AnnotationData = {
@@ -328,7 +328,7 @@ export const Canvas = ({
               onAnnotationsChange={handleBoxAnnotationsChange}
               isAnnotationMode={isBoxAnnotationMode && !annotationData?.confirmationData}
               annotationColor={boxAnnotationColor}
-              annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes } : undefined}
+              annotationData={annotationData ? { additionalNotes: annotationData.additionalNotes, earliestAnnotationTimestamp: annotationData.earliestAnnotationTimestamp } : undefined}
               onAnnotationDataChange={handleAnnotationDataChange}
               isReadOnly={isReadOnly || !!annotationData?.confirmationData}
               caseNumber={caseNumber}
