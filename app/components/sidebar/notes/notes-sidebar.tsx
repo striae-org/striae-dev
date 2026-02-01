@@ -114,7 +114,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
       // First, get existing annotation data to preserve box annotations
       existingData = await getNotes(user, currentCase, imageId);
       
-      // Create updated annotation data, preserving box annotations
+      // Create updated annotation data, preserving box annotations and earliest timestamp
+      const now = new Date().toISOString();
       const annotationData: AnnotationData = {
         // Case Information
         leftCase: leftCase || '',
@@ -145,7 +146,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         boxAnnotations: existingData?.boxAnnotations || [],
         
         // Metadata
-        updatedAt: new Date().toISOString()
+        updatedAt: now,
+        // Set earliest annotation timestamp on first save (don't overwrite if already exists)
+        earliestAnnotationTimestamp: existingData?.earliestAnnotationTimestamp || now
       };
 
       await saveNotes(user, currentCase, imageId, annotationData);

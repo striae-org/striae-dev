@@ -269,9 +269,10 @@ export async function exportCaseData(
             lastModified = annotations.updatedAt;
           }
           
-          // Track annotation date range
-          if (!earliestAnnotationDate || annotations.updatedAt < earliestAnnotationDate) {
-            earliestAnnotationDate = annotations.updatedAt;
+          // Track annotation date range using earliest timestamp for first annotation
+          const annotationDateToCheck = annotations.earliestAnnotationTimestamp || annotations.updatedAt;
+          if (!earliestAnnotationDate || annotationDateToCheck < earliestAnnotationDate) {
+            earliestAnnotationDate = annotationDateToCheck;
           }
           if (!latestAnnotationDate || annotations.updatedAt > latestAnnotationDate) {
             latestAnnotationDate = annotations.updatedAt;
