@@ -77,7 +77,15 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
-## [2025-10-04] - *[Release v1.0.3](https://github.com/striae-org/striae/releases/tag/v1.0.3)*
+## [2026-01-31] - *[Stable Release v1.0.4](https://github.com/striae-org/striae/releases/tag/v1.0.4)*
+
+- **📅 Annotation Date Tracking Fix** - Fixed earliest annotation date tracking in case exports and the notes sidebar
+- **⏱️ Enhanced Timing Normalization** - Improved SHA256 timing normalization for more accurate cryptographic operations
+- **🌐 Community Presence Updates** - Removed Discord and Open Collective references per organizational updates
+- **🏆 OIN Badge Update** - Updated Open Invention Network badge to version 2.0
+- **🧹 Code Cleanup** - Removed unused code and updated development dependencies
+
+## [2025-10-04] - *[Release Candidate v1.0.3](https://github.com/striae-org/striae/releases/tag/v1.0.3)*
 
 - **📱 Enhanced Mobile/Tablet Detection** - Significantly improved iPad landscape detection and multi-method device identification for better desktop-only enforcement
 - **❓ Login Help Integration** - Added user-friendly login assistance and guidance directly on the home page
