@@ -30,8 +30,9 @@ interface BoxAnnotationsProps {
   className?: string;
   annotationData?: {
     additionalNotes?: string;
+    earliestAnnotationTimestamp?: string;
   };
-  onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[] }) => void;
+  onAnnotationDataChange?: (data: { additionalNotes?: string; boxAnnotations?: BoxAnnotation[]; earliestAnnotationTimestamp?: string }) => void;
   isReadOnly?: boolean;
   caseNumber: string; // Required for audit logging
   imageFileId?: string;
