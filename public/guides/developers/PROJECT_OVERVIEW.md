@@ -101,7 +101,7 @@ For new developers joining the project:
 
 ## Project Status
 
-Striae is currently v1.0.3. The project is actively maintained and welcomes contributions from the forensic technology community.
+Striae is currently v1.0.4. The project is actively maintained and welcomes contributions from the forensic technology community.
 
 ---
 
