@@ -18,6 +18,8 @@
   Cache-Control: public, max-age=31536000, immutable
 /*.png
   Cache-Control: public, max-age=31536000, immutable
+/assets/*.js
+  Cache-Control: no-cache, no-store, must-revalidate
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 https://striae.pages.dev/*
