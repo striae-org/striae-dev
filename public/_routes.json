@@ -5,7 +5,6 @@
     "/favicon.ico",    
     "/build/*",
     "/*.css",
-    "/*.js",
     "/*.pdf"    
   ],
   "routes": [
