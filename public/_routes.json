@@ -2,17 +2,11 @@
   "version": 1,
   "include": ["/*"],
   "exclude": [
-    "/favicon.ico",    
+    "/favicon.ico",
+    "/assets/*",
     "/build/*",
     "/*.css",
     "/*.js",
     "/*.pdf"    
-  ],
-  "routes": [
-    {
-      "pattern": "/assets/*.js",
-      "methods": ["GET"],
-      "status": 404
-    }
   ]
 }
