@@ -38,7 +38,7 @@
   "dependencies": {
     "@remix-run/cloudflare": "^2.17.1",
     "@remix-run/cloudflare-pages": "^2.17.1",
-    "@remix-run/react": "^2.17.1",
+    "@remix-run/react": "^2.17.4",
     "@types/jszip": "^3.4.1",
     "@types/xlsx": "^0.0.35",
     "firebase": "^12.4.0",
@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251011.0",
-    "@remix-run/dev": "^2.17.1",
+    "@remix-run/dev": "^2.17.4",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@types/sanitize-html": "^2.16.0",
@@ -70,7 +70,7 @@
     "typescript": "^5.9.3",
     "vite": "^6.4.1",
     "vite-tsconfig-paths": "^4.2.1",
-    "wrangler": "^3.28.2"
+    "wrangler": "^3.114.17"
   },
   "engines": {
     "node": ">=20.0.0"
