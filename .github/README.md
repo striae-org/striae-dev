@@ -14,7 +14,7 @@
 
 **[Email Support](mailto:info@striae.org)**
 
-## Project Contributors
+## 👥 Project Contributors
 
 [![Stephen J. Lu](https://github.com/StephenJLu.png?size=50)](https://github.com/StephenJLu)
 
