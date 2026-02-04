@@ -712,10 +712,26 @@
   background-color: #fff8c4;
 }
 
+.fileItem.active.fileItemNotConfirmed {
+  background-color: #fffacd;
+}
+
+.fileItem.active.fileItemNotConfirmed:hover {
+  background-color: #fff8c4;
+}
+
 .fileItemConfirmed {
   background-color: #c8e6c9;
 }
 
 .fileItemConfirmed:hover {
+  background-color: #a5d6a7;
+}
+
+.fileItem.active.fileItemConfirmed {
+  background-color: #c8e6c9;
+}
+
+.fileItem.active.fileItemConfirmed:hover {
   background-color: #a5d6a7;
 }
