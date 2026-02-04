@@ -41,12 +41,14 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
   // Fetch confirmation status only for currently visible paginated files
   useEffect(() => {
     const fetchConfirmationStatuses = async () => {
-      if (!isOpen || !currentCase || !user || currentFiles.length === 0) {
+      const visibleFiles = files.slice(startIndex, endIndex);
+
+      if (!isOpen || !currentCase || !user || visibleFiles.length === 0) {
         return;
       }
 
       // Fetch annotations in parallel for only visible files
-      const annotationPromises = currentFiles.map(async (file) => {
+      const annotationPromises = visibleFiles.map(async (file) => {
         try {
           const annotations = await getFileAnnotations(user, currentCase, file.id);
           return {
@@ -80,7 +82,7 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
     };
 
     fetchConfirmationStatuses();
-  }, [isOpen, currentCase, currentFiles, user]);
+  }, [isOpen, currentCase, currentPage, files, user]);
 
   const handleFileSelect = (file: FileData) => {
     onFileSelect?.(file);

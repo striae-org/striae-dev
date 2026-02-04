@@ -65,12 +65,17 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
   // Fetch confirmation status only for currently visible paginated cases
   useEffect(() => {
     const fetchCaseConfirmationStatuses = async () => {
-      if (!isOpen || paginatedCases.length === 0) {
+      const visibleCases = cases.slice(
+        currentPage * CASES_PER_PAGE,
+        (currentPage + 1) * CASES_PER_PAGE
+      );
+
+      if (!isOpen || visibleCases.length === 0) {
         return;
       }
 
       // Fetch case statuses in parallel for only visible cases
-      const caseStatusPromises = paginatedCases.map(async (caseNum) => {
+      const caseStatusPromises = visibleCases.map(async (caseNum) => {
         try {
           const files = await fetchFiles(user, caseNum, { skipValidation: true });
           
@@ -124,7 +129,7 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
     };
 
     fetchCaseConfirmationStatuses();
-  }, [isOpen, paginatedCases, user]);
+  }, [isOpen, currentPage, cases, user]);
 
   if (!isOpen) return null;
 
