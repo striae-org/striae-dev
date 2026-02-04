@@ -131,3 +131,36 @@
 .error {
   color: var(--error);
 }
+
+/* Case Confirmation Status Indicators */
+.caseItemNotConfirmed {
+  background-color: #fffacd;
+}
+
+.caseItemNotConfirmed:hover {
+  background-color: #fff8c4;
+}
+
+.caseItem.active.caseItemNotConfirmed {
+  background-color: #fffacd;
+}
+
+.caseItem.active.caseItemNotConfirmed:hover {
+  background-color: #fff8c4;
+}
+
+.caseItemConfirmed {
+  background-color: #c8e6c9;
+}
+
+.caseItemConfirmed:hover {
+  background-color: #a5d6a7;
+}
+
+.caseItem.active.caseItemConfirmed {
+  background-color: #c8e6c9;
+}
+
+.caseItem.active.caseItemConfirmed:hover {
+  background-color: #a5d6a7;
+}

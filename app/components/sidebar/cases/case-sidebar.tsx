@@ -106,6 +106,10 @@ export const CaseSidebar = ({
   const [fileConfirmationStatus, setFileConfirmationStatus] = useState<{
     [fileId: string]: { includeConfirmation: boolean; isConfirmed: boolean }
   }>({});
+  const [caseConfirmationStatus, setCaseConfirmationStatus] = useState<{
+    includeConfirmation: boolean;
+    isConfirmed: boolean;
+  }>({ includeConfirmation: false, isConfirmed: false });
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -195,6 +199,7 @@ export const CaseSidebar = ({
     const fetchConfirmationStatuses = async () => {
       if (!currentCase || !user || files.length === 0) {
         setFileConfirmationStatus({});
+        setCaseConfirmationStatus({ includeConfirmation: false, isConfirmed: false });
         return;
       }
 
@@ -217,6 +222,15 @@ export const CaseSidebar = ({
       }
 
       setFileConfirmationStatus(statuses);
+
+      // Calculate case confirmation status
+      const filesRequiringConfirmation = Object.values(statuses).filter(s => s.includeConfirmation);
+      const allConfirmedFiles = filesRequiringConfirmation.every(s => s.isConfirmed);
+      
+      setCaseConfirmationStatus({
+        includeConfirmation: filesRequiringConfirmation.length > 0,
+        isConfirmed: filesRequiringConfirmation.length > 0 ? allConfirmedFiles : false,
+      });
     };
 
     fetchConfirmationStatuses();
@@ -559,7 +573,13 @@ return (
       
         <div className={styles.filesSection}>
       <div className={isReadOnly && currentCase ? styles.readOnlyContainer : styles.caseHeader}>
-        <h4 className={styles.caseNumber}>
+        <h4 className={`${styles.caseNumber} ${
+          currentCase && caseConfirmationStatus.includeConfirmation 
+            ? caseConfirmationStatus.isConfirmed 
+              ? styles.caseConfirmed 
+              : styles.caseNotConfirmed
+            : ''
+        }`}>
           {currentCase || 'No Case Selected'}
         </h4>
         {isReadOnly && currentCase && (
