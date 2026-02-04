@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
 import { deleteFile } from '~/components/actions/image-manage';
+import { getFileAnnotations } from '~/utils/data-operations';
 import { FileData } from '~/types';
 import styles from './files-modal.module.css';
 
@@ -17,16 +18,56 @@ interface FilesModalProps {
 
 const FILES_PER_PAGE = 10;
 
+// Type to track confirmation status for each file
+interface FileConfirmationStatus {
+  [fileId: string]: {
+    includeConfirmation: boolean;
+    isConfirmed: boolean;
+  };
+}
+
 export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, setFiles, isReadOnly = false, selectedFileId }: FilesModalProps) => {
   const { user } = useContext(AuthContext);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [fileConfirmationStatus, setFileConfirmationStatus] = useState<FileConfirmationStatus>({});
 
   const totalPages = Math.ceil(files.length / FILES_PER_PAGE);
   const startIndex = currentPage * FILES_PER_PAGE;
   const endIndex = startIndex + FILES_PER_PAGE;
   const currentFiles = files.slice(startIndex, endIndex);
+
+  // Fetch confirmation status for files when modal opens or files change
+  useEffect(() => {
+    const fetchConfirmationStatuses = async () => {
+      if (!isOpen || !currentCase || !user || files.length === 0) {
+        return;
+      }
+
+      const statuses: FileConfirmationStatus = {};
+
+      for (const file of files) {
+        try {
+          const annotations = await getFileAnnotations(user, currentCase, file.id);
+          statuses[file.id] = {
+            includeConfirmation: annotations?.includeConfirmation ?? false,
+            isConfirmed: !!(annotations?.includeConfirmation && annotations?.confirmationData),
+          };
+        } catch (err) {
+          console.error(`Error fetching annotations for file ${file.id}:`, err);
+          statuses[file.id] = {
+            includeConfirmation: false,
+            isConfirmed: false,
+          };
+        }
+      }
+
+      setFileConfirmationStatus(statuses);
+    };
+
+    fetchConfirmationStatuses();
+  }, [isOpen, currentCase, files, user]);
 
   const handleFileSelect = (file: FileData) => {
     onFileSelect?.(file);
@@ -117,32 +158,43 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
             <div className={styles.emptyState}>No files in this case</div>
           ) : (
             <div className={styles.filesList}>
-              {currentFiles.map((file) => (
-                <div
-                  key={file.id}
-                  className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''}`}
-                  onClick={() => handleFileSelect(file)}
-                >
-                  <div className={styles.fileInfo}>
-                    <div className={styles.fileName} title={file.originalFilename}>
-                      {formatFileName(file.originalFilename)}
-                    </div>
-                    <div className={styles.fileDate}>
-                      Uploaded: {formatDate(file.uploadedAt)}
-                    </div>
-                  </div>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={(e) => handleDeleteFile(file.id, e)}
-                    disabled={isReadOnly || deletingFileId === file.id}
-                    aria-label={`Delete ${file.originalFilename}`}
-                    title={isReadOnly ? "Cannot delete files for read-only cases" : "Delete file"}
-                    style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
+              {currentFiles.map((file) => {
+                const confirmationStatus = fileConfirmationStatus[file.id];
+                let confirmationClass = '';
+                
+                if (confirmationStatus?.includeConfirmation) {
+                  confirmationClass = confirmationStatus.isConfirmed 
+                    ? styles.fileItemConfirmed 
+                    : styles.fileItemNotConfirmed;
+                }
+
+                return (
+                  <div
+                    key={file.id}
+                    className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''} ${confirmationClass}`}
+                    onClick={() => handleFileSelect(file)}
                   >
-                    {deletingFileId === file.id ? '⏳' : '×'}
-                  </button>
-                </div>
-              ))}
+                    <div className={styles.fileInfo}>
+                      <div className={styles.fileName} title={file.originalFilename}>
+                        {formatFileName(file.originalFilename)}
+                      </div>
+                      <div className={styles.fileDate}>
+                        Uploaded: {formatDate(file.uploadedAt)}
+                      </div>
+                    </div>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={(e) => handleDeleteFile(file.id, e)}
+                      disabled={isReadOnly || deletingFileId === file.id}
+                      aria-label={`Delete ${file.originalFilename}`}
+                      title={isReadOnly ? "Cannot delete files for read-only cases" : "Delete file"}
+                      style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
+                    >
+                      {deletingFileId === file.id ? '⏳' : '×'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
