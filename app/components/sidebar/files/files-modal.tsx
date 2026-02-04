@@ -38,36 +38,49 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
   const endIndex = startIndex + FILES_PER_PAGE;
   const currentFiles = files.slice(startIndex, endIndex);
 
-  // Fetch confirmation status for files when modal opens or files change
+  // Fetch confirmation status only for currently visible paginated files
   useEffect(() => {
     const fetchConfirmationStatuses = async () => {
-      if (!isOpen || !currentCase || !user || files.length === 0) {
+      if (!isOpen || !currentCase || !user || currentFiles.length === 0) {
         return;
       }
 
-      const statuses: FileConfirmationStatus = {};
-
-      for (const file of files) {
+      // Fetch annotations in parallel for only visible files
+      const annotationPromises = currentFiles.map(async (file) => {
         try {
           const annotations = await getFileAnnotations(user, currentCase, file.id);
-          statuses[file.id] = {
+          return {
+            fileId: file.id,
             includeConfirmation: annotations?.includeConfirmation ?? false,
             isConfirmed: !!(annotations?.includeConfirmation && annotations?.confirmationData),
           };
         } catch (err) {
           console.error(`Error fetching annotations for file ${file.id}:`, err);
-          statuses[file.id] = {
+          return {
+            fileId: file.id,
             includeConfirmation: false,
             isConfirmed: false,
           };
         }
-      }
+      });
+
+      // Wait for all fetches to complete
+      const results = await Promise.all(annotationPromises);
+
+      // Build the statuses map from results
+      const statuses: FileConfirmationStatus = {};
+      results.forEach((result) => {
+        statuses[result.fileId] = {
+          includeConfirmation: result.includeConfirmation,
+          isConfirmed: result.isConfirmed,
+        };
+      });
 
       setFileConfirmationStatus(statuses);
     };
 
     fetchConfirmationStatuses();
-  }, [isOpen, currentCase, files, user]);
+  }, [isOpen, currentCase, currentFiles, user]);
 
   const handleFileSelect = (file: FileData) => {
     onFileSelect?.(file);
