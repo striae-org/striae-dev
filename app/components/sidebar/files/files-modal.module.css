@@ -177,33 +177,33 @@
 }
 /* Confirmation Status Indicators */
 .fileItemNotConfirmed {
-  background-color: #fffacd;
+  background-color: color-mix(in lab, var(--warning) 15%, var(--backgroundLight));
 }
 
 .fileItemNotConfirmed:hover {
-  background-color: #fff8c4;
+  background-color: color-mix(in lab, var(--warning) 20%, var(--backgroundLight));
 }
 
 .fileItem.active.fileItemNotConfirmed {
-  background-color: #fffacd;
+  background-color: color-mix(in lab, var(--warning) 15%, var(--backgroundLight));
 }
 
 .fileItem.active.fileItemNotConfirmed:hover {
-  background-color: #fff8c4;
+  background-color: color-mix(in lab, var(--warning) 20%, var(--backgroundLight));
 }
 
 .fileItemConfirmed {
-  background-color: #c8e6c9;
+  background-color: color-mix(in lab, var(--success) 20%, var(--backgroundLight));
 }
 
 .fileItemConfirmed:hover {
-  background-color: #a5d6a7;
+  background-color: color-mix(in lab, var(--success) 28%, var(--backgroundLight));
 }
 
 .fileItem.active.fileItemConfirmed {
-  background-color: #c8e6c9;
+  background-color: color-mix(in lab, var(--success) 20%, var(--backgroundLight));
 }
 
 .fileItem.active.fileItemConfirmed:hover {
-  background-color: #a5d6a7;
+  background-color: color-mix(in lab, var(--success) 28%, var(--backgroundLight));
 }
