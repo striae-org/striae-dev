@@ -14,6 +14,10 @@
 
 **[Email Support](mailto:info@striae.org)**
 
+## Project Contributors
+
+[![Stephen J. Lu](https://github.com/StephenJLu.png?size=50)](https://github.com/StephenJLu)
+
 ---
 
 ## 🚀 Quick Start Install

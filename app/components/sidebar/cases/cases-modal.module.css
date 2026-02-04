@@ -134,33 +134,33 @@
 
 /* Case Confirmation Status Indicators */
 .caseItemNotConfirmed {
-  background-color: #fffacd;
+  background-color: color-mix(in lab, var(--warning) 15%, var(--backgroundLight));
 }
 
 .caseItemNotConfirmed:hover {
-  background-color: #fff8c4;
+  background-color: color-mix(in lab, var(--warning) 20%, var(--backgroundLight));
 }
 
 .caseItem.active.caseItemNotConfirmed {
-  background-color: #fffacd;
+  background-color: color-mix(in lab, var(--warning) 15%, var(--backgroundLight));
 }
 
 .caseItem.active.caseItemNotConfirmed:hover {
-  background-color: #fff8c4;
+  background-color: color-mix(in lab, var(--warning) 20%, var(--backgroundLight));
 }
 
 .caseItemConfirmed {
-  background-color: #c8e6c9;
+  background-color: color-mix(in lab, var(--success) 20%, var(--backgroundLight));
 }
 
 .caseItemConfirmed:hover {
-  background-color: #a5d6a7;
+  background-color: color-mix(in lab, var(--success) 28%, var(--backgroundLight));
 }
 
 .caseItem.active.caseItemConfirmed {
-  background-color: #c8e6c9;
+  background-color: color-mix(in lab, var(--success) 20%, var(--backgroundLight));
 }
 
 .caseItem.active.caseItemConfirmed:hover {
-  background-color: #a5d6a7;
+  background-color: color-mix(in lab, var(--success) 28%, var(--backgroundLight));
 }

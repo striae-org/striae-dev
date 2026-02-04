@@ -55,21 +55,26 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
     }
   }, [isOpen, user]);
 
-  // Fetch confirmation status for all cases when they load
+  const paginatedCases = cases.slice(
+    currentPage * CASES_PER_PAGE,
+    (currentPage + 1) * CASES_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(cases.length / CASES_PER_PAGE);
+
+  // Fetch confirmation status only for currently visible paginated cases
   useEffect(() => {
     const fetchCaseConfirmationStatuses = async () => {
-      if (!isOpen || cases.length === 0) {
-        setCaseConfirmationStatus({});
+      if (!isOpen || paginatedCases.length === 0) {
         return;
       }
 
-      const statuses: { [caseNum: string]: { includeConfirmation: boolean; isConfirmed: boolean } } = {};
-
-      for (const caseNum of cases) {
+      // Fetch case statuses in parallel for only visible cases
+      const caseStatusPromises = paginatedCases.map(async (caseNum) => {
         try {
           const files = await fetchFiles(user, caseNum, { skipValidation: true });
           
-          // Fetch annotations for each file in the case
+          // Fetch annotations for each file in the case (in parallel)
           const fileStatuses = await Promise.all(
             files.map(async (file) => {
               try {
@@ -88,28 +93,38 @@ export const CasesModal = ({ isOpen, onClose, onSelectCase, currentCase, user }:
           const filesRequiringConfirmation = fileStatuses.filter(s => s.includeConfirmation);
           const allConfirmedFiles = filesRequiringConfirmation.every(s => s.isConfirmed);
 
-          statuses[caseNum] = {
+          return {
+            caseNum,
             includeConfirmation: filesRequiringConfirmation.length > 0,
             isConfirmed: filesRequiringConfirmation.length > 0 ? allConfirmedFiles : false,
           };
         } catch (err) {
           console.error(`Error fetching confirmation status for case ${caseNum}:`, err);
-          statuses[caseNum] = { includeConfirmation: false, isConfirmed: false };
+          return {
+            caseNum,
+            includeConfirmation: false,
+            isConfirmed: false,
+          };
         }
-      }
+      });
+
+      // Wait for all case status fetches to complete
+      const results = await Promise.all(caseStatusPromises);
+
+      // Build the statuses map from results
+      const statuses: { [caseNum: string]: { includeConfirmation: boolean; isConfirmed: boolean } } = {};
+      results.forEach((result) => {
+        statuses[result.caseNum] = {
+          includeConfirmation: result.includeConfirmation,
+          isConfirmed: result.isConfirmed,
+        };
+      });
 
       setCaseConfirmationStatus(statuses);
     };
 
     fetchCaseConfirmationStatuses();
-  }, [isOpen, cases, user]);
-
-  const paginatedCases = cases.slice(
-    currentPage * CASES_PER_PAGE,
-    (currentPage + 1) * CASES_PER_PAGE
-  );
-
-  const totalPages = Math.ceil(cases.length / CASES_PER_PAGE);
+  }, [isOpen, paginatedCases, user]);
 
   if (!isOpen) return null;
 

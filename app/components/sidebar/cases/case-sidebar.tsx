@@ -203,23 +203,36 @@ export const CaseSidebar = ({
         return;
       }
 
-      const statuses: { [fileId: string]: { includeConfirmation: boolean; isConfirmed: boolean } } = {};
-
-      for (const file of files) {
+      // Fetch all annotations in parallel
+      const annotationPromises = files.map(async (file) => {
         try {
           const annotations = await getFileAnnotations(user, currentCase, file.id);
-          statuses[file.id] = {
+          return {
+            fileId: file.id,
             includeConfirmation: annotations?.includeConfirmation ?? false,
             isConfirmed: !!(annotations?.includeConfirmation && annotations?.confirmationData),
           };
         } catch (err) {
           console.error(`Error fetching annotations for file ${file.id}:`, err);
-          statuses[file.id] = {
+          return {
+            fileId: file.id,
             includeConfirmation: false,
             isConfirmed: false,
           };
         }
-      }
+      });
+
+      // Wait for all fetches to complete
+      const results = await Promise.all(annotationPromises);
+
+      // Build the statuses map from results
+      const statuses: { [fileId: string]: { includeConfirmation: boolean; isConfirmed: boolean } } = {};
+      results.forEach((result) => {
+        statuses[result.fileId] = {
+          includeConfirmation: result.includeConfirmation,
+          isConfirmed: result.isConfirmed,
+        };
+      });
 
       setFileConfirmationStatus(statuses);
 
