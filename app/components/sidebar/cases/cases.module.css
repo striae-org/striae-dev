@@ -695,6 +695,21 @@
   font-weight: 600;
 }
 
+/* Case Confirmation Status Indicators */
+.caseNumber.caseNotConfirmed {
+  background-color: #fffacd;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.caseNumber.caseConfirmed {
+  background-color: #c8e6c9;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0;
+}
+
 /* Read-Only Badge */
 .readOnlyBadge {
   font-size: 0.75rem;
@@ -702,4 +717,36 @@
   text-align: center;
   color: #856404;
   margin-top: 0.25rem;
+}
+/* Confirmation Status Indicators */
+.fileItemNotConfirmed {
+  background-color: #fffacd;
+}
+
+.fileItemNotConfirmed:hover {
+  background-color: #fff8c4;
+}
+
+.fileItem.active.fileItemNotConfirmed {
+  background-color: #fffacd;
+}
+
+.fileItem.active.fileItemNotConfirmed:hover {
+  background-color: #fff8c4;
+}
+
+.fileItemConfirmed {
+  background-color: #c8e6c9;
+}
+
+.fileItemConfirmed:hover {
+  background-color: #a5d6a7;
+}
+
+.fileItem.active.fileItemConfirmed {
+  background-color: #c8e6c9;
+}
+
+.fileItem.active.fileItemConfirmed:hover {
+  background-color: #a5d6a7;
 }

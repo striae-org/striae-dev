@@ -35,6 +35,7 @@ import {
   getLimitsDescription,
   getUserData
 } from '~/utils/permissions';
+import { getFileAnnotations } from '~/utils/data-operations';
 import { FileData, CaseActionType } from '~/types';
 
 interface CaseSidebarProps {
@@ -102,7 +103,13 @@ export const CaseSidebar = ({
   const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
   const [isAuditTrailOpen, setIsAuditTrailOpen] = useState(false);
-
+  const [fileConfirmationStatus, setFileConfirmationStatus] = useState<{
+    [fileId: string]: { includeConfirmation: boolean; isConfirmed: boolean }
+  }>({});
+  const [caseConfirmationStatus, setCaseConfirmationStatus] = useState<{
+    includeConfirmation: boolean;
+    isConfirmed: boolean;
+  }>({ includeConfirmation: false, isConfirmed: false });
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -186,6 +193,48 @@ export const CaseSidebar = ({
       setFiles([]);
     }
   }, [user, currentCase, setFiles]);
+
+  // Fetch confirmation status for files when they load or change
+  useEffect(() => {
+    const fetchConfirmationStatuses = async () => {
+      if (!currentCase || !user || files.length === 0) {
+        setFileConfirmationStatus({});
+        setCaseConfirmationStatus({ includeConfirmation: false, isConfirmed: false });
+        return;
+      }
+
+      const statuses: { [fileId: string]: { includeConfirmation: boolean; isConfirmed: boolean } } = {};
+
+      for (const file of files) {
+        try {
+          const annotations = await getFileAnnotations(user, currentCase, file.id);
+          statuses[file.id] = {
+            includeConfirmation: annotations?.includeConfirmation ?? false,
+            isConfirmed: !!(annotations?.includeConfirmation && annotations?.confirmationData),
+          };
+        } catch (err) {
+          console.error(`Error fetching annotations for file ${file.id}:`, err);
+          statuses[file.id] = {
+            includeConfirmation: false,
+            isConfirmed: false,
+          };
+        }
+      }
+
+      setFileConfirmationStatus(statuses);
+
+      // Calculate case confirmation status
+      const filesRequiringConfirmation = Object.values(statuses).filter(s => s.includeConfirmation);
+      const allConfirmedFiles = filesRequiringConfirmation.every(s => s.isConfirmed);
+      
+      setCaseConfirmationStatus({
+        includeConfirmation: filesRequiringConfirmation.length > 0,
+        isConfirmed: filesRequiringConfirmation.length > 0 ? allConfirmedFiles : false,
+      });
+    };
+
+    fetchConfirmationStatuses();
+  }, [currentCase, files, user]);
   
   const handleCase = async () => {
     setIsLoading(true);
@@ -524,7 +573,13 @@ return (
       
         <div className={styles.filesSection}>
       <div className={isReadOnly && currentCase ? styles.readOnlyContainer : styles.caseHeader}>
-        <h4 className={styles.caseNumber}>
+        <h4 className={`${styles.caseNumber} ${
+          currentCase && caseConfirmationStatus.includeConfirmation 
+            ? caseConfirmationStatus.isConfirmed 
+              ? styles.caseConfirmed 
+              : styles.caseNotConfirmed
+            : ''
+        }`}>
           {currentCase || 'No Case Selected'}
         </h4>
         {isReadOnly && currentCase && (
@@ -591,31 +646,42 @@ return (
             </div>
           )}
           <ul className={styles.fileList}>
-            {files.map((file) => (
-              <li key={file.id}
-                className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''}`}>
+            {files.map((file) => {
+              const confirmationStatus = fileConfirmationStatus[file.id];
+              let confirmationClass = '';
+              
+              if (confirmationStatus?.includeConfirmation) {
+                confirmationClass = confirmationStatus.isConfirmed 
+                  ? styles.fileItemConfirmed 
+                  : styles.fileItemNotConfirmed;
+              }
+
+              return (
+                <li key={file.id}
+                  className={`${styles.fileItem} ${selectedFileId === file.id ? styles.active : ''} ${confirmationClass}`}>
+                    <button
+                      className={styles.fileButton}
+                      onClick={() => handleImageSelect(file)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
+                    >
+                    <span className={styles.fileName}>{file.originalFilename}</span>
+                  </button>              
                   <button
-                    className={styles.fileButton}
-                    onClick={() => handleImageSelect(file)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+                        handleFileDelete(file.id);                                        
+                      }
+                    }}
+                    className={styles.deleteButton}
+                    aria-label="Delete file"
+                    disabled={isReadOnly || deletingFileId === file.id}
+                    style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
                   >
-                  <span className={styles.fileName}>{file.originalFilename}</span>
-                </button>              
-                <button
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-                      handleFileDelete(file.id);                                        
-                    }
-                  }}
-                  className={styles.deleteButton}
-                  aria-label="Delete file"
-                  disabled={isReadOnly || deletingFileId === file.id}
-                  style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
-                >
-                  {deletingFileId === file.id ? '⏳' : '×'}
-                </button>
-              </li>
-            ))}
+                    {deletingFileId === file.id ? '⏳' : '×'}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </>
       )}
