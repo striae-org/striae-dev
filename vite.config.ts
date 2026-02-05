@@ -4,6 +4,7 @@ import {
 } from "@remix-run/dev";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+//import { visualizer } from "rollup-plugin-visualizer";
 
 declare module "@remix-run/cloudflare" {
   interface Future {
@@ -16,8 +17,9 @@ export default defineConfig({
     port: 7777,
   },
   build: {
-    // Set chunk size warning limit higher since we're using dynamic imports for large libs
-    chunkSizeWarningLimit: 600
+    // Set chunk size warning limit higher since we're using dynamic imports for large libs (default: 500)
+    chunkSizeWarningLimit: 500,
+    minify: true,
   },
   plugins: [
     remixCloudflareDevProxy(),
@@ -30,6 +32,7 @@ export default defineConfig({
         v3_lazyRouteDiscovery: true,
       },
     }),
-    tsconfigPaths(),
+    tsconfigPaths()
+    //visualizer({ open: true, filename: 'dist/states.html' })
   ],
 });
