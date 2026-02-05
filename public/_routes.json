@@ -3,6 +3,9 @@
   "include": ["/*"],
   "exclude": [
     "/favicon.ico",
+    "/guides/*",
+    "/release-notes/*",
+    "/blog-posts/*",
     "/assets/*",
     "/build/*",
     "/*.css",
