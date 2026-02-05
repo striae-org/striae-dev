@@ -347,3 +347,12 @@ const response = await fetch(`${config.user_worker_url}/api/user`, {
 - Data operations: `app/utils/data-operations.ts`
 - Audit service: `app/services/audit.service.ts`
 - Type definitions: `app/types/` (barrel exports via `index.ts`)
+
+## Version Update Protocol
+- Update the `version` field in `package.json`.
+- Create a new release notes file for the version, similar in style to previous release notes, located in public/release-notes.
+- Update the sitemap with the new release notes path.
+- Add an entry to the changelog in .github/README.md
+- Make sure all version references are updated consistently (SECURITY, Project Overview, etc.).
+- Run npm install
+- Run npm run build
