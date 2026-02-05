@@ -16,8 +16,7 @@ export default defineConfig({
   server: {
     port: 7777,
   },
-  build: {
-    // Set chunk size warning limit higher since we're using dynamic imports for large libs (default: 500)
+  build: {    
     chunkSizeWarningLimit: 500,
     minify: true,
   },
@@ -32,7 +31,7 @@ export default defineConfig({
         v3_lazyRouteDiscovery: true,
       },
     }),
-    tsconfigPaths()
+    tsconfigPaths(),
     //visualizer({ open: true, filename: 'dist/states.html' })
   ],
 });
