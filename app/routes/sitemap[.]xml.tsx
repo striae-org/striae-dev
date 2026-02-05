@@ -52,6 +52,7 @@ export const loader: LoaderFunction = async ({ context }) => {
     { path: "/guides/users/faqs/striae-frequently-asked-questions.md", changefreq: "quarterly", priority: 0.6 },
     
     // Release notes - Stable
+    { path: "/release-notes/RELEASE_NOTES_v1.0.5.md", changefreq: "monthly", priority: 0.5 },
     { path: "/release-notes/RELEASE_NOTES_v1.0.4.md", changefreq: "monthly", priority: 0.5 },
     { path: "/release-notes/RELEASE_NOTES_v1.0.3.md", changefreq: "monthly", priority: 0.4 },
     { path: "/release-notes/RELEASE_NOTES_v1.0.2.md", changefreq: "monthly", priority: 0.4 },

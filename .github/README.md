@@ -81,6 +81,14 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2026-02-05] - *[Patch Release v1.0.5](https://github.com/striae-org/striae/releases/tag/v1.0.5)*
+
+- **✅ Confirmation Status Indicators** - Applied visual confirmation indicators to case number displays and file lists
+- **⚡ Performance Optimizations** - Fixed infinite re-render loops and improved component rendering efficiency
+- **🎨 Design System Integration** - Standardized style token usage in some components for consistent design
+- **🗺️ Dynamic Sitemap** - Implemented dynamic sitemap generation for improved SEO and discoverability
+- **📦 Dependency Updates** - Updated Firebase, ESLint, TypeScript ESLint, and other core dependencies for security and compatibility
+
 ## [2026-01-31] - *[Stable Release v1.0.4](https://github.com/striae-org/striae/releases/tag/v1.0.4)*
 
 - **📅 Annotation Date Tracking Fix** - Fixed earliest annotation date tracking in case exports and the notes sidebar
