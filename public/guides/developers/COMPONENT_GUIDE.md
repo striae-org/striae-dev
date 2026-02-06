@@ -262,7 +262,7 @@ interface ToolbarColorSelectorProps {
 
 #### Confirmation (`app/components/canvas/confirmation/confirmation.tsx`)
 
-**Purpose**: Authenticated confirmation modal for forensic image verification workflow
+**Purpose**: Authenticated confirmation modal for comparison image verification workflow
 
 **Features**:
 
