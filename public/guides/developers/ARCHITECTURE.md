@@ -460,29 +460,92 @@ The backend consists of seven specialized Cloudflare Workers, each handling spec
 - Compliance audit trail generation and management
 - Security incident logging and forensic analysis support
 
-**Storage**: Cloudflare R2 (STRIAE_AUDIT bucket)
+**Storage**: Cloudflare R2 dedicated `STRIAE_AUDIT` bucket (separate from STRIAE_DATA)
+
+Storage Pattern: Organized by user and date for efficient retrieval
+- `audit-trails/{userId}/{YYYY-MM-DD}.json` - Daily audit entries per user
 
 **API Endpoints**:
 
-- `POST /audit/?userId={userUid}` - Create new audit log entry for specific user
-- `GET /audit/?userId={userUid}` - Retrieve today's audit logs for specific user
-- `GET /audit/?userId={userUid}&startDate={YYYY-MM-DD}&endDate={YYYY-MM-DD}` - Retrieve audit logs for specific user within date range
+- `POST /{userId}/` - Create new audit log entry for specific user
+- `GET /{userId}/` - Retrieve today's audit logs for specific user
+- `GET /{userId}/?startDate={YYYY-MM-DD}&endDate={YYYY-MM-DD}` - Retrieve audit logs for specific user within date range
+- `GET /{userId}/?action={action}&result={result}&caseNumber={caseNumber}&limit={limit}&offset={offset}` - Advanced filtering with pagination
 
 **Key Features**:
 
-- Comprehensive event tracking with structured metadata
-- User context preservation for forensic analysis
-- Image file tracking with original IDs for chain of custody
-- Security violation detection and logging
-- Multi-factor authentication event logging
-- Case creation, modification, and deletion audit trails
-- Annotation edit tracking with before/after states
-- Confirmation activity, PDF generation, import, and export activity logging
-- R2 bucket storage for persistent audit trails
-- JSON-based audit event structure with timestamps
-- Compliance-ready audit data format
+- **Comprehensive Event Tracking**: All user actions logged with structured metadata
+  - Case management (create, rename, delete)
+  - File operations (upload, access, delete)
+  - Annotation operations (create, edit, delete)
+  - Confirmation activities (export, import, confirm)
+  - User authentication and profile changes
+  - PDF generation and document operations
+
+- **Forensic Accountability**:
+  - Tamper-proof immutable entries that cannot be modified or deleted
+  - User context preservation for chain of custody
+  - Image file tracking with original IDs for forensic chain of custody
+  - Security violation detection and logging
+  - Cryptographic integrity validation with SHA-256 hashing
+
+- **Compliance Features**:
+  - Multi-factor authentication event logging
+  - Role-based access control auditing
+  - Data modification tracking with before/after states
+  - Workflow phase categorization (casework, case-export, case-import, confirmation, user-management)
+  - Result status tracking (success, failure, warning, blocked, pending)
+  - Performance metrics (processing time, file sizes, validation steps)
+
+- **Data Management**:
+  - R2 bucket storage for persistent, durable audit trails (99.999999999% durability)
+  - JSON-based audit event structure with ISO 8601 timestamps
+  - Daily file organization for efficient querying and archival
+  - Automatic aggregation for multi-day audit trail requests
+  - Compliance-ready audit data format for reporting and evidence
+
+- **Inter-Worker Communication**:
+  - Integration with AuditService frontend client for creating audit entries
+  - Automatic API key injection for worker-to-worker authentication
+  - Non-blocking error handling (failures don't block main operations)
+  - Retry logic with exponential backoff for transient failures
+
+- **Data Consistency & Security**:
+  - Immutable entries ensure data integrity (no updates/deletes)
+  - Server-side timestamp generation to prevent clock skew
+  - Permanent data retention for forensic compliance
+  - Multi-format export (CSV, JSON, reports) for analysis
 
 ## Data Architecture
+
+### Storage Systems Overview
+
+Striae's data architecture separates concerns across multiple specialized storage systems:
+
+- **User Data (KV)**: User profiles, authentication state, and case assignments
+- **Case Data (R2)**: Forensic examination data, annotations, file references
+- **Audit Trails (R2)**: Complete immutable audit logs for compliance and forensic accountability
+- **Image Files**: High-performance image storage with global CDN distribution
+- **Authentication**: Firebase for identity management and access control
+
+**Worker-to-Storage Mapping**:
+
+| Data Type | Storage | Worker | Purpose |
+|-----------|---------|--------|---------|
+| User Profiles | KV (`USER_DB`) | User Worker | User account management |
+| Case Data | R2 (`striae-data/cases/`) | Data Worker | Forensic examination data |
+| Audit Logs | R2 (`STRIAE_AUDIT/audit-trails/`) | Audit Worker | Compliance tracking |
+| Images | Cloudflare Images | Image Worker | File storage & delivery |
+| Annotations | R2 (`striae-data/`) | Data Worker | Annotation metadata |
+
+**Key Separation Principle**:
+
+The **Data Worker** manages case-specific operational data (cases, files, annotations), while the **Audit Worker** maintains separate immutable audit trails for forensic accountability. These workers do not share the same data structures - each maintains its own responsibility and data format to ensure:
+
+- **Integrity**: Audit logs cannot be modified by case operations
+- **Security**: Separation of concerns prevents unauthorized access
+- **Compliance**: Audit data remains immutable for legal requirements
+- **Performance**: Independent file organization for efficient querying
 
 ### Storage Systems
 
@@ -591,9 +654,18 @@ interface BoxAnnotation {
 
 #### 4. Audit Trail System (R2 Storage)
 
-**Purpose**: Comprehensive forensic accountability and compliance tracking
+**Purpose**: Comprehensive forensic accountability and compliance tracking managed by Audit Worker
 
-**Storage Location**: Cloudflare R2 bucket (`striae-data`) with audit-specific paths
+**Managed By**: Audit Worker (`workers/audit-worker/`) - Dedicated worker for audit operations
+
+**Storage Location**: Cloudflare R2 bucket (`STRIAE_AUDIT` - Separate dedicated audit bucket)
+
+**Separation from Case Data**: Unlike case data managed by Data Worker in the shared `STRIAE_DATA` bucket, audit entries:
+- Use dedicated bucket: `STRIAE_AUDIT` bucket (completely separate from `STRIAE_DATA`)
+- Immutable: Cannot be modified or deleted after creation
+- Permanent: Retained indefinitely for forensic compliance
+- Isolated: Physical separation prevents any accidental modification through case operations
+- Independent: Maintains own bucket and file organization structure
 
 **Data Structure**:
 
@@ -634,9 +706,10 @@ interface AuditSummary {
 **Storage Organization**:
 
 ```
-striae-data/
+STRIAE_AUDIT (Dedicated R2 Bucket)
 └── audit-trails/
-    └── {userId}-{YYYY-MM-DD}.json    # Daily audit entries per user
+    └── {userId}/
+        └── {YYYY-MM-DD}.json    # Daily audit entries per user
 ```
 
 **File Structure**: Each file contains a JSON array of `ValidationAuditEntry` objects:
