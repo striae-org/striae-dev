@@ -8,8 +8,8 @@ export const loader: LoaderFunction = async ({ context }) => {
     { path: "/", changefreq: "weekly", priority: 1.0 },    
     { path: "/privacy", changefreq: "yearly", priority: 0.5 },
     { path: "/terms", changefreq: "yearly", priority: 0.5 },
-    { path: "/security", changefreq: "yearly", priority: 0.5 },
-    { path: "/support", changefreq: "quarterly", priority: 0.6 },
+    { path: "/security", changefreq: "weekly", priority: 1.0 },
+    { path: "/support", changefreq: "monthly", priority: 0.6 },
     { path: "/bugs", changefreq: "monthly", priority: 0.6 },
   ];
 
@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ context }) => {
     
     // Developer guides
     { path: "/guides/developers/README.md", changefreq: "monthly", priority: 0.7 },
-    { path: "/guides/developers/PROJECT_OVERVIEW.md", changefreq: "quarterly", priority: 0.6 },
+    { path: "/guides/developers/PROJECT_OVERVIEW.md", changefreq: "monthly", priority: 0.7 },
     { path: "/guides/developers/INSTALLATION.md", changefreq: "monthly", priority: 0.6 },
     { path: "/guides/developers/ENV_SETUP.md", changefreq: "monthly", priority: 0.6 },
     { path: "/guides/developers/ARCHITECTURE.md", changefreq: "monthly", priority: 0.6 },
@@ -31,25 +31,25 @@ export const loader: LoaderFunction = async ({ context }) => {
     { path: "/guides/developers/AUDIT_TRAIL.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - Getting Started
-    { path: "/guides/users/getting-started/striae-a-firearms-examiners-comparison-companion.md", changefreq: "quarterly", priority: 0.8 },
-    { path: "/guides/users/getting-started/how-to-log-into-striae.md", changefreq: "quarterly", priority: 0.7 },
+    { path: "/guides/users/getting-started/striae-a-firearms-examiners-comparison-companion.md", changefreq: "monthly", priority: 0.8 },
+    { path: "/guides/users/getting-started/how-to-log-into-striae.md", changefreq: "monthly", priority: 0.7 },
     { path: "/guides/users/getting-started/code-of-responsible-use.md", changefreq: "yearly", priority: 0.6 },
     
     // User guides - Case Management
-    { path: "/guides/users/case-management/striae-case-management.md", changefreq: "quarterly", priority: 0.7 },
+    { path: "/guides/users/case-management/striae-case-management.md", changefreq: "monthly", priority: 0.7 },
     
     // User guides - Annotating & Printing
-    { path: "/guides/users/annotating-printing/striae-image-annotation-and-pdf-generation-guide.md", changefreq: "quarterly", priority: 0.7 },
-    { path: "/guides/users/annotating-printing/box-annotations.md", changefreq: "quarterly", priority: 0.6 },
+    { path: "/guides/users/annotating-printing/striae-image-annotation-and-pdf-generation-guide.md", changefreq: "monthly", priority: 0.7 },
+    { path: "/guides/users/annotating-printing/box-annotations.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - Confirmations
-    { path: "/guides/users/confirmations/confirmations-guide.md", changefreq: "quarterly", priority: 0.6 },
+    { path: "/guides/users/confirmations/confirmations-guide.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - Audit Trail
-    { path: "/guides/users/audit-trail/audit-trail-user-guide.md", changefreq: "quarterly", priority: 0.6 },
+    { path: "/guides/users/audit-trail/audit-trail-user-guide.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - FAQs
-    { path: "/guides/users/faqs/striae-frequently-asked-questions.md", changefreq: "quarterly", priority: 0.6 },
+    { path: "/guides/users/faqs/striae-frequently-asked-questions.md", changefreq: "monthly", priority: 0.6 },
     
     // Release notes - Stable
     { path: "/release-notes/RELEASE_NOTES_v1.0.5.md", changefreq: "monthly", priority: 0.5 },
