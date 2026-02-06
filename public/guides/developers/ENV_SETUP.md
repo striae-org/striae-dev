@@ -152,7 +152,9 @@ wrangler secret put ACCOUNT_HASH --name striae-keys
 
 1. **Configuration First**: Always run `npm run deploy-config` before any deployment
 2. **KV Binding**: Namespace ID automatically configured in `workers/user-worker/wrangler.jsonc`
-3. **R2 Binding**: Bucket name automatically configured in `workers/data-worker/wrangler.jsonc`
+3. **R2 Bindings**: Bucket names automatically configured in:
+   - `workers/data-worker/wrangler.jsonc` (case data storage)
+   - `workers/audit-worker/wrangler.jsonc` (audit log storage)
 4. **Pages Variables**: Automatically set through deployment scripts
 5. **Security**: Never commit `.env` with real values
 
