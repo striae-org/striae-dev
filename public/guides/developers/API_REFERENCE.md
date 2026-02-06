@@ -45,6 +45,7 @@
 11. [Type Definitions](#type-definitions)
     - [Core Annotation Types](#core-annotation-types)
       - [AnnotationData Interface](#annotationdata-interface)
+      - [ConfirmationData Interface](#confirmationdata-interface)
       - [BoxAnnotation Interface](#boxannotation-interface)
     - [Case Management Types](#case-management-types)
       - [CaseData Interface](#casedata-interface)
@@ -1062,11 +1063,39 @@ interface AnnotationData {
   supportLevel?: 'ID' | 'Exclusion' | 'Inconclusive';
   hasSubclass?: boolean;
   includeConfirmation: boolean;
+  confirmationData?: ConfirmationData;
   additionalNotes?: string;
   boxAnnotations?: BoxAnnotation[];
   updatedAt: string;
+  earliestAnnotationTimestamp?: string; // ISO timestamp of first annotation created (notes or box)
 }
 ```
+
+#### ConfirmationData Interface
+
+Authenticated confirmation data structure for forensic verification workflow (defined in `app/types/annotations.ts`):
+
+```typescript
+interface ConfirmationData {
+  fullName: string;           // Confirming examiner's full name
+  badgeId: string;            // Badge/ID number of confirming examiner  
+  timestamp: string;          // Human-readable confirmation timestamp
+  confirmationId: string;     // Unique ID generated at confirmation time
+  confirmedBy: string;        // User UID of the confirming examiner
+  confirmedByEmail: string;   // Email of the confirming examiner
+  confirmedByCompany: string; // Company/Lab of the confirming examiner
+  confirmedAt: string;        // ISO timestamp of confirmation
+}
+```
+
+**Purpose**: Captures authenticated digital confirmation from reviewing examiners for independent verification of forensic conclusions.
+
+**Workflow Context**:
+- Created when reviewing examiner confirms findings using the Confirmation modal
+- Stored within AnnotationData when `includeConfirmation` is true
+- Exported via case export and imported by original examiner
+- Includes unique confirmation ID for audit trails and traceability
+- Appears in PDF reports with full examiner attribution
 
 #### BoxAnnotation Interface
 
