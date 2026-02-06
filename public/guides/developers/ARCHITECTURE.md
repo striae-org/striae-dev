@@ -147,6 +147,7 @@ graph TB
   - **Canvas**: Main image display and annotation overlay
   - **BoxAnnotations**: Interactive box drawing and management
   - **ToolbarColorSelector**: Dynamic color selection interface
+  - **Confirmation**: Authenticated confirmation modal for comparison image verification workflow
 - **Architecture**:
   - **Data Flow**: Canvas → BoxAnnotations → AnnotationData → Automatic Save
   - **Type Safety**: Centralized BoxAnnotation and AnnotationData interfaces
