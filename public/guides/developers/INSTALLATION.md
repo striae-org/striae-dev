@@ -4,6 +4,8 @@ This guide provides step-by-step instructions for deploying Striae, a Firearms E
 
 > **👥 Internal Developers**: If you are an internal developer with the striae-org team, you can skip almost all of the setup process! Frontend, workers, and all infrastructure are already deployed and maintained. See the [Internal Developer Quick Start](#internal-developer-quick-start) section below.
 
+> **🛠 Custom Deployment Assistance**: If your organization requires a custom deployment of Striae, we offer deployment assistance to meet your specific needs. Please [click here](https://support.striae.org/form/WA12nQGh9pS) to submit a request.
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)

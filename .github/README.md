@@ -77,6 +77,8 @@ Set up these Cloudflare services first:
 
 For detailed instructions and troubleshooting, see the **[Complete Installation Guide](https://developers.striae.org/striae-dev/get-started/installation-guide)**
 
+**🛠 Custom Deployment Assistance**: If your organization requires a custom deployment of Striae, we offer deployment assistance to meet your specific needs. Please [click here](https://support.striae.org/form/WA12nQGh9pS) to submit a request.
+
 ---
 
 ## 📋 Changelog

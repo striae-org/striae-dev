@@ -29,6 +29,10 @@ export default function NoticeText() {
 </div>
 
 <p>By registering, you&apos;re helping to build the future of Striae and digital annotation tools for forensic firearms examination. We can&apos;t wait to hear your insights and how you use it in your work!</p>
+
+<h2>Custom Deployment Assistance</h2>
+<p>If your organization requires a custom deployment of Striae, we offer deployment assistance to meet your specific needs. Please <a href="https://support.striae.org/form/WA12nQGh9pS" target="_blank" rel="noopener noreferrer">click here</a> to submit a request.</p>
+
 </>
   );
 }
