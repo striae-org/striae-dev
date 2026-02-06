@@ -8,27 +8,28 @@ Striae is a cloud-native forensic annotation application built specifically for 
 
 ```
 striae/
-├── .github/                     # GitHub configuration and workflows
-├── app/                          # Main Remix application
-│   ├── assets/                  # Application assets (icons, images)
-│   ├── components/              # React components
-│   ├── config/                  # Configuration files
-│   ├── config-example/          # Example configuration templates
+├── .github/                    # GitHub configuration and workflows
+├── app/                        # Main Remix application
+│   ├── assets/                 # Application assets (icons, images)
+│   ├── components/             # React components
+│   ├── config/                 # Configuration files
+│   ├── config-example/         # Example configuration templates
 │   ├── contexts/               # React contexts (auth)
 │   ├── hooks/                  # Custom React hooks
-│   ├── routes/                  # Application routes/pages
+│   ├── routes/                 # Application routes/pages
 │   ├── services/               # Firebase and external services
 │   ├── styles/                 # Global styles and CSS utilities
 │   ├── types/                  # TypeScript type definitions
 │   └── utils/                  # Utility functions
-├── build/                       # Production build output
+├── build/                      # Production build output
 ├── functions/                  # Cloudflare Pages Functions
 ├── guides/                     # Documentation (this directory)
 ├── public/                     # Static assets
 ├── release-notes/              # Version release documentation
 ├── scripts/                    # Build and deployment scripts
-└── workers/                     # Cloudflare Workers
+└── workers/                    # Cloudflare Workers
     ├── data-worker/            # Case data management
+    ├── audit-worker/           # Audit trail management
     ├── image-worker/           # Image upload/management
     ├── keys-worker/            # API key management
     ├── pdf-worker/             # PDF generation

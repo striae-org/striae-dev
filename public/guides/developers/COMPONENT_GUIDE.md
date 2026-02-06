@@ -12,6 +12,7 @@
      - [Canvas](#canvas-appcomponentscanvascanvastsx)
      - [Box Annotations](#box-annotations-appcomponentscanvasbox-annotationstsx)
      - [ToolbarColorSelector](#toolbarcolorselector-appcomponentstoolbartoolbar-color-selectortsx)
+     - [Confirmation](#confirmation-appcomponentscanvasconfirmationconfirmationtsx)
    - [3. Sidebar System](#3-sidebar-system)
      - [Sidebar Container](#sidebar-container-appcomponentssidebarsidebar-containertsx)
      - [Sidebar](#sidebar-appcomponentssidebarsidebartsx)
@@ -25,6 +26,7 @@
      - [Case Management](#case-management-appcomponentsactionscase-managets)
      - [Case Export](#case-export-appcomponentsactionscase-export)
      - [Case Import](#case-import-appcomponentsactionscase-import)
+     - [Confirmation Export](#confirmation-export-appcomponentsactionsconfirm-exportts)
      - [Image Management](#image-management-appcomponentsactionsimage-managets)
      - [PDF Generation](#pdf-generation-appcomponentsactionsgenerate-pdfts)
      - [Notes Management](#notes-management-appcomponentsactionsnotes-managets)
@@ -257,6 +259,107 @@ interface ToolbarColorSelectorProps {
 - `handleConfirm`: Applies selected color and closes selector
 - `handleCancel`: Reverts to previous color and closes selector
 - `resetToDefault`: Resets color selection to default value
+
+#### Confirmation (`app/components/canvas/confirmation/confirmation.tsx`)
+
+**Purpose**: Authenticated confirmation modal for forensic image verification workflow
+
+**Features**:
+
+- Digital authentication with examiner credentials (badge ID and full name)
+- Unique confirmation ID generation for audit trails
+- Timestamp capture with human-readable and ISO formats
+- View-only mode for existing confirmations
+- Form validation requiring badge ID input
+- Keyboard event handling (Escape key to close)
+- Dual-mode operation: new confirmation creation or existing confirmation viewing
+- Automatic population of user metadata (name, email, company)
+- Integration with confirmation data structure for PDF export
+
+**Type Definition**: Uses `ConfirmationData` interface from `app/types/annotations.ts`
+
+**Key Props**:
+
+```typescript
+interface ConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm?: (confirmationData: ConfirmationData) => void;
+  company?: string;
+  existingConfirmation?: ConfirmationData | null;
+}
+```
+
+**Confirmation Data Structure**:
+
+```typescript
+interface ConfirmationData {
+  fullName: string;           // Confirming examiner's full name
+  badgeId: string;            // Badge/ID number of confirming examiner
+  timestamp: string;          // Human-readable confirmation timestamp
+  confirmationId: string;     // Unique ID generated at confirmation time
+  confirmedBy: string;        // User UID of the confirming examiner
+  confirmedByEmail: string;   // Email of the confirming examiner
+  confirmedByCompany: string; // Company/Lab of the confirming examiner
+  confirmedAt: string;        // ISO timestamp of confirmation
+}
+```
+
+**State Management**:
+
+- Badge ID input tracking with validation
+- Error state for invalid or missing inputs
+- Confirmation processing state (loading/submitting)
+- Automatic form reset on modal open
+- Detection and display of existing confirmation data
+
+**Key Methods**:
+
+- `handleConfirm`: Validates badge ID, generates confirmation data with unique ID, triggers callback
+- `handleOverlayClick`: Closes modal when clicking outside content area
+- `formatTimestamp`: Generates human-readable timestamp with full date and time
+- `generateConfirmationId`: Creates unique confirmation identifier (via utility function)
+
+**UI Modes**:
+
+- **New Confirmation Mode**: 
+  - Editable badge ID field with autofocus
+  - Active confirm button when badge ID is provided
+  - Displays current user's credentials
+  - Generates new confirmation ID and timestamp
+  
+- **View Mode** (when `existingConfirmation` provided):
+  - All fields read-only
+  - Green banner indicating confirmed status
+  - Displays original confirming examiner's credentials
+  - Close button instead of confirm/cancel actions
+  - Shows preserved confirmation ID and timestamp
+
+**Security Features**:
+
+- Requires user authentication (Firebase user context)
+- Captures user UID for confirmation attribution
+- Generates unique IDs for confirmation tracking
+- Immutable confirmation data once created
+- ISO timestamp for precise temporal documentation
+
+**Integration Points**:
+
+- Connected to Notes Sidebar for "Include confirmation" checkbox workflow
+- Confirmation data stored within `AnnotationData` structure
+- Exported in case data for reviewing examiner import
+- Appears in PDF reports with full confirmation details
+- Part of forensic workflow for independent verification
+
+**Workflow Context**:
+
+1. Original examiner marks image with "Include confirmation" checkbox
+2. Case exported and transferred to reviewing examiner
+3. Reviewing examiner imports case in read-only mode
+4. Upon independent verification, clicks "Confirm" button
+5. This modal captures confirming examiner's credentials
+6. Confirmation data exported back to original examiner
+7. Original examiner imports confirmation and generates final report
 
 ### 3. Sidebar System
 
@@ -803,6 +906,146 @@ export interface CaseImportPreview {
 - **Confirmation Data Support**: Specialized import handling for confirmation data files
 - **Error Recovery**: Graceful handling of import failures with detailed error reporting
 - **Security Validation**: Prevents modification of imported cases and restricts access appropriately
+
+#### Confirmation Export (`app/components/actions/confirm-export.ts`)
+
+**Purpose**: Confirmation data storage, retrieval, and export with forensic integrity
+
+**Architecture**: Specialized module for managing authenticated confirmation data in the forensic workflow
+
+**Key Functions**:
+
+```typescript
+// Store confirmation
+export async function storeConfirmation(
+  user: User,
+  caseNumber: string,
+  currentImageId: string,
+  confirmationData: ConfirmationData,
+  originalImageFileName?: string
+): Promise<boolean>
+
+// Retrieve confirmations
+export async function getCaseConfirmations(
+  user: User,
+  caseNumber: string
+): Promise<CaseConfirmations | null>
+
+export async function getImageConfirmations(
+  user: User,
+  caseNumber: string,
+  originalImageId: string
+): Promise<ConfirmationData[]>
+
+export async function getCaseDataWithManifest(
+  user: User,
+  caseNumber: string
+): Promise<{ confirmations: CaseConfirmations | null; forensicManifestCreatedAt?: string }>
+
+// Export confirmation data
+export async function exportConfirmationData(
+  user: User, 
+  caseNumber: string
+): Promise<void>
+```
+
+**Core Features**:
+
+- **Confirmation Storage**: Stores authenticated confirmation data linked to original image IDs
+- **Multi-Confirmation Support**: Multiple confirmations per image (multiple reviewing examiners)
+- **Original Image ID Mapping**: Maps current image IDs to original export image IDs for traceability
+- **Forensic Data Export**: Exports confirmations as JSON with SHA256 hash for integrity verification
+- **Metadata Integration**: Includes user credentials, timestamps, and forensic manifest linking
+- **Case Data Integration**: Confirmations stored within case data structure for unified management
+- **Audit Trail Logging**: Comprehensive logging of all confirmation operations (creation, export, failures)
+- **Workflow Tracking**: Integrated with audit service workflow system for forensic accountability
+
+**Data Structures**:
+
+```typescript
+interface CaseConfirmations {
+  [originalImageId: string]: ConfirmationData[];
+}
+
+interface CaseDataWithConfirmations extends CaseData {
+  confirmations?: CaseConfirmations;
+  forensicManifestCreatedAt?: string;
+}
+
+interface ConfirmationExportData {
+  metadata: {
+    caseNumber: string;
+    exportDate: string;
+    exportedBy: string;
+    exportedByUid: string;
+    exportedByName: string;
+    exportedByCompany: string;
+    totalConfirmations: number;
+    version: string;
+    originalExportCreatedAt?: string;
+    hash: string;
+  };
+  confirmations: CaseConfirmations;
+}
+```
+
+**Export File Format**:
+
+- **Filename Pattern**: `confirmation-data-{caseNumber}-{timestamp}.json`
+- **Timestamp Format**: `YYYYMMDD-HHMMSS` in local timezone
+- **Content Type**: `application/json` with pretty-printed formatting
+- **Hash Algorithm**: SHA-256 secure hash calculated from JSON payload
+- **Forensic Linking**: Includes original export timestamp for traceability
+
+**Workflow Integration**:
+
+1. **Confirmation Creation**:
+   - Reviewing examiner confirms findings via Confirmation modal
+   - `storeConfirmation` called with confirmation data
+   - Original image ID mapping established
+   - Confirmation added to case data array
+   - Audit event logged with image metadata
+
+2. **Confirmation Retrieval**:
+   - Original examiner retrieves confirmations via `getCaseConfirmations`
+   - Image-specific confirmations via `getImageConfirmations`
+   - Forensic manifest metadata via `getCaseDataWithManifest`
+
+3. **Confirmation Export**:
+   - Export triggered from reviewing examiner's system
+   - Complete confirmation data collected with metadata
+   - SHA-256 hash calculated for forensic integrity
+   - JSON file downloaded with hash included
+   - Audit trail logged with file size and confirmation count
+
+4. **Import Process** (handled by case-import module):
+   - Confirmation JSON file imported by original examiner
+   - Hash validated against calculated hash
+   - Confirmation data merged into original case
+   - Forensic linking preserved via original export timestamp
+
+**Security Features**:
+
+- **User Identity Validation**: Captures confirming examiner's UID and email
+- **Tamper Detection**: SHA-256 hash enables integrity verification
+- **Immutable Records**: Confirmations cannot be modified once created
+- **Audit Trail**: All operations logged for compliance and traceability
+- **Original Image Linking**: Prevents confirmation misattribution via ID mapping
+
+**Error Handling**:
+
+- Validation of case existence before operations
+- Original image ID lookup with fallback mechanisms
+- Graceful handling of missing confirmation data
+- Comprehensive error logging in audit trail
+- User metadata retrieval with fallback defaults
+
+**Performance Considerations**:
+
+- Processing time tracked for all operations
+- File size calculated for audit logging
+- Minimal network calls via centralized data operations
+- Efficient JSON serialization and hash calculation
 
 #### Image Management (`app/components/actions/image-manage.ts`)
 
