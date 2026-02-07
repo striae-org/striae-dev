@@ -27,6 +27,20 @@ visibility: PUBLIC
 
 * Add notes, mark support levels, and record findings. Rest easy knowing every annotation is **securely saved and instantly updated**.
 
+## Authenticated Confirmations System
+
+Reviewing examiners may **digitally confirm comparison images**, with confirmations secured by:
+
+* User authentication (ensuring only authorized users may confirm)
+
+* Data file cryptographic hash validation (to ensure case package integrity)
+
+* Timestamp validation (prevents confirmation of outdated or modified files)
+
+* Self-confirmation blocking (users cannot confirm their own work)
+
+These controls ensure every confirmation is credible, verified, and audit-ready.
+
 ## Effortless PDF Reports
 
 * **Create detailed, timestamped PDF reports with one click**. Your reports use custom filenames based on your case, and are always ready to download straight from the browser.
