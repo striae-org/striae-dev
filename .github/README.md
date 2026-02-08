@@ -83,6 +83,15 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2026-02-08] - *[Minor Release v1.1.0](https://github.com/striae-org/striae/releases/tag/v1.1.0)*
+
+- **⚙️ Configuration Architecture** - Separated meta-config and app-config concerns for better security and maintainability
+- **📚 Enhanced Documentation** - Comprehensive updates to user guides, deployment guides, and environment setup
+- **🎨 Branding Updates** - Added new logos and deploy assistance references
+- **🛠️ Deploy Script Improvements** - Enhanced deploy-config scripts to handle separated configuration files
+- **📦 Dependency Updates** - Updated Cloudflare Workers Types and React to stable release
+- **🗺️ Sitemap Fixes** - Resolved sitemap routing issues for improved SEO
+
 ## [2026-02-05] - *[Patch Release v1.0.5](https://github.com/striae-org/striae/releases/tag/v1.0.5)*
 
 - **✅ Confirmation Status Indicators** - Applied visual confirmation indicators to case number displays and file lists
