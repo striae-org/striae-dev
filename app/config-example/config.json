@@ -1,7 +1,4 @@
-{
-  "name": "Striae",  
-  "author": "Stephen J. Lu",
-  "title": "A Firearms Examiner's Comparison Companion",  
+{    
   "url": "PAGES_CUSTOM_DOMAIN",    
   "data_worker_url": "DATA_WORKER_CUSTOM_DOMAIN",
   "keys_url": "KEYS_WORKER_CUSTOM_DOMAIN",
