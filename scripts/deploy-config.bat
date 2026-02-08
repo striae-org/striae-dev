@@ -816,6 +816,13 @@ if exist "app\config\config.json" (
     echo [92m      ✅ app config.json updated[0m
 )
 
+REM Update app/config/meta-config.json
+if exist "app\config\meta-config.json" (
+    echo [93m    Updating app/config/meta-config.json...[0m
+    powershell -Command "(Get-Content 'app/config/meta-config.json') -replace '\"PAGES_CUSTOM_DOMAIN\"', '\"https://%PAGES_CUSTOM_DOMAIN%\"' | Set-Content 'app/config/meta-config.json'"
+    echo [92m      ✅ app meta-config.json updated[0m
+)
+
 REM Update app/config/firebase.ts
 if exist "app\config\firebase.ts" (
     echo [93m    Updating app/config/firebase.ts...[0m

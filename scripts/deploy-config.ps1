@@ -486,6 +486,15 @@ function Update-WranglerConfigs {
         Write-Host "${Green}      ✅ app config.json updated${Reset}"
     }
     
+    # Update app/config/meta-config.json
+    if (Test-Path "app/config/meta-config.json") {
+        Write-Host "${Yellow}    Updating app/config/meta-config.json...${Reset}"
+        $content = Get-Content "app/config/meta-config.json" -Raw
+        $content = $content -replace '"PAGES_CUSTOM_DOMAIN"', "`"https://$PAGES_CUSTOM_DOMAIN`""
+        Set-Content -Path "app/config/meta-config.json" -Value $content -NoNewline
+        Write-Host "${Green}      ✅ app meta-config.json updated${Reset}"
+    }
+    
     # Update app/config/firebase.ts
     if (Test-Path "app/config/firebase.ts") {
         Write-Host "${Yellow}    Updating app/config/firebase.ts...${Reset}"

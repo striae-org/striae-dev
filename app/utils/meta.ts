@@ -1,4 +1,4 @@
-import config from '~/config/config.json';
+import config from '~/config/meta-config.json';
 
 interface AppConfig {
   name: string;

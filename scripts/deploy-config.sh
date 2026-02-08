@@ -488,6 +488,13 @@ update_wrangler_configs() {
         echo -e "${GREEN}      ✅ app config.json updated${NC}"
     fi
     
+    # Update app/config/meta-config.json
+    if [ -f "app/config/meta-config.json" ]; then
+        echo -e "${YELLOW}    Updating app/config/meta-config.json...${NC}"
+        sed -i "s|\"PAGES_CUSTOM_DOMAIN\"|\"https://$PAGES_CUSTOM_DOMAIN\"|g" app/config/meta-config.json
+        echo -e "${GREEN}      ✅ app meta-config.json updated${NC}"
+    fi
+    
     # Update app/config/firebase.ts
     if [ -f "app/config/firebase.ts" ]; then
         echo -e "${YELLOW}    Updating app/config/firebase.ts...${NC}"
