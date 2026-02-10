@@ -245,6 +245,16 @@ if not exist ".env" (
     echo [92m📄 Created .env from .env.example[0m
 )
 
+REM Load existing .env values into batch variables so prompt_required can show current values
+if exist ".env" (
+    for /f "tokens=1,2 delims==" %%A in (.env) do (
+        if not "%%A"=="" if not "%%A:~0,1%"=="#" (
+            set "%%A=%%B"
+        )
+    )
+    echo [92m✅ Loaded existing environment variables[0m
+)
+
 REM Always prompt for secrets configuration
 :prompt_secrets
 echo.
