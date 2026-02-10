@@ -177,31 +177,51 @@ function Read-Secrets {
         )
         
         $currentValue = [Environment]::GetEnvironmentVariable($VarName, "Process")
+        $newValue = ""
         
-        # Auto-generate specific authentication secrets
+        # Auto-generate specific authentication secrets - but allow keeping current
         if ($VarName -eq "USER_DB_AUTH" -or $VarName -eq "R2_KEY_SECRET" -or $VarName -eq "KEYS_AUTH") {
             Write-Host "${Blue}$VarName${Reset}"
             Write-Host "${Yellow}$Description${Reset}"
             
             if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here" -and $currentValue -ne "your_custom_user_db_auth_token_here" -and $currentValue -ne "your_custom_r2_secret_here" -and $currentValue -ne "your_custom_keys_auth_token_here") {
+                # Current value exists and is not a placeholder
                 Write-Host "${Green}Current value: [HIDDEN]${Reset}"
-                Write-Host "${Yellow}Auto-generating new secret...${Reset}"
+                $genChoice = Read-Host "Generate new secret? (press Enter to keep current, or type 'y' to generate)"
+                
+                if ($genChoice -eq "y" -or $genChoice -eq "Y") {
+                    try {
+                        $newValue = & openssl rand -hex 32 2>$null
+                        if (-not $newValue) { throw "OpenSSL failed" }
+                        Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+                    } catch {
+                        try {
+                            $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
+                            Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+                        } catch {
+                            Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                            $newValue = Read-Host "Enter value"
+                        }
+                    }
+                } else {
+                    # User wants to keep current value
+                    $newValue = ""
+                }
             } else {
+                # No current value or placeholder value - auto-generate
                 Write-Host "${Yellow}Auto-generating secret...${Reset}"
-            }
-            
-            # Generate new secret using openssl or PowerShell fallback
-            try {
-                $newValue = & openssl rand -hex 32 2>$null
-                if (-not $newValue) { throw "OpenSSL failed" }
-                Write-Host "${Green}✅ $VarName auto-generated${Reset}"
-            } catch {
                 try {
-                    $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
+                    $newValue = & openssl rand -hex 32 2>$null
+                    if (-not $newValue) { throw "OpenSSL failed" }
                     Write-Host "${Green}✅ $VarName auto-generated${Reset}"
                 } catch {
-                    Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
-                    $newValue = Read-Host "Enter value"
+                    try {
+                        $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
+                        Write-Host "${Green}✅ $VarName auto-generated${Reset}"
+                    } catch {
+                        Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                        $newValue = Read-Host "Enter value"
+                    }
                 }
             }
         } else {
