@@ -6,11 +6,16 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  
   "browser": {
     "binding": "BROWSER"
   },
+  
   "observability": { 
-	"enabled": true
+	"enabled": true,
+  "traces": {
+      "enabled": true
+    }
   },
 
   "routes": [
