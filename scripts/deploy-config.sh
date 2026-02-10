@@ -168,15 +168,10 @@ copy_example_configs() {
     
     # Copy app config-example directory to config
     if [ -d "app/config-example" ]; then
-        if [ "$update_env" = "true" ] && [ -d "app/config" ]; then
+        if [ "$update_env" = "true" ] || [ ! -d "app/config" ]; then
             rm -rf app/config
-        fi
-        if [ ! -d "app/config" ]; then
             cp -r app/config-example app/config
             echo -e "${GREEN}    ✅ app: config directory created from config-example${NC}"
-        elif [ "$update_env" = "true" ]; then
-            cp -r app/config-example app/config
-            echo -e "${GREEN}    ✅ app: config directory replaced from config-example${NC}"
         else
             echo -e "${YELLOW}    ⚠️  app: config directory already exists, skipping copy${NC}"
         fi
