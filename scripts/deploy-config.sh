@@ -46,7 +46,7 @@ fi
 
 is_placeholder() {
     local value="$1"
-    local normalized="${value,,}"
+    local normalized=$(echo "$value" | tr '[:upper:]' '[:lower:]')
 
     if [ -z "$normalized" ]; then
         return 1
@@ -155,10 +155,6 @@ validate_required_vars() {
     echo -e "${GREEN}✅ All required variables found${NC}"
 }
 
-if [ "$update_env" != "true" ]; then
-    validate_required_vars
-fi
-
 # Function to copy example configuration files
 copy_example_configs() {
     echo -e "\n${BLUE}📋 Copying example configuration files...${NC}"
@@ -168,15 +164,10 @@ copy_example_configs() {
     
     # Copy app config-example directory to config
     if [ -d "app/config-example" ]; then
-        if [ "$update_env" = "true" ] && [ -d "app/config" ]; then
+        if [ "$update_env" = "true" ] || [ ! -d "app/config" ]; then
             rm -rf app/config
-        fi
-        if [ ! -d "app/config" ]; then
             cp -r app/config-example app/config
             echo -e "${GREEN}    ✅ app: config directory created from config-example${NC}"
-        elif [ "$update_env" = "true" ]; then
-            cp -r app/config-example app/config
-            echo -e "${GREEN}    ✅ app: config directory replaced from config-example${NC}"
         else
             echo -e "${YELLOW}    ⚠️  app: config directory already exists, skipping copy${NC}"
         fi
@@ -469,9 +460,8 @@ prompt_for_secrets() {
 # Always prompt for secrets to ensure configuration
 prompt_for_secrets
 
-if [ "$update_env" = "true" ]; then
-    validate_required_vars
-fi
+# Validate after secrets have been configured
+validate_required_vars
 
 # Function to replace variables in wrangler configuration files
 update_wrangler_configs() {

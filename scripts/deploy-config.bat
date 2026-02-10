@@ -60,68 +60,6 @@ if "%UPDATE_ENV%"=="1" (
     )
 )
 
-REM Load environment variables from .env
-echo [93m📖 Loading environment variables from .env...[0m
-for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
-    set "line=%%a"
-    if not "!line:~0,1!"=="#" (
-        set "%%a=%%b"
-        REM Remove quotes if present
-        call set "%%a=%%!%%a:"=%%"
-    )
-)
-
-REM Validate required variables (complete check)
-if "%UPDATE_ENV%"=="0" (
-    echo [93m🔍 Validating required environment variables...[0m
-
-    for %%V in (
-        ACCOUNT_ID
-        SL_API_KEY
-        USER_DB_AUTH
-        R2_KEY_SECRET
-        IMAGES_API_TOKEN
-        API_KEY
-        AUTH_DOMAIN
-        PROJECT_ID
-        STORAGE_BUCKET
-        MESSAGING_SENDER_ID
-        APP_ID
-        MEASUREMENT_ID
-        PAGES_PROJECT_NAME
-        PAGES_CUSTOM_DOMAIN
-        KEYS_WORKER_NAME
-        USER_WORKER_NAME
-        DATA_WORKER_NAME
-        AUDIT_WORKER_NAME
-        IMAGES_WORKER_NAME
-        TURNSTILE_WORKER_NAME
-        PDF_WORKER_NAME
-        KEYS_WORKER_DOMAIN
-        USER_WORKER_DOMAIN
-        DATA_WORKER_DOMAIN
-        AUDIT_WORKER_DOMAIN
-        IMAGES_WORKER_DOMAIN
-        TURNSTILE_WORKER_DOMAIN
-        PDF_WORKER_DOMAIN
-        DATA_BUCKET_NAME
-        AUDIT_BUCKET_NAME
-        KV_STORE_ID
-        KEYS_AUTH
-        ACCOUNT_HASH
-        API_TOKEN
-        HMAC_KEY
-        CFT_PUBLIC_KEY
-        CFT_SECRET_KEY
-    ) do (
-        call :require_env_value %%V
-    )
-)
-
-if "%UPDATE_ENV%"=="0" (
-    echo [92m✅ All required environment variables validated[0m
-)
-
 REM Function to copy example configuration files
 echo.
 echo [94m📋 Copying example configuration files...[0m
@@ -293,10 +231,12 @@ echo [93mPlease provide values for the following environment variables.[0m
 echo [93mPress Enter to keep existing values (if any).[0m
 echo.
 
-REM Create or backup existing .env
+REM Create or backup existing .env (skip backup in update-env mode as it was already done)
 if exist ".env" (
-    copy ".env" ".env.backup" >nul
-    echo [92m📄 Existing .env backed up to .env.backup[0m
+    if "%UPDATE_ENV%"=="0" (
+        copy ".env" ".env.backup" >nul
+        echo [92m📄 Existing .env backed up to .env.backup[0m
+    )
 )
 
 REM Copy .env.example to .env if it doesn't exist
@@ -738,51 +678,50 @@ echo.
 echo [92m🎉 Environment variables setup completed![0m
 echo [94m📄 All values saved to .env file[0m
 
-if "%UPDATE_ENV%"=="1" (
-    echo [93m🔍 Validating required environment variables...[0m
-    for %%V in (
-        ACCOUNT_ID
-        SL_API_KEY
-        USER_DB_AUTH
-        R2_KEY_SECRET
-        IMAGES_API_TOKEN
-        API_KEY
-        AUTH_DOMAIN
-        PROJECT_ID
-        STORAGE_BUCKET
-        MESSAGING_SENDER_ID
-        APP_ID
-        MEASUREMENT_ID
-        PAGES_PROJECT_NAME
-        PAGES_CUSTOM_DOMAIN
-        KEYS_WORKER_NAME
-        USER_WORKER_NAME
-        DATA_WORKER_NAME
-        AUDIT_WORKER_NAME
-        IMAGES_WORKER_NAME
-        TURNSTILE_WORKER_NAME
-        PDF_WORKER_NAME
-        KEYS_WORKER_DOMAIN
-        USER_WORKER_DOMAIN
-        DATA_WORKER_DOMAIN
-        AUDIT_WORKER_DOMAIN
-        IMAGES_WORKER_DOMAIN
-        TURNSTILE_WORKER_DOMAIN
-        PDF_WORKER_DOMAIN
-        DATA_BUCKET_NAME
-        AUDIT_BUCKET_NAME
-        KV_STORE_ID
-        KEYS_AUTH
-        ACCOUNT_HASH
-        API_TOKEN
-        HMAC_KEY
-        CFT_PUBLIC_KEY
-        CFT_SECRET_KEY
-    ) do (
-        call :require_env_value %%V
-    )
-    echo [92m✅ All required environment variables validated[0m
+REM Validate after secrets have been configured
+echo [93m🔍 Validating required environment variables...[0m
+for %%V in (
+    ACCOUNT_ID
+    SL_API_KEY
+    USER_DB_AUTH
+    R2_KEY_SECRET
+    IMAGES_API_TOKEN
+    API_KEY
+    AUTH_DOMAIN
+    PROJECT_ID
+    STORAGE_BUCKET
+    MESSAGING_SENDER_ID
+    APP_ID
+    MEASUREMENT_ID
+    PAGES_PROJECT_NAME
+    PAGES_CUSTOM_DOMAIN
+    KEYS_WORKER_NAME
+    USER_WORKER_NAME
+    DATA_WORKER_NAME
+    AUDIT_WORKER_NAME
+    IMAGES_WORKER_NAME
+    TURNSTILE_WORKER_NAME
+    PDF_WORKER_NAME
+    KEYS_WORKER_DOMAIN
+    USER_WORKER_DOMAIN
+    DATA_WORKER_DOMAIN
+    AUDIT_WORKER_DOMAIN
+    IMAGES_WORKER_DOMAIN
+    TURNSTILE_WORKER_DOMAIN
+    PDF_WORKER_DOMAIN
+    DATA_BUCKET_NAME
+    AUDIT_BUCKET_NAME
+    KV_STORE_ID
+    KEYS_AUTH
+    ACCOUNT_HASH
+    API_TOKEN
+    HMAC_KEY
+    CFT_PUBLIC_KEY
+    CFT_SECRET_KEY
+) do (
+    call :require_env_value %%V
 )
+echo [92m✅ All required environment variables validated[0m
 
 REM Reload environment variables from .env file
 for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
