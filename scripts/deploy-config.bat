@@ -7,19 +7,56 @@ REM Run this BEFORE installing worker dependencies to avoid wrangler validation 
 
 setlocal enabledelayedexpansion
 
+set "UPDATE_ENV=0"
+set "SHOW_HELP=0"
+for %%A in (%*) do (
+    if /i "%%A"=="-h" set "SHOW_HELP=1"
+    if /i "%%A"=="--help" set "SHOW_HELP=1"
+    if /i "%%A"=="/h" set "SHOW_HELP=1"
+    if /i "%%A"=="/?" set "SHOW_HELP=1"
+    if /i "%%A"=="--update-env" set "UPDATE_ENV=1"
+)
+
+if "%SHOW_HELP%"=="1" (
+    echo Usage: scripts\deploy-config.bat [--update-env]
+    echo.
+    echo Options:
+    echo   --update-env   Reset .env from .env.example and overwrite configs
+    echo   -h, --help     Show this help message
+    exit /b 0
+)
+
+if "%UPDATE_ENV%"=="1" (
+    echo [93m⚠️  Update-env mode: overwriting configs and regenerating .env values[0m
+)
+
 echo [94m⚙️  Striae Configuration Setup Script[0m
 echo =====================================
 
 REM Check if .env file exists
-if not exist ".env" (
-    echo [93m📄 .env file not found, copying from .env.example...[0m
+if "%UPDATE_ENV%"=="1" (
+    if exist ".env" (
+        copy ".env" ".env.backup" >nul
+        echo [92m📄 Existing .env backed up to .env.backup[0m
+    )
     if exist ".env.example" (
         copy ".env.example" ".env" >nul 2>&1
-        echo [92m✅ .env file created from .env.example[0m
+        echo [92m✅ .env file reset from .env.example[0m
     ) else (
-        echo [91m❌ Error: Neither .env nor .env.example file found![0m
-        echo Please create a .env.example file or provide a .env file.
+        echo [91m❌ Error: .env.example file not found![0m
         exit /b 1
+    )
+) else (
+    if not exist ".env" (
+        echo [93m📄 .env file not found, copying from .env.example...[0m
+        if exist ".env.example" (
+            copy ".env.example" ".env" >nul 2>&1
+            echo [92m✅ .env file created from .env.example[0m
+        ) else (
+            echo [91m❌ Error: Neither .env nor .env.example file found![0m
+            echo Please create a .env.example file or provide a .env file.
+            exit /b 1
+        )
     )
 )
 
@@ -35,173 +72,55 @@ for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
 )
 
 REM Validate required variables (complete check)
-echo [93m🔍 Validating required environment variables...[0m
+if "%UPDATE_ENV%"=="0" (
+    echo [93m🔍 Validating required environment variables...[0m
 
-REM Core Cloudflare Configuration
-if "%ACCOUNT_ID%"=="" (
-    echo [91m❌ Error: ACCOUNT_ID is not set in .env file[0m
-    exit /b 1
-)
-
-REM Shared Authentication & Storage
-if "%SL_API_KEY%"=="" (
-    echo [91m❌ Error: SL_API_KEY is not set in .env file[0m
-    exit /b 1
-)
-if "%USER_DB_AUTH%"=="" (
-    echo [91m❌ Error: USER_DB_AUTH is not set in .env file[0m
-    exit /b 1
-)
-if "%R2_KEY_SECRET%"=="" (
-    echo [91m❌ Error: R2_KEY_SECRET is not set in .env file[0m
-    exit /b 1
-)
-if "%IMAGES_API_TOKEN%"=="" (
-    echo [91m❌ Error: IMAGES_API_TOKEN is not set in .env file[0m
-    exit /b 1
-)
-
-REM Firebase Auth Configuration
-if "%API_KEY%"=="" (
-    echo [91m❌ Error: API_KEY is not set in .env file[0m
-    exit /b 1
-)
-if "%AUTH_DOMAIN%"=="" (
-    echo [91m❌ Error: AUTH_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%PROJECT_ID%"=="" (
-    echo [91m❌ Error: PROJECT_ID is not set in .env file[0m
-    exit /b 1
-)
-if "%STORAGE_BUCKET%"=="" (
-    echo [91m❌ Error: STORAGE_BUCKET is not set in .env file[0m
-    exit /b 1
-)
-if "%MESSAGING_SENDER_ID%"=="" (
-    echo [91m❌ Error: MESSAGING_SENDER_ID is not set in .env file[0m
-    exit /b 1
-)
-if "%APP_ID%"=="" (
-    echo [91m❌ Error: APP_ID is not set in .env file[0m
-    exit /b 1
-)
-if "%MEASUREMENT_ID%"=="" (
-    echo [91m❌ Error: MEASUREMENT_ID is not set in .env file[0m
-    exit /b 1
+    for %%V in (
+        ACCOUNT_ID
+        SL_API_KEY
+        USER_DB_AUTH
+        R2_KEY_SECRET
+        IMAGES_API_TOKEN
+        API_KEY
+        AUTH_DOMAIN
+        PROJECT_ID
+        STORAGE_BUCKET
+        MESSAGING_SENDER_ID
+        APP_ID
+        MEASUREMENT_ID
+        PAGES_PROJECT_NAME
+        PAGES_CUSTOM_DOMAIN
+        KEYS_WORKER_NAME
+        USER_WORKER_NAME
+        DATA_WORKER_NAME
+        AUDIT_WORKER_NAME
+        IMAGES_WORKER_NAME
+        TURNSTILE_WORKER_NAME
+        PDF_WORKER_NAME
+        KEYS_WORKER_DOMAIN
+        USER_WORKER_DOMAIN
+        DATA_WORKER_DOMAIN
+        AUDIT_WORKER_DOMAIN
+        IMAGES_WORKER_DOMAIN
+        TURNSTILE_WORKER_DOMAIN
+        PDF_WORKER_DOMAIN
+        DATA_BUCKET_NAME
+        AUDIT_BUCKET_NAME
+        KV_STORE_ID
+        KEYS_AUTH
+        ACCOUNT_HASH
+        API_TOKEN
+        HMAC_KEY
+        CFT_PUBLIC_KEY
+        CFT_SECRET_KEY
+    ) do (
+        call :require_env_value %%V
+    )
 )
 
-REM Pages Configuration
-if "%PAGES_PROJECT_NAME%"=="" (
-    echo [91m❌ Error: PAGES_PROJECT_NAME is not set in .env file[0m
-    exit /b 1
+if "%UPDATE_ENV%"=="0" (
+    echo [92m✅ All required environment variables validated[0m
 )
-if "%PAGES_CUSTOM_DOMAIN%"=="" (
-    echo [91m❌ Error: PAGES_CUSTOM_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-
-REM Worker Names
-if "%KEYS_WORKER_NAME%"=="" (
-    echo [91m❌ Error: KEYS_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%USER_WORKER_NAME%"=="" (
-    echo [91m❌ Error: USER_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%DATA_WORKER_NAME%"=="" (
-    echo [91m❌ Error: DATA_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%AUDIT_WORKER_NAME%"=="" (
-    echo [91m❌ Error: AUDIT_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%IMAGES_WORKER_NAME%"=="" (
-    echo [91m❌ Error: IMAGES_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%TURNSTILE_WORKER_NAME%"=="" (
-    echo [91m❌ Error: TURNSTILE_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%PDF_WORKER_NAME%"=="" (
-    echo [91m❌ Error: PDF_WORKER_NAME is not set in .env file[0m
-    exit /b 1
-)
-
-REM Worker Domains
-if "%KEYS_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: KEYS_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%USER_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: USER_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%DATA_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: DATA_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%AUDIT_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: AUDIT_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%IMAGES_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: IMAGES_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%TURNSTILE_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: TURNSTILE_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-if "%PDF_WORKER_DOMAIN%"=="" (
-    echo [91m❌ Error: PDF_WORKER_DOMAIN is not set in .env file[0m
-    exit /b 1
-)
-
-REM Storage Configuration
-if "%DATA_BUCKET_NAME%"=="" (
-    echo [91m❌ Error: DATA_BUCKET_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%AUDIT_BUCKET_NAME%"=="" (
-    echo [91m❌ Error: AUDIT_BUCKET_NAME is not set in .env file[0m
-    exit /b 1
-)
-if "%KV_STORE_ID%"=="" (
-    echo [91m❌ Error: KV_STORE_ID is not set in .env file[0m
-    exit /b 1
-)
-
-REM Worker-Specific Secrets
-if "%KEYS_AUTH%"=="" (
-    echo [91m❌ Error: KEYS_AUTH is not set in .env file[0m
-    exit /b 1
-)
-if "%ACCOUNT_HASH%"=="" (
-    echo [91m❌ Error: ACCOUNT_HASH is not set in .env file[0m
-    exit /b 1
-)
-if "%API_TOKEN%"=="" (
-    echo [91m❌ Error: API_TOKEN is not set in .env file[0m
-    exit /b 1
-)
-if "%HMAC_KEY%"=="" (
-    echo [91m❌ Error: HMAC_KEY is not set in .env file[0m
-    exit /b 1
-)
-if "%CFT_PUBLIC_KEY%"=="" (
-    echo [91m❌ Error: CFT_PUBLIC_KEY is not set in .env file[0m
-    exit /b 1
-)
-if "%CFT_SECRET_KEY%"=="" (
-    echo [91m❌ Error: CFT_SECRET_KEY is not set in .env file[0m
-    exit /b 1
-)
-
-echo [92m✅ All required environment variables validated[0m
 
 REM Function to copy example configuration files
 echo.
@@ -211,22 +130,33 @@ REM Copy app configuration files
 echo [93m  Copying app configuration files...[0m
 
 REM Copy app config-example directory to config
-if exist "app\config-example" if not exist "app\config" (
-    xcopy "app\config-example" "app\config" /E /I /Q >nul
-    echo [92m    ✅ app: config directory created from config-example[0m
-) else (
-    if exist "app\config" (
-        echo [93m    ⚠️  app: config directory already exists, skipping copy[0m
+if exist "app\config-example" (
+    if "%UPDATE_ENV%"=="1" if exist "app\config" rmdir /s /q "app\config"
+    if not exist "app\config" (
+        xcopy "app\config-example" "app\config" /E /I /Q >nul
+        echo [92m    ✅ app: config directory created from config-example[0m
+    ) else (
+        if "%UPDATE_ENV%"=="1" (
+            xcopy "app\config-example" "app\config" /E /I /Q /Y >nul
+            echo [92m    ✅ app: config directory replaced from config-example[0m
+        ) else (
+            echo [93m    ⚠️  app: config directory already exists, skipping copy[0m
+        )
     )
 )
 
 REM Copy turnstile keys.json.example to keys.json
-if exist "app\components\turnstile\keys.json.example" if not exist "app\components\turnstile\keys.json" (
-    copy "app\components\turnstile\keys.json.example" "app\components\turnstile\keys.json" >nul
-    echo [92m    ✅ turnstile: keys.json created from example[0m
-) else (
-    if exist "app\components\turnstile\keys.json" (
-        echo [93m    ⚠️  turnstile: keys.json already exists, skipping copy[0m
+if exist "app\components\turnstile\keys.json.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "app\components\turnstile\keys.json.example" "app\components\turnstile\keys.json" >nul
+        echo [92m    ✅ turnstile: keys.json created from example[0m
+    ) else (
+        if not exist "app\components\turnstile\keys.json" (
+            copy "app\components\turnstile\keys.json.example" "app\components\turnstile\keys.json" >nul
+            echo [92m    ✅ turnstile: keys.json created from example[0m
+        ) else (
+            echo [93m    ⚠️  turnstile: keys.json already exists, skipping copy[0m
+        )
     )
 )
 
@@ -234,82 +164,122 @@ REM Copy worker configuration files
 echo [93m  Copying worker configuration files...[0m
 
 REM Keys Worker
-if exist "workers\keys-worker\wrangler.jsonc.example" if not exist "workers\keys-worker\wrangler.jsonc" (
-    copy "workers\keys-worker\wrangler.jsonc.example" "workers\keys-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ keys-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\keys-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  keys-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\keys-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\keys-worker\wrangler.jsonc.example" "workers\keys-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ keys-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\keys-worker\wrangler.jsonc" (
+            copy "workers\keys-worker\wrangler.jsonc.example" "workers\keys-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ keys-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  keys-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM User Worker
-if exist "workers\user-worker\wrangler.jsonc.example" if not exist "workers\user-worker\wrangler.jsonc" (
-    copy "workers\user-worker\wrangler.jsonc.example" "workers\user-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ user-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\user-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  user-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\user-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\user-worker\wrangler.jsonc.example" "workers\user-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ user-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\user-worker\wrangler.jsonc" (
+            copy "workers\user-worker\wrangler.jsonc.example" "workers\user-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ user-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  user-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM Data Worker
-if exist "workers\data-worker\wrangler.jsonc.example" if not exist "workers\data-worker\wrangler.jsonc" (
-    copy "workers\data-worker\wrangler.jsonc.example" "workers\data-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ data-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\data-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  data-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\data-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\data-worker\wrangler.jsonc.example" "workers\data-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ data-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\data-worker\wrangler.jsonc" (
+            copy "workers\data-worker\wrangler.jsonc.example" "workers\data-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ data-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  data-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM Audit Worker
-if exist "workers\audit-worker\wrangler.jsonc.example" if not exist "workers\audit-worker\wrangler.jsonc" (
-    copy "workers\audit-worker\wrangler.jsonc.example" "workers\audit-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ audit-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\audit-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\audit-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\audit-worker\wrangler.jsonc.example" "workers\audit-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ audit-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\audit-worker\wrangler.jsonc" (
+            copy "workers\audit-worker\wrangler.jsonc.example" "workers\audit-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ audit-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  audit-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM Image Worker
-if exist "workers\image-worker\wrangler.jsonc.example" if not exist "workers\image-worker\wrangler.jsonc" (
-    copy "workers\image-worker\wrangler.jsonc.example" "workers\image-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ image-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\image-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  image-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\image-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\image-worker\wrangler.jsonc.example" "workers\image-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ image-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\image-worker\wrangler.jsonc" (
+            copy "workers\image-worker\wrangler.jsonc.example" "workers\image-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ image-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  image-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM Turnstile Worker
-if exist "workers\turnstile-worker\wrangler.jsonc.example" if not exist "workers\turnstile-worker\wrangler.jsonc" (
-    copy "workers\turnstile-worker\wrangler.jsonc.example" "workers\turnstile-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ turnstile-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\turnstile-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  turnstile-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\turnstile-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\turnstile-worker\wrangler.jsonc.example" "workers\turnstile-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ turnstile-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\turnstile-worker\wrangler.jsonc" (
+            copy "workers\turnstile-worker\wrangler.jsonc.example" "workers\turnstile-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ turnstile-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  turnstile-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM PDF Worker
-if exist "workers\pdf-worker\wrangler.jsonc.example" if not exist "workers\pdf-worker\wrangler.jsonc" (
-    copy "workers\pdf-worker\wrangler.jsonc.example" "workers\pdf-worker\wrangler.jsonc" >nul
-    echo [92m    ✅ pdf-worker: wrangler.jsonc created from example[0m
-) else (
-    if exist "workers\pdf-worker\wrangler.jsonc" (
-        echo [93m    ⚠️  pdf-worker: wrangler.jsonc already exists, skipping copy[0m
+if exist "workers\pdf-worker\wrangler.jsonc.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "workers\pdf-worker\wrangler.jsonc.example" "workers\pdf-worker\wrangler.jsonc" >nul
+        echo [92m    ✅ pdf-worker: wrangler.jsonc created from example[0m
+    ) else (
+        if not exist "workers\pdf-worker\wrangler.jsonc" (
+            copy "workers\pdf-worker\wrangler.jsonc.example" "workers\pdf-worker\wrangler.jsonc" >nul
+            echo [92m    ✅ pdf-worker: wrangler.jsonc created from example[0m
+        ) else (
+            echo [93m    ⚠️  pdf-worker: wrangler.jsonc already exists, skipping copy[0m
+        )
     )
 )
 
 REM Copy main wrangler.toml from example
-if exist "wrangler.toml.example" if not exist "wrangler.toml" (
-    copy "wrangler.toml.example" "wrangler.toml" >nul
-    echo [92m    ✅ root: wrangler.toml created from example[0m
-) else (
-    if exist "wrangler.toml" (
-        echo [93m    ⚠️  root: wrangler.toml already exists, skipping copy[0m
+if exist "wrangler.toml.example" (
+    if "%UPDATE_ENV%"=="1" (
+        copy /Y "wrangler.toml.example" "wrangler.toml" >nul
+        echo [92m    ✅ root: wrangler.toml created from example[0m
+    ) else (
+        if not exist "wrangler.toml" (
+            copy "wrangler.toml.example" "wrangler.toml" >nul
+            echo [92m    ✅ root: wrangler.toml created from example[0m
+        ) else (
+            echo [93m    ⚠️  root: wrangler.toml already exists, skipping copy[0m
+        )
     )
 )
 
@@ -342,7 +312,7 @@ echo [94m📊 CLOUDFLARE CORE CONFIGURATION[0m
 echo ==================================
 echo [94mACCOUNT_ID[0m
 echo [93mYour Cloudflare Account ID[0m
-set /p "ACCOUNT_ID=Enter value: "
+call :prompt_required ACCOUNT_ID
 if not "%ACCOUNT_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^ACCOUNT_ID=.*', 'ACCOUNT_ID=%ACCOUNT_ID%' | Set-Content '.env'"
     echo [92m✅ ACCOUNT_ID updated[0m
@@ -353,7 +323,7 @@ echo [94m🔐 SHARED AUTHENTICATION ^& STORAGE[0m
 echo ===================================
 echo [94mSL_API_KEY[0m
 echo [93mSendLayer API key for email services[0m
-set /p "SL_API_KEY=Enter value: "
+call :prompt_required SL_API_KEY
 if not "%SL_API_KEY%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^SL_API_KEY=.*', 'SL_API_KEY=%SL_API_KEY%' | Set-Content '.env'"
     echo [92m✅ SL_API_KEY updated[0m
@@ -363,6 +333,9 @@ echo [94mUSER_DB_AUTH[0m
 echo [93mCustom user database authentication token (generate with: openssl rand -hex 16)[0m
 
 REM Check if USER_DB_AUTH already exists in .env and is not a placeholder
+call :is_placeholder "%USER_DB_AUTH%"
+if "%ERRORLEVEL%"=="1" set "USER_DB_AUTH="
+if "%UPDATE_ENV%"=="1" set "USER_DB_AUTH="
 if "%USER_DB_AUTH%"=="" (
     echo [95mAuto-generating secret...[0m
     for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "USER_DB_AUTH=%%i"
@@ -371,7 +344,7 @@ if "%USER_DB_AUTH%"=="" (
         echo [92m✅ USER_DB_AUTH auto-generated[0m
     ) else (
         echo [91m❌ Failed to auto-generate, please enter manually:[0m
-        set /p "USER_DB_AUTH=Enter value: "
+        call :prompt_required USER_DB_AUTH
         if not "%USER_DB_AUTH%"=="" (
             powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
             echo [92m✅ USER_DB_AUTH updated[0m
@@ -389,7 +362,7 @@ if "%USER_DB_AUTH%"=="" (
             echo [92m✅ USER_DB_AUTH auto-generated[0m
         ) else (
             echo [91m❌ Failed to auto-generate, please enter manually:[0m
-            set /p "USER_DB_AUTH=Enter value: "
+            call :prompt_required USER_DB_AUTH
             if not "%USER_DB_AUTH%"=="" (
                 powershell -Command "(Get-Content '.env') -replace '^USER_DB_AUTH=.*', 'USER_DB_AUTH=%USER_DB_AUTH%' | Set-Content '.env'"
                 echo [92m✅ USER_DB_AUTH updated[0m
@@ -404,6 +377,9 @@ echo [94mR2_KEY_SECRET[0m
 echo [93mCustom R2 storage authentication token (generate with: openssl rand -hex 16)[0m
 
 REM Check if R2_KEY_SECRET already exists in .env and is not a placeholder
+call :is_placeholder "%R2_KEY_SECRET%"
+if "%ERRORLEVEL%"=="1" set "R2_KEY_SECRET="
+if "%UPDATE_ENV%"=="1" set "R2_KEY_SECRET="
 if "%R2_KEY_SECRET%"=="" (
     echo [95mAuto-generating secret...[0m
     for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "R2_KEY_SECRET=%%i"
@@ -412,7 +388,7 @@ if "%R2_KEY_SECRET%"=="" (
         echo [92m✅ R2_KEY_SECRET auto-generated[0m
     ) else (
         echo [91m❌ Failed to auto-generate, please enter manually:[0m
-        set /p "R2_KEY_SECRET=Enter value: "
+        call :prompt_required R2_KEY_SECRET
         if not "%R2_KEY_SECRET%"=="" (
             powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
             echo [92m✅ R2_KEY_SECRET updated[0m
@@ -430,7 +406,7 @@ if "%R2_KEY_SECRET%"=="" (
             echo [92m✅ R2_KEY_SECRET auto-generated[0m
         ) else (
             echo [91m❌ Failed to auto-generate, please enter manually:[0m
-            set /p "R2_KEY_SECRET=Enter value: "
+            call :prompt_required R2_KEY_SECRET
             if not "%R2_KEY_SECRET%"=="" (
                 powershell -Command "(Get-Content '.env') -replace '^R2_KEY_SECRET=.*', 'R2_KEY_SECRET=%R2_KEY_SECRET%' | Set-Content '.env'"
                 echo [92m✅ R2_KEY_SECRET updated[0m
@@ -443,7 +419,7 @@ if "%R2_KEY_SECRET%"=="" (
 
 echo [94mIMAGES_API_TOKEN[0m
 echo [93mCloudflare Images API token (shared between workers)[0m
-set /p "IMAGES_API_TOKEN=Enter value: "
+call :prompt_required IMAGES_API_TOKEN
 if not "%IMAGES_API_TOKEN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^IMAGES_API_TOKEN=.*', 'IMAGES_API_TOKEN=%IMAGES_API_TOKEN%' | Set-Content '.env'"
     echo [92m✅ IMAGES_API_TOKEN updated[0m
@@ -454,7 +430,7 @@ echo [94m🔥 FIREBASE AUTH CONFIGURATION[0m
 echo ===============================
 echo [94mAPI_KEY[0m
 echo [93mFirebase API key[0m
-set /p "API_KEY=Enter value: "
+call :prompt_required API_KEY
 if not "%API_KEY%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^API_KEY=.*', 'API_KEY=%API_KEY%' | Set-Content '.env'"
     echo [92m✅ API_KEY updated[0m
@@ -462,7 +438,7 @@ if not "%API_KEY%"=="" (
 
 echo [94mAUTH_DOMAIN[0m
 echo [93mFirebase auth domain (project-id.firebaseapp.com)[0m
-set /p "AUTH_DOMAIN=Enter value: "
+call :prompt_required AUTH_DOMAIN
 if not "%AUTH_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^AUTH_DOMAIN=.*', 'AUTH_DOMAIN=%AUTH_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ AUTH_DOMAIN updated[0m
@@ -470,7 +446,7 @@ if not "%AUTH_DOMAIN%"=="" (
 
 echo [94mPROJECT_ID[0m
 echo [93mFirebase project ID[0m
-set /p "PROJECT_ID=Enter value: "
+call :prompt_required PROJECT_ID
 if not "%PROJECT_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^PROJECT_ID=.*', 'PROJECT_ID=%PROJECT_ID%' | Set-Content '.env'"
     echo [92m✅ PROJECT_ID updated[0m
@@ -478,7 +454,7 @@ if not "%PROJECT_ID%"=="" (
 
 echo [94mSTORAGE_BUCKET[0m
 echo [93mFirebase storage bucket[0m
-set /p "STORAGE_BUCKET=Enter value: "
+call :prompt_required STORAGE_BUCKET
 if not "%STORAGE_BUCKET%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^STORAGE_BUCKET=.*', 'STORAGE_BUCKET=%STORAGE_BUCKET%' | Set-Content '.env'"
     echo [92m✅ STORAGE_BUCKET updated[0m
@@ -486,7 +462,7 @@ if not "%STORAGE_BUCKET%"=="" (
 
 echo [94mMESSAGING_SENDER_ID[0m
 echo [93mFirebase messaging sender ID[0m
-set /p "MESSAGING_SENDER_ID=Enter value: "
+call :prompt_required MESSAGING_SENDER_ID
 if not "%MESSAGING_SENDER_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^MESSAGING_SENDER_ID=.*', 'MESSAGING_SENDER_ID=%MESSAGING_SENDER_ID%' | Set-Content '.env'"
     echo [92m✅ MESSAGING_SENDER_ID updated[0m
@@ -494,7 +470,7 @@ if not "%MESSAGING_SENDER_ID%"=="" (
 
 echo [94mAPP_ID[0m
 echo [93mFirebase app ID[0m
-set /p "APP_ID=Enter value: "
+call :prompt_required APP_ID
 if not "%APP_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^APP_ID=.*', 'APP_ID=%APP_ID%' | Set-Content '.env'"
     echo [92m✅ APP_ID updated[0m
@@ -502,7 +478,7 @@ if not "%APP_ID%"=="" (
 
 echo [94mMEASUREMENT_ID[0m
 echo [93mFirebase measurement ID (optional)[0m
-set /p "MEASUREMENT_ID=Enter value: "
+call :prompt_required MEASUREMENT_ID
 if not "%MEASUREMENT_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^MEASUREMENT_ID=.*', 'MEASUREMENT_ID=%MEASUREMENT_ID%' | Set-Content '.env'"
     echo [92m✅ MEASUREMENT_ID updated[0m
@@ -513,7 +489,7 @@ echo [94m📄 PAGES CONFIGURATION[0m
 echo ======================
 echo [94mPAGES_PROJECT_NAME[0m
 echo [93mYour Cloudflare Pages project name[0m
-set /p "PAGES_PROJECT_NAME=Enter value: "
+call :prompt_required PAGES_PROJECT_NAME
 if not "%PAGES_PROJECT_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^PAGES_PROJECT_NAME=.*', 'PAGES_PROJECT_NAME=%PAGES_PROJECT_NAME%' | Set-Content '.env'"
     echo [92m✅ PAGES_PROJECT_NAME updated[0m
@@ -521,7 +497,7 @@ if not "%PAGES_PROJECT_NAME%"=="" (
 
 echo [94mPAGES_CUSTOM_DOMAIN[0m
 echo [93mYour custom domain (e.g., striae.org) - DO NOT include https://[0m
-set /p "PAGES_CUSTOM_DOMAIN=Enter value: "
+call :prompt_required PAGES_CUSTOM_DOMAIN
 if not "%PAGES_CUSTOM_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^PAGES_CUSTOM_DOMAIN=.*', 'PAGES_CUSTOM_DOMAIN=%PAGES_CUSTOM_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ PAGES_CUSTOM_DOMAIN updated[0m
@@ -534,7 +510,7 @@ echo =========================
 
 echo [94mKEYS_WORKER_NAME[0m
 echo [93mKeys worker name[0m
-set /p "KEYS_WORKER_NAME=Enter value: "
+call :prompt_required KEYS_WORKER_NAME
 if not "%KEYS_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^KEYS_WORKER_NAME=.*', 'KEYS_WORKER_NAME=%KEYS_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ KEYS_WORKER_NAME updated[0m
@@ -542,7 +518,7 @@ if not "%KEYS_WORKER_NAME%"=="" (
 
 echo [94mKEYS_WORKER_DOMAIN[0m
 echo [93mKeys worker domain (e.g., keys.striae.org) - DO NOT include https://[0m
-set /p "KEYS_WORKER_DOMAIN=Enter value: "
+call :prompt_required KEYS_WORKER_DOMAIN
 if not "%KEYS_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^KEYS_WORKER_DOMAIN=.*', 'KEYS_WORKER_DOMAIN=%KEYS_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ KEYS_WORKER_DOMAIN updated[0m
@@ -550,7 +526,7 @@ if not "%KEYS_WORKER_DOMAIN%"=="" (
 
 echo [94mUSER_WORKER_NAME[0m
 echo [93mUser worker name[0m
-set /p "USER_WORKER_NAME=Enter value: "
+call :prompt_required USER_WORKER_NAME
 if not "%USER_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^USER_WORKER_NAME=.*', 'USER_WORKER_NAME=%USER_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ USER_WORKER_NAME updated[0m
@@ -558,7 +534,7 @@ if not "%USER_WORKER_NAME%"=="" (
 
 echo [94mUSER_WORKER_DOMAIN[0m
 echo [93mUser worker domain (e.g., users.striae.org) - DO NOT include https://[0m
-set /p "USER_WORKER_DOMAIN=Enter value: "
+call :prompt_required USER_WORKER_DOMAIN
 if not "%USER_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^USER_WORKER_DOMAIN=.*', 'USER_WORKER_DOMAIN=%USER_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ USER_WORKER_DOMAIN updated[0m
@@ -566,7 +542,7 @@ if not "%USER_WORKER_DOMAIN%"=="" (
 
 echo [94mDATA_WORKER_NAME[0m
 echo [93mData worker name[0m
-set /p "DATA_WORKER_NAME=Enter value: "
+call :prompt_required DATA_WORKER_NAME
 if not "%DATA_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^DATA_WORKER_NAME=.*', 'DATA_WORKER_NAME=%DATA_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ DATA_WORKER_NAME updated[0m
@@ -574,7 +550,7 @@ if not "%DATA_WORKER_NAME%"=="" (
 
 echo [94mDATA_WORKER_DOMAIN[0m
 echo [93mData worker domain (e.g., data.striae.org) - DO NOT include https://[0m
-set /p "DATA_WORKER_DOMAIN=Enter value: "
+call :prompt_required DATA_WORKER_DOMAIN
 if not "%DATA_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^DATA_WORKER_DOMAIN=.*', 'DATA_WORKER_DOMAIN=%DATA_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ DATA_WORKER_DOMAIN updated[0m
@@ -582,7 +558,7 @@ if not "%DATA_WORKER_DOMAIN%"=="" (
 
 echo [94mAUDIT_WORKER_NAME[0m
 echo [93mAudit worker name[0m
-set /p "AUDIT_WORKER_NAME=Enter value: "
+call :prompt_required AUDIT_WORKER_NAME
 if not "%AUDIT_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^AUDIT_WORKER_NAME=.*', 'AUDIT_WORKER_NAME=%AUDIT_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ AUDIT_WORKER_NAME updated[0m
@@ -590,7 +566,7 @@ if not "%AUDIT_WORKER_NAME%"=="" (
 
 echo [94mAUDIT_WORKER_DOMAIN[0m
 echo [93mAudit worker domain (e.g., audit.striae.org) - DO NOT include https://[0m
-set /p "AUDIT_WORKER_DOMAIN=Enter value: "
+call :prompt_required AUDIT_WORKER_DOMAIN
 if not "%AUDIT_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^AUDIT_WORKER_DOMAIN=.*', 'AUDIT_WORKER_DOMAIN=%AUDIT_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ AUDIT_WORKER_DOMAIN updated[0m
@@ -598,7 +574,7 @@ if not "%AUDIT_WORKER_DOMAIN%"=="" (
 
 echo [94mIMAGES_WORKER_NAME[0m
 echo [93mImages worker name[0m
-set /p "IMAGES_WORKER_NAME=Enter value: "
+call :prompt_required IMAGES_WORKER_NAME
 if not "%IMAGES_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^IMAGES_WORKER_NAME=.*', 'IMAGES_WORKER_NAME=%IMAGES_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ IMAGES_WORKER_NAME updated[0m
@@ -606,7 +582,7 @@ if not "%IMAGES_WORKER_NAME%"=="" (
 
 echo [94mIMAGES_WORKER_DOMAIN[0m
 echo [93mImages worker domain (e.g., images.striae.org) - DO NOT include https://[0m
-set /p "IMAGES_WORKER_DOMAIN=Enter value: "
+call :prompt_required IMAGES_WORKER_DOMAIN
 if not "%IMAGES_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^IMAGES_WORKER_DOMAIN=.*', 'IMAGES_WORKER_DOMAIN=%IMAGES_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ IMAGES_WORKER_DOMAIN updated[0m
@@ -614,7 +590,7 @@ if not "%IMAGES_WORKER_DOMAIN%"=="" (
 
 echo [94mTURNSTILE_WORKER_NAME[0m
 echo [93mTurnstile worker name[0m
-set /p "TURNSTILE_WORKER_NAME=Enter value: "
+call :prompt_required TURNSTILE_WORKER_NAME
 if not "%TURNSTILE_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^TURNSTILE_WORKER_NAME=.*', 'TURNSTILE_WORKER_NAME=%TURNSTILE_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ TURNSTILE_WORKER_NAME updated[0m
@@ -622,7 +598,7 @@ if not "%TURNSTILE_WORKER_NAME%"=="" (
 
 echo [94mTURNSTILE_WORKER_DOMAIN[0m
 echo [93mTurnstile worker domain (e.g., turnstile.striae.org) - DO NOT include https://[0m
-set /p "TURNSTILE_WORKER_DOMAIN=Enter value: "
+call :prompt_required TURNSTILE_WORKER_DOMAIN
 if not "%TURNSTILE_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^TURNSTILE_WORKER_DOMAIN=.*', 'TURNSTILE_WORKER_DOMAIN=%TURNSTILE_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ TURNSTILE_WORKER_DOMAIN updated[0m
@@ -630,7 +606,7 @@ if not "%TURNSTILE_WORKER_DOMAIN%"=="" (
 
 echo [94mPDF_WORKER_NAME[0m
 echo [93mPDF worker name[0m
-set /p "PDF_WORKER_NAME=Enter value: "
+call :prompt_required PDF_WORKER_NAME
 if not "%PDF_WORKER_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^PDF_WORKER_NAME=.*', 'PDF_WORKER_NAME=%PDF_WORKER_NAME%' | Set-Content '.env'"
     echo [92m✅ PDF_WORKER_NAME updated[0m
@@ -638,7 +614,7 @@ if not "%PDF_WORKER_NAME%"=="" (
 
 echo [94mPDF_WORKER_DOMAIN[0m
 echo [93mPDF worker domain (e.g., pdf.striae.org) - DO NOT include https://[0m
-set /p "PDF_WORKER_DOMAIN=Enter value: "
+call :prompt_required PDF_WORKER_DOMAIN
 if not "%PDF_WORKER_DOMAIN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^PDF_WORKER_DOMAIN=.*', 'PDF_WORKER_DOMAIN=%PDF_WORKER_DOMAIN%' | Set-Content '.env'"
     echo [92m✅ PDF_WORKER_DOMAIN updated[0m
@@ -649,7 +625,7 @@ echo [94m🗄️ STORAGE CONFIGURATION[0m
 echo =========================
 echo [94mDATA_BUCKET_NAME[0m
 echo [93mYour R2 bucket name for case data storage[0m
-set /p "DATA_BUCKET_NAME=Enter value: "
+call :prompt_required DATA_BUCKET_NAME
 if not "%DATA_BUCKET_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^DATA_BUCKET_NAME=.*', 'DATA_BUCKET_NAME=%DATA_BUCKET_NAME%' | Set-Content '.env'"
     echo [92m✅ DATA_BUCKET_NAME updated[0m
@@ -657,7 +633,7 @@ if not "%DATA_BUCKET_NAME%"=="" (
 
 echo [94mAUDIT_BUCKET_NAME[0m
 echo [93mYour R2 bucket name for audit logs (separate from data bucket)[0m
-set /p "AUDIT_BUCKET_NAME=Enter value: "
+call :prompt_required AUDIT_BUCKET_NAME
 if not "%AUDIT_BUCKET_NAME%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^AUDIT_BUCKET_NAME=.*', 'AUDIT_BUCKET_NAME=%AUDIT_BUCKET_NAME%' | Set-Content '.env'"
     echo [92m✅ AUDIT_BUCKET_NAME updated[0m
@@ -665,7 +641,7 @@ if not "%AUDIT_BUCKET_NAME%"=="" (
 
 echo [94mKV_STORE_ID[0m
 echo [93mYour KV namespace ID (UUID format)[0m
-set /p "KV_STORE_ID=Enter value: "
+call :prompt_required KV_STORE_ID
 if not "%KV_STORE_ID%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^KV_STORE_ID=.*', 'KV_STORE_ID=%KV_STORE_ID%' | Set-Content '.env'"
     echo [92m✅ KV_STORE_ID updated[0m
@@ -678,6 +654,9 @@ echo [94mKEYS_AUTH[0m
 echo [93mKeys worker authentication token (generate with: openssl rand -hex 16)[0m
 
 REM Check if KEYS_AUTH already exists in .env and is not a placeholder
+call :is_placeholder "%KEYS_AUTH%"
+if "%ERRORLEVEL%"=="1" set "KEYS_AUTH="
+if "%UPDATE_ENV%"=="1" set "KEYS_AUTH="
 if "%KEYS_AUTH%"=="" (
     echo [95mAuto-generating secret...[0m
     for /f %%i in ('openssl rand -hex 32 2^>nul ^|^| powershell -Command "[System.Web.Security.Membership]::GeneratePassword(64, 0) -replace '[^a-f0-9]', '' | ForEach-Object { $_.Substring(0, [Math]::Min(64, $_.Length)) }"') do set "KEYS_AUTH=%%i"
@@ -686,7 +665,7 @@ if "%KEYS_AUTH%"=="" (
         echo [92m✅ KEYS_AUTH auto-generated[0m
     ) else (
         echo [91m❌ Failed to auto-generate, please enter manually:[0m
-        set /p "KEYS_AUTH=Enter value: "
+        call :prompt_required KEYS_AUTH
         if not "%KEYS_AUTH%"=="" (
             powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
             echo [92m✅ KEYS_AUTH updated[0m
@@ -704,7 +683,7 @@ if "%KEYS_AUTH%"=="" (
             echo [92m✅ KEYS_AUTH auto-generated[0m
         ) else (
             echo [91m❌ Failed to auto-generate, please enter manually:[0m
-            set /p "KEYS_AUTH=Enter value: "
+            call :prompt_required KEYS_AUTH
             if not "%KEYS_AUTH%"=="" (
                 powershell -Command "(Get-Content '.env') -replace '^KEYS_AUTH=.*', 'KEYS_AUTH=%KEYS_AUTH%' | Set-Content '.env'"
                 echo [92m✅ KEYS_AUTH updated[0m
@@ -717,7 +696,7 @@ if "%KEYS_AUTH%"=="" (
 
 echo [94mACCOUNT_HASH[0m
 echo [93mCloudflare Images Account Hash[0m
-set /p "ACCOUNT_HASH=Enter value: "
+call :prompt_required ACCOUNT_HASH
 if not "%ACCOUNT_HASH%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^ACCOUNT_HASH=.*', 'ACCOUNT_HASH=%ACCOUNT_HASH%' | Set-Content '.env'"
     echo [92m✅ ACCOUNT_HASH updated[0m
@@ -725,7 +704,7 @@ if not "%ACCOUNT_HASH%"=="" (
 
 echo [94mAPI_TOKEN[0m
 echo [93mCloudflare Images API token (for Images Worker)[0m
-set /p "API_TOKEN=Enter value: "
+call :prompt_required API_TOKEN
 if not "%API_TOKEN%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^API_TOKEN=.*', 'API_TOKEN=%API_TOKEN%' | Set-Content '.env'"
     echo [92m✅ API_TOKEN updated[0m
@@ -733,7 +712,7 @@ if not "%API_TOKEN%"=="" (
 
 echo [94mHMAC_KEY[0m
 echo [93mCloudflare Images HMAC signing key[0m
-set /p "HMAC_KEY=Enter value: "
+call :prompt_required HMAC_KEY
 if not "%HMAC_KEY%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^HMAC_KEY=.*', 'HMAC_KEY=%HMAC_KEY%' | Set-Content '.env'"
     echo [92m✅ HMAC_KEY updated[0m
@@ -741,7 +720,7 @@ if not "%HMAC_KEY%"=="" (
 
 echo [94mCFT_PUBLIC_KEY[0m
 echo [93mCloudflare Turnstile public key[0m
-set /p "CFT_PUBLIC_KEY=Enter value: "
+call :prompt_required CFT_PUBLIC_KEY
 if not "%CFT_PUBLIC_KEY%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^CFT_PUBLIC_KEY=.*', 'CFT_PUBLIC_KEY=%CFT_PUBLIC_KEY%' | Set-Content '.env'"
     echo [92m✅ CFT_PUBLIC_KEY updated[0m
@@ -749,7 +728,7 @@ if not "%CFT_PUBLIC_KEY%"=="" (
 
 echo [94mCFT_SECRET_KEY[0m
 echo [93mCloudflare Turnstile secret key[0m
-set /p "CFT_SECRET_KEY=Enter value: "
+call :prompt_required CFT_SECRET_KEY
 if not "%CFT_SECRET_KEY%"=="" (
     powershell -Command "(Get-Content '.env') -replace '^CFT_SECRET_KEY=.*', 'CFT_SECRET_KEY=%CFT_SECRET_KEY%' | Set-Content '.env'"
     echo [92m✅ CFT_SECRET_KEY updated[0m
@@ -758,6 +737,52 @@ if not "%CFT_SECRET_KEY%"=="" (
 echo.
 echo [92m🎉 Environment variables setup completed![0m
 echo [94m📄 All values saved to .env file[0m
+
+if "%UPDATE_ENV%"=="1" (
+    echo [93m🔍 Validating required environment variables...[0m
+    for %%V in (
+        ACCOUNT_ID
+        SL_API_KEY
+        USER_DB_AUTH
+        R2_KEY_SECRET
+        IMAGES_API_TOKEN
+        API_KEY
+        AUTH_DOMAIN
+        PROJECT_ID
+        STORAGE_BUCKET
+        MESSAGING_SENDER_ID
+        APP_ID
+        MEASUREMENT_ID
+        PAGES_PROJECT_NAME
+        PAGES_CUSTOM_DOMAIN
+        KEYS_WORKER_NAME
+        USER_WORKER_NAME
+        DATA_WORKER_NAME
+        AUDIT_WORKER_NAME
+        IMAGES_WORKER_NAME
+        TURNSTILE_WORKER_NAME
+        PDF_WORKER_NAME
+        KEYS_WORKER_DOMAIN
+        USER_WORKER_DOMAIN
+        DATA_WORKER_DOMAIN
+        AUDIT_WORKER_DOMAIN
+        IMAGES_WORKER_DOMAIN
+        TURNSTILE_WORKER_DOMAIN
+        PDF_WORKER_DOMAIN
+        DATA_BUCKET_NAME
+        AUDIT_BUCKET_NAME
+        KV_STORE_ID
+        KEYS_AUTH
+        ACCOUNT_HASH
+        API_TOKEN
+        HMAC_KEY
+        CFT_PUBLIC_KEY
+        CFT_SECRET_KEY
+    ) do (
+        call :require_env_value %%V
+    )
+    echo [92m✅ All required environment variables validated[0m
+)
 
 REM Reload environment variables from .env file
 for /f "usebackq tokens=1,2 delims==" %%a in (".env") do (
@@ -924,3 +949,51 @@ echo    4. Deploy pages
 echo    5. Deploy pages secrets
 echo.
 echo [92m✨ Ready for deployment![0m
+
+goto :eof
+
+:is_placeholder
+set "value=%~1"
+if "%value%"=="" exit /b 0
+echo(%value%| findstr /i /r "^your_.*_here$" >nul
+if "%ERRORLEVEL%"=="0" exit /b 1
+exit /b 0
+
+:prompt_required
+set "var_name=%~1"
+set "current_value=!%var_name%!"
+set "requires_value=0"
+call :is_placeholder "!current_value!"
+if "%ERRORLEVEL%"=="1" set "requires_value=1"
+if "%UPDATE_ENV%"=="1" (
+    set "requires_value=1"
+    set "current_value="
+)
+:prompt_required_loop
+set /p "%var_name%=Enter value: "
+if "!%var_name%!"=="" (
+    if "%requires_value%"=="1" (
+        echo [91m❌ %var_name% cannot be empty or a placeholder.[0m
+        goto prompt_required_loop
+    ) else (
+        set "%var_name%=!current_value!"
+    )
+)
+call :is_placeholder "!%var_name%!"
+if "%ERRORLEVEL%"=="1" (
+    echo [91m❌ %var_name% cannot be a placeholder.[0m
+    set "%var_name%="
+    goto prompt_required_loop
+)
+exit /b 0
+
+:require_env_value
+set "var_name=%~1"
+set "current_value=!%var_name%!"
+call :is_placeholder "!current_value!"
+if "%ERRORLEVEL%"=="1" set "current_value="
+if "%current_value%"=="" (
+    echo [91m❌ Error: %var_name% is not set in .env file or is a placeholder[0m
+    exit /b 1
+)
+exit /b 0

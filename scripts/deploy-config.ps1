@@ -11,11 +11,54 @@ $Yellow = "`e[93m"
 $Blue = "`e[94m"
 $Reset = "`e[0m"
 
+param(
+    [switch]$UpdateEnv,
+    [switch]$Help
+)
+
+if ($Help) {
+    Write-Host "Usage: ./scripts/deploy-config.ps1 [-UpdateEnv] [-Help]"
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -UpdateEnv   Reset .env from .env.example and overwrite configs"
+    Write-Host "  -Help        Show this help message"
+    exit 0
+}
+
 Write-Host "${Blue}⚙️  Striae Configuration Setup Script${Reset}"
 Write-Host "====================================="
 
+if ($UpdateEnv) {
+    Write-Host "${Yellow}⚠️  Update-env mode: overwriting configs and regenerating .env values${Reset}"
+}
+
+function Test-PlaceholderValue {
+    param(
+        [string]$Value
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return $false
+    }
+
+    $normalized = $Value.Trim().ToLowerInvariant()
+    return $normalized -like "your_*_here"
+}
+
 # Check if .env file exists
-if (-not (Test-Path ".env")) {
+if ($UpdateEnv) {
+    if (Test-Path ".env") {
+        Copy-Item ".env" ".env.backup"
+        Write-Host "${Green}📄 Existing .env backed up to .env.backup${Reset}"
+    }
+    if (Test-Path ".env.example") {
+        Copy-Item ".env.example" ".env" -Force
+        Write-Host "${Green}✅ .env file reset from .env.example${Reset}"
+    } else {
+        Write-Host "${Red}❌ Error: .env.example file not found!${Reset}"
+        exit 1
+    }
+} elseif (-not (Test-Path ".env")) {
     Write-Host "${Yellow}📄 .env file not found, copying from .env.example...${Reset}"
     if (Test-Path ".env.example") {
         Copy-Item ".env.example" ".env"
@@ -82,16 +125,21 @@ $required_vars = @(
     "CFT_SECRET_KEY"
 )
 
-Write-Host "${Yellow}🔍 Validating required environment variables...${Reset}"
-foreach ($var in $required_vars) {
-    $value = [Environment]::GetEnvironmentVariable($var, "Process")
-    if ([string]::IsNullOrWhiteSpace($value)) {
-        Write-Host "${Red}❌ Error: $var is not set in .env file${Reset}"
-        exit 1
+function Validate-RequiredVars {
+    Write-Host "${Yellow}🔍 Validating required environment variables...${Reset}"
+    foreach ($var in $required_vars) {
+        $value = [Environment]::GetEnvironmentVariable($var, "Process")
+        if ([string]::IsNullOrWhiteSpace($value) -or (Test-PlaceholderValue $value)) {
+            Write-Host "${Red}❌ Error: $var is not set in .env file${Reset}"
+            exit 1
+        }
     }
+    Write-Host "${Green}✅ All required variables found${Reset}"
 }
 
-Write-Host "${Green}✅ All required variables found${Reset}"
+if (-not $UpdateEnv) {
+    Validate-RequiredVars
+}
 
 # Function to copy example configuration files
 function Copy-ExampleConfigs {
@@ -102,19 +150,29 @@ function Copy-ExampleConfigs {
     Write-Host "${Yellow}  Copying app configuration files...${Reset}"
     
     # Copy app config-example directory to config
-    if ((Test-Path "app/config-example") -and (-not (Test-Path "app/config"))) {
-        Copy-Item -Path "app/config-example" -Destination "app/config" -Recurse
-        Write-Host "${Green}    ✅ app: config directory created from config-example${Reset}"
-    } elseif (Test-Path "app/config") {
-        Write-Host "${Yellow}    ⚠️  app: config directory already exists, skipping copy${Reset}"
+    if (Test-Path "app/config-example") {
+        if ($UpdateEnv -and (Test-Path "app/config")) {
+            Remove-Item -Path "app/config" -Recurse -Force
+        }
+        if (-not (Test-Path "app/config")) {
+            Copy-Item -Path "app/config-example" -Destination "app/config" -Recurse
+            Write-Host "${Green}    ✅ app: config directory created from config-example${Reset}"
+        } elseif ($UpdateEnv) {
+            Copy-Item -Path "app/config-example" -Destination "app/config" -Recurse -Force
+            Write-Host "${Green}    ✅ app: config directory replaced from config-example${Reset}"
+        } else {
+            Write-Host "${Yellow}    ⚠️  app: config directory already exists, skipping copy${Reset}"
+        }
     }
     
     # Copy turnstile keys.json.example to keys.json
-    if ((Test-Path "app/components/turnstile/keys.json.example") -and (-not (Test-Path "app/components/turnstile/keys.json"))) {
-        Copy-Item -Path "app/components/turnstile/keys.json.example" -Destination "app/components/turnstile/keys.json"
-        Write-Host "${Green}    ✅ turnstile: keys.json created from example${Reset}"
-    } elseif (Test-Path "app/components/turnstile/keys.json") {
-        Write-Host "${Yellow}    ⚠️  turnstile: keys.json already exists, skipping copy${Reset}"
+    if (Test-Path "app/components/turnstile/keys.json.example") {
+        if ($UpdateEnv -or (-not (Test-Path "app/components/turnstile/keys.json"))) {
+            Copy-Item -Path "app/components/turnstile/keys.json.example" -Destination "app/components/turnstile/keys.json" -Force
+            Write-Host "${Green}    ✅ turnstile: keys.json created from example${Reset}"
+        } elseif (Test-Path "app/components/turnstile/keys.json") {
+            Write-Host "${Yellow}    ⚠️  turnstile: keys.json already exists, skipping copy${Reset}"
+        }
     }
     
     # Copy worker configuration files
@@ -126,8 +184,8 @@ function Copy-ExampleConfigs {
         $examplePath = "workers/$worker/wrangler.jsonc.example"
         $configPath = "workers/$worker/wrangler.jsonc"
         
-        if ((Test-Path $examplePath) -and (-not (Test-Path $configPath))) {
-            Copy-Item -Path $examplePath -Destination $configPath
+        if ((Test-Path $examplePath) -and ($UpdateEnv -or (-not (Test-Path $configPath)))) {
+            Copy-Item -Path $examplePath -Destination $configPath -Force
             Write-Host "${Green}    ✅ $worker`: wrangler.jsonc created from example${Reset}"
         } elseif (Test-Path $configPath) {
             Write-Host "${Yellow}    ⚠️  $worker`: wrangler.jsonc already exists, skipping copy${Reset}"
@@ -135,11 +193,13 @@ function Copy-ExampleConfigs {
     }
     
     # Copy main wrangler.toml from example
-    if ((Test-Path "wrangler.toml.example") -and (-not (Test-Path "wrangler.toml"))) {
-        Copy-Item -Path "wrangler.toml.example" -Destination "wrangler.toml"
-        Write-Host "${Green}    ✅ root: wrangler.toml created from example${Reset}"
-    } elseif (Test-Path "wrangler.toml") {
-        Write-Host "${Yellow}    ⚠️  root: wrangler.toml already exists, skipping copy${Reset}"
+    if (Test-Path "wrangler.toml.example") {
+        if ($UpdateEnv -or (-not (Test-Path "wrangler.toml"))) {
+            Copy-Item -Path "wrangler.toml.example" -Destination "wrangler.toml" -Force
+            Write-Host "${Green}    ✅ root: wrangler.toml created from example${Reset}"
+        } elseif (Test-Path "wrangler.toml") {
+            Write-Host "${Yellow}    ⚠️  root: wrangler.toml already exists, skipping copy${Reset}"
+        }
     }
     
     Write-Host "${Green}✅ Configuration file copying completed${Reset}"
@@ -169,6 +229,8 @@ function Read-Secrets {
         Write-Host "${Green}📄 Created .env from .env.example${Reset}"
     }
     
+    $forceUpdate = $UpdateEnv
+
     # Function to prompt for a variable
     function Read-EnvVariable {
         param(
@@ -177,6 +239,7 @@ function Read-Secrets {
         )
         
         $currentValue = [Environment]::GetEnvironmentVariable($VarName, "Process")
+        $isPlaceholder = Test-PlaceholderValue $currentValue
         $newValue = ""
         
         # Auto-generate specific authentication secrets - but allow keeping current
@@ -184,7 +247,7 @@ function Read-Secrets {
             Write-Host "${Blue}$VarName${Reset}"
             Write-Host "${Yellow}$Description${Reset}"
             
-            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here" -and $currentValue -ne "your_custom_user_db_auth_token_here" -and $currentValue -ne "your_custom_r2_secret_here" -and $currentValue -ne "your_custom_keys_auth_token_here") {
+            if (-not $forceUpdate -and $currentValue -and -not $isPlaceholder -and $currentValue -ne "your_custom_user_db_auth_token_here" -and $currentValue -ne "your_custom_r2_secret_here" -and $currentValue -ne "your_custom_keys_auth_token_here") {
                 # Current value exists and is not a placeholder
                 Write-Host "${Green}Current value: [HIDDEN]${Reset}"
                 $genChoice = Read-Host "Generate new secret? (press Enter to keep current, or type 'y' to generate)"
@@ -199,8 +262,14 @@ function Read-Secrets {
                             $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
                             Write-Host "${Green}✅ $VarName auto-generated${Reset}"
                         } catch {
-                            Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
-                            $newValue = Read-Host "Enter value"
+                            do {
+                                Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                                $newValue = Read-Host "Enter value"
+                                if (Test-PlaceholderValue $newValue) {
+                                    Write-Host "${Red}❌ Placeholder values are not allowed.${Reset}"
+                                    $newValue = ""
+                                }
+                            } while ([string]::IsNullOrWhiteSpace($newValue))
                         }
                     }
                 } else {
@@ -219,8 +288,14 @@ function Read-Secrets {
                         $newValue = Prompt-ForSecret -SecretName $VarName -Description "Auto-generating fallback"
                         Write-Host "${Green}✅ $VarName auto-generated${Reset}"
                     } catch {
-                        Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
-                        $newValue = Read-Host "Enter value"
+                        do {
+                            Write-Host "${Red}❌ Failed to auto-generate, please enter manually:${Reset}"
+                            $newValue = Read-Host "Enter value"
+                            if (Test-PlaceholderValue $newValue) {
+                                Write-Host "${Red}❌ Placeholder values are not allowed.${Reset}"
+                                $newValue = ""
+                            }
+                        } while ([string]::IsNullOrWhiteSpace($newValue))
                     }
                 }
             }
@@ -229,11 +304,32 @@ function Read-Secrets {
             Write-Host "${Blue}$VarName${Reset}"
             Write-Host "${Yellow}$Description${Reset}"
             
-            if ($currentValue -and $currentValue -ne "your_$($VarName.ToLower())_here") {
+            $allowKeep = (-not $forceUpdate) -and $currentValue -and -not $isPlaceholder
+            if ($allowKeep) {
                 Write-Host "${Green}Current value: $currentValue${Reset}"
-                $newValue = Read-Host "New value (or press Enter to keep current)"
-            } else {
-                $newValue = Read-Host "Enter value"
+            }
+
+            while ($true) {
+                if ($allowKeep) {
+                    $newValue = Read-Host "New value (or press Enter to keep current)"
+                    if ([string]::IsNullOrWhiteSpace($newValue)) {
+                        break
+                    }
+                } else {
+                    $newValue = Read-Host "Enter value"
+                    if ([string]::IsNullOrWhiteSpace($newValue)) {
+                        Write-Host "${Red}❌ A value is required.${Reset}"
+                        continue
+                    }
+                }
+
+                if (Test-PlaceholderValue $newValue) {
+                    Write-Host "${Red}❌ Placeholder values are not allowed.${Reset}"
+                    $newValue = ""
+                    continue
+                }
+
+                break
             }
         }
         
@@ -330,6 +426,10 @@ function Read-Secrets {
 
 # Always prompt for secrets to ensure configuration
 Read-Secrets
+
+if ($UpdateEnv) {
+    Validate-RequiredVars
+}
 
 # Function to replace variables in configuration files
 function Update-WranglerConfigs {

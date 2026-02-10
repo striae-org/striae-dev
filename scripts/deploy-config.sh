@@ -18,9 +18,60 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}⚙️  Striae Configuration Setup Script${NC}"
 echo "====================================="
 
+update_env=false
+show_help=false
+for arg in "$@"; do
+    case "$arg" in
+        -h|--help)
+            show_help=true
+            ;;
+        --update-env)
+            update_env=true
+            ;;
+    esac
+done
+
+if [ "$show_help" = "true" ]; then
+    echo "Usage: bash ./scripts/deploy-config.sh [--update-env]"
+    echo ""
+    echo "Options:"
+    echo "  --update-env   Reset .env from .env.example and overwrite configs"
+    echo "  -h, --help     Show this help message"
+    exit 0
+fi
+
+if [ "$update_env" = "true" ]; then
+    echo -e "${YELLOW}⚠️  Update-env mode: overwriting configs and regenerating .env values${NC}"
+fi
+
+is_placeholder() {
+    local value="$1"
+    local normalized="${value,,}"
+
+    if [ -z "$normalized" ]; then
+        return 1
+    fi
+
+    [[ "$normalized" == your_*_here ]]
+}
+
 # Check if .env file exists
 env_created_from_example=false
-if [ ! -f ".env" ]; then
+if [ "$update_env" = "true" ]; then
+    if [ -f ".env" ]; then
+        cp .env .env.backup
+        echo -e "${GREEN}📄 Existing .env backed up to .env.backup${NC}"
+    fi
+
+    if [ -f ".env.example" ]; then
+        cp ".env.example" ".env"
+        echo -e "${GREEN}✅ .env file reset from .env.example${NC}"
+        env_created_from_example=true
+    else
+        echo -e "${RED}❌ Error: .env.example file not found!${NC}"
+        exit 1
+    fi
+elif [ ! -f ".env" ]; then
     echo -e "${YELLOW}📄 .env file not found, copying from .env.example...${NC}"
     if [ -f ".env.example" ]; then
         cp ".env.example" ".env"
@@ -93,15 +144,20 @@ required_vars=(
     "CFT_SECRET_KEY"
 )
 
-echo -e "${YELLOW}🔍 Validating required environment variables...${NC}"
-for var in "${required_vars[@]}"; do
-    if [ -z "${!var}" ]; then
-        echo -e "${RED}❌ Error: $var is not set in .env file${NC}"
-        exit 1
-    fi
-done
+validate_required_vars() {
+    echo -e "${YELLOW}🔍 Validating required environment variables...${NC}"
+    for var in "${required_vars[@]}"; do
+        if [ -z "${!var}" ] || is_placeholder "${!var}"; then
+            echo -e "${RED}❌ Error: $var is not set in .env file or is a placeholder${NC}"
+            exit 1
+        fi
+    done
+    echo -e "${GREEN}✅ All required variables found${NC}"
+}
 
-echo -e "${GREEN}✅ All required variables found${NC}"
+if [ "$update_env" != "true" ]; then
+    validate_required_vars
+fi
 
 # Function to copy example configuration files
 copy_example_configs() {
@@ -111,26 +167,36 @@ copy_example_configs() {
     echo -e "${YELLOW}  Copying app configuration files...${NC}"
     
     # Copy app config-example directory to config
-    if [ -d "app/config-example" ] && [ ! -d "app/config" ]; then
-        cp -r app/config-example app/config
-        echo -e "${GREEN}    ✅ app: config directory created from config-example${NC}"
-    elif [ -d "app/config" ]; then
-        echo -e "${YELLOW}    ⚠️  app: config directory already exists, skipping copy${NC}"
+    if [ -d "app/config-example" ]; then
+        if [ "$update_env" = "true" ] && [ -d "app/config" ]; then
+            rm -rf app/config
+        fi
+        if [ ! -d "app/config" ]; then
+            cp -r app/config-example app/config
+            echo -e "${GREEN}    ✅ app: config directory created from config-example${NC}"
+        elif [ "$update_env" = "true" ]; then
+            cp -r app/config-example app/config
+            echo -e "${GREEN}    ✅ app: config directory replaced from config-example${NC}"
+        else
+            echo -e "${YELLOW}    ⚠️  app: config directory already exists, skipping copy${NC}"
+        fi
     fi
     
     # Copy turnstile keys.json.example to keys.json
-    if [ -f "app/components/turnstile/keys.json.example" ] && [ ! -f "app/components/turnstile/keys.json" ]; then
-        cp app/components/turnstile/keys.json.example app/components/turnstile/keys.json
-        echo -e "${GREEN}    ✅ turnstile: keys.json created from example${NC}"
-    elif [ -f "app/components/turnstile/keys.json" ]; then
-        echo -e "${YELLOW}    ⚠️  turnstile: keys.json already exists, skipping copy${NC}"
+    if [ -f "app/components/turnstile/keys.json.example" ]; then
+        if [ "$update_env" = "true" ] || [ ! -f "app/components/turnstile/keys.json" ]; then
+            cp app/components/turnstile/keys.json.example app/components/turnstile/keys.json
+            echo -e "${GREEN}    ✅ turnstile: keys.json created from example${NC}"
+        elif [ -f "app/components/turnstile/keys.json" ]; then
+            echo -e "${YELLOW}    ⚠️  turnstile: keys.json already exists, skipping copy${NC}"
+        fi
     fi
     
     # Navigate to each worker directory and copy the example file
     echo -e "${YELLOW}  Copying worker configuration files...${NC}"
     
     cd workers/keys-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ keys-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -138,7 +204,7 @@ copy_example_configs() {
     fi
 
     cd ../user-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ user-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -146,7 +212,7 @@ copy_example_configs() {
     fi
 
     cd ../data-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ data-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -154,7 +220,7 @@ copy_example_configs() {
     fi
 
     cd ../audit-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ audit-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -162,7 +228,7 @@ copy_example_configs() {
     fi
 
     cd ../image-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ image-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -170,7 +236,7 @@ copy_example_configs() {
     fi
 
     cd ../turnstile-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ turnstile-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -178,7 +244,7 @@ copy_example_configs() {
     fi
 
     cd ../pdf-worker
-    if [ -f "wrangler.jsonc.example" ] && [ ! -f "wrangler.jsonc" ]; then
+    if [ -f "wrangler.jsonc.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.jsonc" ]; }; then
         cp wrangler.jsonc.example wrangler.jsonc
         echo -e "${GREEN}    ✅ pdf-worker: wrangler.jsonc created from example${NC}"
     elif [ -f "wrangler.jsonc" ]; then
@@ -189,7 +255,7 @@ copy_example_configs() {
     cd ../..
     
     # Copy main wrangler.toml from example
-    if [ -f "wrangler.toml.example" ] && [ ! -f "wrangler.toml" ]; then
+    if [ -f "wrangler.toml.example" ] && { [ "$update_env" = "true" ] || [ ! -f "wrangler.toml" ]; }; then
         cp wrangler.toml.example wrangler.toml
         echo -e "${GREEN}    ✅ root: wrangler.toml created from example${NC}"
     elif [ -f "wrangler.toml" ]; then
@@ -211,7 +277,7 @@ prompt_for_secrets() {
     echo ""
     
     # Create or backup existing .env
-    if [ -f ".env" ]; then
+    if [ -f ".env" ] && [ "$update_env" != "true" ]; then
         cp .env .env.backup
         echo -e "${GREEN}📄 Existing .env backed up to .env.backup${NC}"
     fi
@@ -228,13 +294,14 @@ prompt_for_secrets() {
         local description=$2
         local current_value="${!var_name}"
         local new_value=""
+        local allow_keep="false"
         
         # Auto-generate specific authentication secrets - but allow keeping current
         if [ "$var_name" = "USER_DB_AUTH" ] || [ "$var_name" = "R2_KEY_SECRET" ] || [ "$var_name" = "KEYS_AUTH" ]; then
             echo -e "${BLUE}$var_name${NC}"
             echo -e "${YELLOW}$description${NC}"
             
-            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ] && [ "$current_value" != "your_custom_user_db_auth_token_here" ] && [ "$current_value" != "your_custom_r2_secret_here" ] && [ "$current_value" != "your_custom_keys_auth_token_here" ]; then
+            if [ "$update_env" != "true" ] && [ -n "$current_value" ] && ! is_placeholder "$current_value" && [ "$current_value" != "your_custom_user_db_auth_token_here" ] && [ "$current_value" != "your_custom_r2_secret_here" ] && [ "$current_value" != "your_custom_keys_auth_token_here" ]; then
                 # Current value exists and is not a placeholder
                 echo -e "${GREEN}Current value: [HIDDEN]${NC}"
                 read -p "Generate new secret? (press Enter to keep current, or type 'y' to generate): " gen_choice
@@ -244,8 +311,20 @@ prompt_for_secrets() {
                     if [ -n "$new_value" ]; then
                         echo -e "${GREEN}✅ $var_name auto-generated${NC}"
                     else
-                        echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
-                        read -p "Enter value: " new_value
+                        while true; do
+                            echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
+                            read -p "Enter value: " new_value
+                            if [ -z "$new_value" ]; then
+                                echo -e "${RED}❌ A value is required.${NC}"
+                                continue
+                            fi
+                            if is_placeholder "$new_value"; then
+                                echo -e "${RED}❌ Placeholder values are not allowed.${NC}"
+                                new_value=""
+                                continue
+                            fi
+                            break
+                        done
                     fi
                 else
                     # User wants to keep current value
@@ -258,20 +337,53 @@ prompt_for_secrets() {
                 if [ -n "$new_value" ]; then
                     echo -e "${GREEN}✅ $var_name auto-generated${NC}"
                 else
-                    echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
-                    read -p "Enter value: " new_value
+                    while true; do
+                        echo -e "${RED}❌ Failed to auto-generate, please enter manually:${NC}"
+                        read -p "Enter value: " new_value
+                        if [ -z "$new_value" ]; then
+                            echo -e "${RED}❌ A value is required.${NC}"
+                            continue
+                        fi
+                        if is_placeholder "$new_value"; then
+                            echo -e "${RED}❌ Placeholder values are not allowed.${NC}"
+                            new_value=""
+                            continue
+                        fi
+                        break
+                    done
                 fi
             fi
         else
             # Normal prompt for other variables
             echo -e "${BLUE}$var_name${NC}"
             echo -e "${YELLOW}$description${NC}"
-            if [ -n "$current_value" ] && [ "$current_value" != "your_${var_name,,}_here" ]; then
+            if [ "$update_env" != "true" ] && [ -n "$current_value" ] && ! is_placeholder "$current_value"; then
+                allow_keep="true"
                 echo -e "${GREEN}Current value: $current_value${NC}"
-                read -p "New value (or press Enter to keep current): " new_value
-            else
-                read -p "Enter value: " new_value
             fi
+
+            while true; do
+                if [ "$allow_keep" = "true" ]; then
+                    read -p "New value (or press Enter to keep current): " new_value
+                    if [ -z "$new_value" ]; then
+                        break
+                    fi
+                else
+                    read -p "Enter value: " new_value
+                    if [ -z "$new_value" ]; then
+                        echo -e "${RED}❌ A value is required.${NC}"
+                        continue
+                    fi
+                fi
+
+                if is_placeholder "$new_value"; then
+                    echo -e "${RED}❌ Placeholder values are not allowed.${NC}"
+                    new_value=""
+                    continue
+                fi
+
+                break
+            done
         fi
         
         if [ -n "$new_value" ]; then
@@ -356,6 +468,10 @@ prompt_for_secrets() {
 
 # Always prompt for secrets to ensure configuration
 prompt_for_secrets
+
+if [ "$update_env" = "true" ]; then
+    validate_required_vars
+fi
 
 # Function to replace variables in wrangler configuration files
 update_wrangler_configs() {
