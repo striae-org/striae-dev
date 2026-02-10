@@ -46,7 +46,7 @@ fi
 
 is_placeholder() {
     local value="$1"
-    local normalized="${value,,}"
+    local normalized=$(echo "$value" | tr '[:upper:]' '[:lower:]')
 
     if [ -z "$normalized" ]; then
         return 1
@@ -154,10 +154,6 @@ validate_required_vars() {
     done
     echo -e "${GREEN}✅ All required variables found${NC}"
 }
-
-if [ "$update_env" != "true" ]; then
-    validate_required_vars
-fi
 
 # Function to copy example configuration files
 copy_example_configs() {
@@ -464,9 +460,8 @@ prompt_for_secrets() {
 # Always prompt for secrets to ensure configuration
 prompt_for_secrets
 
-if [ "$update_env" = "true" ]; then
-    validate_required_vars
-fi
+# Validate after secrets have been configured
+validate_required_vars
 
 # Function to replace variables in wrangler configuration files
 update_wrangler_configs() {
