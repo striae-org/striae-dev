@@ -125,7 +125,7 @@ $required_vars = @(
     "CFT_SECRET_KEY"
 )
 
-function Validate-RequiredVars {
+function Test-RequiredVars {
     Write-Host "${Yellow}🔍 Validating required environment variables...${Reset}"
     foreach ($var in $required_vars) {
         $value = [Environment]::GetEnvironmentVariable($var, "Process")
@@ -135,10 +135,6 @@ function Validate-RequiredVars {
         }
     }
     Write-Host "${Green}✅ All required variables found${Reset}"
-}
-
-if (-not $UpdateEnv) {
-    Validate-RequiredVars
 }
 
 # Function to copy example configuration files
@@ -217,8 +213,8 @@ function Read-Secrets {
     Write-Host "${Yellow}Press Enter to keep existing values (if any).${Reset}"
     Write-Host ""
     
-    # Create or backup existing .env
-    if (Test-Path ".env") {
+    # Create or backup existing .env (skip backup in UpdateEnv mode as it was already done)
+    if ((Test-Path ".env") -and (-not $UpdateEnv)) {
         Copy-Item ".env" ".env.backup"
         Write-Host "${Green}📄 Existing .env backed up to .env.backup${Reset}"
     }
@@ -427,9 +423,8 @@ function Read-Secrets {
 # Always prompt for secrets to ensure configuration
 Read-Secrets
 
-if ($UpdateEnv) {
-    Validate-RequiredVars
-}
+# Validate after secrets have been configured
+Test-RequiredVars
 
 # Function to replace variables in configuration files
 function Update-WranglerConfigs {
