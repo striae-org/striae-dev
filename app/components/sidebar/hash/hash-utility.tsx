@@ -124,24 +124,21 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
       } else if (fileName.toLowerCase().endsWith('.txt')) {
         const content = await file.text();
         result = await verifyTXTFile(content, fileName);
-      } else {
-        // Read file content once for JSON/CSV type detection
+      } else if (fileName.toLowerCase().endsWith('.json') || await isJSONContent(file)) {
         const content = await file.text();
-        
-        if (fileName.toLowerCase().endsWith('.json') || content.trim().startsWith('{')) {
-          result = await verifyJSONFile(content, fileName);
-        } else if (fileName.toLowerCase().endsWith('.csv') || content.includes(',')) {
-          result = await verifyCSVFile(content, fileName);
-        } else {
-          result = {
-            isValid: false,
-            expectedHash: '',
-            calculatedHash: '',
-            fileName,
-            fileType: 'unknown',
-            errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, ZIP, or TXT export file.'
-          };
-        }
+        result = await verifyJSONFile(content, fileName);
+      } else if (fileName.toLowerCase().endsWith('.csv') || await isCSVContent(file)) {
+        const content = await file.text();
+        result = await verifyCSVFile(content, fileName);
+      } else {
+        result = {
+          isValid: false,
+          expectedHash: '',
+          calculatedHash: '',
+          fileName,
+          fileType: 'unknown',
+          errorMessage: 'Unsupported file type. Please select a Striae JSON, CSV, ZIP, or TXT export file.'
+        };
       }
 
       setVerificationResult(result);
@@ -157,6 +154,24 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
       });
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const isJSONContent = async (file: File): Promise<boolean> => {
+    try {
+      const content = await file.text();
+      return content.trim().startsWith('{');
+    } catch {
+      return false;
+    }
+  };
+
+  const isCSVContent = async (file: File): Promise<boolean> => {
+    try {
+      const content = await file.text();
+      return content.includes(',');
+    } catch {
+      return false;
     }
   };
 
