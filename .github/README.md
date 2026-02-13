@@ -83,6 +83,14 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2026-02-13] - *[Patch Release v1.1.1](https://github.com/striae-org/striae/releases/tag/v1.1.1)*
+
+- **📁 Multi-File Upload Support** - Upload multiple image files simultaneously using drag & drop or file picker with sequential processing
+- **⏳ Sequential Upload Processing** - Files upload one-at-a-time in order with automatic permission refresh after each file
+- **📊 Enhanced Progress Feedback** - Real-time file counter ("X of Y") and current filename display during batch uploads
+- **✅ Automatic File List Refresh** - Case sidebar file list updates immediately after each file upload completes
+- **🎨 Improved Upload UX** - Better visual feedback with per-file error messages and graceful failure handling
+
 ## [2026-02-08] - *[Minor Release v1.1.0](https://github.com/striae-org/striae/releases/tag/v1.1.0)*
 
 - **⚙️ Configuration Architecture** - Separated meta-config and app-config concerns for better security and maintainability
