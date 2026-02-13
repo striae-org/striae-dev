@@ -84,7 +84,32 @@
 .uploadingText {
   font-size: 0.875rem;
   color: var(--textBody);
+  font-weight: 500;
+}
+
+.uploadStatusContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
   margin-top: 0.25rem;
+}
+
+.fileCountText {
+  font-size: 0.75rem;
+  color: var(--textLight);
+  font-weight: 400;
+}
+
+.currentFileName {
+  font-size: 0.875rem;
+  color: var(--textBody);
+  margin: 0.25rem 0 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* Status Messages */

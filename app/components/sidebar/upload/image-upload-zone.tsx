@@ -40,34 +40,32 @@ export const ImageUploadZone = ({
   const [fileError, setFileError] = useState('');
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
   const [dragCounter, setDragCounter] = useState(0);
+  const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
+  const [currentFileName, setCurrentFileName] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
-  const validateAndUploadFile = async (file: File) => {
-    if (!file || !currentCase) return;
+  const validateAndUploadFile = async (file: File, currentFilesList: FileData[]) => {
+    if (!file || !currentCase) return { success: false, files: currentFilesList };
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setFileError('Only PNG, GIF, JPEG, WEBP, or SVG files are allowed');
-      setIsUploadingFile(false);
-      setUploadProgress(0);
-      setTimeout(() => setFileError(''), 3000);
-      return;
+      setFileError(`${file.name}: Only PNG, GIF, JPEG, WEBP, or SVG files are allowed`);
+      return { success: false, files: currentFilesList };
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setFileError('File size must be less than 10 MB');
-      setIsUploadingFile(false);
-      setUploadProgress(0);
-      setTimeout(() => setFileError(''), 3000);
-      return;
+      setFileError(`${file.name}: File size must be less than 10 MB`);
+      return { success: false, files: currentFilesList };
     }
 
     try {
+      setCurrentFileName(file.name);
       const uploadedFile = await uploadFile(user, currentCase, file, (progress) => {
         setUploadProgress(progress);
       });
-      const updatedFiles = [...currentFiles, uploadedFile];
+      const updatedFiles = [...currentFilesList, uploadedFile];
       onFilesChanged(updatedFiles);
       if (fileInputRef.current) fileInputRef.current.value = '';
 
@@ -75,13 +73,41 @@ export const ImageUploadZone = ({
       if (onUploadPermissionCheck) {
         await onUploadPermissionCheck(updatedFiles.length);
       }
+      return { success: true, files: updatedFiles };
     } catch (err) {
-      setFileError(err instanceof Error ? err.message : 'Upload failed');
-      setTimeout(() => setFileError(''), 3000);
-    } finally {
-      setIsUploadingFile(false);
-      setUploadProgress(0);
+      setFileError(`${file.name}: ${err instanceof Error ? err.message : 'Upload failed'}`);
+      return { success: false, files: currentFilesList };
     }
+  };
+
+  // Process files sequentially
+  const processFileQueue = async (filesToProcess: File[]) => {
+    setUploadQueue(filesToProcess);
+    setCurrentFileIndex(0);
+    setIsUploadingFile(true);
+    setFileError('');
+
+    let accumulatedFiles = currentFiles;
+
+    for (let i = 0; i < filesToProcess.length; i++) {
+      setCurrentFileIndex(i);
+      setUploadProgress(0);
+      const file = filesToProcess[i];
+      const result = await validateAndUploadFile(file, accumulatedFiles);
+      
+      if (result.success) {
+        accumulatedFiles = result.files;
+      } else if (i === filesToProcess.length - 1) {
+        // Only show error if it's the last file
+        setTimeout(() => setFileError(''), 3000);
+      }
+    }
+
+    setIsUploadingFile(false);
+    setUploadProgress(0);
+    setCurrentFileName('');
+    setUploadQueue([]);
+    setCurrentFileIndex(0);
   };
 
   const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,14 +115,12 @@ export const ImageUploadZone = ({
       return;
     }
 
-    const file = event.target.files?.[0];
-    if (!file || !currentCase) return;
+    const files = event.target.files;
+    if (!files || files.length === 0 || !currentCase) return;
 
-    setFileError('');
-    setIsUploadingFile(true);
-    setUploadProgress(0);
-
-    await validateAndUploadFile(file);
+    // Convert FileList to Array
+    const filesToUpload = Array.from(files);
+    await processFileQueue(filesToUpload);
   };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -136,14 +160,9 @@ export const ImageUploadZone = ({
     const files = e.dataTransfer.files;
     if (files.length === 0 || !currentCase) return;
 
-    // Process only the first file (consistent with input behavior)
-    const file = files[0];
-
-    setFileError('');
-    setIsUploadingFile(true);
-    setUploadProgress(0);
-
-    await validateAndUploadFile(file);
+    // Convert FileList to Array and process all files
+    const filesToUpload = Array.from(files);
+    await processFileQueue(filesToUpload);
   };
 
   return (
@@ -155,10 +174,10 @@ export const ImageUploadZone = ({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <label htmlFor="file-upload">Upload Image:</label>
+      <label htmlFor="file-upload">Upload Images:</label>
       <div className={styles.dragDropHint}>
         <p className={styles.dragDropText}>
-          Drag & drop image files here or click to select
+          Drag & drop image files here or click below to select
         </p>
       </div>
       <input
@@ -166,10 +185,11 @@ export const ImageUploadZone = ({
         ref={fileInputRef}
         type="file"
         accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
+        multiple
         onChange={handleFileInputChange}
         disabled={isUploadingFile || !canUploadNewFile || isReadOnly}
         className={styles.fileInput}
-        aria-label="Upload image file"
+        aria-label="Upload image files"
         title={!canUploadNewFile ? uploadFileError : undefined}
       />
       {isUploadingFile && (
@@ -180,9 +200,19 @@ export const ImageUploadZone = ({
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
-          <span className={styles.uploadingText}>
-            {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
-          </span>
+          <div className={styles.uploadStatusContainer}>
+            <span className={styles.uploadingText}>
+              {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
+            </span>
+            {uploadQueue.length > 1 && (
+              <span className={styles.fileCountText}>
+                {currentFileIndex + 1} of {uploadQueue.length}
+              </span>
+            )}
+          </div>
+          {currentFileName && (
+            <p className={styles.currentFileName}>{currentFileName}</p>
+          )}
         </>
       )}
       {fileError && <p className={styles.error}>{fileError}</p>}
