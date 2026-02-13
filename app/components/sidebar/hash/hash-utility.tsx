@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './hash-utility.module.css';
 import { calculateSHA256Secure, validateCaseIntegritySecure } from '~/utils/SHA256';
 import { removeForensicWarning } from '~/components/actions/case-import/validation';
@@ -29,6 +29,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isMountedRef = useRef(true);
 
   // Handle Escape key
   useEffect(() => {
@@ -56,6 +57,13 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
     }
   }, [isOpen]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   if (!isOpen) return null;
 
   const handleFileSelect = (file: File) => {
@@ -71,47 +79,60 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
     }
   };
 
-  const handleDrop = (event: React.DragEvent) => {
+  const isValidFileType = (fileName: string): boolean => {
+    return fileName.toLowerCase().endsWith('.json') || 
+           fileName.toLowerCase().endsWith('.csv') ||
+           fileName.toLowerCase().endsWith('.zip') ||
+           fileName.toLowerCase().endsWith('.txt');
+  };
+
+  const handleDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault();
-    setDragOver(false);
+    if (isMountedRef.current) {
+      setDragOver(false);
+    }
     
     const files = event.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
       
-      // Validate file type before processing
-      const isValidType = file.name.toLowerCase().endsWith('.json') || 
-                         file.name.toLowerCase().endsWith('.csv') ||
-                         file.name.toLowerCase().endsWith('.zip') ||
-                         file.name.toLowerCase().endsWith('.txt');
-      
-      if (isValidType) {
+      if (isValidFileType(file.name)) {
         handleFileSelect(file);
       } else {
-        // Show error for invalid file type
-        setVerificationResult({
-          isValid: false,
-          expectedHash: 'N/A',
-          calculatedHash: 'N/A',
-          fileName: file.name,
-          fileType: 'unknown',
-          errorMessage: 'Invalid file type. Please drop a Striae JSON, CSV, ZIP, or TXT export file.'
-        });
+        if (isMountedRef.current) {
+          setVerificationResult({
+            isValid: false,
+            expectedHash: 'N/A',
+            calculatedHash: 'N/A',
+            fileName: file.name,
+            fileType: 'unknown',
+            errorMessage: 'Invalid file type. Please drop a Striae JSON, CSV, ZIP, or TXT export file.'
+          });
+        }
       }
     }
-  };
+  }, []);
 
-  const handleDragOver = (event: React.DragEvent) => {
+  const handleDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
-    setDragOver(true);
-  };
+    if (isMountedRef.current) {
+      setDragOver(true);
+    }
+  }, []);
 
-  const handleDragLeave = (event: React.DragEvent) => {
+  const handleDragLeave = useCallback((event: React.DragEvent) => {
     event.preventDefault();
-    setDragOver(false);
-  };
+    const relatedTarget = event.relatedTarget as HTMLElement | null;
+    if (!relatedTarget || !event.currentTarget?.contains(relatedTarget)) {
+      if (isMountedRef.current) {
+        setDragOver(false);
+      }
+    }
+  }, []);
 
   const verifyFileIntegrity = async (file: File) => {
+    if (!isMountedRef.current) return;
+    
     setIsVerifying(true);
     setVerificationResult(null);
 
@@ -141,19 +162,25 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
         };
       }
 
-      setVerificationResult(result);
+      if (isMountedRef.current) {
+        setVerificationResult(result);
+      }
     } catch (error) {
       console.error('Verification failed:', error);
-      setVerificationResult({
-        isValid: false,
-        expectedHash: '',
-        calculatedHash: '',
-        fileName: file.name,
-        fileType: 'unknown',
-        errorMessage: error instanceof Error ? error.message : 'Failed to read file'
-      });
+      if (isMountedRef.current) {
+        setVerificationResult({
+          isValid: false,
+          expectedHash: '',
+          calculatedHash: '',
+          fileName: file.name,
+          fileType: 'unknown',
+          errorMessage: error instanceof Error ? error.message : 'Failed to read file'
+        });
+      }
     } finally {
-      setIsVerifying(false);
+      if (isMountedRef.current) {
+        setIsVerifying(false);
+      }
     }
   };
 
@@ -524,9 +551,9 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.modal}>
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="hashUtilityTitle">
         <div className={styles.header}>
-          <h2 className={styles.title}>Hash Utility</h2>
+          <h2 className={styles.title} id="hashUtilityTitle">Hash Utility</h2>
           <button 
             className={styles.closeButton}
             onClick={onClose}
@@ -548,6 +575,15 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onClick={() => fileInputRef.current?.click()}
+            role="button"
+            tabIndex={isVerifying ? -1 : 0}
+            aria-disabled={isVerifying}
+            aria-label="Upload area. Click here or drag and drop a Striae export file to verify its integrity."
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !isVerifying) {
+                fileInputRef.current?.click();
+              }
+            }}
           >
             <div className={styles.uploadContent}>
               <div className={styles.uploadIcon}>📁</div>
@@ -561,15 +597,16 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
                 Supports JSON, CSV, ZIP, and TXT export files with embedded hashes
               </div>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json,.csv,.zip,.xlsx,.txt"
-              onChange={handleFileInputChange}
-              className={styles.hiddenInput}
-              aria-label="Select Striae export file for hash verification"
-            />
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,.csv,.zip,.xlsx,.txt"
+            onChange={handleFileInputChange}
+            className={styles.hiddenInput}
+            aria-label="Select Striae export file for hash verification"
+          />
 
           {isVerifying && (
             <div className={styles.verifyingSection}>
