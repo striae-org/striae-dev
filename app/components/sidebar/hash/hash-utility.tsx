@@ -614,7 +614,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
                 {verificationResult.errorMessage && (
                   <div className={styles.resultRow}>
                     <span className={styles.resultLabel}>Error:</span>
-                    <span className={`${styles.resultValue} ${styles.errorMessage}`}>{verificationResult.errorMessage}</span>
+                    <span className={`${styles.resultValue} ${styles.errorMessage}`}>SEE BELOW</span>
                   </div>
                 )}
               </div>

@@ -102,6 +102,11 @@ export const FileSelector = ({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={() => {
+            if (!isDisabled) {
+              fileInputRef.current?.click();
+            }
+          }}
           role="button"
           tabIndex={isDisabled ? -1 : 0}
           aria-disabled={isDisabled}
