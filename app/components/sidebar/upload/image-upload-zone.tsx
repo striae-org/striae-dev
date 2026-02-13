@@ -97,8 +97,8 @@ export const ImageUploadZone = ({
       
       if (result.success) {
         accumulatedFiles = result.files;
-      } else if (i === filesToProcess.length - 1) {
-        // Only show error if it's the last file
+      } else { 
+        // Auto-dismiss error after 3 seconds for any failed upload
         setTimeout(() => setFileError(''), 3000);
       }
     }
@@ -194,13 +194,24 @@ export const ImageUploadZone = ({
       />
       {isUploadingFile && (
         <>
-          <div className={styles.progressBar}>
+          <div
+            className={styles.progressBar}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={uploadProgress}
+            aria-label="Image upload progress"
+          >
             <div
               className={styles.progressFill}
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
-          <div className={styles.uploadStatusContainer}>
+          <div
+            className={styles.uploadStatusContainer}
+            aria-live="polite"
+            aria-label="Current upload status"
+          >
             <span className={styles.uploadingText}>
               {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
             </span>
