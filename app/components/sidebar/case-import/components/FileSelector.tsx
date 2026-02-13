@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { resetFileInput } from '../utils/file-validation';
 import styles from '../case-import.module.css';
 
@@ -18,30 +18,43 @@ export const FileSelector = ({
   onFileSelectDirect
 }: FileSelectorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isMountedRef = useRef(true);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const handleClear = () => {
     resetFileInput(fileInputRef);
     onClear?.();
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    if (!isDisabled) {
+    if (!isDisabled && isMountedRef.current) {
       setIsDragOver(true);
     }
-  };
+  }, [isDisabled]);
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(false);
-  };
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+    if (!relatedTarget || !e.currentTarget?.contains(relatedTarget)) {
+      if (isMountedRef.current) {
+        setIsDragOver(false);
+      }
+    }
+  }, []);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(false);
-    
-    if (isDisabled) return;
+    if (isMountedRef.current) {
+      setIsDragOver(false);
+    }
+    if (isDisabled || !isMountedRef.current) return;
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {
@@ -60,17 +73,17 @@ export const FileSelector = ({
           dataTransfer.items.add(file);
           if (fileInputRef.current) {
             fileInputRef.current.files = dataTransfer.files;
-            const event = new Event('change', { bubbles: true }) as any;
-            Object.defineProperty(event, 'target', { value: fileInputRef.current });
-            onFileSelect(event);
+            const input = fileInputRef.current;
+            const event = new Event('change', { bubbles: true });
+            Object.defineProperty(event, 'target', { value: input, enumerable: true });
+            onFileSelect(event as unknown as React.ChangeEvent<HTMLInputElement>);
           }
         }
       } else {
-        // Could show an error, but the parent component will handle validation
         console.warn('Invalid file type dropped:', file.name);
       }
     }
-  };
+  }, [isDisabled, onFileSelectDirect, onFileSelect]);
 
   return (
     <div className={styles.fileSection}>
@@ -84,23 +97,33 @@ export const FileSelector = ({
           disabled={isDisabled}
           className={styles.fileInput}
         />
-        <label 
-          htmlFor="zipFile" 
+        <div 
           className={`${styles.fileLabel} ${isDragOver ? styles.fileLabelDragOver : ''}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-        >
-          <span className={styles.fileLabelIcon}>📁</span>
-          <span className={styles.fileLabelText}>
-            {selectedFile 
-              ? selectedFile.name 
-              : isDragOver 
-                ? 'Drop file here...' 
-                : 'Select ZIP file (case import) or JSON file (confirmation import)... or drag & drop'
+          role="button"
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled}
+          aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
+          onKeyDown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+              fileInputRef.current?.click();
             }
-          </span>
-        </label>
+          }}
+        >
+          <label htmlFor="zipFile" className={styles.fileLabelContent}>
+            <span className={styles.fileLabelIcon}>📁</span>
+            <span className={styles.fileLabelText}>
+              {selectedFile 
+                ? selectedFile.name 
+                : isDragOver 
+                  ? 'Drop file here...' 
+                  : 'Select ZIP file or JSON file... or drag & drop'
+              }
+            </span>
+          </label>
+        </div>
         
         {/* Clear button positioned in upper right corner */}
         {selectedFile && onClear && (
@@ -110,6 +133,7 @@ export const FileSelector = ({
             className={styles.clearFileButton}
             disabled={isDisabled}
             title="Clear selected file"
+            aria-label="Clear selected file"
           >
             ×
           </button>
