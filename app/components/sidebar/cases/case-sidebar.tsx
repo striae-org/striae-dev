@@ -8,11 +8,12 @@ import {
   downloadAllCasesAsCSV,
   downloadCaseAsZip
 } from '../../actions/case-export';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './cases.module.css';
 import { CasesModal } from './cases-modal';
 import { FilesModal } from '../files/files-modal';
 import { CaseExport, ExportFormat } from '../case-export/case-export';
+import { ImageUploadZone } from '../upload/image-upload-zone';
 import { UserAuditViewer } from '~/components/audit/user-audit-viewer';
 import {
   validateCaseNumber,
@@ -23,7 +24,6 @@ import {
 } from '../../actions/case-manage';
 import {
   fetchFiles,
-  uploadFile,
   deleteFile,
 } from '../../actions/image-manage';
 import { 
@@ -88,8 +88,6 @@ export const CaseSidebar = ({
   const [isRenaming, setIsRenaming] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUploadingFile, setIsUploadingFile] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [fileError, setFileError] = useState('');
   const [newCaseName, setNewCaseName] = useState('');
   const [showCaseActions, setShowCaseActions] = useState(false);
@@ -110,16 +108,6 @@ export const CaseSidebar = ({
     includeConfirmation: boolean;
     isConfirmed: boolean;
   }>({ includeConfirmation: false, isConfirmed: false });
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const allowedTypes = [
-      'image/png',
-      'image/gif', 
-      'image/jpeg',
-      'image/webp',
-      'image/svg+xml'
-    ];
 
   // Check user permissions on mount and when user changes
   useEffect(() => {
@@ -310,56 +298,7 @@ export const CaseSidebar = ({
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Don't allow file upload for read-only cases
-    if (isReadOnly) {
-      return;
-    }
 
-    const file = event.target.files?.[0];
-    if (!file || !currentCase) return;
-
-    setFileError('');
-    setIsUploadingFile(true);
-    setUploadProgress(0);
-
-    if (!allowedTypes.includes(file.type)) {
-      setFileError('Only PNG, GIF, JPEG, WEBP, or SVG files are allowed');
-      setIsUploadingFile(false);
-      setUploadProgress(0);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      setTimeout(() => setFileError(''), 3000);
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setFileError('File size must be less than 10 MB');
-      setIsUploadingFile(false);
-      setUploadProgress(0);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      setTimeout(() => setFileError(''), 3000);
-      return;
-    }
-
-    try {
-    const uploadedFile = await uploadFile(user, currentCase, file, (progress) => {
-      setUploadProgress(progress);
-    });
-    const updatedFiles = [...files, uploadedFile];
-    setFiles(updatedFiles);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    
-    // Refresh file upload permissions after successful upload
-    // Pass the new file count directly to avoid state update timing issues
-    await checkFileUploadPermissions(updatedFiles.length);
-  } catch (err) {
-    setFileError(err instanceof Error ? err.message : 'Upload failed');
-    setTimeout(() => setFileError(''), 3000);
-  } finally {
-    setIsUploadingFile(false);
-    setUploadProgress(0);
-  }
-};
 
   const handleFileDelete = async (fileId: string) => {
     // Don't allow file deletion for read-only cases
@@ -600,37 +539,16 @@ return (
         )}
       </div>
       {currentCase && (
-        <div className={styles.fileUpload}>
-      <label htmlFor="file-upload">Upload Image:</label>
-      <input
-        id="file-upload"
-        ref={fileInputRef}
-        type="file"
-        accept="image/png, image/gif, image/jpeg, image/webp, image/svg+xml"
-        onChange={handleFileUpload}
-        disabled={isUploadingFile || !canUploadNewFile || isReadOnly}
-        className={styles.fileInput}
-        aria-label="Upload image file"
-        title={!canUploadNewFile ? uploadFileError : undefined}
-      />      
-      {isUploadingFile && (
-        <>
-        <div className={styles.progressBar}>
-          <div 
-            className={styles.progressFill} 
-            style={{ width: `${uploadProgress}%` }}
-          />          
-        </div>
-        <span className={styles.uploadingText}>
-            {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
-          </span>
-          </>
-      )}
-      {fileError && <p className={styles.error}>{fileError}</p>}
-      {!canUploadNewFile && uploadFileError && (
-        <p className={styles.error}>{uploadFileError}</p>
-      )}
-    </div>
+        <ImageUploadZone
+          user={user}
+          currentCase={currentCase}
+          isReadOnly={isReadOnly}
+          canUploadNewFile={canUploadNewFile}
+          uploadFileError={uploadFileError}
+          onFilesChanged={setFiles}
+          onUploadPermissionCheck={checkFileUploadPermissions}
+          currentFiles={files}
+        />
       )}
       
       {/* Files Modal Button - positioned between upload and file list */}
