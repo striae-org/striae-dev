@@ -541,27 +541,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
             Upload a JSON, CSV, ZIP, or TXT export to validate that the data hasn't been tampered with or corrupted.
           </p>
 
-          <div
-            ref={uploadZoneRef}
-            className={`${styles.uploadArea} ${dragOver ? styles.dragOver : ''}`}
-            onDragEnter={handleDragEnter}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className={styles.uploadContent}>
-              <div className={styles.uploadIcon}>📁</div>
-              <div className={styles.uploadText}>
-                <strong>
-                  {dragOver ? 'Drop file here...' : 'Click to select'}
-                </strong> 
-                {!dragOver && ' or drag and drop a Striae export file'}
-              </div>
-              <div className={styles.uploadSubtext}>
-                Supports JSON, CSV, ZIP, and TXT export files with embedded hashes
-              </div>
-            </div>
+          <div className={styles.uploadWrapper}>
             <input
               ref={fileInputRef}
               type="file"
@@ -570,6 +550,40 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
               className={styles.hiddenInput}
               aria-label="Select Striae export file for hash verification"
             />
+            <div
+              ref={uploadZoneRef}
+              className={`${styles.uploadArea} ${dragOver ? styles.dragOver : ''}`}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              role="button"
+              tabIndex={isVerifying ? -1 : 0}
+              aria-disabled={isVerifying}
+              aria-label="File selection area. Drag and drop or press Enter to select a Striae export file for hash verification."
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !isVerifying) {
+                  if (e.key === ' ') {
+                    e.preventDefault();
+                  }
+                  fileInputRef.current?.click();
+                }
+              }}
+            >
+              <div className={styles.uploadContent}>
+                <div className={styles.uploadIcon}>📁</div>
+                <div className={styles.uploadText}>
+                  <strong>
+                    {dragOver ? 'Drop file here...' : 'Click to select'}
+                  </strong> 
+                  {!dragOver && ' or drag and drop a Striae export file'}
+                </div>
+                <div className={styles.uploadSubtext}>
+                  Supports JSON, CSV, ZIP, and TXT export files with embedded hashes
+                </div>
+              </div>
+            </div>
           </div>
 
           {isVerifying && (

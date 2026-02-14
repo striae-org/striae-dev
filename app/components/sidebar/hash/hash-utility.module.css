@@ -79,6 +79,11 @@
 }
 
 /* Upload Area */
+.uploadWrapper {
+  position: relative;
+  margin-bottom: var(--spaceL);
+}
+
 .uploadArea {
   border: 2px dashed color-mix(in lab, var(--primary) 30%, transparent);
   border-radius: var(--spaceXS);
@@ -87,7 +92,6 @@
   text-align: center;
   cursor: pointer;
   transition: all var(--durationS) var(--bezierFastoutSlowin);
-  margin-bottom: var(--spaceL);
   min-height: 120px;
   display: flex;
   align-items: center;
@@ -100,12 +104,31 @@
   transform: translateY(-1px);
 }
 
+.uploadArea:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 20%, transparent);
+}
+
 .uploadArea.dragOver {
   border-color: var(--accent);
   background: color-mix(in lab, var(--accent) 15%, transparent);
   border-style: solid;
   transform: scale(1.02);
   box-shadow: 0 0 0 2px color-mix(in lab, var(--accent) 30%, transparent);
+}
+
+.uploadArea[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: color-mix(in lab, var(--text) 15%, transparent);
+  background: color-mix(in lab, var(--background) 95%, transparent);
+}
+
+.uploadArea[aria-disabled="true"]:hover {
+  border-color: color-mix(in lab, var(--text) 15%, transparent);
+  background: color-mix(in lab, var(--background) 95%, transparent);
+  transform: none;
 }
 
 .uploadContent {
@@ -155,7 +178,11 @@
 }
 
 .hiddenInput {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 /* Verification Status */
