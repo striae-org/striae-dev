@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import styles from './sidebar.module.css';
 import { ManageProfile } from '../user/manage-profile';
 import { SignOut } from '../actions/signout';
@@ -57,17 +57,18 @@ export const Sidebar = ({
   setShowNotes,
   onAnnotationRefresh,
   isReadOnly = false,
-  isConfirmed = false  
+  isConfirmed = false,
+  isUploading: initialIsUploading = false,  
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isHashModalOpen, setIsHashModalOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(initialIsUploading);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
   const [isToastVisible, setIsToastVisible] = useState(false);
 
-  const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
+  const handleImportComplete = useCallback((result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
       // For case imports, load the imported case automatically
       if ('isReadOnly' in result) {
@@ -92,9 +93,9 @@ export const Sidebar = ({
       }
       // For confirmation imports, no action needed - the confirmations are already loaded
     }
-  };
+  }, [onCaseChange, setCurrentCase, setCaseNumber, setSuccessAction, setFiles, onImageSelect, setImageLoaded, setShowNotes]);
 
-  const handleUploadComplete = (result: { successCount: number; failedFiles: string[] }) => {
+  const handleUploadComplete = useCallback((result: { successCount: number; failedFiles: string[] }) => {
     if (result.successCount === 0 && result.failedFiles.length > 0) {
       // All files failed
       setToastType('error');
@@ -111,7 +112,7 @@ export const Sidebar = ({
       setToastMessage(`${result.successCount} file${result.successCount !== 1 ? 's' : ''} uploaded!`);
     }
     setIsToastVisible(true);
-  };  
+  }, []);  
 
   return (
     <div className={styles.sidebar}>
@@ -124,6 +125,7 @@ export const Sidebar = ({
             onClick={() => setIsProfileModalOpen(true)}
             className={styles.profileButton}
             disabled={isUploading}
+            title={isUploading ? 'Cannot manage profile while uploading files' : undefined}
           >
             Manage Profile
           </button>
@@ -184,6 +186,7 @@ export const Sidebar = ({
               onClick={() => setIsImportModalOpen(true)}
               className={styles.importButton}
               disabled={isUploading}
+              title={isUploading ? 'Cannot import while uploading files' : undefined}
             >
               Import/Clear RO Case
             </button>
@@ -191,6 +194,7 @@ export const Sidebar = ({
               onClick={() => setIsHashModalOpen(true)}
               className={styles.hashButton}
               disabled={isUploading}
+              title={isUploading ? 'Cannot open hash utility while uploading files' : undefined}
             >
               Hash Utility
             </button>
