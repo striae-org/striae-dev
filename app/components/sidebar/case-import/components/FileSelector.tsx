@@ -96,6 +96,7 @@ export const FileSelector = ({
           onChange={onFileSelect}
           disabled={isDisabled}
           className={styles.fileInput}
+          aria-label="File picker for ZIP or JSON files"
         />
         <div 
           className={`${styles.fileLabel} ${isDragOver ? styles.fileLabelDragOver : ''}`}
@@ -120,17 +121,17 @@ export const FileSelector = ({
             }
           }}
         >
-          <label htmlFor="zipFile" className={styles.fileLabelContent}>
+          <div className={styles.fileLabelContent}>
             <span className={styles.fileLabelIcon}>📁</span>
             <span className={styles.fileLabelText}>
               {selectedFile 
                 ? selectedFile.name 
                 : isDragOver 
                   ? 'Drop file here...' 
-                  : 'Select ZIP file or JSON file... or drag & drop'
+                  : 'Select ZIP or JSON file... or drag & drop'
               }
             </span>
-          </label>
+          </div>
         </div>
         
         {/* Clear button positioned in upper right corner */}
