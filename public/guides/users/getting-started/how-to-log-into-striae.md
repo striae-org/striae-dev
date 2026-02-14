@@ -26,11 +26,11 @@ Make sure you have:
 
 ### Access the Striae Platform
 
-* Go to [https://www.striae.org](https://www.striae.org)
+You have two options to access the secure registration and login portal:
 
-* Click **Sign In**
+1. [Authenticating with Cloudflare WARP](https://help.striae.org/striae-users-guide/getting-started/authenticating-with-cloudflare-warp)
 
-* You will see the Striae login screen where you can either log in or register
+2. [Authenticating without Cloudflare WARP](https://help.striae.org/striae-users-guide/getting-started/accessing-striae-registration-and-login)
 
 ***
 
@@ -225,4 +225,4 @@ Now you can:
 
 ***
 
-*Need additional help? Don't hesitate to reach out to our [support team](https://www.striae.org/support). We're here to ensure you have secure and seamless access to Striae's features.*
+*Need additional help? Don't hesitate to reach out to our* <a target="_blank" href="https://www.striae.org/support">*support team*</a>*. We're here to ensure you have secure and seamless access to Striae's features.*

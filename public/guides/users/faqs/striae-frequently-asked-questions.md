@@ -1,16 +1,33 @@
+---
+title: Frequently Asked Questions
+label: Striae Frequently Asked Questions
+slug: striae-frequently-asked-questions
+visibility: PUBLIC
+---
 ## Table of Contents
 
 1. [🔐 Login & Authentication](#-login--authentication)
-2. [📊 Case Management](#-case-management)  
+
+2. [📊 Case Management](#-case-management)
+
 3. [📥 Case Import & Review System](#-case-import--review-system)
+
 4. [📤 Case Data Export](#-case-data-export)
+
 5. [🎯 Image Annotation](#-image-annotation)
+
 6. [✅ Authenticated Confirmations System](#-authenticated-confirmations-system)
+
 7. [📄 PDF Generation](#-pdf-generation)
-8. [🕵️ Audit Trail System](#️-audit-trail-system)
+
+8. [🕵️ Audit Trail System](#%EF%B8%8F-audit-trail-system)
+
 9. [👤 Account Deletion](#-account-deletion)
+
 10. [🔧 Troubleshooting](#-troubleshooting)
-11. [🛡️ Security & Best Practices](#️-security--best-practices)
+
+11. [🛡️ Security & Best Practices](#%EF%B8%8F-security--best-practices)
+
 12. [🚀 Getting Started Quickly](#-getting-started-quickly)
 
 ***
@@ -91,11 +108,11 @@ A: Striae offers comprehensive case export functionality with multiple format op
 
 A: Striae supports three export formats, each optimized for different use cases:
 
-- **JSON Format**: Choose this for technical analysis, database integration, or when you need structured data with complete hierarchy preservation. JSON provides the most compact file size and maintains all data relationships.
+* **JSON Format**: Choose this for technical analysis, database integration, or when you need structured data with complete hierarchy preservation. JSON provides the most compact file size and maintains all data relationships.
 
-- **CSV Format**: Ideal for single case exports when you need spreadsheet analysis. CSV files include all 22 annotation fields in organized columns, perfect for Excel, Google Sheets, or statistical analysis tools like R.
+* **CSV Format**: Ideal for single case exports when you need spreadsheet analysis. CSV files include all 22 annotation fields in organized columns, perfect for Excel, Google Sheets, or statistical analysis tools like R.
 
-- **Excel Format**: Best for bulk exports involving multiple cases. Excel files feature organized worksheets with summary statistics and individual case details, plus built-in analysis and formatting capabilities.
+* **Excel Format**: Best for bulk exports involving multiple cases. Excel files feature organized worksheets with summary statistics and individual case details, plus built-in analysis and formatting capabilities.
 
 **Note**: When you choose to include images with your export, the system automatically packages everything in a ZIP file containing both the data files and all original images, regardless of which format you select.
 
@@ -103,16 +120,21 @@ A: Striae supports three export formats, each optimized for different use cases:
 
 A: All export formats include identical, comprehensive data to ensure complete documentation:
 
-- Complete annotation information (all 22 data fields including case identifiers, visual elements, classifications, and options)
-- Box annotation details with precise coordinates and visual properties
-- Case metadata including file information, upload dates, and case statistics
-- Export tracking information and error handling details
-- Timestamps and user attribution for accountability
-- File IDs, original filenames, and complete annotation data for each file in the case
+* Complete annotation information (all 22 data fields including case identifiers, visual elements, classifications, and options)
+
+* Box annotation details with precise coordinates and visual properties
+
+* Case metadata including file information, upload dates, and case statistics
+
+* Export tracking information and error handling details
+
+* Timestamps and user attribution for accountability
+
+* File IDs, original filenames, and complete annotation data for each file in the case
 
 **Q: Can I export all my cases at once?**
 
-A: Yes! The bulk export feature allows you to export all your cases in a single operation. Choose between JSON format (single comprehensive file) or Excel format (multi-worksheet file with summary data). The system provides real-time progress tracking showing "Exporting case X of Y: [Case Name]" and continues processing even if individual cases encounter errors. Large exports with many cases may take several minutes to complete.
+A: Yes! The bulk export feature allows you to export all your cases in a single operation. Choose between JSON format (single comprehensive file) or Excel format (multi-worksheet file with summary data). The system provides real-time progress tracking showing "Exporting case X of Y: \[Case Name]" and continues processing even if individual cases encounter errors. Large exports with many cases may take several minutes to complete.
 
 **Q: How does the progress tracking work during bulk exports?**
 
@@ -122,11 +144,15 @@ A: Striae provides comprehensive progress monitoring during bulk exports. You'll
 
 A: Striae uses intelligent, descriptive file naming to keep your exports organized:
 
-- **Single Case JSON**: `striae-case-export-[CASE-NUMBER]-[DATE].json`
-- **Single Case CSV**: `striae-case-export-[CASE-NUMBER]-[DATE].csv`
-- **Single Case with Images**: `striae-case-export-[CASE-NUMBER]-[DATE].zip` (contains data files + images)
-- **Bulk JSON**: `striae-all-cases-export-[DATE].json`
-- **Bulk Excel**: `striae-all-cases-detailed-[DATE].xlsx`
+* **Single Case JSON**: `striae-case-export-[CASE-NUMBER]-[DATE].json`
+
+* **Single Case CSV**: `striae-case-export-[CASE-NUMBER]-[DATE].csv`
+
+* **Single Case with Images**: `striae-case-export-[CASE-NUMBER]-[DATE].zip` (contains data files + images)
+
+* **Bulk JSON**: `striae-all-cases-export-[DATE].json`
+
+* **Bulk Excel**: `striae-all-cases-detailed-[DATE].xlsx`
 
 All files include timestamps to prevent naming conflicts and ensure proper version control.
 
@@ -150,10 +176,13 @@ A: ZIP exports are created automatically when you choose to include images with 
 
 A: When you include images in your export, the ZIP file is organized for easy navigation:
 
-- **Data Files**: Your selected format (JSON or CSV) is included in the root directory
-- **Images Folder**: All original case images are organized in a dedicated `images/` directory within the ZIP
-- **README File**: A helpful text file explaining the contents and structure of the export
-- **Organized Layout**: Files are clearly named and structured for immediate use and archiving
+* **Data Files**: Your selected format (JSON or CSV) is included in the root directory
+
+* **Images Folder**: All original case images are organized in a dedicated `images/` directory within the ZIP
+
+* **README File**: A helpful text file explaining the contents and structure of the export
+
+* **Organized Layout**: Files are clearly named and structured for immediate use and archiving
 
 **Q: Can I choose whether to include images in my export?**
 
@@ -425,4 +454,4 @@ A: Yes! The Striae support team is available to assist with any technical issues
 
 ***
 
-*Need additional help? Don't hesitate to reach out to our [support team](https://www.striae.org/support). We're here to ensure you have secure and seamless access to Striae's features.*
+*Need additional help? Don't hesitate to reach out to our* [*support team*](https://www.striae.org/support)*. We're here to ensure you have secure and seamless access to Striae's features.*

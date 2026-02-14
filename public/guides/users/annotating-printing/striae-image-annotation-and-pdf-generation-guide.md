@@ -1,7 +1,17 @@
-
+---
+title: Image Annotation & PDF Generation Guide
+label: Striae Image Annotation & PDF Generation Guide
+slug: striae-image-annotation-and-pdf-generation-guide
+description: >-
+  Striae's annotation and PDF generation system allows forensic firearms
+  examiners to create professional documentation of firearms comparison images.
+  The system provides comprehensive annotation tools and generates high-quality
+  PDF reports suitable for case notes and reporting
+visibility: PUBLIC
+---
 ## Key Features
 
-* **Visual Annotation Tools:** Add case/item numbers, class characteristics, index marks, support levels, boxes, and additional notes directly on images. *See the [Box Annotation Guide](box-annotation-guide.md) for detailed box annotation techniques.*
+* **Visual Annotation Tools:** Add case/item numbers, class characteristics, index marks, support levels, boxes, and additional notes directly on images. *See the* [*Box Annotation Guide*](https://help.striae.org/striae-users-guide/annotating-printing/box-annotation-system) *for detailed box annotation techniques.*
 
 * **Professional PDF Output:** Generate casefile-ready, formatted notes with one click.
 
@@ -77,7 +87,7 @@
 
 * Resize or reposition boxes by clicking and dragging after creation.
 
-*For detailed instructions on using box annotations, see the [Box Annotation Guide](box-annotation-guide.md).*
+* *For detailed instructions on using box annotations, see the* [*Box Annotation Guide*](https://help.striae.org/striae-users-guide/annotating-printing/box-annotation-system)*.*
 
 ### Step 6: Add Additional Notes (Optional)
 
@@ -90,11 +100,17 @@
 ## Annotation Tools Overview
 
 * **Number** - Show/hide case and item numbers
+
 * **Class** - Show/hide class characteristic information
+
 * **Index** - Show/hide index marks (color or number/letter)
+
 * **ID** - Show/hide support level conclusion
+
 * **Box** - Show/hide box annotations with custom colors
+
 * **Notes** - Show/hide additional notes section
+
 * **Print** - Generate PDF with current annotations
 
 ***
@@ -131,7 +147,7 @@
 
 * All box annotations are preserved in the PDF output with the same colors and positions.
 
-*For comprehensive box annotation techniques and advanced features, refer to the [Box Annotation Guide](box-annotation-guide.md).*
+* *For comprehensive box annotation techniques and advanced features, refer to the* [*Box Annotation Guide*](https://help.striae.org/striae-users-guide/annotating-printing/box-annotation-system)*.*
 
 ### Additional Notes
 
@@ -255,4 +271,4 @@
 
 ***
 
-*Need additional help? Don't hesitate to reach out to our [support team](https://www.striae.org/support). We're here to ensure you have secure and seamless access to Striae's features.*
+*Need additional help? Don't hesitate to reach out to our* [*support team*](https://www.striae.org/support)*. We're here to ensure you have secure and seamless access to Striae's features.*
