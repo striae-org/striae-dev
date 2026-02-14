@@ -102,25 +102,23 @@ export const FileSelector = ({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => {
-            if (!isDisabled) {
-              fileInputRef.current?.click();
-            }
-          }}
-          role="button"
-          tabIndex={isDisabled ? -1 : 0}
-          aria-disabled={isDisabled}
-          aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
-          onKeyDown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
-              if (e.key === ' ') {
-                e.preventDefault();
-              }
-              fileInputRef.current?.click();
-            }
-          }}
         >
-          <label htmlFor="zipFile" className={styles.fileLabelContent}>
+          <label 
+            htmlFor="zipFile" 
+            className={styles.fileLabelContent}
+            role="button"
+            tabIndex={isDisabled ? -1 : 0}
+            aria-disabled={isDisabled}
+            aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+                if (e.key === ' ') {
+                  e.preventDefault();
+                }
+                fileInputRef.current?.click();
+              }
+            }}
+          >
             <span className={styles.fileLabelIcon}>📁</span>
             <span className={styles.fileLabelText}>
               {selectedFile 
