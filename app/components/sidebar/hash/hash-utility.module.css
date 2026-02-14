@@ -256,25 +256,28 @@
 
 .resultRow {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-start;
-  gap: var(--spaceS);
+  gap: var(--spaceXS);
 }
 
 .resultLabel {
   font-weight: var(--fontWeightMedium);
   color: var(--textBody);
-  min-width: 80px;
-  flex-shrink: 0;
   font-size: var(--fontSizeBodyXS);
+  flex-shrink: 0;
 }
 
 .resultValue {
   color: var(--text);
   font-family: var(--fontFamilyMono);
   font-size: var(--fontSizeBodyXS);
-  word-break: break-all;
-  text-align: right;
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  text-align: left;
+  width: 100%;
 }
 
 /* Special handling for error messages - use normal text wrapping */

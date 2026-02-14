@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './image-upload-zone.module.css';
 import { uploadFile } from '~/components/actions/image-manage';
 import { FileData } from '~/types';
@@ -39,57 +39,134 @@ export const ImageUploadZone = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [fileError, setFileError] = useState('');
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
-  const [dragCounter, setDragCounter] = useState(0);
   const [uploadQueue, setUploadQueue] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
   const [currentFileName, setCurrentFileName] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const currentFilesRef = useRef(currentFiles);
+
+  // Keep currentFilesRef in sync with prop to avoid stale closure
+  useEffect(() => {
+    currentFilesRef.current = currentFiles;
+  }, [currentFiles]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      // Abort any in-flight uploads
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      // Clear any pending timeout
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
+    };
+  }, []);
+
+  // Helper to set error with auto-dismiss, managing timeout properly
+  const setErrorWithAutoDismiss = (errorMessage: string) => {
+    // Clear any pending timeout from previous error
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+    }
+    setFileError(errorMessage);
+    // Set new timeout for auto-dismiss
+    timeoutIdRef.current = setTimeout(() => {
+      setFileError('');
+      timeoutIdRef.current = null;
+    }, 3000);
+  };
 
   const validateAndUploadFile = async (file: File, currentFilesList: FileData[]) => {
-    if (!file || !currentCase) return { success: false, files: currentFilesList };
+    if (!file || !currentCase || !user || !user.uid) return { success: false, files: currentFilesList };
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setFileError(`${file.name}: Only PNG, GIF, JPEG, WEBP, or SVG files are allowed`);
+      if (isMountedRef.current) {
+        setErrorWithAutoDismiss(`${file.name}: Only PNG, GIF, JPEG, WEBP, or SVG files are allowed`);
+      }
       return { success: false, files: currentFilesList };
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setFileError(`${file.name}: File size must be less than 10 MB`);
+      if (isMountedRef.current) {
+        setErrorWithAutoDismiss(`${file.name}: File size must be less than 10 MB`);
+      }
       return { success: false, files: currentFilesList };
     }
 
     try {
-      setCurrentFileName(file.name);
+      if (isMountedRef.current) {
+        setCurrentFileName(file.name);
+      }
       const uploadedFile = await uploadFile(user, currentCase, file, (progress) => {
-        setUploadProgress(progress);
+        if (isMountedRef.current) {
+          setUploadProgress(progress);
+        }
       });
       const updatedFiles = [...currentFilesList, uploadedFile];
-      onFilesChanged(updatedFiles);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      
+      if (isMountedRef.current) {
+        onFilesChanged(updatedFiles);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
 
       // Refresh file upload permissions after successful upload
-      if (onUploadPermissionCheck) {
-        await onUploadPermissionCheck(updatedFiles.length);
+      if (onUploadPermissionCheck && isMountedRef.current) {
+        try {
+          await onUploadPermissionCheck(updatedFiles.length);
+        } catch (permissionErr) {
+          console.error('Failed to refresh upload permissions:', permissionErr);
+          // Note: Files have already been successfully uploaded.
+          // This error is non-critical but should be tracked in monitoring.
+          // In production, consider showing a non-blocking warning notification.
+        }
       }
       return { success: true, files: updatedFiles };
     } catch (err) {
-      setFileError(`${file.name}: ${err instanceof Error ? err.message : 'Upload failed'}`);
+      if (isMountedRef.current) {
+        setErrorWithAutoDismiss(`${file.name}: ${err instanceof Error ? err.message : 'Upload failed'}`);
+      }
       return { success: false, files: currentFilesList };
     }
   };
 
   // Process files sequentially
   const processFileQueue = async (filesToProcess: File[]) => {
+    // Clear any pending timeout from previous errors
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+      timeoutIdRef.current = null;
+    }
+
+    // Create new abort controller for this upload session
+    abortControllerRef.current = new AbortController();
+
+    if (!isMountedRef.current) return;
+    
     setUploadQueue(filesToProcess);
     setCurrentFileIndex(0);
     setIsUploadingFile(true);
     setFileError('');
+    setUploadProgress(0);
 
-    let accumulatedFiles = currentFiles;
+    // Use ref to get current files, avoiding stale closure issues
+    let accumulatedFiles = currentFilesRef.current;
 
     for (let i = 0; i < filesToProcess.length; i++) {
+      // Check if upload was cancelled
+      if (abortControllerRef.current?.signal.aborted) {
+        break;
+      }
+
+      if (!isMountedRef.current) break;
+      
       setCurrentFileIndex(i);
       setUploadProgress(0);
       const file = filesToProcess[i];
@@ -97,20 +174,19 @@ export const ImageUploadZone = ({
       
       if (result.success) {
         accumulatedFiles = result.files;
-      } else { 
-        // Auto-dismiss error after 3 seconds for any failed upload
-        setTimeout(() => setFileError(''), 3000);
       }
     }
 
-    setIsUploadingFile(false);
-    setUploadProgress(0);
-    setCurrentFileName('');
-    setUploadQueue([]);
-    setCurrentFileIndex(0);
+    if (isMountedRef.current) {
+      setIsUploadingFile(false);
+      setUploadProgress(0);
+      setCurrentFileName('');
+      setUploadQueue([]);
+      setCurrentFileIndex(0);
+    }
   };
 
-  const handleFileInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (isReadOnly) {
       return;
     }
@@ -121,36 +197,34 @@ export const ImageUploadZone = ({
     // Convert FileList to Array
     const filesToUpload = Array.from(files);
     await processFileQueue(filesToUpload);
-  };
+  }, [isReadOnly, currentCase]);
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragCounter((prev) => prev + 1);
     setIsDraggingFiles(true);
-  };
+  }, []);
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragCounter((prev) => {
-      const newCount = prev - 1;
-      if (newCount <= 0) {
-        setIsDraggingFiles(false);
-      }
-      return newCount;
-    });
-  };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    // Only disable drag mode if leaving the entire drop zone
+    // Check if relatedTarget (element being entered) is outside the drop zone
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+    if (!relatedTarget || !dropZoneRef.current?.contains(relatedTarget)) {
+      setIsDraggingFiles(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-  };
+  }, []);
 
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragCounter(0);
     setIsDraggingFiles(false);
 
     if (isReadOnly) {
@@ -163,7 +237,22 @@ export const ImageUploadZone = ({
     // Convert FileList to Array and process all files
     const filesToUpload = Array.from(files);
     await processFileQueue(filesToUpload);
-  };
+  }, [isReadOnly, currentCase]);
+
+  // If read-only or uploads restricted, show only error message
+  if (isReadOnly || !canUploadNewFile) {
+    return (
+      <div className={styles.imageUploadZone}>
+        {(isReadOnly || uploadFileError) && (
+          <p className={styles.error}>
+            {isReadOnly 
+              ? 'This case is read-only. You cannot upload files.' 
+              : uploadFileError}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -200,6 +289,7 @@ export const ImageUploadZone = ({
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={uploadProgress}
+            aria-valuetext={uploadProgress === 100 ? 'Processing...' : undefined}
             aria-label="Image upload progress"
           >
             <div
@@ -207,11 +297,7 @@ export const ImageUploadZone = ({
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
-          <div
-            className={styles.uploadStatusContainer}
-            aria-live="polite"
-            aria-label="Current upload status"
-          >
+          <div className={styles.uploadStatusContainer}>
             <span className={styles.uploadingText}>
               {uploadProgress === 100 ? 'Processing...' : `${uploadProgress}%`}
             </span>
@@ -227,9 +313,6 @@ export const ImageUploadZone = ({
         </>
       )}
       {fileError && <p className={styles.error}>{fileError}</p>}
-      {!canUploadNewFile && uploadFileError && (
-        <p className={styles.error}>{uploadFileError}</p>
-      )}
     </div>
   );
 };
