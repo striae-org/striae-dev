@@ -262,7 +262,7 @@ export const CaseImport = ({
       <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Import Case for Review</h2>
+          <h2 className={styles.title}>Import RO Case or Confirmations</h2>
           <button 
             className={styles.closeButton}
             onClick={onClose}
@@ -371,12 +371,20 @@ export const CaseImport = ({
 
             {/* Instructions */}
             <div className={styles.instructions}>
-              <h3 className={styles.instructionsTitle}>Instructions:</h3>
+              <h3 className={styles.instructionsTitle}>Case Review Instructions:</h3>
               <ul className={styles.instructionsList}>
                 <li>Only ZIP files (.zip) exported with the JSON data format from Striae are accepted</li>
                 <li>Only one case can be reviewed at a time</li>
                 <li>Imported cases are read-only and cannot be modified</li>
                 <li>Importing will automatically replace any existing review case</li>
+              </ul>
+              <br />
+              <h3 className={styles.instructionsTitle}>Confirmation Import Instructions:</h3>
+              <ul className={styles.instructionsList}>
+                <li>Only JSON files (.json) exported with confirmation data exported from Striae are accepted</li>
+                <li>Only one confirmation file can be imported at a time</li>
+                <li>Confirmed images will become read-only and cannot be modified</li>
+                <li>If an image has a pre-existing confirmation, it will be skipped</li>
               </ul>
             </div>
           </div>

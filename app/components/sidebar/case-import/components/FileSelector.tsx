@@ -96,39 +96,42 @@ export const FileSelector = ({
           onChange={onFileSelect}
           disabled={isDisabled}
           className={styles.fileInput}
+          aria-label="File picker for ZIP or JSON files"
         />
         <div 
           className={`${styles.fileLabel} ${isDragOver ? styles.fileLabelDragOver : ''}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-        >
-          <label 
-            htmlFor="zipFile" 
-            className={styles.fileLabelContent}
-            role="button"
-            tabIndex={isDisabled ? -1 : 0}
-            aria-disabled={isDisabled}
-            aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
-            onKeyDown={(e) => {
-              if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
-                if (e.key === ' ') {
-                  e.preventDefault();
-                }
-                fileInputRef.current?.click();
+          onClick={() => {
+            if (!isDisabled) {
+              fileInputRef.current?.click();
+            }
+          }}
+          role="button"
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled}
+          aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
+          onKeyDown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+              if (e.key === ' ') {
+                e.preventDefault();
               }
-            }}
-          >
+              fileInputRef.current?.click();
+            }
+          }}
+        >
+          <div className={styles.fileLabelContent}>
             <span className={styles.fileLabelIcon}>📁</span>
             <span className={styles.fileLabelText}>
               {selectedFile 
                 ? selectedFile.name 
                 : isDragOver 
                   ? 'Drop file here...' 
-                  : 'Select ZIP file or JSON file... or drag & drop'
+                  : 'Select ZIP or JSON file... or drag & drop'
               }
             </span>
-          </label>
+          </div>
         </div>
         
         {/* Clear button positioned in upper right corner */}
