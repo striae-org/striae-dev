@@ -56,8 +56,7 @@ export const Sidebar = ({
   setShowNotes,
   onAnnotationRefresh,
   isReadOnly = false,
-  isConfirmed = false,
-  isUploading: uploadingProp = false
+  isConfirmed = false  
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
