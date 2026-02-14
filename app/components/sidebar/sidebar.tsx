@@ -7,6 +7,7 @@ import { CaseSidebar } from './cases/case-sidebar';
 import { NotesSidebar } from './notes/notes-sidebar';
 import { CaseImport } from './case-import/case-import';
 import { HashUtility } from './hash/hash-utility';
+import { Toast } from '../toast/toast';
 import { FileData } from '~/types';
 import { ImportResult, ConfirmationImportResult } from '~/types';
 
@@ -32,6 +33,7 @@ interface SidebarProps {
   onAnnotationRefresh?: () => void;
   isReadOnly?: boolean;
   isConfirmed?: boolean;
+  isUploading?: boolean;
 }
 
 export const Sidebar = ({ 
@@ -55,11 +57,15 @@ export const Sidebar = ({
   setShowNotes,
   onAnnotationRefresh,
   isReadOnly = false,
-  isConfirmed = false
+  isConfirmed = false  
 }: SidebarProps) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isHashModalOpen, setIsHashModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('success');
+  const [isToastVisible, setIsToastVisible] = useState(false);
 
   const handleImportComplete = (result: ImportResult | ConfirmationImportResult) => {
     if (result.success) {
@@ -86,6 +92,25 @@ export const Sidebar = ({
       }
       // For confirmation imports, no action needed - the confirmations are already loaded
     }
+  };
+
+  const handleUploadComplete = (result: { successCount: number; failedFiles: string[] }) => {
+    if (result.successCount === 0 && result.failedFiles.length > 0) {
+      // All files failed
+      setToastType('error');
+      const errorList = result.failedFiles.map(fn => `${fn} was not uploaded`).join(', ');
+      setToastMessage(`Errors: ${errorList}`);
+    } else if (result.failedFiles.length > 0) {
+      // Some files succeeded, some failed
+      const errorList = result.failedFiles.map(fn => `${fn} was not uploaded`).join(', ');
+      setToastType('warning');
+      setToastMessage(`${result.successCount} file${result.successCount !== 1 ? 's' : ''} successfully uploaded! Errors: ${errorList}`);
+    } else if (result.successCount > 0) {
+      // All files succeeded
+      setToastType('success');
+      setToastMessage(`${result.successCount} file${result.successCount !== 1 ? 's' : ''} uploaded!`);
+    }
+    setIsToastVisible(true);
   };  
 
   return (
@@ -98,10 +123,11 @@ export const Sidebar = ({
           <button 
             onClick={() => setIsProfileModalOpen(true)}
             className={styles.profileButton}
+            disabled={isUploading}
           >
             Manage Profile
           </button>
-          <SignOut />
+          <SignOut disabled={isUploading} />
         </div>
       </div>  
       <ManageProfile 
@@ -125,6 +151,7 @@ export const Sidebar = ({
           imageId={imageId || ''}
           onAnnotationRefresh={onAnnotationRefresh}
           originalFileName={files.find(file => file.id === imageId)?.originalFilename}
+          isUploading={isUploading}
         />
       ) : (
         <>
@@ -148,23 +175,34 @@ export const Sidebar = ({
             isReadOnly={isReadOnly}
             isConfirmed={isConfirmed}
             selectedFileId={imageId}
+            isUploading={isUploading}
+            onUploadStatusChange={setIsUploading}
+            onUploadComplete={handleUploadComplete}
           />
           <div className={styles.importSection}>
             <button 
               onClick={() => setIsImportModalOpen(true)}
               className={styles.importButton}
+              disabled={isUploading}
             >
               Import/Clear RO Case
             </button>
             <button 
               onClick={() => setIsHashModalOpen(true)}
               className={styles.hashButton}
+              disabled={isUploading}
             >
               Hash Utility
             </button>
           </div>
         </>
       )}
+      <Toast 
+        message={toastMessage}
+        type={toastType}
+        isVisible={isToastVisible}
+        onClose={() => setIsToastVisible(false)}
+      />
     </div>
   );
 };

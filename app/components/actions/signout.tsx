@@ -5,9 +5,10 @@ import styles from './signout.module.css';
 
 interface SignOutProps {
   redirectTo?: string;
+  disabled?: boolean;
 }
 
-export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {    
+export const SignOut = ({ redirectTo = '/', disabled = false }: SignOutProps) => {    
   const handleSignOut = async () => {
     try {
       const user = auth.currentUser;
@@ -37,7 +38,12 @@ export const SignOut = ({ redirectTo = '/' }: SignOutProps) => {
   };
 
   return (
-    <button onClick={handleSignOut} className={styles.signOutButton}>
+    <button 
+      onClick={handleSignOut} 
+      className={styles.signOutButton}
+      disabled={disabled}
+      title={disabled ? "Cannot sign out while uploading files" : undefined}
+    >
       Sign Out
     </button>
   );

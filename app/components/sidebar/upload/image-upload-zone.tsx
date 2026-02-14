@@ -13,6 +13,8 @@ interface ImageUploadZoneProps {
   onFilesChanged: (files: FileData[]) => void;
   onUploadPermissionCheck?: (fileCount: number) => Promise<void>;
   currentFiles: FileData[];
+  onUploadStatusChange?: (isUploading: boolean) => void;
+  onUploadComplete?: (result: { successCount: number; failedFiles: string[] }) => void;
 }
 
 const ALLOWED_TYPES = [
@@ -34,6 +36,8 @@ export const ImageUploadZone = ({
   onFilesChanged,
   onUploadPermissionCheck,
   currentFiles,
+  onUploadStatusChange,
+  onUploadComplete,
 }: ImageUploadZoneProps) => {
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -53,6 +57,11 @@ export const ImageUploadZone = ({
   useEffect(() => {
     currentFilesRef.current = currentFiles;
   }, [currentFiles]);
+
+  // Notify parent when upload status changes
+  useEffect(() => {
+    onUploadStatusChange?.(isUploadingFile);
+  }, [isUploadingFile, onUploadStatusChange]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -153,6 +162,8 @@ export const ImageUploadZone = ({
 
     // Use ref to get current files, avoiding stale closure issues
     let accumulatedFiles = currentFilesRef.current;
+    const successfulUploads: string[] = [];
+    const failedUploads: string[] = [];
 
     for (let i = 0; i < filesToProcess.length; i++) {
       if (!isMountedRef.current) break;
@@ -164,6 +175,9 @@ export const ImageUploadZone = ({
       
       if (result.success) {
         accumulatedFiles = result.files;
+        successfulUploads.push(file.name);
+      } else {
+        failedUploads.push(file.name);
       }
     }
 
@@ -173,6 +187,14 @@ export const ImageUploadZone = ({
       setCurrentFileName('');
       setUploadQueue([]);
       setCurrentFileIndex(0);
+      
+      // Call completion callback with results
+      if (onUploadComplete && (successfulUploads.length > 0 || failedUploads.length > 0)) {
+        onUploadComplete({
+          successCount: successfulUploads.length,
+          failedFiles: failedUploads
+        });
+      }
     }
   };
 
