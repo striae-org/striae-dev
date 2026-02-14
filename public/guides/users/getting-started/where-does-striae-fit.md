@@ -3,7 +3,7 @@ title: Where Does Striae Fit?
 label: Where Does Striae Fit?
 slug: where-does-striae-fit
 description: >-
-  Striae is designed to slot into the existing firearms workflow between image
+  Striae is designed to slot into the existing firearms identification workflow between image
   acquisition and case reporting, not to replace microscopes, 3D systems, or
   NIBIN/IBIS.
 visibility: PUBLIC
@@ -63,7 +63,7 @@ graph TB
 
 ***
 
-Striae is designed to slot into the existing firearms workflow between image acquisition and case reporting, not to replace microscopes, 3D systems, or NIBIN/IBIS.
+Striae is designed to slot into the existing firearms identification workflow between image acquisition and case reporting, not to replace microscopes, 3D systems, or NIBIN/IBIS.
 
 * Upstream: Works with images exported from comparison microscopes, VCM platforms like TopMatch, or 3D imaging systems; it treats them as inputs rather than competing with acquisition hardware.
 
