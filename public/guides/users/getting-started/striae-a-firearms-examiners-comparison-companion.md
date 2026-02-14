@@ -11,9 +11,13 @@ visibility: PUBLIC
 ---
 ***
 
+<Embed src="https://youtu.be/C95Wl0r3zeM" />
+
+***
+
 ## Case Management Made Simple
 
-* Use the sidebar to **switch between cases**, organize files, and keep track of important notes—everything stays neatly on one screen.
+* Use the sidebar to [**switch between cases**](https://help.striae.org/striae-users-guide/case-management/striae-case-management), organize files, and keep track of important notes—everything stays neatly on one screen.
 
 * Easily manage your profile and sign out whenever you need.
 
@@ -23,13 +27,13 @@ visibility: PUBLIC
 
 ## Dynamic Image Annotation
 
-* See and annotate comparison images on an interactive canvas area, with a dynamic toolbar that makes annotating your images easy.
+* [**See and annotate comparison images**](https://help.striae.org/striae-users-guide/annotating-printing/striae-image-annotation-and-pdf-generation-guide) on an interactive canvas area, with a dynamic toolbar that makes annotating your images easy.
 
 * Add notes, mark support levels, and record findings. Rest easy knowing every annotation is **securely saved and instantly updated**.
 
 ## Authenticated Confirmations System
 
-Reviewing examiners may **digitally confirm comparison images**, with confirmations secured by:
+Reviewing examiners may [**digitally confirm comparison images**](https://help.striae.org/striae-users-guide/authenticated-confirmations/authenticated-confirmations), with confirmations secured by:
 
 * User authentication (ensuring only authorized users may confirm)
 
@@ -43,7 +47,21 @@ These controls ensure every confirmation is credible, verified, and audit-ready.
 
 ## Effortless PDF Reports
 
-* **Create detailed, timestamped PDF reports with one click**. Your reports use custom filenames based on your case, and are always ready to download straight from the browser.
+[**Create detailed, timestamped PDF reports with one click**](https://help.striae.org/striae-users-guide/annotating-printing/striae-image-annotation-and-pdf-generation-guide#pdf-generation). Your reports use custom filenames based on your case, and are always ready to download straight from the browser.
+
+## Comprehensive Audit Trail
+
+Striae captures a <a target="_blank" href="https://help.striae.org/striae-users-guide/audit-trail-system/audit-trail-system">**complete, immutable, and append-only log**</a> of all user, case, and system events.
+
+* Activity logs are filterable by case number, activity, and date, and cannot be edited or deleted.
+
+This permanent record supports:
+
+* Internal QA audit workflows
+
+* Legal discovery and litigation needs
+
+* Standards compliance—helps laboratories meet OSAC and ISO/IEC 17025 requirements
 
 ## Help & Support Anytime
 
@@ -68,3 +86,5 @@ These controls ensure every confirmation is credible, verified, and audit-ready.
 ## Why Choose Striae?
 
 Striae helps firearms examiners work smart—from managing cases and annotating images to producing professional reports with ease. **It’s your trusted companion for clear, organized comparison work**.
+
+If you are interested in learning more about how Striae addresses current shortfalls and advances the use of cloud-native technology applied to the forensics industry, read our white paper here: <a target="_blank" href="https://www.striae.org/docs/striae-white-paper.pdf">Striae White Paper</a>.
