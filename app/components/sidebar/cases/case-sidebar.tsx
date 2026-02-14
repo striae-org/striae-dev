@@ -60,6 +60,7 @@ interface CaseSidebarProps {
   selectedFileId?: string;
   isUploading?: boolean;
   onUploadStatusChange?: (isUploading: boolean) => void;
+  onUploadComplete?: (result: { successCount: number; failedFiles: string[] }) => void;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -85,7 +86,8 @@ export const CaseSidebar = ({
   isConfirmed = false,
   selectedFileId,
   isUploading = false,
-  onUploadStatusChange
+  onUploadStatusChange,
+  onUploadComplete
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -557,6 +559,7 @@ return (
           onUploadPermissionCheck={checkFileUploadPermissions}
           currentFiles={files}
           onUploadStatusChange={onUploadStatusChange}
+          onUploadComplete={onUploadComplete}
         />
       )}
       
