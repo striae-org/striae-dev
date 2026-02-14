@@ -113,6 +113,9 @@ export const FileSelector = ({
           aria-label="File selection area. Drag and drop a ZIP file for case import or JSON file for confirmation import."
           onKeyDown={(e) => {
             if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+              if (e.key === ' ') {
+                e.preventDefault();
+              }
               fileInputRef.current?.click();
             }
           }}

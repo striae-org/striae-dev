@@ -29,6 +29,7 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadZoneRef = useRef<HTMLDivElement>(null);
 
   // Handle Escape key
   useEffect(() => {
@@ -101,14 +102,27 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
     }
   };
 
+  const handleDragEnter = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragOver(true);
+  };
+
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
-    setDragOver(true);
+    event.stopPropagation();
   };
 
   const handleDragLeave = (event: React.DragEvent) => {
     event.preventDefault();
-    setDragOver(false);
+    event.stopPropagation();
+
+    // Only disable drag mode if leaving the entire drop zone
+    // Check if relatedTarget (element being entered) is outside the drop zone
+    const relatedTarget = event.relatedTarget as HTMLElement | null;
+    if (!relatedTarget || !uploadZoneRef.current?.contains(relatedTarget)) {
+      setDragOver(false);
+    }
   };
 
   const verifyFileIntegrity = async (file: File) => {
@@ -528,10 +542,12 @@ export const HashUtility: React.FC<HashUtilityProps> = ({ isOpen, onClose }) => 
           </p>
 
           <div
+            ref={uploadZoneRef}
             className={`${styles.uploadArea} ${dragOver ? styles.dragOver : ''}`}
-            onDrop={handleDrop}
+            onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
             <div className={styles.uploadContent}>

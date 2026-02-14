@@ -47,7 +47,6 @@ export const ImageUploadZone = ({
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef(true);
-  const abortControllerRef = useRef<AbortController | null>(null);
   const currentFilesRef = useRef(currentFiles);
 
   // Keep currentFilesRef in sync with prop to avoid stale closure
@@ -59,10 +58,6 @@ export const ImageUploadZone = ({
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
-      // Abort any in-flight uploads
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
       // Clear any pending timeout
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
@@ -79,6 +74,9 @@ export const ImageUploadZone = ({
     setFileError(errorMessage);
     // Set new timeout for auto-dismiss
     timeoutIdRef.current = setTimeout(() => {
+      if (!isMountedRef.current) {
+        return;
+      }
       setFileError('');
       timeoutIdRef.current = null;
     }, 3000);
@@ -145,9 +143,6 @@ export const ImageUploadZone = ({
       timeoutIdRef.current = null;
     }
 
-    // Create new abort controller for this upload session
-    abortControllerRef.current = new AbortController();
-
     if (!isMountedRef.current) return;
     
     setUploadQueue(filesToProcess);
@@ -160,11 +155,6 @@ export const ImageUploadZone = ({
     let accumulatedFiles = currentFilesRef.current;
 
     for (let i = 0; i < filesToProcess.length; i++) {
-      // Check if upload was cancelled
-      if (abortControllerRef.current?.signal.aborted) {
-        break;
-      }
-
       if (!isMountedRef.current) break;
       
       setCurrentFileIndex(i);
