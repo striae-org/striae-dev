@@ -31,7 +31,7 @@ export default function Home() {
           </div>
           <div className={styles.buttonGroup}>            
             <a 
-              href="https://www.striae.org/auth"
+              href="/auth"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.signInButton}>
