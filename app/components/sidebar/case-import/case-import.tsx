@@ -381,7 +381,7 @@ export const CaseImport = ({
               <br />
               <h3 className={styles.instructionsTitle}>Confirmation Import Instructions:</h3>
               <ul className={styles.instructionsList}>
-                <li>Only JSON files (.json) exported with confirmation data exported from Striae are accepted</li>
+                <li>Only JSON files (.json) with confirmation data exported from Striae are accepted</li>
                 <li>Only one confirmation file can be imported at a time</li>
                 <li>Confirmed images will become read-only and cannot be modified</li>
                 <li>If an image has a pre-existing confirmation, it will be skipped</li>
