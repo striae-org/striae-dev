@@ -58,6 +58,8 @@ interface CaseSidebarProps {
   isReadOnly?: boolean;
   isConfirmed?: boolean;
   selectedFileId?: string;
+  isUploading?: boolean;
+  onUploadStatusChange?: (isUploading: boolean) => void;
 }
 
 const SUCCESS_MESSAGE_TIMEOUT = 3000;
@@ -81,7 +83,9 @@ export const CaseSidebar = ({
   setSuccessAction,
   isReadOnly = false,
   isConfirmed = false,
-  selectedFileId
+  selectedFileId,
+  isUploading = false,
+  onUploadStatusChange
 }: CaseSidebarProps) => {
   
   const [isDeletingCase, setIsDeletingCase] = useState(false);
@@ -471,9 +475,11 @@ return (
           <div className={`${styles.caseLoad} mb-4`}>
           <button
         onClick={handleCase}
-        disabled={isLoading || !caseNumber || permissionChecking || (isReadOnly && !!currentCase)}
+        disabled={isLoading || !caseNumber || permissionChecking || (isReadOnly && !!currentCase) || isUploading}
         title={
-          (isReadOnly && currentCase)
+          isUploading
+            ? "Cannot load/create cases while uploading files"
+            : (isReadOnly && currentCase)
             ? "Cannot load/create cases while reviewing a read-only case. Clear the current case first." 
             : (!canCreateNewCase ? createCaseError : undefined)
         }
@@ -485,6 +491,8 @@ return (
       <button 
             onClick={() => setIsModalOpen(true)}
             className={styles.listButton}
+            disabled={isUploading}
+            title={isUploading ? "Cannot list cases while uploading files" : undefined}
           >
             List All Cases
           </button>
@@ -548,6 +556,7 @@ return (
           onFilesChanged={setFiles}
           onUploadPermissionCheck={checkFileUploadPermissions}
           currentFiles={files}
+          onUploadStatusChange={onUploadStatusChange}
         />
       )}
       
@@ -557,8 +566,8 @@ return (
           <button
             className={styles.filesModalButton}
             onClick={() => setIsFilesModalOpen(true)}
-            disabled={files.length === 0}
-            title={files.length === 0 ? "No files to view" : "View all files in modal"}
+            disabled={files.length === 0 || isUploading}
+            title={isUploading ? "Cannot view files while uploading" : files.length === 0 ? "No files to view" : "View all files in modal"}
           >
             View All Files ({files.length})
           </button>
@@ -594,6 +603,8 @@ return (
                       className={styles.fileButton}
                       onClick={() => handleImageSelect(file)}
                       onKeyDown={(e) => e.key === 'Enter' && handleImageSelect(file)}
+                      disabled={isUploading}
+                      title={isUploading ? "Cannot select files while uploading" : undefined}
                     >
                     <span className={styles.fileName}>{file.originalFilename}</span>
                   </button>              
@@ -605,8 +616,9 @@ return (
                     }}
                     className={styles.deleteButton}
                     aria-label="Delete file"
-                    disabled={isReadOnly || deletingFileId === file.id}
-                    style={{ opacity: isReadOnly ? 0.5 : 1, cursor: isReadOnly ? 'not-allowed' : 'pointer' }}
+                    disabled={isReadOnly || deletingFileId === file.id || isUploading}
+                    style={{ opacity: (isReadOnly || isUploading) ? 0.5 : 1, cursor: (isReadOnly || isUploading) ? 'not-allowed' : 'pointer' }}
+                    title={isUploading ? "Cannot delete while uploading" : undefined}
                   >
                     {deletingFileId === file.id ? '⏳' : '×'}
                   </button>
@@ -620,8 +632,8 @@ return (
     <div className={`${styles.sidebarToggle} mb-4`}>
     <button
           onClick={onNotesClick}
-          disabled={!imageLoaded || isReadOnly || isConfirmed}
-          title={isConfirmed ? "Cannot edit notes for confirmed images" : isReadOnly ? "Cannot edit notes for read-only cases" : !imageLoaded ? "Select an image first" : undefined}
+          disabled={!imageLoaded || isReadOnly || isConfirmed || isUploading}
+          title={isUploading ? "Cannot edit notes while uploading" : isConfirmed ? "Cannot edit notes for confirmed images" : isReadOnly ? "Cannot edit notes for read-only cases" : !imageLoaded ? "Select an image first" : undefined}
         >
           Image Notes
         </button>
@@ -631,17 +643,21 @@ return (
           <button
             onClick={() => setShowCaseActions(!showCaseActions)}
             className={styles.caseActionsButton}
+            disabled={isUploading}
+            title={isUploading ? "Cannot access case actions while uploading" : undefined}
           >
             {showCaseActions ? 'Hide Case Actions' : 'Case Actions'}
           </button>
           
-          {showCaseActions && (
+          {showCaseActions && !isUploading && (
             <div className={styles.caseActionsContent}>
               {/* Export Case Data Section */}
               <div className={styles.exportSection}>
                 <button 
                   onClick={() => setIsExportModalOpen(true)}
                   className={styles.exportButton}
+                  disabled={isUploading}
+                  title={isUploading ? "Cannot export while uploading" : undefined}
                 >
                   Export Case Data
                 </button>
@@ -652,6 +668,8 @@ return (
                 <button
                   onClick={() => setIsAuditTrailOpen(true)}
                   className={styles.auditTrailButton}
+                  disabled={isUploading}
+                  title={isUploading ? "Cannot view audit trail while uploading" : undefined}
                 >
                   Audit Trail
                 </button>
@@ -665,11 +683,13 @@ return (
                       type="text"
                       value={newCaseName}
                       onChange={(e) => setNewCaseName(e.target.value)}
-                      placeholder="New Case Number"            
+                      placeholder="New Case Number"
+                      disabled={isUploading}
                     />
                     <button
                       onClick={handleRenameCase}
-                      disabled={isRenaming || !newCaseName}            
+                      disabled={isRenaming || !newCaseName || isUploading}
+                      title={isUploading ? "Cannot rename while uploading" : undefined}
                     >
                       {isRenaming ? 'Renaming...' : 'Rename Case'}
                     </button>
@@ -678,8 +698,9 @@ return (
                   <div className={styles.deleteCaseSection}>
                     <button
                       onClick={handleDeleteCase}
-                      disabled={isDeletingCase}
+                      disabled={isDeletingCase || isUploading}
                       className={styles.deleteWarningButton}
+                      title={isUploading ? "Cannot delete while uploading" : undefined}
                     >
                         {isDeletingCase ? 'Deleting...' : 'Delete Case'}
                       </button>

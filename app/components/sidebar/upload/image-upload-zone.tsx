@@ -13,6 +13,7 @@ interface ImageUploadZoneProps {
   onFilesChanged: (files: FileData[]) => void;
   onUploadPermissionCheck?: (fileCount: number) => Promise<void>;
   currentFiles: FileData[];
+  onUploadStatusChange?: (isUploading: boolean) => void;
 }
 
 const ALLOWED_TYPES = [
@@ -34,6 +35,7 @@ export const ImageUploadZone = ({
   onFilesChanged,
   onUploadPermissionCheck,
   currentFiles,
+  onUploadStatusChange,
 }: ImageUploadZoneProps) => {
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -53,6 +55,11 @@ export const ImageUploadZone = ({
   useEffect(() => {
     currentFilesRef.current = currentFiles;
   }, [currentFiles]);
+
+  // Notify parent when upload status changes
+  useEffect(() => {
+    onUploadStatusChange?.(isUploadingFile);
+  }, [isUploadingFile, onUploadStatusChange]);
 
   // Cleanup on unmount
   useEffect(() => {

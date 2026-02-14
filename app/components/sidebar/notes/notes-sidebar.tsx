@@ -14,13 +14,14 @@ interface NotesSidebarProps {
   imageId: string;
   onAnnotationRefresh?: () => void;
   originalFileName?: string;
+  isUploading?: boolean;
 }
 
 type SupportLevel = 'ID' | 'Exclusion' | 'Inconclusive';
 type ClassType = 'Bullet' | 'Cartridge Case' | 'Other';
 type IndexType = 'number' | 'color';
 
-export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh, originalFileName }: NotesSidebarProps) => {
+export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotationRefresh, originalFileName, isUploading = false }: NotesSidebarProps) => {
   // Loading/Saving Notes States
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string>();
@@ -214,7 +215,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 type="text"
                 value={leftCase}
                 onChange={(e) => setLeftCase(e.target.value)}
-                disabled={useCurrentCaseLeft}                
+                disabled={useCurrentCaseLeft || isUploading}                
               />
             </div>
             <label className={`${styles.checkboxLabel} mb-4`}>
@@ -223,6 +224,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 checked={useCurrentCaseLeft}
                 onChange={(e) => setUseCurrentCaseLeft(e.target.checked)}
                 className={styles.checkbox}
+                disabled={isUploading}
               />
               <span>Use current case number</span>
             </label>            
@@ -232,7 +234,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 id="leftItem"
                 type="text"
                 value={leftItem}
-                onChange={(e) => setLeftItem(e.target.value)}                
+                onChange={(e) => setLeftItem(e.target.value)}
+                disabled={isUploading}
               />
             </div>            
           </div>
@@ -246,7 +249,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 type="text"
                 value={rightCase}
                 onChange={(e) => setRightCase(e.target.value)}
-                disabled={useCurrentCaseRight}                
+                disabled={useCurrentCaseRight || isUploading}                
               />
             </div>
             <label className={`${styles.checkboxLabel} mb-4`}>
@@ -255,6 +258,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 checked={useCurrentCaseRight}
                 onChange={(e) => setUseCurrentCaseRight(e.target.checked)}
                 className={styles.checkbox}
+                disabled={isUploading}
               />
               <span>Use current case number</span>
             </label>
@@ -264,7 +268,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 id="rightItem"
                 type="text"
                 value={rightItem}
-                onChange={(e) => setRightItem(e.target.value)}                
+                onChange={(e) => setRightItem(e.target.value)}
+                disabled={isUploading}
               />
             </div>            
           </div>
@@ -285,6 +290,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
             value={classType}
             onChange={(e) => setClassType(e.target.value as ClassType)}
             className={styles.select}
+            disabled={isUploading}
           >
             <option value="">Select class type...</option>
             <option value="Bullet">Bullet</option>
@@ -297,7 +303,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
               type="text"
               value={customClass}
               onChange={(e) => setCustomClass(e.target.value)}
-              placeholder="Specify object type"              
+              placeholder="Specify object type"
+              disabled={isUploading}
             />
           )}
 
@@ -306,6 +313,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
             onChange={(e) => setClassNote(e.target.value)}
             placeholder="Enter class characteristic details..."
             className={styles.textarea}
+            disabled={isUploading}
           />          
         </div>
         <label className={`${styles.checkboxLabel} mb-4`}>
@@ -314,6 +322,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
             checked={hasSubclass}
             onChange={(e) => setHasSubclass(e.target.checked)}
             className={styles.checkbox}
+            disabled={isUploading}
           />
           <span>Potential subclass?</span>
         </label>
@@ -328,6 +337,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 type="radio"
                 checked={indexType === 'color'}
                 onChange={() => setIndexType('color')}
+                disabled={isUploading}
               />
               <span>Color</span>
             </label>
@@ -336,6 +346,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
                 type="radio"
                 checked={indexType === 'number'}
                 onChange={() => setIndexType('number')}
+                disabled={isUploading}
               />
               <span>Number/Letter</span>
             </label>
@@ -346,7 +357,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
               type="text"
               value={indexNumber}
               onChange={(e) => setIndexNumber(e.target.value)}
-              placeholder="Enter index number"              
+              placeholder="Enter index number"
+              disabled={isUploading}
             />
           ) : indexType === 'color' ? (            
             <ColorSelector
@@ -374,6 +386,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
               }
             }}
             className={styles.select}
+            disabled={isUploading}
           >
             <option value="">Select support level...</option>
             <option value="ID">Identification</option>
@@ -386,6 +399,7 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
             checked={includeConfirmation}
             onChange={(e) => setIncludeConfirmation(e.target.checked)}
             className={styles.checkbox}
+            disabled={isUploading}
           />
           <span>Include confirmation field</span>
         </label>
@@ -393,6 +407,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         <button 
         onClick={() => setIsModalOpen(true)}
         className={styles.notesButton}
+        disabled={isUploading}
+        title={isUploading ? "Cannot add notes while uploading" : undefined}
       >
         Additional Notes
       </button>
@@ -400,6 +416,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         <button 
             onClick={handleSave}
             className={styles.saveButton}
+            disabled={isUploading}
+            title={isUploading ? "Cannot save notes while uploading" : undefined}
           >
             Save Notes
           </button>
@@ -413,6 +431,8 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
         <button 
           onClick={onReturn}
           className={styles.returnButton}
+          disabled={isUploading}
+          title={isUploading ? "Cannot return while uploading" : undefined}
         >
           Return to Case Management
         </button>            
