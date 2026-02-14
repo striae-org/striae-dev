@@ -156,7 +156,7 @@ export const FilesModal = ({ isOpen, onClose, onFileSelect, currentCase, files, 
     <div className={styles.modalOverlay} onKeyDown={handleKeyDown} tabIndex={-1}>
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
-          <h2>Files in Case</h2>
+          <h2>Files in Case {currentCase}</h2>
           <button
             className={styles.closeButton}
             onClick={onClose}
