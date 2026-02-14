@@ -239,6 +239,21 @@ export const ImageUploadZone = ({
     await processFileQueue(filesToUpload);
   }, [isReadOnly, currentCase]);
 
+  // If read-only or uploads restricted, show only error message
+  if (isReadOnly || !canUploadNewFile) {
+    return (
+      <div className={styles.imageUploadZone}>
+        {(isReadOnly || uploadFileError) && (
+          <p className={styles.error}>
+            {isReadOnly 
+              ? 'This case is read-only. You cannot upload files.' 
+              : uploadFileError}
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={dropZoneRef}
@@ -298,9 +313,6 @@ export const ImageUploadZone = ({
         </>
       )}
       {fileError && <p className={styles.error}>{fileError}</p>}
-      {!canUploadNewFile && uploadFileError && (
-        <p className={styles.error}>{uploadFileError}</p>
-      )}
     </div>
   );
 };
