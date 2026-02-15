@@ -53,22 +53,13 @@ export default function Home() {
           <div className={styles.noticeSection}>
             <p className={styles.noticeText}>Access to Striae is free for professionals employed at a forensic laboratory or organization
               <br />
-              </p>
-            <div className={styles.buttonGroup}>
-              <Link 
-                to="/access#top"
-                viewTransition
-                className={styles.actionButton}>
-                Agency Registration
-              </Link>
-              <a 
-                href="https://support.striae.org/form/Y4sWjhi6Ppf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.signInButton}>
-                Request a Demo
-              </a>
-            </div>            
+              </p>            
+             <Link 
+              to="/access#top"
+              viewTransition
+              className={styles.actionButton}>
+              Agency Registration
+            </Link>            
           </div>         
           
           <BlogFeed />
