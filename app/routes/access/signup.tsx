@@ -9,6 +9,7 @@ import { verifyTurnstileToken } from '~/utils/turnstile';
 import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { BaseForm, FormField, FormButton, FormMessage, FormToggle } from '~/components/form';
+import { escapeHtml } from '~/utils/html-sanitizer';
 import styles from './signup.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -94,7 +95,7 @@ export async function action({ request, context }: { request: Request, context: 
     errors.agencyDomain = 'Please enter a valid agency domain (e.g., @agency.gov)';
   }
 
-  if (email && agencyDomain && !emailMatchesDomain(email, agencyDomain)) {
+  if (email && agencyDomain && !errors.email && !errors.agencyDomain && !emailMatchesDomain(email, agencyDomain)) {
     errors.email = 'Email address must match the agency domain';
   }
 
@@ -144,10 +145,10 @@ export async function action({ request, context }: { request: Request, context: 
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>New Striae Agency Registration Request</h2>
-          <p><strong>Representative Name:</strong> ${firstName} ${lastName}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Agency Name:</strong> ${company}</p>
-          <p><strong>Agency Domain:</strong> ${agencyDomain}</p>
+          <p><strong>Representative Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Agency Name:</strong> ${escapeHtml(company)}</p>
+          <p><strong>Agency Domain:</strong> ${escapeHtml(agencyDomain)}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
           <p><strong>Code Agreement:</strong> ${codeAgreement}</p>
           <p><strong>Agency Representation Confirmed:</strong> ${agencyConsent}</p>
@@ -155,7 +156,7 @@ export async function action({ request, context }: { request: Request, context: 
           <hr style="margin: 20px 0; border: 1px solid #ccc;">
           
           <h3>Agency Registration Request Received</h3>
-          <p>Your agency registration request has been received and is being processed. Once approved, all users with email addresses from the ${agencyDomain} domain will be able to access Striae. You will receive an email notification once your agency domain has been added to the access list.</p>
+          <p>Your agency registration request has been received and is being processed. Once approved, all users with email addresses from the ${escapeHtml(agencyDomain)} domain will be able to access Striae. You will receive an email notification once your agency domain has been added to the access list.</p>
                              
           <p><strong>Important:</strong> After approval, users from your agency will require a one-time access code that will be emailed to them to access the login screen. This code will be valid for one month from the date of issuance.</p>
           

@@ -78,6 +78,24 @@ const corsHeaders: Record<string, string> = {
 
 // Worker URLs - configure these for deployment
 const DATA_WORKER_URL = 'DATA_WORKER_DOMAIN';
+
+/**
+ * Escapes HTML special characters to prevent injection attacks in email content
+ * 
+ * @param text - Raw user input that may contain HTML characters
+ * @returns Safely escaped string suitable for embedding in HTML
+ */
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
 const IMAGE_WORKER_URL = 'IMAGES_WORKER_DOMAIN';
 
 async function authenticate(request: Request, env: Env): Promise<void> {
@@ -184,13 +202,13 @@ async function sendDeletionEmails(env: Env, userData: UserData): Promise<boolean
       ContentType: "HTML",
       HTMLContent: `<html><body>
         <h2>Account Deletion Confirmation</h2>
-        <p>Dear ${fullName},</p>
+        <p>Dear ${escapeHtml(fullName)},</p>
         <p>This email confirms that your Striae account has been successfully deleted.</p>
         <p><strong>Account Details:</strong></p>
         <ul>
-          <li><strong>UID:</strong> ${uid}</li>
-          <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
+          <li><strong>UID:</strong> ${escapeHtml(uid)}</li>
+          <li><strong>Email:</strong> ${escapeHtml(email)}</li>
+          <li><strong>Lab/Company:</strong> ${escapeHtml(company || 'Not provided')}</li>
         </ul>
         <p>All your account information and data have been permanently removed from our systems. The account associated with this email address has been disabled.</p>
         <p>If you did not request this deletion or believe this was done in error, please contact our support team immediately at info@striae.org.</p>
@@ -250,10 +268,10 @@ The Striae Team`,
         <p>A user has deleted their Striae account.</p>
         <p><strong>Deleted Account Details:</strong></p>
         <ul>
-          <li><strong>UID:</strong> ${uid}</li>
-          <li><strong>Name:</strong> ${fullName}</li>
-          <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Lab/Company:</strong> ${company || 'Not provided'}</li>
+          <li><strong>UID:</strong> ${escapeHtml(uid)}</li>
+          <li><strong>Name:</strong> ${escapeHtml(fullName)}</li>
+          <li><strong>Email:</strong> ${escapeHtml(email)}</li>
+          <li><strong>Lab/Company:</strong> ${escapeHtml(company || 'Not provided')}</li>
           <li><strong>Deletion Time:</strong> ${new Date().toISOString()}</li>
         </ul>
         <p>The user has been sent a confirmation email.</p>

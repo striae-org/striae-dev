@@ -6,6 +6,7 @@ import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { BaseForm, FormField, FormMessage, FormButton } from '~/components/form';
 import freeEmailDomains from 'free-email-domains';
+import { escapeHtml } from '~/utils/html-sanitizer';
 import styles from './bugs.module.css';
 
 const MAX_NAME_LENGTH = 128;
@@ -111,11 +112,11 @@ export async function action({ request, context }: { request: Request, context: 
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>New Striae Bug Report</h2>
-          <p><strong>Reported By:</strong> ${name} (${email})</p>
-          <p><strong>Description:</strong> ${description}</p>
-          <p><strong>Steps to Reproduce:</strong> ${steps}</p>
-          <p><strong>Expected Behavior:</strong> ${expected}</p>
-          <p><strong>Actual Behavior:</strong> ${actual}</p>
+          <p><strong>Reported By:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>
+          <p><strong>Description:</strong> ${escapeHtml(description)}</p>
+          <p><strong>Steps to Reproduce:</strong> ${escapeHtml(steps)}</p>
+          <p><strong>Expected Behavior:</strong> ${escapeHtml(expected)}</p>
+          <p><strong>Actual Behavior:</strong> ${escapeHtml(actual)}</p>
         </body></html>`,
         "PlainContent": `New Striae Bug Report:
 

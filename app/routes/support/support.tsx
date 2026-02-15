@@ -5,8 +5,7 @@ import { verifyTurnstileToken } from '~/utils/turnstile';
 import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { BaseForm, FormField, FormButton, FormMessage } from '~/components/form';
-import freeEmailDomains from 'free-email-domains';
-import styles from './support.module.css';
+import freeEmailDomains from 'free-email-domains';import { escapeHtml } from '~/utils/html-sanitizer';import styles from './support.module.css';
 
 const MAX_NAME_LENGTH = 128;
 
@@ -104,11 +103,11 @@ export async function action({ request, context }: { request: Request, context: 
         "ContentType": "HTML",
         "HTMLContent": `<html><body>
           <h2>New Support Ticket</h2>
-          <p><strong>Requested By:</strong> ${name} (${email})</p>
-          <p><strong>Category:</strong> ${category}</p>
-          <p><strong>Description of Issue:</strong> ${description}</p>
-          <p><strong>Steps Previously Taken:</strong> ${steps}</p>
-          <p><strong>Expected Results:</strong> ${expected}</p>          
+          <p><strong>Requested By:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>
+          <p><strong>Category:</strong> ${escapeHtml(category)}</p>
+          <p><strong>Description of Issue:</strong> ${escapeHtml(description)}</p>
+          <p><strong>Steps Previously Taken:</strong> ${escapeHtml(steps)}</p>
+          <p><strong>Expected Results:</strong> ${escapeHtml(expected)}</p>          
         </body></html>`,
         "PlainContent": `New Striae Support Ticket:
 
