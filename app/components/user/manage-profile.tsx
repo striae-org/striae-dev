@@ -9,6 +9,7 @@ import { AuthContext } from '~/contexts/auth.context';
 import { getUserData, updateUserData } from '~/utils/permissions';
 import { auditService } from '~/services/audit.service';
 import { handleAuthError, ERROR_MESSAGES } from '~/services/firebase-errors';
+import { FormField, FormButton, FormMessage } from '../form';
 import styles from './manage-profile.module.css';
 
 interface ManageProfileProps {
@@ -182,18 +183,17 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
             </header>
 
             <form onSubmit={handleUpdateProfile} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="displayName">Display Name</label>
-            <input
-              id="displayName"
-              type="text"
-              value={displayName}
-              autoComplete="name"
-              onChange={(e) => setDisplayName(e.target.value)}
-              className={styles.input}
-              required
-            />
-          </div>
+          <FormField
+            label="Display Name"
+            component="input"
+            type="text"
+            name="displayName"
+            id="displayName"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            autoComplete="name"
+            required
+          />
 
           <div className={styles.formGroup}>
             <label htmlFor="company">Lab/Company Name</label>
@@ -201,9 +201,9 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               id="company"
               type="text"
               value={company}
-              className={styles.input}
               disabled
               readOnly
+              className={styles.input}
               style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
             />
             <p className={styles.helpText}>
@@ -217,10 +217,10 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
               id="email"
               type="email"
               value={email}
-              autoComplete="email"
-              className={styles.input}
               disabled
               readOnly
+              className={styles.input}
+              autoComplete="email"
               style={{ backgroundColor: '#f8f9fa', cursor: 'not-allowed' }}
             />
             <p className={styles.helpText}>
@@ -228,31 +228,32 @@ export const ManageProfile = ({ isOpen, onClose }: ManageProfileProps) => {
             </p>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
-          {success && <p className={styles.success}>{success}</p>}
+          {error && <FormMessage type="error" message={error} />}
+          {success && <FormMessage type="success" message={success} />}
 
           <div className={styles.buttonGroup}>
-                <button 
+                <FormButton 
+                  variant="primary"
                   type="submit" 
-                  className={styles.primaryButton}
-                  disabled={isLoading}
+                  isLoading={isLoading}
+                  loadingText="Updating..."
                 >
-                  {isLoading ? 'Updating...' : 'Update Profile'}
-                </button>
-                <button
+                  Update Profile
+                </FormButton>
+                <FormButton
+                  variant="secondary"
                   type="button"
                   onClick={() => setShowAuditViewer(true)}
-                  className={styles.secondaryButton}
                 >
                   View My Audit Trail
-                </button>
-                <button
+                </FormButton>
+                <FormButton
+                  variant="secondary"
                   type="button"
                   onClick={() => setShowResetForm(true)}
-                  className={styles.secondaryButton}
                 >
                   Reset Password
-                </button>
+                </FormButton>
               </div>
               <button
                 type="button"

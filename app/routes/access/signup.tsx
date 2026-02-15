@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';

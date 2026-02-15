@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
 import { verifyTurnstileToken } from '~/utils/turnstile';

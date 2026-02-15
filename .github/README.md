@@ -83,6 +83,14 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2026-02-15] - *[Patch Release v1.1.2](https://github.com/striae-org/striae/releases/tag/v1.1.2)*
+
+- **🔒 HTML Injection Prevention** - Added comprehensive HTML entity escaping to all email form submissions (signup, bug reports, support, account deletion) to prevent XSS attacks
+- **✅ Server-Side Validation** - Added required checkbox validation (emailConsent, codeAgreement) on server to prevent direct API bypass
+- **🎨 Form Component Consolidation** - Refactored form styling to use centralized FormMessage, FormButton, and FormField components (~77% CSS reduction)
+- **🧹 Code Quality Improvements** - Entity-escaped JSX apostrophes, improved type safety, cleaned up unused styles across 5+ components
+- **📊 CSS Architecture Optimization** - Eliminated duplicate error/success message and button styling across manage-profile, delete-account, case-import, and sidebar components
+
 ## [2026-02-13] - *[Patch Release v1.1.1](https://github.com/striae-org/striae/releases/tag/v1.1.1)*
 
 - **📁 Multi-File Upload Support** - Upload multiple image files simultaneously using drag & drop or file picker with sequential processing
