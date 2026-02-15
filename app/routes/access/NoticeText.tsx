@@ -16,6 +16,18 @@ export default function NoticeText() {
   <li><strong>Feedback Welcome:</strong> We encourage you to share your thoughts with us. Every bit of feedback helps make Striae better.</li>
 </ul>
 
+<h2>Registered Agencies</h2>
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+  <ul style={{ margin: 0, paddingLeft: '20px' }}>
+    <li>California Department of Justice</li>
+    <li>El Poder Judicial de Costa Rica</li>
+  </ul>
+  <ul style={{ margin: 0, paddingLeft: '20px' }}>
+    <li>Los Angeles Police Department</li>
+    <li>Nichols Forensic Science Consulting</li>
+  </ul>
+</div>
+
 <p>By registering, you&apos;re helping to build the future of Striae and digital annotation tools for forensic firearms examination. We can&apos;t wait to hear your insights and how you use it in your work!</p>
 
 <h2>Request a Demo Account</h2>
