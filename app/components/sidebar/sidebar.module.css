@@ -207,6 +207,12 @@
   margin-top: 1rem;
 }
 
+.footerModalCopyrightLink {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.7rem;  
+}
+
 .badgeContainer {
   display: flex;
   justify-content: center;

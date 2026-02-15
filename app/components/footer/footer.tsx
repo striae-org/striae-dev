@@ -69,7 +69,13 @@ export default function Footer() {
           </div>
         </div>
         <p className={styles.copyright}>
+<<<<<<< HEAD
           <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}. All rights reserved.
+=======
+          <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae</a> © {year}. All rights reserved.
+          <br />
+            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
+>>>>>>> parent of e7c9d66 (rm developer info from landing page and footer references and in security)
         </p>
       </div>
     </footer>    
