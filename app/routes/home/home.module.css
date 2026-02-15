@@ -126,12 +126,7 @@
 
 @media (max-width: 696px) {
   .container {
-    padding: 0;
-  }
-
-  .content {
-    margin: 0 var(--spaceS);
-    padding: var(--spaceL);
+    padding: 0 var(--spaceM);
   }
 
   .title {
