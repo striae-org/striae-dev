@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useContext, useCallback } from 'react';
 import { AuthContext } from '~/contexts/auth.context';
+import { FormMessage } from '~/components/form';
 import { 
   listReadOnlyCases, 
   deleteReadOnlyCase
@@ -330,16 +331,12 @@ export const CaseImport = ({
 
             {/* Success message */}
             {messages.success && (
-              <div className={styles.success}>
-                {messages.success}
-              </div>
+              <FormMessage type="success" message={messages.success} />
             )}
 
             {/* Error message */}
             {messages.error && (
-              <div className={styles.error}>
-                {messages.error}
-              </div>
+              <FormMessage type="error" message={messages.error} />
             )}
 
             {/* Action buttons */}

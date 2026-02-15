@@ -167,16 +167,6 @@
   opacity: 0.6;
 }
 
-/* Status Messages */
-.success {
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  color: #198754;
-  background-color: rgba(25,135,84,0.1);
-}
-
 /* Files Section */
 .filesSection {
   margin-top: 2rem;
@@ -601,17 +591,7 @@
   cursor: not-allowed;
 }
 
-/* Error Messages - now in component modules */
-.error {
-  font-size: 0.875rem;
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
-  margin-top: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.auditTrailSection {
+/* Audit Trail Section */
   margin-top: 1rem;
 }
 

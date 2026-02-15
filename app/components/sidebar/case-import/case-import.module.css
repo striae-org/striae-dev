@@ -348,31 +348,6 @@
   cursor: not-allowed;
 }
 
-/* Success and error messages */
-.success {
-  margin-top: var(--spaceM);
-  padding: var(--spaceM);
-  background: color-mix(in lab, var(--success) 10%, transparent);
-  border: 1px solid color-mix(in lab, var(--success) 20%, transparent);
-  border-radius: var(--spaceXS);
-  color: var(--success);
-  font-size: var(--fontSizeBodyS);
-  font-weight: var(--fontWeightMedium);
-  white-space: pre-wrap;
-}
-
-.error {
-  margin-top: var(--spaceM);
-  padding: var(--spaceM);
-  background: color-mix(in lab, var(--error) 10%, transparent);
-  border: 1px solid color-mix(in lab, var(--error) 20%, transparent);
-  border-radius: var(--spaceXS);
-  color: var(--error);
-  font-size: var(--fontSizeBodyS);
-  font-weight: var(--fontWeightMedium);
-  white-space: pre-wrap;
-}
-
 /* Instructions section */
 .instructions {
   margin-top: var(--spaceL);

@@ -15,6 +15,7 @@ import { FilesModal } from '../files/files-modal';
 import { CaseExport, ExportFormat } from '../case-export/case-export';
 import { ImageUploadZone } from '../upload/image-upload-zone';
 import { UserAuditViewer } from '~/components/audit/user-audit-viewer';
+import { FormMessage } from '~/components/form';
 import {
   validateCaseNumber,
   checkExistingCase,
@@ -499,11 +500,9 @@ return (
             List All Cases
           </button>
     </div>
-    {error && <p className={styles.error}>{error}</p>}
+    {error && <FormMessage type="error" message={error} />}
     {successAction && (
-      <p className={styles.success}>
-        Case {currentCase} {successAction} successfully!
-      </p>
+      <FormMessage type="success" message={`Case ${currentCase} ${successAction} successfully!`} />
     )}  
     <CasesModal
         isOpen={isModalOpen}
