@@ -219,9 +219,7 @@ export const Support = () => {
               disabled={sending}
             />
             
-            <Turnstile
-              className={styles.turnstile}
-            />
+            <Turnstile />
             
             {actionData?.errors?.email && actionData.errors.email.includes('CAPTCHA') && (
               <p className={styles.error}>{actionData.errors.email}</p>

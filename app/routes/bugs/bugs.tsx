@@ -226,7 +226,7 @@ export const Bugs = () => {
             disabled={sending}
           />
           
-          <Turnstile className={styles.turnstile} />
+          <Turnstile />
           
           <FormButton 
             type="submit"
