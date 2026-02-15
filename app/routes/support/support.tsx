@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseMeta } from '~/utils/meta';
 import { Turnstile } from '~/components/turnstile/turnstile';
-import { verifyTurnstileToken } from '~/utils/turnstile';
+import { isTurnstileSuccess, verifyTurnstileToken } from '~/utils/turnstile';
 import { useActionData, useNavigation, Link } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
 import { BaseForm, FormField, FormButton, FormMessage } from '~/components/form';
@@ -75,8 +75,8 @@ export async function action({ request, context }: { request: Request, context: 
 
     const token = formData.get('cf-turnstile-response') as string;
     const verificationResult = await verifyTurnstileToken(token);
-    
-    if ('success' in verificationResult && !verificationResult.success) {
+
+    if (!isTurnstileSuccess(verificationResult)) {
       return json<ActionData>(
         { errors: { email: 'CAPTCHA verification failed. Please try again.' } },
         { status: 400 }

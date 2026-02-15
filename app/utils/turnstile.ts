@@ -9,6 +9,12 @@ interface TurnstileError {
   status: number;
 }
 
+export const isTurnstileSuccess = (
+  result: TurnstileResponse | TurnstileError
+): result is TurnstileResponse => {
+  return 'success' in result && result.success === true;
+};
+
 export async function verifyTurnstileToken(token: string): Promise<TurnstileResponse | TurnstileError> {
   try {
     const workerUrl = `${keys.worker_url}`;
