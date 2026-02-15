@@ -99,10 +99,10 @@ graph TB
     Backend <--> Images
     
     %% Styling
-    classDef external fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
-    classDef auth fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef app fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef storage fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef external fill:#93c5fd,stroke:#2563eb,stroke-width:2px,color:#0b1f3a
+    classDef auth fill:#60a5fa,stroke:#1d4ed8,stroke-width:2px,color:#0b1f3a
+    classDef app fill:#7dd3fc,stroke:#2563eb,stroke-width:2px,color:#0b1f3a
+    classDef storage fill:#a5b4fc,stroke:#4338ca,stroke-width:2px,color:#0b1f3a
     
     class Turnstile,SendLayer external
     class Firebase auth
