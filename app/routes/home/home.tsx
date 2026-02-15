@@ -1,4 +1,3 @@
-import { Link } from '@remix-run/react';
 import styles from './home.module.css';
 import { useState } from 'react';
 import { Notice } from '~/components/notice/notice';
