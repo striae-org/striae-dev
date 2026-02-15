@@ -49,7 +49,7 @@ export default function Home() {
             </a>
           </div>
           <div className={styles.noticeSection}>
-            <p className={styles.noticeText}>Access to Striae is free for professionals employed at a forensic laboratory or organization
+            <p className={styles.noticeText}>Access to Striae is restricted to professionals employed at a forensic laboratory or organization
               <br />
               </p>
             <div className={styles.buttonGroup}>              
