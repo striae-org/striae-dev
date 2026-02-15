@@ -1,1 +1,1 @@
-export { Terms as default, meta } from './terms'
+export { Terms as default, meta } from './terms';

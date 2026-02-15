@@ -1,1 +1,1 @@
-export { Privacy as default, meta } from './privacy'
+export { Privacy as default, meta } from './privacy';
