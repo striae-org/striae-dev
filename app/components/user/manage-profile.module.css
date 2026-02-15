@@ -1,3 +1,4 @@
+/* Modal Overlay & Container */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -20,6 +21,7 @@
   overflow: hidden;
 }
 
+/* Modal Header */
 .modalHeader {
   display: flex;
   justify-content: space-between;
@@ -36,6 +38,7 @@
   font-weight: var(--fontWeightMedium);
 }
 
+/* Close Button */
 .closeButton {
   background: none;
   border: none;
@@ -50,6 +53,7 @@
   color: var(--text);
 }
 
+/* Form & Form Groups */
 .form {
   display: flex;
   flex-direction: column;
@@ -71,6 +75,7 @@
   color: var(--textBody);
 }
 
+/* Readonly Input Styling (for company/email fields) */
 .input {
   width: 100%;
   padding: var(--spaceM);
@@ -79,55 +84,15 @@
   font-size: var(--fontSizeBodyS);
   background: var(--backgroundLight);
   color: var(--textBody);
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
   box-sizing: border-box;
 }
 
-.input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px color-mix(in lab, var(--primary) 25%, transparent);
+.input:disabled {
+  background-color: color-mix(in lab, var(--background) 95%, transparent);
+  cursor: not-allowed;
 }
 
-.passwordField {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.passwordField .input {
-  padding-right: var(--space2XL);
-  width: 100%;
-}
-
-.passwordToggle {
-  position: absolute;
-  right: var(--spaceM);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  padding: var(--spaceXS);
-  border-radius: var(--spaceXS);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color var(--durationS) var(--bezierFastoutSlowin);
-  z-index: 1;
-  height: auto;
-  min-width: 24px;
-}
-
-.passwordToggle:hover {
-  background-color: color-mix(in lab, var(--text) 10%, transparent);
-}
-
-.passwordToggle:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
+/* Helper Text */
 .helpText {
   font-size: var(--fontSizeBodyXS);
   color: var(--textLight);
@@ -135,75 +100,14 @@
   line-height: 1.4;
 }
 
+/* Button Group */
 .buttonGroup {
   display: flex;
   gap: var(--spaceS);
   margin-top: var(--spaceL);
 }
 
-.primaryButton, .secondaryButton {
-  padding: var(--spaceM) var(--spaceL);
-  border-radius: var(--spaceXS);
-  font-weight: var(--fontWeightMedium);
-  cursor: pointer;
-  transition: all var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.primaryButton {
-  background-color: var(--primary);
-  color: var(--white);
-  border: none;
-}
-
-.primaryButton:hover:not(:disabled) {
-  background-color: color-mix(in lab, var(--primary) 85%, var(--black));
-}
-
-.secondaryButton {
-  background-color: transparent;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-}
-
-.secondaryButton:hover {
-  background-color: color-mix(in lab, var(--primary) 10%, transparent);
-}
-
-.error, .success {
-  padding: var(--spaceM);
-  border-radius: var(--spaceXS);
-  margin-top: var(--spaceL);
-}
-
-.error {
-  background-color: color-mix(in lab, var(--error) 10%, transparent);
-  color: var(--error);
-  border: 1px solid color-mix(in lab, var(--error) 25%, transparent);
-}
-
-.success {
-  background-color: color-mix(in lab, var(--accent) 10%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in lab, var(--accent) 25%, transparent);
-}
-
-.deleteNotice {
-  margin-top: var(--spaceXL);
-  font-size: var(--fontSizeBodyXS);
-  text-align: center;
-  color: var(--textLight);
-}
-
-.deleteLink {
-  color: var(--error);
-  text-decoration: underline;
-  transition: color var(--durationS) var(--bezierFastoutSlowin);
-}
-
-.deleteLink:hover {
-  color: color-mix(in lab, var(--error) 85%, var(--black));
-}
-
+/* Delete Button (error variant) */
 .deleteButton {
   background-color: var(--error);
   color: var(--white);
@@ -225,4 +129,21 @@
 .deleteButton:focus {
   outline: 2px solid var(--error);
   outline-offset: 2px;
+}
+
+.deleteNotice {
+  margin-top: var(--spaceXL);
+  font-size: var(--fontSizeBodyXS);
+  text-align: center;
+  color: var(--textLight);
+}
+
+.deleteLink {
+  color: var(--error);
+  text-decoration: underline;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.deleteLink:hover {
+  color: color-mix(in lab, var(--error) 85%, var(--black));
 }
