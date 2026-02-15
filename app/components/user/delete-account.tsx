@@ -4,7 +4,6 @@ import { auth } from '~/services/firebase';
 import paths from '~/config/config.json';
 import { getUserApiKey } from '~/utils/auth';
 import { auditService } from '~/services/audit.service';
-import { FormMessage } from '../form';
 import styles from './delete-account.module.css';
 
 interface DeleteAccountProps {
@@ -220,11 +219,16 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
 
           {/* Success/Error Messages */}
           {error && (
-            <FormMessage type="error" message={error} />
+            <div className={styles.errorMessage}>
+              <p>{error}</p>
+            </div>
           )}
           
           {success && (
-            <FormMessage type="success" message="✓ Account deletion successful! Confirmation emails have been sent. You will be logged out automatically in 3 seconds..." />
+            <div className={styles.successMessage}>
+              <p>✓ Account deletion successful! Confirmation emails have been sent.</p>
+              <p>You will be logged out automatically in 3 seconds...</p>
+            </div>
           )}
 
           {/* Confirmation Form */}
