@@ -32,7 +32,10 @@ export const loader: LoaderFunction = async ({ context }) => {
     
     // User guides - Getting Started
     { path: "/guides/users/getting-started/striae-a-firearms-examiners-comparison-companion.md", changefreq: "monthly", priority: 0.8 },
+    { path: "/guides/users/getting-started/where-does-striae-fit.md", changefreq: "monthly", priority: 0.7 },
     { path: "/guides/users/getting-started/how-to-log-into-striae.md", changefreq: "monthly", priority: 0.7 },
+    { path: "/guides/users/getting-started/accessing-striae-registration-and-login.md", changefreq: "monthly", priority: 0.7 },
+    { path: "/guides/users/getting-started/authenticating-with-cloudflare-warp.md", changefreq: "monthly", priority: 0.7 },
     { path: "/guides/users/getting-started/code-of-responsible-use.md", changefreq: "yearly", priority: 0.6 },
     
     // User guides - Case Management
@@ -43,15 +46,16 @@ export const loader: LoaderFunction = async ({ context }) => {
     { path: "/guides/users/annotating-printing/box-annotations.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - Confirmations
-    { path: "/guides/users/confirmations/confirmations-guide.md", changefreq: "monthly", priority: 0.6 },
+    { path: "/guides/users/authenticated-confirmations/authenticated-confirmations.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - Audit Trail
-    { path: "/guides/users/audit-trail/audit-trail-user-guide.md", changefreq: "monthly", priority: 0.6 },
+    { path: "/guides/users/audit-trail-system/audit-trail-system.md", changefreq: "monthly", priority: 0.6 },
     
     // User guides - FAQs
     { path: "/guides/users/faqs/striae-frequently-asked-questions.md", changefreq: "monthly", priority: 0.6 },
     
     // Release notes - Stable
+    { path: "/release-notes/RELEASE_NOTES_v1.1.2.md", changefreq: "monthly", priority: 0.5 },
     { path: "/release-notes/RELEASE_NOTES_v1.1.1.md", changefreq: "monthly", priority: 0.5 },
     { path: "/release-notes/RELEASE_NOTES_v1.1.0.md", changefreq: "monthly", priority: 0.5 },
     { path: "/release-notes/RELEASE_NOTES_v1.0.5.md", changefreq: "monthly", priority: 0.5 },
