@@ -5,7 +5,6 @@ import { NotesModal } from './notes-modal';
 import { getNotes, saveNotes } from '~/components/actions/notes-manage';
 import { AnnotationData } from '~/types/annotations';
 import { auditService } from '~/services/audit.service';
-import { FormMessage } from '~/components/form';
 import styles from './notes.module.css';
 
 interface NotesSidebarProps {
@@ -198,9 +197,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
   return (
     <div className={styles.notesSidebar}>
       {isLoading ? (
-        <FormMessage type="error" message="Loading notes..." />
+        <div className={styles.loading}>Loading notes...</div>
       ) : loadError ? (
-        <FormMessage type="error" message={loadError} />
+        <div className={styles.error}>{loadError}</div>
       ) : (
         <>
       <div className={styles.section}>
@@ -424,7 +423,9 @@ export const NotesSidebar = ({ currentCase, onReturn, user, imageId, onAnnotatio
           </button>
           
           {saveSuccess && (
-            <FormMessage type="success" message="Notes saved successfully!" />
+            <div className={styles.successMessage}>
+              Notes saved successfully!
+            </div>
           )}
 
         <button 
