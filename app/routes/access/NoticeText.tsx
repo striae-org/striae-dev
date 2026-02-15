@@ -31,7 +31,7 @@ export default function NoticeText() {
 <p>By registering, you&apos;re helping to build the future of Striae and digital annotation tools for forensic firearms examination. We can&apos;t wait to hear your insights and how you use it in your work!</p>
 
 <h2>Request a Demo Account</h2>
-<p>If you'd like to trial all of Striae's features before registering your agency, please <a href="https://support.striae.org/form/Y4sWjhi6Ppf" target="_blank" rel="noopener noreferrer">submit a request</a>.</p>
+<p>If you&apos;d like to trial all of Striae&apos;s features before registering your agency, please <a href="https://support.striae.org/form/Y4sWjhi6Ppf" target="_blank" rel="noopener noreferrer">submit a request</a>.</p>
 <p>Demo accounts are created in the development instance of Striae and provide full access to all features for evaluation purposes only. Actual casework images and data, research data, or training materials should <em>NOT</em> be uploaded or entered using a demo account. <em>Demo account files and data may be subject to regular purging without notification.</em></p>
 <p>The creation of a demo account is subject to approval.</p>
 

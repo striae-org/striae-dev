@@ -23,6 +23,8 @@ interface ActionData {
       email?: string;
       company?: string;
       agencyDomain?: string;
+      emailConsent?: string;
+      codeAgreement?: string;
       agencyConsent?: string;
     };
 }
@@ -73,7 +75,7 @@ export async function action({ request, context }: { request: Request, context: 
   const emailConsent = formData.get('emailConsent') === 'on';
   const codeAgreement = formData.get('codeAgreement') === 'on';
   const agencyConsent = formData.get('agencyConsent') === 'on';
-  const errors: { firstName?: string; lastName?: string; email?: string; company?: string; agencyDomain?: string; agencyConsent?: string; } = {};
+  const errors: { firstName?: string; lastName?: string; email?: string; company?: string; agencyDomain?: string; emailConsent?: string; codeAgreement?: string; agencyConsent?: string; } = {};
 
   if (!firstName || firstName.length > MAX_NAME_LENGTH) {
     errors.firstName = 'Please enter your first name';
@@ -97,6 +99,14 @@ export async function action({ request, context }: { request: Request, context: 
 
   if (email && agencyDomain && !errors.email && !errors.agencyDomain && !emailMatchesDomain(email, agencyDomain)) {
     errors.email = 'Email address must match the agency domain';
+  }
+
+  if (!emailConsent) {
+    errors.emailConsent = 'You must agree to receive email communications';
+  }
+
+  if (!codeAgreement) {
+    errors.codeAgreement = 'You must agree to the Code of Professional Conduct';
   }
 
   if (!agencyConsent) {
