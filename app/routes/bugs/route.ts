@@ -1,1 +1,1 @@
-export { Bugs as default, meta, action } from './bugs';
+export { Bugs as default, meta, action } from './bugs'

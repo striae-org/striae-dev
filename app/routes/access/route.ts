@@ -1,1 +1,1 @@
-export { Signup as default, meta, action } from './signup';
+export { Signup as default, meta, action } from './signup'
