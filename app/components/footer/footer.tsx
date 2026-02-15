@@ -69,7 +69,9 @@ export default function Footer() {
           </div>
         </div>
         <p className={styles.copyright}>
-          <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}. All rights reserved.
+          <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae</a> © {year}. All rights reserved.
+          <br />
+            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
         </p>
       </div>
     </footer>    
