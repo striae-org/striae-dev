@@ -133,7 +133,7 @@ Upon receipt of a notification, the Company will take whatever action, in its so
 <p>The Service and its original content (excluding Data provided by You or other users), features and functionality are and will remain the exclusive property of the Company and its licensors.</p>
 <p>The Service is protected by copyright, trademark, patent, and other laws of both the Country and foreign countries.</p>
 <p>Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of the Company.</p>
-<h3>Open-Source License Precedence</h3>
+<h2>Open-Source License Precedence</h2>
 <p>Certain software components distributed with or as part of the Service are licensed under the Apache License, Version 2.0 (and, where applicable, other open-source licenses).</p>
 <p>In the event of any conflict between these Terms and such applicable open-source license terms for those components, the applicable open-source license terms (including Apache License 2.0) will control solely with respect to those components.</p>
 <h2>Your Feedback to Us</h2>
