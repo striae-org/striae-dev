@@ -60,7 +60,7 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 1000px) {
   .logo {
     display: none;
   }
