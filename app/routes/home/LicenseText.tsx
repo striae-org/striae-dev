@@ -11,7 +11,7 @@ const LicenseText = () => {
         <p>
         Mattijssen, Erwin &amp; Kerkhoff, Wim &amp; Berger, Charles &amp; Dror, Itiel &amp; Stoel, Reinoud. (2016). Implementing context information management in forensic casework: Minimizing contextual bias in firearms examination. Science &amp; Justice. 56. 113-122.
         <br />
-        <a href="https://doi.org/10.1016/j.scijus.2015.11.004" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.scijus.2015.11.004</a>.</p>
+        <a href="https://www.researchgate.net/publication/288700798_Implementing_context_information_management_in_forensic_casework_Minimizing_contextual_bias_in_firearms_examination" target="_blank" rel="noopener noreferrer">Research Gate Journal Link</a>.</p>
         <br />
         <br />
       <h2 style={{ textAlign: 'center' }}>
