@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
 import { Sidebar } from './sidebar';
+import { Notice } from '~/components/notice/notice';
 import { User } from 'firebase/auth';
 import { FileData } from '~/types';
 import styles from './sidebar.module.css';
 import { getAppVersion } from '../../utils/version';
+import LicenseText from '~/routes/home/LicenseText';
 
 interface SidebarContainerProps {
   user: User;
@@ -34,8 +36,14 @@ interface SidebarContainerProps {
 
 export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
   const [isFooterModalOpen, setIsFooterModalOpen] = useState(false);
+  const [isLicenseNoticeOpen, setIsLicenseNoticeOpen] = useState(false);
   const year = new Date().getFullYear();
   const appVersion = getAppVersion();
+
+  const handleOpenLicenseNotice = () => {
+    setIsFooterModalOpen(false);
+    setIsLicenseNoticeOpen(true);
+  };
 
   useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
@@ -153,7 +161,14 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                 </div>
               </div>
               <div className={styles.footerModalCopyright}>
-                <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}. All rights reserved.              
+                <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}.{' '}
+                <button
+                  type="button"
+                  className={styles.licenseLinkButton}
+                  onClick={handleOpenLicenseNotice}
+                >
+                  Licensed under Apache 2.0.
+                </button>
                 <div className={styles.footerModalCopyrightLink}>
                 Designed and developed by <a href="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>
                 </div>
@@ -162,6 +177,11 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
           </div>
         </div>
       )}
+      <Notice
+        isOpen={isLicenseNoticeOpen}
+        onClose={() => setIsLicenseNoticeOpen(false)}
+        notice={{ title: 'Apache License 2.0 Notice', content: <LicenseText />, buttonText: 'Close License Notice' }}
+      />
     </div>
   );
 };

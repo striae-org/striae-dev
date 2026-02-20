@@ -53,6 +53,14 @@
     text-underline-offset: 3px;
   }
 
+  :global(h3) {
+    color: var(--textTitle);
+    font-size: var(--fontSizeH5);
+    font-weight: var(--fontWeightMedium);
+    line-height: var(--lineHeightHeading);
+    margin: var(--spaceL) 0 var(--spaceM);
+  }
+
   :global(ul) {
     padding: 0;
   }
