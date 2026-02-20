@@ -48,6 +48,26 @@
   transform: translateY(-1px);
 }
 
+.licenseLinkButton {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: var(--textLight);
+  text-decoration: none;
+  font-size: var(--fontSizeBodyXS);
+  font-family: inherit;
+  cursor: pointer;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.licenseLinkButton:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
 .copyright {
   color: var(--textLight);
   font-size: var(--fontSizeBodyXS);

@@ -40,18 +40,21 @@ export function Notice({ isOpen, onClose, notice }: NoticeProps) {
     >
       <div 
         className={styles.modal}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="notice-title"
       >
-        <button 
-          className={styles.closeButton} 
-          onClick={onClose}
-          aria-label="Close"
-        >
-          &times;
-        </button>
-        <h2 id="notice-title">{notice.title}</h2>
+        <div className={styles.header}>
+          <h2 id="notice-title">{notice.title}</h2>
+          <button 
+            className={styles.closeButton} 
+            onClick={onClose}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
         <div className={styles.content}>
           {notice.content}
         </div>

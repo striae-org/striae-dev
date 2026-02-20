@@ -17,16 +17,31 @@
   max-width: var(--maxWidthL);
   width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   position: relative;
   box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
   animation: slideIn var(--durationM) var(--bezierFastoutSlowin);
 }
 
+.header {
+  position: relative;
+  padding-right: var(--space2XL);
+}
+
+.header h2 {
+  text-align: left;
+  color: var(--textTitle);
+  margin-bottom: var(--spaceXL);
+  font-size: var(--fontSizeH4);
+}
+
 .closeButton {
   position: absolute;
-  top: var(--spaceL);
-  right: var(--spaceL);
+  top: 0;
+  right: 0;
+  z-index: 3;
   border: none;
   background: none;
   font-size: var(--fontSizeH5);
@@ -42,6 +57,9 @@
 
 .content {
   margin: var(--spaceL) 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .content h1 {
@@ -67,6 +85,11 @@
 
 .content ul {
   list-style-type: disc;
+  padding-left: var(--spaceXL);
+  margin: var(--spaceM) 0;
+}
+
+.content ol {
   padding-left: var(--spaceXL);
   margin: var(--spaceM) 0;
 }
@@ -148,5 +171,9 @@
 @media (max-width: 768px) {
   .modal {
     padding: var(--spaceL);
+  }
+
+  .header {
+    padding-right: var(--spaceXL);
   }
 }

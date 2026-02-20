@@ -1,15 +1,20 @@
 import { Link } from '@remix-run/react';
+import { useState } from 'react';
 import styles from './footer.module.css';
+import { Notice } from '~/components/notice/notice';
+import LicenseText from '~/routes/home/LicenseText';
 import { getAppVersion } from '../../utils/version';
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const appVersion = getAppVersion();
+  const [isLicenseNoticeOpen, setIsLicenseNoticeOpen] = useState(false);
   
-  return (    
-    <footer className={styles.footer}>
-      <div className={styles.container}>
-        <nav className={styles.nav}>
+  return (
+    <>
+      <footer className={styles.footer}>
+        <div className={styles.container}>
+          <nav className={styles.nav}>
           <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
             User&apos;s Guide
           </a>
@@ -51,29 +56,40 @@ export default function Footer() {
             className={styles.link}>
             Submit a Bug Report
           </Link>
-        </nav>
-        <div className={styles.badgeContainer}>          
-          <div className={styles.oinBadge}>
-            <a
-              href="https://openinventionnetwork.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.oinBadgeLink}
-            >
-              <img 
-                src="/oin-badge.png" 
-                alt="Open Invention Network Community Member" 
-                className={styles.oinBadgeImage}
-              />
-            </a>
+          </nav>
+          <div className={styles.badgeContainer}>
+            <div className={styles.oinBadge}>
+              <a
+                href="https://openinventionnetwork.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.oinBadgeLink}
+              >
+                <img 
+                  src="/oin-badge.png" 
+                  alt="Open Invention Network Community Member" 
+                  className={styles.oinBadgeImage}
+                />
+              </a>
+            </div>
           </div>
+          <p className={styles.copyright}>
+            <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}.{' '}
+            <button
+              type="button"
+              className={styles.licenseLinkButton}
+              onClick={() => setIsLicenseNoticeOpen(true)}
+            >
+              Licensed under Apache 2.0.
+            </button>
+          </p>
         </div>
-        <p className={styles.copyright}>
-          <a href={`https://github.com/striae-org/striae/releases/tag/v${appVersion}`} className={styles.link} target="_blank" rel="noopener noreferrer">Striae v{appVersion}</a> © {year}. All rights reserved.
-          <br />
-            <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>        
-        </p>
-      </div>
-    </footer>    
+      </footer>
+      <Notice
+        isOpen={isLicenseNoticeOpen}
+        onClose={() => setIsLicenseNoticeOpen(false)}
+        notice={{ title: 'Apache License 2.0 Notice', content: <LicenseText />, buttonText: 'Close License Notice' }}
+      />
+    </>
   );
 }

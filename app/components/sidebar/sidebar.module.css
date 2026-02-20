@@ -207,10 +207,36 @@
   margin-top: 1rem;
 }
 
-.footerModalCopyrightLink {
-  text-align: center;
+.link {
   color: #6c757d;
-  font-size: 0.7rem;  
+  text-decoration: none;
+}
+
+.link:hover {
+  color: #495057;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.licenseLinkButton {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.licenseLinkButton:hover {
+  color: #495057;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
 }
 
 .badgeContainer {
