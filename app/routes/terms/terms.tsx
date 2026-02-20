@@ -22,7 +22,7 @@ export const Terms = () => {
       </Link>
       <div className={styles.content}>
         <h1>Terms and Conditions</h1>
-        <p className={styles.lastUpdated}>Last updated: September 12, 2025</p>
+        <p className={styles.lastUpdated}>Last updated: February 20, 2026</p>
         <p>Please read these terms and conditions carefully before using Our Service.</p>        
         <section className={styles.section}>
           <h2>Interpretation and Definitions</h2>
@@ -131,8 +131,11 @@ Upon receipt of a notification, the Company will take whatever action, in its so
 <section className={styles.section}>
           <h2>Intellectual Property</h2>
 <p>The Service and its original content (excluding Data provided by You or other users), features and functionality are and will remain the exclusive property of the Company and its licensors.</p>
-<p>The Service is protected by copyright, trademark, and other laws of both the Country and foreign countries.</p>
+<p>The Service is protected by copyright, trademark, patent, and other laws of both the Country and foreign countries.</p>
 <p>Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of the Company.</p>
+<h3>Open-Source License Precedence</h3>
+<p>Certain software components distributed with or as part of the Service are licensed under the Apache License, Version 2.0 (and, where applicable, other open-source licenses).</p>
+<p>In the event of any conflict between these Terms and such applicable open-source license terms for those components, the applicable open-source license terms (including Apache License 2.0) will control solely with respect to those components.</p>
 <h2>Your Feedback to Us</h2>
 <p>You assign all rights, title and interest in any Feedback You provide the Company. If for any reason such assignment is ineffective, You agree to grant the Company a non-exclusive, perpetual, irrevocable, royalty free, worldwide right and license to use, reproduce, disclose, sub-license, distribute, modify and exploit such Feedback without restriction.</p>
 </section>
