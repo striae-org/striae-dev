@@ -168,10 +168,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                   onClick={handleOpenLicenseNotice}
                 >
                   Licensed under Apache 2.0.
-                </button>
-                <div className={styles.footerModalCopyrightLink}>
-                Designed and developed by <a href="https://stephenjlu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>
-                </div>
+                </button>                
               </div>              
             </div>
           </div>

@@ -82,8 +82,6 @@ export default function Footer() {
             >
               Licensed under Apache 2.0.
             </button>
-            <br />
-              <a href="https://www.StephenJLu.com" className={styles.linkSmall} target="_blank" rel="noopener noreferrer">Designed and developed by Stephen J. Lu</a>
           </p>
         </div>
       </footer>

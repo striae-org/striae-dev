@@ -2,7 +2,7 @@ const LicenseText = () => {
   return (
     <div>      
       <h3>Striae – A Firearms Examiner&apos;s Comparison Companion</h3>
-      <p>This product includes software developed by Stephen J. Lu.</p>
+      <p>This product includes software developed by <a href="https://www.StephenJLu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>.</p>
       <p><strong>Attributions for bundled components:</strong></p>
       <p>Portions of this product may include open-source software licensed under their respective licenses, including but not limited to: Remix, Cloudflare Workers, Firebase, Tailwind CSS, Vite, and other npm packages. License texts for third-party components are provided in their respective source files or in node_modules as applicable.</p>
       <p>No trademark rights are granted for “Striae,” “Stephen J. Lu,” or any associated names or logos.</p>
