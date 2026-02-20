@@ -15,13 +15,12 @@ import {
   ThemeProvider,
   themeStyles 
 } from '~/components/theme-provider/theme-provider';
-import Footer from "~/components/footer/footer";
-import MobileWarning from "~/components/mobile/mobile-warning";
+import Footer from '~/components/footer/footer';
+import MobileWarning from '~/components/mobile/mobile-warning';
 import { AuthProvider } from '~/components/auth/auth-provider';
 import { useEffect } from 'react';
 import styles from '~/styles/root.module.css';
-import "./tailwind.css";
-import './reset.module.css';
+import './tailwind.css';
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
