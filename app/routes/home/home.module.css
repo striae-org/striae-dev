@@ -276,6 +276,12 @@
     padding: var(--spaceL);
   }
 
+  .noticeSection {
+    width: 90vw;
+    max-width: 90vw;
+    padding: var(--spaceL);
+  }
+
   .aboutTitle {
     font-size: var(--fontSizeH4);
   }
