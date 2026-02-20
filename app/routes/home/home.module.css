@@ -241,12 +241,6 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 1024px) {
-  .logo {
-    display: none;
-  }
-}
-
 @media (max-width: 696px) {
   .container {
     padding: 0 var(--spaceM);
