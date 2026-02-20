@@ -5,9 +5,15 @@ const LicenseText = () => {
       <p>This product includes software developed by <a href="https://www.StephenJLu.com" target="_blank" rel="noopener noreferrer">Stephen J. Lu</a>.</p>
       <p><strong>Attributions for bundled components:</strong></p>
       <p>Portions of this product may include open-source software licensed under their respective licenses, including but not limited to: Remix, Cloudflare Workers, Firebase, Tailwind CSS, Vite, and other npm packages. License texts for third-party components are provided in their respective source files or in node_modules as applicable.</p>
-      <p>No trademark rights are granted for “Striae,” “Stephen J. Lu,” or any associated names or logos.</p>
+      <p>No trademark rights are granted for “Striae” or any associated names or logos.</p>
       <p><strong>Background image attribution:</strong></p>
-      <p>The background image used in the application landing page and marketing materials is sourced from: Mattijssen, Erwin &amp; Kerkhoff, Wim &amp; Berger, Charles &amp; Dror, Itiel &amp; Stoel, Reinoud. (2016). Implementing context information management in forensic casework: Minimizing contextual bias in firearms examination. Science &amp; Justice. 56. 113-122. <a href="https://doi.org/10.1016/j.scijus.2015.11.004" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.scijus.2015.11.004</a>.</p>
+      <p>The background image used in the application landing page and marketing materials is sourced from:</p>
+        <p>
+        Mattijssen, Erwin &amp; Kerkhoff, Wim &amp; Berger, Charles &amp; Dror, Itiel &amp; Stoel, Reinoud. (2016). Implementing context information management in forensic casework: Minimizing contextual bias in firearms examination. Science &amp; Justice. 56. 113-122.
+        <br />
+        <a href="https://doi.org/10.1016/j.scijus.2015.11.004" target="_blank" rel="noopener noreferrer">https://doi.org/10.1016/j.scijus.2015.11.004</a>.</p>
+        <br />
+        <br />
       <h2 style={{ textAlign: 'center' }}>
         Apache License
         <br />
