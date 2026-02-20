@@ -6,6 +6,20 @@ import { getUserApiKey } from '~/utils/auth';
 import { auditService } from '~/services/audit.service';
 import styles from './delete-account.module.css';
 
+interface DeletionProgress {
+  totalCases: number;
+  completedCases: number;
+  currentCaseNumber: string;
+  percent: number;
+}
+
+const initialDeletionProgress: DeletionProgress = {
+  totalCases: 0,
+  completedCases: 0,
+  currentCaseNumber: '',
+  percent: 0
+};
+
 interface DeleteAccountProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +37,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [deletionProgress, setDeletionProgress] = useState<DeletionProgress>(initialDeletionProgress);
 
   // Extract first and last name from display name
   const [firstName, lastName] = (user.displayName || '').split(' ');
@@ -30,6 +45,128 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
 
   // Check if confirmations match user data
   const isConfirmationValid = uidConfirmation === user.uid && emailConfirmation === user.email;
+
+  const scheduleLogout = () => {
+    setTimeout(async () => {
+      try {
+        await signOut(auth);
+        onClose();
+      } catch (logoutError) {
+        console.error('Error during logout:', logoutError);
+        onClose();
+      }
+    }, 3000);
+  };
+
+  const updateProgress = (totalCases: number, completedCases: number, currentCaseNumber = '') => {
+    const safeTotal = totalCases > 0 ? totalCases : 0;
+    const safeCompleted = completedCases > safeTotal ? safeTotal : completedCases;
+    const percent = safeTotal > 0 ? Math.round((safeCompleted / safeTotal) * 100) : 0;
+
+    setDeletionProgress({
+      totalCases: safeTotal,
+      completedCases: safeCompleted,
+      currentCaseNumber,
+      percent
+    });
+  };
+
+  const handleProgressStream = async (response: Response) => {
+    if (!response.body) {
+      throw new Error('No progress stream available from account deletion service.');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let streamError = '';
+    let streamCompleted = false;
+    let latestTotalCases = 0;
+    let latestCompletedCases = 0;
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      let eventBoundary = buffer.indexOf('\n\n');
+      while (eventBoundary !== -1) {
+        const rawEvent = buffer.slice(0, eventBoundary);
+        buffer = buffer.slice(eventBoundary + 2);
+
+        const lines = rawEvent.split('\n');
+        const eventTypeLine = lines.find((line) => line.startsWith('event:'));
+        const dataLine = lines.find((line) => line.startsWith('data:'));
+
+        if (eventTypeLine && dataLine) {
+          const eventType = eventTypeLine.replace('event:', '').trim();
+
+          try {
+            const data = JSON.parse(dataLine.replace('data:', '').trim()) as {
+              totalCases?: number;
+              completedCases?: number;
+              currentCaseNumber?: string;
+              success?: boolean;
+              message?: string;
+            };
+
+            if (eventType === 'start') {
+              latestTotalCases = data.totalCases ?? 0;
+              latestCompletedCases = data.completedCases ?? 0;
+              updateProgress(latestTotalCases, latestCompletedCases, '');
+            }
+
+            if (eventType === 'case-start') {
+              latestTotalCases = data.totalCases ?? latestTotalCases;
+              latestCompletedCases = data.completedCases ?? latestCompletedCases;
+              updateProgress(
+                latestTotalCases,
+                latestCompletedCases,
+                data.currentCaseNumber ?? ''
+              );
+            }
+
+            if (eventType === 'case-complete') {
+              latestTotalCases = data.totalCases ?? latestTotalCases;
+              latestCompletedCases = data.completedCases ?? latestCompletedCases;
+              updateProgress(
+                latestTotalCases,
+                latestCompletedCases,
+                data.currentCaseNumber ?? ''
+              );
+            }
+
+            if (eventType === 'complete') {
+              latestTotalCases = data.totalCases ?? latestTotalCases;
+              latestCompletedCases = data.completedCases ?? latestCompletedCases;
+              updateProgress(latestTotalCases, latestCompletedCases, '');
+              streamCompleted = data.success === true;
+              if (!streamCompleted) {
+                streamError = data.message || 'Account deletion failed.';
+              }
+            }
+
+            if (eventType === 'error') {
+              streamError = data.message || 'Account deletion failed.';
+            }
+          } catch {
+            streamError = 'Failed to parse account deletion progress.';
+          }
+        }
+
+        eventBoundary = buffer.indexOf('\n\n');
+      }
+    }
+
+    if (streamError) {
+      throw new Error(streamError);
+    }
+
+    if (!streamCompleted) {
+      throw new Error('Account deletion did not complete successfully.');
+    }
+  };
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -45,6 +182,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       setEmailConfirmation('');
       setError('');
       setSuccess(false);
+      setDeletionProgress(initialDeletionProgress);
     }
 
     return () => {
@@ -64,6 +202,7 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
     
     setIsDeleting(true);
     setError('');
+    updateProgress(0, 0, '');
     
     try {
       // Log account deletion attempt
@@ -83,10 +222,11 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
       const apiKey = await getUserApiKey();
       
       // Delete the user account via user-worker (includes email sending)
-      const deleteResponse = await fetch(`${paths.user_worker_url}/${user.uid}`, {
+      const deleteResponse = await fetch(`${paths.user_worker_url}/${user.uid}?stream=true`, {
         method: 'DELETE',
         headers: {
-          'X-Custom-Auth-Key': apiKey
+          'X-Custom-Auth-Key': apiKey,
+          'Accept': 'text/event-stream'
         }
       });
 
@@ -95,9 +235,11 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
         throw new Error(errorData.message || 'Failed to delete account');
       }
 
-      const result = await deleteResponse.json() as { success: boolean; message?: string };
-      
-      if (result.success) {
+      const contentType = deleteResponse.headers.get('content-type') || '';
+
+      if (contentType.includes('text/event-stream')) {
+        await handleProgressStream(deleteResponse);
+
         // Log successful account deletion
         await auditService.logAccountDeletionSimple(
           user.uid,
@@ -112,20 +254,29 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
         );
 
         setSuccess(true);
-        
-        // Log out user and close modal after 3 seconds
-        setTimeout(async () => {
-          try {
-            await signOut(auth);
-            onClose();
-          } catch (logoutError) {
-            console.error('Error during logout:', logoutError);
-            // Still close the modal even if logout fails
-            onClose();
-          }
-        }, 3000);
+        scheduleLogout();
       } else {
-        throw new Error(result.message || 'Account deletion failed');
+        const result = await deleteResponse.json() as { success: boolean; message?: string };
+        if (result.success) {
+          updateProgress(1, 1, '');
+
+          await auditService.logAccountDeletionSimple(
+            user.uid,
+            user.email || '',
+            'success',
+            'user-requested',
+            'uid-email',
+            undefined,
+            undefined,
+            undefined,
+            true
+          );
+
+          setSuccess(true);
+          scheduleLogout();
+        } else {
+          throw new Error(result.message || 'Account deletion failed');
+        }
       }
       
     } catch (err) {
@@ -152,6 +303,17 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
   };
 
   if (!isOpen) return null;
+
+  const showProgress = isDeleting || success || (Boolean(error) && deletionProgress.totalCases > 0);
+  const progressStatus = success
+    ? 'All cases have been deleted.'
+    : error
+      ? (deletionProgress.currentCaseNumber
+          ? `Deletion stopped while processing case ${deletionProgress.currentCaseNumber}.`
+          : 'Deletion stopped before completion.')
+      : (deletionProgress.currentCaseNumber
+          ? `Deleting case ${deletionProgress.currentCaseNumber}...`
+          : 'Preparing account deletion...');
 
   return (
     <div 
@@ -216,6 +378,31 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
 
           {/* Divider */}
           <div className={styles.divider}></div>
+
+          {showProgress && (
+            <div className={styles.progressSection} aria-live="polite">
+              <div className={styles.progressHeader}>
+                <p className={styles.progressTitle}>Deletion Progress</p>
+                <p className={styles.progressMeta}>
+                  {deletionProgress.completedCases}/{deletionProgress.totalCases} cases
+                </p>
+              </div>
+              <div
+                className={styles.progressTrack}
+                role="progressbar"
+                aria-label="Account deletion progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={deletionProgress.percent}
+              >
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${deletionProgress.percent}%` }}
+                />
+              </div>
+              <p className={styles.progressStatus}>{progressStatus}</p>
+            </div>
+          )}
 
           {/* Success/Error Messages */}
           {error && (
