@@ -23,7 +23,23 @@ export const Terms = () => {
       <div className={styles.content}>
         <h1>Terms and Conditions</h1>
         <p className={styles.lastUpdated}>Last updated: February 20, 2026</p>
-        <p>Please read these terms and conditions carefully before using Our Service.</p>        
+        <p>Please read these terms and conditions carefully before using Our Service.</p>
+        <hr />
+          <br />
+        <section className={styles.section}>          
+          <h2>Here&apos;s the short version</h2>
+          <ul>
+            <li>Striae is for eligible forensic professionals and users must be 18 or older.</li>
+            <li>You are responsible for your account security and all activity under your account.</li>
+            <li>You keep control of your uploaded Data, and you should maintain your own backups.</li>
+            <li>Do not upload unlawful, harmful, infringing, or abusive content.</li>
+            <li>The Service is provided &quot;AS IS,&quot; and liability is limited to the extent allowed by law.</li>
+            <li>If any term conflicts with applicable open-source license terms for bundled components, those license terms (including Apache License 2.0) control for those components.</li>
+          </ul>
+          <p>This summary is provided for convenience only. The full Terms below are the governing legal agreement.</p>
+        </section>
+        <hr />
+          <br />
         <section className={styles.section}>
           <h2>Interpretation and Definitions</h2>
 <h3>Interpretation</h3>
