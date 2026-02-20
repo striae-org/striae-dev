@@ -25,7 +25,22 @@ export const Privacy = () => {
         <p className={styles.lastUpdated}>Last updated: September 12, 2025</p>        
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
         <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
-        
+        <hr />
+          <br />
+        <section className={styles.section}>
+          <h2>Here&apos;s the short version</h2>
+          <ul>
+            <li>We collect limited account and usage information to run, secure, and improve Striae.</li>
+            <li>We use service providers such as Cloudflare and Firebase for hosting, storage, and authentication.</li>
+            <li>You can request access, correction, or deletion of your personal data, subject to legal requirements.</li>
+            <li>We do not sell personal information in the ordinary sense and do not use social-media integrations.</li>
+            <li>The Service is for users 18+ in eligible forensic contexts, and we do not knowingly collect data from children.</li>
+            <li>California residents may have additional CCPA/CPRA rights, including opt-out and limitation rights.</li>
+          </ul>
+          <p>This summary is provided for convenience only. The full Privacy Policy below is the governing statement of our data practices.</p>
+        </section>
+        <hr />
+          <br />
         <section className={styles.section}>
           <h2>Interpretation and Definitions</h2>
           <h3>Interpretation</h3>
