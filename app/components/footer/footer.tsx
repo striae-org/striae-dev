@@ -14,7 +14,10 @@ export default function Footer() {
     <>
       <footer className={styles.footer}>
         <div className={styles.container}>
-          <nav className={styles.nav}>                            
+          <nav className={styles.nav}>          
+          <a href="https://blog.striae.org" target="_blank" rel="noopener noreferrer" className={styles.link}>
+            Blog
+          </a>          
           <Link 
             viewTransition
             prefetch="intent"

@@ -142,6 +142,15 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
                   className={styles.footerModalLink}>
                   Security Policy
                 </Link>
+                <Link 
+                  viewTransition
+                  prefetch="intent"
+                  to="https://blog.striae.org" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={styles.footerModalLink}>
+                  Striae Blog
+                </Link>
               </div>
               <div className={styles.badgeContainer}>                
                 <div className={styles.oinBadge}>
