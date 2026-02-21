@@ -16,7 +16,6 @@ import {
   themeStyles 
 } from '~/components/theme-provider/theme-provider';
 import Footer from '~/components/footer/footer';
-import MobileWarning from '~/components/mobile/mobile-warning';
 import { AuthProvider } from '~/components/auth/auth-provider';
 import { Icon } from '~/components/icon/icon';
 import { useEffect, useState } from 'react';
@@ -128,7 +127,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className="flex flex-col min-h-screen w-screen max-w-full overflow-x-hidden">
         <div id="__page-top" />
         <ThemeProvider theme={theme} className="">
-        {isAuthPath && <MobileWarning />}
         <main className="flex-grow w-full">
           {children}
         </main>
