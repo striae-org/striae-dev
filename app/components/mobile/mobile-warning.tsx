@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from '@remix-run/react';
 import styles from './mobile-warning.module.css';
 
 export default function MobileWarning() {
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
-  const location = useLocation();
 
   useEffect(() => {
     const checkMobileOrTablet = () => {
@@ -66,9 +64,7 @@ export default function MobileWarning() {
     return () => window.removeEventListener('resize', checkMobileOrTablet);
   }, []);
 
-  const isAuthPath = location.pathname.includes('auth');
-
-  if (!isMobileOrTablet || !isAuthPath) return null;
+  if (!isMobileOrTablet) return null;
 
   return (
     <div className={styles.mobileWarning}>

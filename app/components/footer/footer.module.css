@@ -3,7 +3,6 @@
   padding: var(--spaceL) 0;
   background-color: color-mix(in lab, var(--backgroundLight) 95%, transparent);
   border-top: 1px solid color-mix(in lab, var(--text) 10%, transparent);
-  margin-top: auto;
   transition: background-color var(--durationM) var(--bezierFastoutSlowin);
 }
 
