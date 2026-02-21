@@ -58,10 +58,12 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
     }, 3000);
   };
 
-  const updateProgress = (totalCases: number, completedCases: number, currentCaseNumber = '') => {
+  const updateProgress = (totalCases: number, completedCases: number, currentCaseNumber = '', forceComplete = false) => {
     const safeTotal = totalCases > 0 ? totalCases : 0;
     const safeCompleted = completedCases > safeTotal ? safeTotal : completedCases;
-    const percent = safeTotal > 0 ? Math.round((safeCompleted / safeTotal) * 100) : 0;
+    const percent = safeTotal > 0
+      ? Math.round((safeCompleted / safeTotal) * 100)
+      : (forceComplete ? 100 : 0);
 
     setDeletionProgress({
       totalCases: safeTotal,
@@ -140,8 +142,8 @@ export const DeleteAccount = ({ isOpen, onClose, user, company }: DeleteAccountP
             if (eventType === 'complete') {
               latestTotalCases = data.totalCases ?? latestTotalCases;
               latestCompletedCases = data.completedCases ?? latestCompletedCases;
-              updateProgress(latestTotalCases, latestCompletedCases, '');
               streamCompleted = data.success === true;
+              updateProgress(latestTotalCases, latestCompletedCases, '', streamCompleted && latestTotalCases === 0);
               if (!streamCompleted) {
                 streamError = data.message || 'Account deletion failed.';
               }
