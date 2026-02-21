@@ -87,7 +87,7 @@ export const Policy = () => {
           </ul>
         </section>
         <section>
-          <div className={styles.lastUpdated}>Last updated: September 1, 2025</div>
+          <div className={styles.lastUpdated}>Last updated: February 20, 2026</div>
         </section>
       </div>
     </div>
