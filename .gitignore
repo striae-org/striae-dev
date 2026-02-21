@@ -17,10 +17,9 @@ firebase-debug.log
 *.env
 *.dev.vars
 *.env.backup
-*.env.example
+*.example
 *.toml
 *.jsonc
 app/config
 app/config-example
 app/components/turnstile/keys.json
-app/components/turnstile/keys.json.example
