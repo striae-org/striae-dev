@@ -12,19 +12,19 @@ export const meta = () => {
 
 export const Policy = () => {
   return (
-    <div id="top" className={styles.container}>
+    <div id="top" className={`route-legal-container ${styles.container}`}>
       <Link 
         viewTransition
         prefetch="intent"
         to="/#top" 
-        className={styles.logoLink}>
-        <div className={styles.logo} />
+        className="route-brand-logo-link">
+        <div className={`route-brand-logo ${styles.logo}`} />
       </Link>
       <Link
         viewTransition
         prefetch="intent"
         to="/#top"
-        className={styles.returnLink}
+        className={`route-brand-return-link ${styles.returnLink}`}
         aria-label="Return to Striae"
       />
       <div className={styles.content}>
