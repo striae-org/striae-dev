@@ -14,12 +14,11 @@ archive/
 .firebaserc
 firebase-debug.log
 
-*.env
+*.env*
 *.dev.vars
-*.env.backup
-*.example
-*.toml
-*.jsonc
+*.toml*
+*.jsonc*
 app/config
 app/config-example
 app/components/turnstile/keys.json
+app/components/turnstile/keys.json.example
