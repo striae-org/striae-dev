@@ -158,7 +158,14 @@ export const Bugs = () => {
         to="/#top" 
         className={styles.logoLink}>
         <div className={styles.logo} />
-      </Link>      
+      </Link>
+      <Link
+        viewTransition
+        prefetch="intent"
+        to="/#top"
+        className={styles.returnLink}
+        aria-label="Return to Striae"
+      />
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Report a Bug</h1>
         <p className={styles.subtitle}>Help us improve Striae by reporting issues you encounter

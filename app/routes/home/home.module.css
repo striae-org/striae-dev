@@ -124,19 +124,6 @@
   transform: translateY(-1px);
 }
 
-.youtubeEmbed {
-  width: 100%;
-  max-width: 560px;
-  aspect-ratio: 16 / 9;
-  margin: 1.5em auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #000;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 .aboutSection {
   width: 100%;
   max-width: 900px;
@@ -241,9 +228,22 @@
   transform: translateY(-2px);
 }
 
+@media (max-width: 1024px) {
+  .signInButton {
+    display: none;
+  }
+}
+
 @media (max-width: 696px) {
   .container {
     padding: 0 var(--spaceM);
+  }
+
+  .content,
+  .title,
+  .buttonGroup { 
+    width: 90vw;
+    max-width: 90vw;
   }
 
   .title {

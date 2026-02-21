@@ -149,7 +149,14 @@ export const Support = () => {
         to="/#top" 
         className={styles.logoLink}>
         <div className={styles.logo} />
-      </Link>      
+      </Link>
+      <Link
+        viewTransition
+        prefetch="intent"
+        to="/#top"
+        className={styles.returnLink}
+        aria-label="Return to Striae"
+      />
       <div className={styles.formWrapper}>
         <h1 className={styles.title}>Contact Striae Support</h1>
         <p className={styles.subtitle}>Need help with Striae? Submit a ticket and we&apos;ll assist you.</p>

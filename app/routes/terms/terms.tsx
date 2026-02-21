@@ -20,6 +20,13 @@ export const Terms = () => {
         className={styles.logoLink}>
         <div className={styles.logo} />
       </Link>
+      <Link
+        viewTransition
+        prefetch="intent"
+        to="/#top"
+        className={styles.returnLink}
+        aria-label="Return to Striae"
+      />
       <div className={styles.content}>
         <h1>Terms and Conditions</h1>
         <p className={styles.lastUpdated}>Last updated: February 20, 2026</p>
