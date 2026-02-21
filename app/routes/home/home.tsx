@@ -5,7 +5,6 @@ import { Notice } from '~/components/notice/notice';
 import NoticeText from './NoticeText';
 import { baseMeta } from '~/utils/meta';
 import { Icon } from '~/components/icon/icon';
-import { BlogFeed } from '~/components/blog-feed/blog-feed';
 
 export const meta = () => {
   return baseMeta({
@@ -61,9 +60,6 @@ export default function Home() {
               Agency Registration
             </Link>            
           </div>         
-          
-          <BlogFeed />
-          
           <div className={styles.aboutSection}>
             <h2 className={styles.aboutTitle}>The Origins of Striae</h2>            
             <div className={styles.aboutContent}>              

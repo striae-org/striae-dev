@@ -3,8 +3,7 @@ const path = require('path');
 const packageJson = require('../package.json');
 
 const markdownFiles = [
-  '.github/SECURITY.md',  
-  'public/guides/developers/PROJECT_OVERVIEW.md',
+  '.github/SECURITY.md',    
   // Add other markdown files that need version updates
 ];
 
