@@ -151,24 +151,24 @@ export const Bugs = () => {
   const sending = state === 'submitting';    
 
   return (
-    <div id="top" className={styles.container}>
+    <div id="top" className={`route-centered-container ${styles.container}`}>
       <Link 
         viewTransition
         prefetch="intent"
         to="/#top" 
-        className={styles.logoLink}>
-        <div className={styles.logo} />
+        className="route-brand-logo-link">
+        <div className={`route-brand-logo ${styles.logo}`} />
       </Link>
       <Link
         viewTransition
         prefetch="intent"
         to="/#top"
-        className={styles.returnLink}
+        className={`route-brand-return-link ${styles.returnLink}`}
         aria-label="Return to Striae"
       />
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Report a Bug</h1>
-        <p className={styles.subtitle}>Help us improve Striae by reporting issues you encounter
+      <div className={`route-form-wrapper ${styles.formWrapper}`}>
+        <h1 className="route-form-title">Report a Bug</h1>
+        <p className="route-form-subtitle">Help us improve Striae by reporting issues you encounter
           <br />
           To avoid redundancy, please check the <a href="https://github.com/striae-org/striae/issues" target="_blank" rel="noopener noreferrer">current list of issues</a> first
         </p>
@@ -233,7 +233,7 @@ export const Bugs = () => {
             disabled={sending}
           />
           
-          <Turnstile className={styles.turnstile} />
+          <Turnstile className="route-turnstile" />
           
           <FormButton 
             type="submit"

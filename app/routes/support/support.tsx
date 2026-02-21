@@ -142,24 +142,24 @@ export const Support = () => {
   const sending = state === 'submitting';    
 
   return (
-    <div id="top" className={styles.container}>
+    <div id="top" className={`route-centered-container ${styles.container}`}>
       <Link 
         viewTransition
         prefetch="intent"
         to="/#top" 
-        className={styles.logoLink}>
-        <div className={styles.logo} />
+        className="route-brand-logo-link">
+        <div className={`route-brand-logo ${styles.logo}`} />
       </Link>
       <Link
         viewTransition
         prefetch="intent"
         to="/#top"
-        className={styles.returnLink}
+        className={`route-brand-return-link ${styles.returnLink}`}
         aria-label="Return to Striae"
       />
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Contact Striae Support</h1>
-        <p className={styles.subtitle}>Need help with Striae? Submit a ticket and we&apos;ll assist you.</p>
+      <div className={`route-form-wrapper ${styles.formWrapper}`}>
+        <h1 className="route-form-title">Contact Striae Support</h1>
+        <p className="route-form-subtitle">Need help with Striae? Submit a ticket and we&apos;ll assist you.</p>
         
         {actionData?.success ? (
           <FormMessage
@@ -225,11 +225,11 @@ export const Support = () => {
             />
             
             <Turnstile
-              className={styles.turnstile}
+              className="route-turnstile"
             />
             
             {actionData?.errors?.email && actionData.errors.email.includes('CAPTCHA') && (
-              <p className={styles.error}>{actionData.errors.email}</p>
+              <p className="route-captcha-error">{actionData.errors.email}</p>
             )}
             
             <FormButton

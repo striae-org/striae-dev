@@ -225,15 +225,22 @@ export const Signup = () => {
   };
 
   return (
-    <div id="top" className={styles.container}>
+    <div id="top" className={`route-centered-container ${styles.container}`}>
       <Link 
         to="/#top"
         viewTransition
-        className={styles.logoLink}>
-          <div className={styles.logo} />
-      </Link>      
-      <div className={styles.formWrapper}>
-        <h1 className={styles.title}>Register Agency for Striae Access</h1>
+        className="route-brand-logo-link">
+          <div className={`route-brand-logo ${styles.logo}`} />
+      </Link>
+      <Link
+        viewTransition
+        prefetch="intent"
+        to="/#top"
+        className={`route-brand-return-link ${styles.returnLink}`}
+        aria-label="Return to Striae"
+      />
+      <div className={`route-form-wrapper ${styles.formWrapper}`}>
+        <h1 className="route-form-title">Register Agency for Striae Access</h1>
          <button 
           type="button"
           onClick={() => setIsNoticeOpen(true)}
@@ -319,12 +326,12 @@ export const Signup = () => {
           />
 
           <Turnstile
-            className={styles.turnstile}
+            className="route-turnstile"
             theme="light"
           />
           
           {actionData?.errors?.email && actionData.errors.email.includes('CAPTCHA') && (
-            <p className={styles.error}>{actionData.errors.email}</p>
+            <p className="route-captcha-error">{actionData.errors.email}</p>
           )}
           
           <FormButton

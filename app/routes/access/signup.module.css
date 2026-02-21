@@ -1,68 +1,8 @@
 /* Layout & Container Styles */
-.container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: var(--spaceL);
-  z-index: var(--zIndex0);
-}
-
-.logo {
-  position: fixed;
-  top: var(--spaceL);
-  left: var(--spaceL);
-  width: 150px;
-  height: 150px;
-  background-image: url('/logo-dark.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  z-index: var(--zIndex2);
-  transition: transform var(--durationM) var(--bezierFastoutSlowin);
-}
-
-.logoLink {
-  position: absolute;
-  top: var(--spaceL);
-  left: var(--spaceL);
-  text-decoration: none;
-}
-
-.logo:hover {
-  transform: scale(1.05);
-}
-
 .formWrapper {
-  background: color-mix(in lab, var(--backgroundLight) 95%, transparent);
   padding: var(--space2XL) var(--space2XL) var(--space3XL) var(--space2XL);
-  border-radius: var(--spaceXS);
-  box-shadow: 0 var(--spaceXS) var(--spaceM) color-mix(in lab, var(--black) 10%, transparent);
-  width: 100%;
   max-width: var(--maxWidthS);
   margin-bottom: var(--spaceXL);
-}
-
-.title {
-  text-align: center;
-  color: var(--textTitle);
-  margin-bottom: var(--spaceXL);
-  font-size: var(--fontSizeH4);
-}
-
-/* CAPTCHA-specific error styling */
-.error {
-  color: var(--error);
-  text-align: center;
-  margin: var(--spaceS) 0;
-  font-size: var(--fontSizeBodyXS);
-}
-
-/* Turnstile CAPTCHA widget */
-.turnstile {
-  justify-self: flex-start;
-  margin: var(--spaceM) 0;
 }
 
 /* Notice button */
@@ -85,13 +25,18 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+
   .logo {
     display: none;
   }
 
-  .turnstile {
-    justify-self: center;
+  .returnLink {
+    display: block;
+    margin: 0 auto var(--spaceM);
   }
 
   .formWrapper {
