@@ -69,6 +69,15 @@ interface EmailData {
   Headers: Record<string, string>;
 }
 
+interface AccountDeletionProgressEvent {
+  event: 'start' | 'case-start' | 'case-complete' | 'email-sent' | 'complete' | 'error';
+  totalCases: number;
+  completedCases: number;
+  currentCaseNumber?: string;
+  success?: boolean;
+  message?: string;
+}
+
 const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'PAGES_CUSTOM_DOMAIN',
   'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
@@ -365,42 +374,76 @@ async function deleteSingleCase(env: Env, userUid: string, caseNumber: string): 
   }
 }
 
+async function executeUserDeletion(
+  env: Env,
+  userUid: string,
+  reportProgress?: (progress: AccountDeletionProgressEvent) => void
+): Promise<{ success: boolean; message: string; totalCases: number; completedCases: number }> {
+  // First, get the user data to include in the deletion emails
+  const userData = await env.USER_DB.get(userUid);
+  if (userData === null) {
+    throw new Error('User not found');
+  }
+
+  const userObject: UserData = JSON.parse(userData);
+  const ownedCases = (userObject.cases || []).map((caseItem) => caseItem.caseNumber);
+  const readOnlyCases = (userObject.readOnlyCases || []).map((caseItem) => caseItem.caseNumber);
+  const allCaseNumbers = [...ownedCases, ...readOnlyCases];
+  const totalCases = allCaseNumbers.length;
+  let completedCases = 0;
+
+  reportProgress?.({
+    event: 'start',
+    totalCases,
+    completedCases
+  });
+
+  for (const caseNumber of allCaseNumbers) {
+    reportProgress?.({
+      event: 'case-start',
+      totalCases,
+      completedCases,
+      currentCaseNumber: caseNumber
+    });
+
+    await deleteSingleCase(env, userUid, caseNumber);
+    completedCases += 1;
+
+    reportProgress?.({
+      event: 'case-complete',
+      totalCases,
+      completedCases,
+      currentCaseNumber: caseNumber
+    });
+  }
+
+  // Send deletion emails before deleting the account
+  await sendDeletionEmails(env, userObject);
+
+  reportProgress?.({
+    event: 'email-sent',
+    totalCases,
+    completedCases
+  });
+
+  // Delete the user account from the database
+  await env.USER_DB.delete(userUid);
+
+  return {
+    success: true,
+    message: 'Account successfully deleted and confirmation emails sent',
+    totalCases,
+    completedCases
+  };
+}
+
 async function handleDeleteUser(env: Env, userUid: string): Promise<Response> {
   try {
-    // First, get the user data to include in the deletion emails
-    const userData = await env.USER_DB.get(userUid);
-    if (userData === null) {
-      return new Response('User not found', { 
-        status: 404, 
-        headers: corsHeaders 
-      });
-    }
-
-    const userObject: UserData = JSON.parse(userData);
-    
-    // Delete all user's cases using the same logic as case-manage.ts
-    if (userObject.cases && userObject.cases.length > 0) {
-      for (const caseItem of userObject.cases) {
-        await deleteSingleCase(env, userUid, caseItem.caseNumber);
-      }
-    }
-    
-    // Delete all user's read-only cases
-    if (userObject.readOnlyCases && userObject.readOnlyCases.length > 0) {
-      for (const readOnlyCaseItem of userObject.readOnlyCases) {
-        await deleteSingleCase(env, userUid, readOnlyCaseItem.caseNumber);
-      }
-    }
-    
-    // Send deletion emails before deleting the account
-    await sendDeletionEmails(env, userObject);
-    
-    // Delete the user account from the database
-    await env.USER_DB.delete(userUid);
+    const result = await executeUserDeletion(env, userUid);
     
     return new Response(JSON.stringify({
-      success: true,
-      message: 'Account successfully deleted and confirmation emails sent'
+      success: result.success,
+      message: result.message
     }), {
       status: 200,
       headers: corsHeaders
@@ -408,6 +451,13 @@ async function handleDeleteUser(env: Env, userUid: string): Promise<Response> {
   } catch (error) {
     console.error('Delete user error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
+    if (errorMessage === 'User not found') {
+      return new Response('User not found', {
+        status: 404,
+        headers: corsHeaders
+      });
+    }
     
     // If it's an email error, we might want to still delete the account
     // and just log the email failure, or handle it differently based on requirements
@@ -429,6 +479,53 @@ async function handleDeleteUser(env: Env, userUid: string): Promise<Response> {
       headers: corsHeaders 
     });
   }
+}
+
+function handleDeleteUserWithProgress(env: Env, userUid: string): Response {
+  const sseHeaders: Record<string, string> = {
+    ...corsHeaders,
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive'
+  };
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const sendEvent = (payload: AccountDeletionProgressEvent) => {
+        controller.enqueue(encoder.encode(`event: ${payload.event}\ndata: ${JSON.stringify(payload)}\n\n`));
+      };
+
+      try {
+        const result = await executeUserDeletion(env, userUid, sendEvent);
+        sendEvent({
+          event: 'complete',
+          totalCases: result.totalCases,
+          completedCases: result.completedCases,
+          success: result.success,
+          message: result.message
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete user account';
+
+        sendEvent({
+          event: 'error',
+          totalCases: 0,
+          completedCases: 0,
+          success: false,
+          message: errorMessage
+        });
+      } finally {
+        controller.close();
+      }
+    }
+  });
+
+  return new Response(stream, {
+    status: 200,
+    headers: sseHeaders
+  });
 }
 
 async function handleAddCases(request: Request, env: Env, userUid: string): Promise<Response> {
@@ -540,10 +637,13 @@ export default {
       }
 
       // Handle user operations
+      const acceptsEventStream = request.headers.get('Accept')?.includes('text/event-stream') === true;
+      const streamProgress = url.searchParams.get('stream') === 'true' || acceptsEventStream;
+
       switch (request.method) {
         case 'GET': return handleGetUser(env, userUid);
         case 'PUT': return handleAddUser(request, env, userUid);
-        case 'DELETE': return handleDeleteUser(env, userUid);
+        case 'DELETE': return streamProgress ? handleDeleteUserWithProgress(env, userUid) : handleDeleteUser(env, userUid);
         default: return new Response('Method not allowed', {
           status: 405,
           headers: corsHeaders

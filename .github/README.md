@@ -83,6 +83,15 @@ For detailed instructions and troubleshooting, see the **[Complete Installation 
 
 ## 📋 Changelog
 
+## [2026-02-20] - *[Patch Release v1.1.3](https://github.com/striae-org/striae/releases/tag/v1.1.3)*
+
+- **📊 Account Deletion Progress Tracking** - Added real-time per-case deletion progress with streaming updates and a red progress bar in the delete-account modal
+- **✅ Zero-Case Completion Fix** - Successful account deletions with zero cases now correctly show `100%` progress
+- **📱 Public Route Display Refinements** - Adjusted mobile/tablet threshold and logo visibility behavior on home and related public-facing routes
+- **📄 Notice & Legal Content Updates** - Refined notice modal content/spacing and updated Terms/Privacy short-form text
+- **🔒 Security Metadata Maintenance** - Updated `security.txt` advisory link, expiry, and PGP key material
+- **🎨 CSS Baseline Consolidation** - Consolidated Tailwind/reset layering and refined global styling consistency
+
 ## [2026-02-15] - *[Patch Release v1.1.2](https://github.com/striae-org/striae/releases/tag/v1.1.2)*
 
 - **🔒 HTML Injection Prevention** - Added comprehensive HTML entity escaping to all email form submissions (signup, bug reports, support, account deletion) to prevent XSS attacks

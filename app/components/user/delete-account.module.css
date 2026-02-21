@@ -113,6 +113,58 @@
   border-radius: var(--spaceXS);
 }
 
+.progressSection {
+  margin: var(--spaceL) 0;
+  padding: var(--spaceM);
+  border-radius: var(--spaceXS);
+  border: 1px solid color-mix(in lab, var(--error) 25%, transparent);
+  background-color: color-mix(in lab, var(--error) 8%, transparent);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spaceM);
+  margin-bottom: var(--spaceS);
+}
+
+.progressTitle {
+  margin: 0;
+  color: var(--error);
+  font-weight: var(--fontWeightMedium);
+  font-size: var(--fontSizeBodyS);
+}
+
+.progressMeta {
+  margin: 0;
+  color: var(--textBody);
+  font-size: var(--fontSizeBodyS);
+}
+
+.progressTrack {
+  width: 100%;
+  height: var(--spaceM);
+  border-radius: var(--spaceXL);
+  overflow: hidden;
+  background-color: color-mix(in lab, var(--error) 18%, transparent);
+  border: 1px solid color-mix(in lab, var(--error) 25%, transparent);
+}
+
+.progressFill {
+  height: 100%;
+  width: 0;
+  background-color: var(--error);
+  transition: width var(--durationS) var(--bezierFastoutSlowin);
+}
+
+.progressStatus {
+  margin: var(--spaceS) 0 0;
+  color: var(--error);
+  font-size: var(--fontSizeBodyS);
+  font-weight: var(--fontWeightMedium);
+  word-break: break-word;
+}
+
 /* Success and Error Messages */
 .errorMessage {
   background-color: color-mix(in lab, var(--error) 10%, transparent);
