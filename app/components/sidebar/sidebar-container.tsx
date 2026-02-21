@@ -96,8 +96,7 @@ export const SidebarContainer: React.FC<SidebarContainerProps> = (props) => {
               </button>
             </div>
             <div className={styles.footerModalContent}>
-              <div className={styles.footerModalLinks}>
-                <a href="https://help.striae.org" target="_blank" rel="noopener noreferrer" className={styles.footerModalLink}>User&apos;s Guide</a>                
+              <div className={styles.footerModalLinks}>                                
                 <Link 
                   viewTransition
                   prefetch="intent"
