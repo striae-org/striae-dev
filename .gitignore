@@ -3,7 +3,6 @@ build/
 dist/
 
 tests/
-blog-posts/
 archive/
 
 .vscode
