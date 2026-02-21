@@ -23,7 +23,6 @@ interface ActionData {
       company?: string;
       agencyDomain?: string;
       emailConsent?: string;
-      codeAgreement?: string;
       agencyConsent?: string;
     };
 }
@@ -72,9 +71,8 @@ export async function action({ request, context }: { request: Request, context: 
   const company = formData.get('company') as string;
   const agencyDomain = formData.get('agencyDomain') as string;
   const emailConsent = formData.get('emailConsent') === 'on';
-  const codeAgreement = formData.get('codeAgreement') === 'on';
   const agencyConsent = formData.get('agencyConsent') === 'on';
-  const errors: { firstName?: string; lastName?: string; email?: string; company?: string; agencyDomain?: string; emailConsent?: string; codeAgreement?: string; agencyConsent?: string; } = {};
+  const errors: { firstName?: string; lastName?: string; email?: string; company?: string; agencyDomain?: string; emailConsent?: string; agencyConsent?: string; } = {};
 
   if (!firstName || firstName.length > MAX_NAME_LENGTH) {
     errors.firstName = 'Please enter your first name';
@@ -102,10 +100,6 @@ export async function action({ request, context }: { request: Request, context: 
 
   if (!emailConsent) {
     errors.emailConsent = 'You must agree to receive email communications';
-  }
-
-  if (!codeAgreement) {
-    errors.codeAgreement = 'You must agree to the Code of Professional Conduct';
   }
 
   if (!agencyConsent) {
@@ -159,7 +153,6 @@ export async function action({ request, context }: { request: Request, context: 
           <p><strong>Agency Name:</strong> ${escapeHtml(company)}</p>
           <p><strong>Agency Domain:</strong> ${escapeHtml(agencyDomain)}</p>
           <p><strong>Email Consent:</strong> ${emailConsent}</p>
-          <p><strong>Code Agreement:</strong> ${codeAgreement}</p>
           <p><strong>Agency Representation Confirmed:</strong> ${agencyConsent}</p>
           
           <hr style="margin: 20px 0; border: 1px solid #ccc;">
@@ -178,7 +171,6 @@ export async function action({ request, context }: { request: Request, context: 
         Agency Name: ${company}
         Agency Domain: ${agencyDomain}
         Email Consent: ${emailConsent}
-        Code Agreement: ${codeAgreement}
         Agency Representation Confirmed: ${agencyConsent}
         
         ==========================================
@@ -314,21 +306,6 @@ export const Signup = () => {
           <FormToggle
             name="emailConsent"
             label="I agree to receive emails from striae.org"
-            required
-            disabled={sending}
-          />
-
-          <FormToggle
-            name="codeAgreement"
-            label={
-              <span>
-                I have read the{' '}
-                <a href="https://help.striae.org/striae-users-guide/getting-started/code-of-responsible-use" target="_blank" rel="noopener noreferrer">
-                  Code of Responsible Use
-                </a>{' '}
-                and agree to abide by its terms.
-              </span>
-            }
             required
             disabled={sending}
           />
