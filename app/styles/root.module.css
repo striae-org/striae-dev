@@ -83,6 +83,39 @@
     color: color-mix(in lab, var(--primary) 85%, var(--black));
   }
 
+  .returnToTop {
+    position: fixed;
+    right: var(--space2XL);
+    bottom: var(--spaceM);
+    width: 50px;
+    height: 50px;
+    border: none;
+    background: transparent;
+    color: color-mix(in lab, var(--white) 60%, var(--textLight));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--zIndex4);
+    cursor: pointer;
+    transition: all var(--durationS) var(--bezierFastoutSlowin);
+  }
+
+  .returnToTop:hover {
+    color: var(--primary);
+  }
+
+  .returnToTopIcon {
+    transform: rotate(-90deg);
+    color: color-mix(in lab, var(--white) 60%, var(--textLight));
+    filter: drop-shadow(0 0 1px color-mix(in lab, var(--black) 45%, transparent))
+      drop-shadow(0 0 1px color-mix(in lab, var(--white) 45%, transparent));
+    transition: color var(--durationS) var(--bezierFastoutSlowin);
+  }
+
+  .returnToTop:hover .returnToTopIcon {
+    color: var(--primary);
+  }
+
   /* Global enhanced button hover effects */
   :global(button:not([data-no-enhance]):hover:not(:disabled)) {
     transform: translateY(-1px);

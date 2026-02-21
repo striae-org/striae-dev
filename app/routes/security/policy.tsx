@@ -20,6 +20,13 @@ export const Policy = () => {
         className={styles.logoLink}>
         <div className={styles.logo} />
       </Link>
+      <Link
+        viewTransition
+        prefetch="intent"
+        to="/#top"
+        className={styles.returnLink}
+        aria-label="Return to Striae"
+      />
       <div className={styles.content}>
         <h1>Security Policy</h1>
         

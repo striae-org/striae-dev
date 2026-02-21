@@ -34,6 +34,22 @@
   transform: scale(1.05);
 }
 
+.returnLink {
+  display: none;
+  width: 150px;
+  height: 150px;
+  background-image: url('/logo-dark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-bottom: var(--spaceM);
+  transition: transform var(--durationM) var(--bezierFastoutSlowin);
+}
+
+.returnLink:hover {
+  transform: scale(1.05);
+}
+
 .formWrapper {
   background: color-mix(in lab, var(--backgroundLight) 95%, transparent);
   padding: var(--space2XL);
@@ -60,9 +76,15 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 1000px) {
+@media (max-width: 1024px) {
   .logo {
     display: none;
+  }
+
+  .returnLink {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .formWrapper {
