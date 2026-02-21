@@ -2,6 +2,7 @@ node_modules
 build/
 dist/
 
+scripts/
 tests/
 archive/
 
@@ -16,7 +17,10 @@ firebase-debug.log
 *.env
 *.dev.vars
 *.env.backup
+*.env.example
 *.toml
 *.jsonc
 app/config
+app/config-example
 app/components/turnstile/keys.json
+app/components/turnstile/keys.json.example
