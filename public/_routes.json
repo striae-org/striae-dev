@@ -2,10 +2,7 @@
   "version": 1,
   "include": ["/*"],
   "exclude": [
-    "/favicon.ico",
-    "/guides/*",
-    "/release-notes/*",
-    "/blog-posts/*",
+    "/favicon.ico",    
     "/assets/*",
     "/build/*",
     "/*.css",
