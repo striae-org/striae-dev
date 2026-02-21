@@ -18,7 +18,8 @@ import {
 import Footer from '~/components/footer/footer';
 import MobileWarning from '~/components/mobile/mobile-warning';
 import { AuthProvider } from '~/components/auth/auth-provider';
-import { useEffect } from 'react';
+import { Icon } from '~/components/icon/icon';
+import { useEffect, useState } from 'react';
 import styles from '~/styles/root.module.css';
 import './tailwind.css';
 
@@ -52,6 +53,20 @@ export function getScrollRestorationKey({ pathname, search, hash }: { pathname: 
 export function Layout({ children }: { children: React.ReactNode }) {
   const theme = 'light';
   const location = useLocation();
+  const showReturnToTop = !location.pathname.startsWith('/auth');
+  const [hasScrolledPastThreshold, setHasScrolledPastThreshold] = useState(false);
+
+  const handleReturnToTop = () => {
+    const topAnchor = document.getElementById('__page-top');
+    if (topAnchor) {
+      topAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
 
   useEffect(() => {
     if (location.hash) {
@@ -63,6 +78,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
       }
     }
   }, [location.hash]);
+
+  useEffect(() => {
+    if (!showReturnToTop) {
+      setHasScrolledPastThreshold(false);
+      return;
+    }
+
+    const updateVisibility = () => {
+      const threshold = window.innerHeight * 0.2;
+      const documentScrollTop =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+
+      const activeElement = document.scrollingElement as HTMLElement | null;
+      const elementScrollTop = activeElement?.scrollTop ?? 0;
+      const scrollTop = Math.max(documentScrollTop, elementScrollTop);
+
+      setHasScrolledPastThreshold(scrollTop >= threshold);
+    };
+
+    requestAnimationFrame(updateVisibility);
+    window.addEventListener('scroll', updateVisibility, { passive: true });
+    document.addEventListener('scroll', updateVisibility, { passive: true, capture: true });
+    window.addEventListener('resize', updateVisibility);
+
+    return () => {
+      window.removeEventListener('scroll', updateVisibility);
+      document.removeEventListener('scroll', updateVisibility, true);
+      window.removeEventListener('resize', updateVisibility);
+    };
+  }, [showReturnToTop, location.pathname]);
 
   return (
     <html lang="en" data-theme={theme}>
@@ -76,11 +124,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="flex flex-col min-h-screen w-screen max-w-full overflow-x-hidden">
+        <div id="__page-top" />
         <ThemeProvider theme={theme} className="">
         <MobileWarning />
         <main className="flex-grow w-full">
           {children}
         </main>
+        {showReturnToTop && hasScrolledPastThreshold && (
+          <button
+            type="button"
+            className={styles.returnToTop}
+            onClick={handleReturnToTop}
+            aria-label="Return to top"
+          >
+            <Icon icon="chevron-right" className={styles.returnToTopIcon} size={20} />
+          </button>
+        )}
         <Footer />
         </ThemeProvider>        
         <Scripts />

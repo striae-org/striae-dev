@@ -31,17 +31,18 @@
 
 .returnLink {
   display: none;
-  width: 84px;
-  height: 84px;
+  width: 150px;
+  height: 150px;
   background-image: url('/logo-dark.png');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   margin-bottom: var(--spaceM);
+  transition: transform var(--durationM) var(--bezierFastoutSlowin);
 }
 
 .returnLink:hover {
-  opacity: 0.9;
+  transform: scale(1.05);
 }
 
 .content {
