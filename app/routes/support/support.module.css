@@ -77,18 +77,21 @@
 
 /* Mobile Responsive */
 @media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+
   .logo {
     display: none;
   }
 
   .returnLink {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto var(--spaceM);
   }
 
   .formWrapper {
     padding: var(--spaceL);
-    margin: var(--spaceM);
+    margin: var(--spaceM) auto;
   }
 }
