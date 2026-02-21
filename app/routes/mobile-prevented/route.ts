@@ -3,11 +3,11 @@ import { isMobileOrTabletUserAgent } from '~/utils/device-detection';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const userAgent = request.headers.get('user-agent') ?? '';
-	if (isMobileOrTabletUserAgent(userAgent)) {
-		throw redirect('/mobile-prevented');
+	if (!isMobileOrTabletUserAgent(userAgent)) {
+		throw redirect('/auth');
 	}
 
 	return null;
 };
 
-export { Login as default, meta } from './login';
+export { MobilePrevented as default, meta } from './mobilePrevented';
