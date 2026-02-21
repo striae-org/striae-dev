@@ -53,7 +53,9 @@ export function getScrollRestorationKey({ pathname, search, hash }: { pathname: 
 export function Layout({ children }: { children: React.ReactNode }) {
   const theme = 'light';
   const location = useLocation();
-  const showReturnToTop = !location.pathname.startsWith('/auth');
+  const isAuthPath = location.pathname.startsWith('/auth');
+  const showReturnToTop = !isAuthPath;
+  const showFooter = !isAuthPath;
   const [hasScrolledPastThreshold, setHasScrolledPastThreshold] = useState(false);
 
   const handleReturnToTop = () => {
@@ -126,7 +128,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className="flex flex-col min-h-screen w-screen max-w-full overflow-x-hidden">
         <div id="__page-top" />
         <ThemeProvider theme={theme} className="">
-        <MobileWarning />
+        {isAuthPath && <MobileWarning />}
         <main className="flex-grow w-full">
           {children}
         </main>
@@ -140,7 +142,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Icon icon="chevron-right" className={styles.returnToTopIcon} size={20} />
           </button>
         )}
-        <Footer />
+        {showFooter && <Footer />}
         </ThemeProvider>        
         <Scripts />
         <ScrollRestoration 
